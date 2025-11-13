@@ -23,6 +23,7 @@ import ReviewManagement from '@/components/ReviewManagement';
 import { BlogManagement } from '@/components/BlogManagement';
 import { BlogCommentManagement } from '@/components/BlogCommentManagement';
 import { FeaturedSitesManagement } from '@/components/FeaturedSitesManagement';
+import { AIAssistant } from '@/components/AIAssistant';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
