@@ -1,8 +1,7 @@
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, Shield } from 'lucide-react';
-import fanatikLogo from '@/assets/fanatik-logo.png';
+import { LogOut, Shield, Trophy } from 'lucide-react';
 
 export const Header = () => {
   const { user, isAdmin, signOut } = useAuth();
@@ -11,8 +10,9 @@ export const Header = () => {
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center justify-between">
-          <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={fanatikLogo} alt="Fanatik" className="h-10 w-auto" />
+          <NavLink to="/" className="flex items-center gap-2 text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <Trophy className="w-7 h-7 text-primary" />
+            <span>BahisSiteleri</span>
           </NavLink>
 
           <div className="flex items-center gap-6">
