@@ -74,6 +74,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('manage');
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   useEffect(() => {
@@ -261,6 +262,32 @@ export default function Admin() {
           </p>
         </div>
 
+        {/* Quick Action Buttons */}
+        <div className="flex flex-wrap gap-4 justify-center mb-8">
+          <Button 
+            size="lg" 
+            onClick={() => setActiveTab('manage')}
+            className="gap-2 shadow-lg hover:shadow-xl transition-shadow"
+          >
+            <Upload className="w-5 h-5" />
+            Yeni Site Ekle
+          </Button>
+          <Button 
+            size="lg" 
+            variant="secondary"
+            onClick={() => setActiveTab('reviews')}
+            className="gap-2 shadow-lg hover:shadow-xl transition-shadow"
+          >
+            <CheckSquare className="w-5 h-5" />
+            Yorumları Onayla
+            {dashboardStats && dashboardStats.pendingReviews > 0 && (
+              <span className="ml-1 px-2 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
+                {dashboardStats.pendingReviews}
+              </span>
+            )}
+          </Button>
+        </div>
+
         {/* Dashboard Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg transition-shadow">
@@ -330,7 +357,7 @@ export default function Admin() {
           </Card>
         </div>
 
-        <Tabs defaultValue="manage" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3"><TabsTrigger value="manage">Site Yönetimi</TabsTrigger><TabsTrigger value="reviews">Yorumlar</TabsTrigger><TabsTrigger value="stats">İstatistikler</TabsTrigger></TabsList>
           <TabsContent value="manage" className="space-y-8">
             <Card><CardHeader><CardTitle>{editingId ? 'Site Düzenle' : 'Yeni Site Ekle'}</CardTitle></CardHeader><CardContent><form onSubmit={handleSubmit} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><div><Label htmlFor="name">Site Adı</Label><Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div><div><Label htmlFor="rating">Puan</Label><Input id="rating" type="number" min="0" max="5" step="0.1" value={formData.rating} onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })} required /></div><div className="md:col-span-2"><Label htmlFor="bonus">Bonus</Label><Input id="bonus" value={formData.bonus} onChange={(e) => setFormData({ ...formData, bonus: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="features">Özellikler</Label><Input id="features" value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="affiliate_link">Link</Label><Input id="affiliate_link" value={formData.affiliate_link} onChange={(e) => setFormData({ ...formData, affiliate_link: e.target.value })} required /></div><div><Label htmlFor="email">Email</Label><Input id="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /></div><div><Label htmlFor="whatsapp">WhatsApp</Label><Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} /></div><div><Label htmlFor="telegram">Telegram</Label><Input id="telegram" value={formData.telegram} onChange={(e) => setFormData({ ...formData, telegram: e.target.value })} /></div><div><Label htmlFor="twitter">Twitter</Label><Input id="twitter" value={formData.twitter} onChange={(e) => setFormData({ ...formData, twitter: e.target.value })} /></div><div><Label htmlFor="instagram">Instagram</Label><Input id="instagram" value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} /></div><div><Label htmlFor="facebook">Facebook</Label><Input id="facebook" value={formData.facebook} onChange={(e) => setFormData({ ...formData, facebook: e.target.value })} /></div><div><Label htmlFor="youtube">YouTube</Label><Input id="youtube" value={formData.youtube} onChange={(e) => setFormData({ ...formData, youtube: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="logo">Logo</Label><Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} /></div></div><div className="flex gap-2"><Button type="submit" disabled={createSiteMutation.isPending || updateSiteMutation.isPending}>{createSiteMutation.isPending || updateSiteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : editingId ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}{editingId ? 'Güncelle' : 'Ekle'}</Button>{editingId && <Button type="button" variant="outline" onClick={resetForm}><X className="w-4 h-4 mr-2" />İptal</Button>}</div></form></CardContent></Card>
