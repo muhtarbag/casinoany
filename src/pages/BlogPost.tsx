@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { BlogCommentForm } from '@/components/BlogCommentForm';
 import { BlogCommentList } from '@/components/BlogCommentList';
 import { BlogRelatedSites } from '@/components/BlogRelatedSites';
@@ -149,6 +150,35 @@ export default function BlogPost() {
           keywords: post.tags?.join(', '),
           inLanguage: 'tr-TR',
           articleBody: post.excerpt,
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Ana Sayfa',
+                item: window.location.origin,
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Blog',
+                item: `${window.location.origin}/blog`,
+              },
+              ...(post.category ? [{
+                '@type': 'ListItem',
+                position: 3,
+                name: post.category,
+                item: `${window.location.origin}/blog?category=${post.category}`,
+              }] : []),
+              {
+                '@type': 'ListItem',
+                position: post.category ? 4 : 3,
+                name: post.title,
+                item: `${window.location.origin}/blog/${post.slug}`,
+              },
+            ],
+          },
         }}
       />
       
@@ -156,6 +186,15 @@ export default function BlogPost() {
       
       <main className="container mx-auto px-4 py-8">
         <article className="max-w-4xl mx-auto">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb 
+            items={[
+              { label: 'Blog', href: '/blog' },
+              ...(post.category ? [{ label: post.category, href: `/blog?category=${post.category}` }] : []),
+              { label: post.title }
+            ]}
+          />
+
           {/* Back Button */}
           <Button
             variant="ghost"

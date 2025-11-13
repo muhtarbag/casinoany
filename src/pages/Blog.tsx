@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -72,12 +73,16 @@ const Blog = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-12">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Bahis siteleri hakkında en güncel haberler, ipuçları ve stratejiler
-          </p>
-        </header>
+        <div className="max-w-6xl mx-auto">
+          {/* Breadcrumb */}
+          <Breadcrumb items={[{ label: 'Blog' }]} />
+          
+          <header className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Bahis siteleri hakkında en güncel haberler, ipuçları ve stratejiler
+            </p>
+          </header>
 
         <div className="mb-8 space-y-4">
           <div className="relative max-w-md mx-auto">
@@ -198,6 +203,7 @@ const Blog = () => {
             ))}
           </div>
         )}
+        </div>
       </main>
 
       <Footer />
