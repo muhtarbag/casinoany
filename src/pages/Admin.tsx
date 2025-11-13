@@ -10,10 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles, Search, Calendar } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles, Search, Calendar, ChevronDown, Settings, FileText, BarChart3, LayoutDashboard } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -108,7 +109,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState('manage');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
@@ -671,104 +672,190 @@ export default function Admin() {
           </Card>
         </div>
 
-        {/* Extended Statistics - Row 2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blog Yazıları</CardTitle>
-              <MessageSquare className="h-4 w-4 text-purple-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.totalBlogPosts || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {dashboardStats?.publishedBlogs || 0} yayında
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border-cyan-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blog Görüntüleme</CardTitle>
-              <Eye className="h-4 w-4 text-cyan-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.totalBlogViews.toLocaleString() || 0}</div>
-              <p className="text-xs text-muted-foreground">Toplam okuma</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blog Yorumları</CardTitle>
-              <MessageSquare className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.totalBlogComments || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {dashboardStats?.pendingComments || 0} beklemede
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tıklama Oranı (CTR)</CardTitle>
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.ctr || '0'}%</div>
-              <p className="text-xs text-muted-foreground">Dönüşüm performansı</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Site Görüntüleme</CardTitle>
-              <Eye className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.totalViews.toLocaleString() || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalViews / dashboardStats.totalSites) : 0} / site
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Affiliate Tıklama</CardTitle>
-              <MousePointer className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboardStats?.totalClicks.toLocaleString() || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalClicks / dashboardStats.totalSites) : 0} / site
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin">
-            <TabsList className="inline-flex h-auto flex-nowrap w-auto min-w-full justify-start gap-1">
-              <TabsTrigger value="manage" className="whitespace-nowrap">Site Yönetimi</TabsTrigger>
-              <TabsTrigger value="featured" className="whitespace-nowrap">Öne Çıkanlar</TabsTrigger>
-              <TabsTrigger value="settings" className="whitespace-nowrap">Ayarlar</TabsTrigger>
-              <TabsTrigger value="casino" className="whitespace-nowrap">Casino İçerik</TabsTrigger>
-              <TabsTrigger value="analytics" className="whitespace-nowrap">İçerik Analitiği</TabsTrigger>
-              <TabsTrigger value="traffic" className="whitespace-nowrap">Analytics</TabsTrigger>
-              <TabsTrigger value="blog" className="whitespace-nowrap">Blog</TabsTrigger>
-              <TabsTrigger value="planner" className="whitespace-nowrap">İçerik Planlama</TabsTrigger>
-              <TabsTrigger value="keywords" className="whitespace-nowrap">Keyword Performans</TabsTrigger>
-              <TabsTrigger value="reviews" className="whitespace-nowrap">Yorumlar</TabsTrigger>
-              <TabsTrigger value="ai" className="whitespace-nowrap">AI Asistan</TabsTrigger>
-              <TabsTrigger value="history" className="whitespace-nowrap">Analiz Geçmişi</TabsTrigger>
-              <TabsTrigger value="stats" className="whitespace-nowrap">İstatistikler</TabsTrigger>
+            <TabsList className="inline-flex h-auto flex-nowrap w-auto min-w-full justify-start gap-2">
+              {/* Genel Bakış - Ana Tab */}
+              <TabsTrigger value="dashboard" className="whitespace-nowrap gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                Genel Bakış
+              </TabsTrigger>
+
+              {/* Site Yönetimi Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant={['manage', 'featured', 'settings'].includes(activeTab) ? 'default' : 'ghost'}
+                    size="sm"
+                    className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Site Yönetimi
+                    <ChevronDown className="w-4 h-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => setActiveTab('manage')}>
+                    Site Yönetimi
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('featured')}>
+                    Öne Çıkanlar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                    Ayarlar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* İçerik Yönetimi Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant={['casino', 'blog', 'planner', 'reviews'].includes(activeTab) ? 'default' : 'ghost'}
+                    size="sm"
+                    className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
+                  >
+                    <FileText className="w-4 h-4" />
+                    İçerik Yönetimi
+                    <ChevronDown className="w-4 h-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => setActiveTab('casino')}>
+                    Casino İçerik
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('blog')}>
+                    Blog
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('planner')}>
+                    İçerik Planlama
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('reviews')}>
+                    Yorumlar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Analizler Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant={['analytics', 'traffic', 'keywords', 'stats', 'ai', 'history'].includes(activeTab) ? 'default' : 'ghost'}
+                    size="sm"
+                    className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    Analizler & AI
+                    <ChevronDown className="w-4 h-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => setActiveTab('analytics')}>
+                    İçerik Analitiği
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('traffic')}>
+                    Analytics
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('keywords')}>
+                    Keyword Performans
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('stats')}>
+                    İstatistikler
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('ai')}>
+                    AI Asistan
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('history')}>
+                    Analiz Geçmişi
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TabsList>
           </div>
+          
+          {/* Dashboard Tab Content */}
+          <TabsContent value="dashboard" className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Toplam Site</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalSites || 0}</div>
+                  <p className="text-xs text-muted-foreground">Aktif bahis siteleri</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Toplam Görüntüleme</CardTitle>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalViews.toLocaleString() || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalViews / dashboardStats.totalSites) : 0} / site
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Toplam Tıklama</CardTitle>
+                  <MousePointer className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalClicks.toLocaleString() || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalClicks / dashboardStats.totalSites) : 0} / site
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hızlı Eylemler</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button onClick={() => setActiveTab('manage')} variant="outline" className="w-full justify-start">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Site Ekle
+                  </Button>
+                  <Button onClick={() => setActiveTab('blog')} variant="outline" className="w-full justify-start">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Blog Yazısı Ekle
+                  </Button>
+                  <Button onClick={() => setActiveTab('reviews')} variant="outline" className="w-full justify-start">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Yorumları İncele
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Son Aktiviteler</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Son güncelleme: {new Date().toLocaleDateString('tr-TR')}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Toplam blog: {dashboardStats?.totalBlogPosts || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Bekleyen yorumlar: {dashboardStats?.pendingReviews || 0}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
           <TabsContent value="manage" className="space-y-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
