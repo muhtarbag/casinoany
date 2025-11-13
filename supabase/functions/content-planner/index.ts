@@ -146,6 +146,17 @@ Niş: ${niche || 'Online bahis ve casino'}
   });
 
   const result = await response.json();
+  
+  console.log('Gaps Analysis API Response:', JSON.stringify(result));
+  
+  if (!result.choices || !result.choices[0]) {
+    throw new Error('AI API yanıtı beklenmedik formatta');
+  }
+
+  if (!result.choices[0].message?.tool_calls?.[0]?.function?.arguments) {
+    throw new Error('AI içerik analizi yapamadı. Lütfen tekrar deneyin.');
+  }
+
   return JSON.parse(result.choices[0].message.tool_calls[0].function.arguments);
 }
 
@@ -235,6 +246,17 @@ Her içerik için:
   });
 
   const result = await response.json();
+  
+  console.log('Calendar API Response:', JSON.stringify(result));
+  
+  if (!result.choices || !result.choices[0]) {
+    throw new Error('AI API yanıtı beklenmedik formatta');
+  }
+
+  if (!result.choices[0].message?.tool_calls?.[0]?.function?.arguments) {
+    throw new Error('AI takvim oluşturamadı. Lütfen tekrar deneyin.');
+  }
+
   return JSON.parse(result.choices[0].message.tool_calls[0].function.arguments);
 }
 
@@ -318,5 +340,16 @@ Her konu için:
   });
 
   const result = await response.json();
+  
+  console.log('Topics Suggestion API Response:', JSON.stringify(result));
+  
+  if (!result.choices || !result.choices[0]) {
+    throw new Error('AI API yanıtı beklenmedik formatta');
+  }
+
+  if (!result.choices[0].message?.tool_calls?.[0]?.function?.arguments) {
+    throw new Error('AI konu önerisi oluşturamadı. Lütfen tekrar deneyin.');
+  }
+
   return JSON.parse(result.choices[0].message.tool_calls[0].function.arguments);
 }
