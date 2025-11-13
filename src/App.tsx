@@ -48,10 +48,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 dakika
-      gcTime: 10 * 60 * 1000, // 10 dakika (eski adı: cacheTime)
-      refetchOnWindowFocus: false, // Pencere odaklandığında otomatik yenilemeyi kapat
-      refetchOnMount: false, // Mount olduğunda otomatik yenilemeyi kapat
-      retry: 1, // Hata durumunda sadece 1 kez tekrar dene
+      gcTime: 10 * 60 * 1000, // 10 dakika
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+      networkMode: 'offlineFirst', // Offline-first yaklaşım
     },
   },
 });

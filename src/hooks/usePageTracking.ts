@@ -27,11 +27,18 @@ export const usePageTracking = () => {
   const location = useLocation();
   const startTimeRef = useRef<number>(Date.now());
   const scrollDepthRef = useRef<number>(0);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    // Track page view on mount and route change
-    startTimeRef.current = Date.now();
-    trackPageView();
+    // Reset scroll depth on route change
+    scrollDepthRef.current = 0;
+    
+    // Only track on initial mount, not on every route change
+    if (isInitialMount.current) {
+      startTimeRef.current = Date.now();
+      trackPageView();
+      isInitialMount.current = false;
+    }
 
     // Throttled scroll depth tracking (500ms)
     const handleScroll = throttle(() => {
@@ -40,23 +47,16 @@ export const usePageTracking = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollPercentage = Math.round((scrollTop / (documentHeight - windowHeight)) * 100);
       
-      if (scrollPercentage > scrollDepthRef.current) {
+      if (scrollPercentage > scrollDepthRef.current && scrollPercentage % 25 === 0) {
         scrollDepthRef.current = scrollPercentage;
-        if (scrollPercentage % 25 === 0) { // Track at 25%, 50%, 75%, 100%
-          analytics.trackScroll(scrollPercentage);
-        }
+        analytics.trackScroll(scrollPercentage);
       }
-    }, 500); // 500ms throttle
+    }, 500);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Track page duration on unmount or route change
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
-      if (duration > 0) {
-        trackPageView(location.pathname, document.title, duration);
-      }
     };
   }, [location]);
 };

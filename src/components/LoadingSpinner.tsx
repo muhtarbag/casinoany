@@ -31,7 +31,7 @@ export const LoadingSpinner = ({
 
   if (fullScreen) {
     return (
-      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+      <div className="min-h-[400px] flex items-center justify-center">
         {content}
       </div>
     );
