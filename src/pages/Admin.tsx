@@ -13,10 +13,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles, Search } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles, Search, Calendar } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
 import SiteStats from '@/components/SiteStats';
 import BlogStats from '@/components/BlogStats';
 import ReviewManagement from '@/components/ReviewManagement';
@@ -60,7 +62,20 @@ const SortableItem = ({ id, site, editingId, selectedSites, onToggleSelect, onEd
         <div className="flex-1">
           <p className="font-medium">{site.name}</p>
           <p className="text-xs text-muted-foreground">Puan: {site.rating} | {site.features?.length || 0} özellik</p>
-          {stats && <p className="text-xs text-muted-foreground mt-1"><Eye className="inline w-3 h-3 mr-1" />{stats.views || 0} görüntülenme | <MousePointer className="inline w-3 h-3 ml-2 mr-1" />{stats.clicks || 0} tıklama</p>}
+          <div className="flex items-center gap-4 flex-wrap">
+            {stats && (
+              <p className="text-xs text-muted-foreground mt-1">
+                <Eye className="inline w-3 h-3 mr-1" />{stats.views || 0} görüntülenme | 
+                <MousePointer className="inline w-3 h-3 ml-2 mr-1" />{stats.clicks || 0} tıklama
+              </p>
+            )}
+            {site.created_at && (
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                {format(new Date(site.created_at), 'dd MMM yyyy', { locale: tr })}
+              </p>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex gap-2">
