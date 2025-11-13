@@ -532,12 +532,13 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="manage">Site Yönetimi</TabsTrigger>
             <TabsTrigger value="featured">Öne Çıkanlar</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="reviews">Yorumlar</TabsTrigger>
             <TabsTrigger value="ai">AI Asistan</TabsTrigger>
+            <TabsTrigger value="history">Analiz Geçmişi</TabsTrigger>
             <TabsTrigger value="stats">İstatistikler</TabsTrigger>
           </TabsList>
           <TabsContent value="manage" className="space-y-8">
@@ -596,6 +597,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="ai">
             <AIAssistant />
+          </TabsContent>
+          <TabsContent value="history">
+            <AnalysisHistory />
           </TabsContent>
         </Tabs>
       </main>

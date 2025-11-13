@@ -108,7 +108,7 @@ export const AIAssistant = () => {
       setAnalysis(data.data);
       
       // Save to history
-      await supabase.from('ai_analysis_history').insert({
+      await supabase.from('ai_analysis_history' as any).insert({
         analysis_type: 'seo',
         score: data.data.score,
         summary: data.data.summary,
@@ -119,7 +119,7 @@ export const AIAssistant = () => {
         ux_data: data.data.ux,
         actions: data.data.actions,
         provider: data.provider || 'openai',
-      });
+      } as any);
 
       toast({
         title: "Analiz Tamamlandı",
