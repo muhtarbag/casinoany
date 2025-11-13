@@ -18,6 +18,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import SiteStats from '@/components/SiteStats';
+import BlogStats from '@/components/BlogStats';
 import ReviewManagement from '@/components/ReviewManagement';
 import { BlogManagement } from '@/components/BlogManagement';
 import { BlogCommentManagement } from '@/components/BlogCommentManagement';
@@ -576,7 +577,20 @@ export default function Admin() {
             </div>
           </TabsContent>
           <TabsContent value="reviews"><ReviewManagement /></TabsContent>
-          <TabsContent value="stats"><SiteStats /></TabsContent>
+          <TabsContent value="stats">
+            <Tabs defaultValue="site-stats" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="site-stats">Site İstatistikleri</TabsTrigger>
+                <TabsTrigger value="blog-stats">Blog İstatistikleri</TabsTrigger>
+              </TabsList>
+              <TabsContent value="site-stats" className="mt-6">
+                <SiteStats />
+              </TabsContent>
+              <TabsContent value="blog-stats" className="mt-6">
+                <BlogStats />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
         </Tabs>
       </main>
       <Footer />
