@@ -386,25 +386,16 @@ export default function SiteDetail() {
           </CardContent>
         </Card>
 
-        {/* Review Form */}
-        {user ? (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Yorum Yap</CardTitle>
-              <CardDescription>Deneyimlerinizi diğer kullanıcılarla paylaşın</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ReviewForm siteId={id!} />
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="mb-8">
-            <CardContent className="text-center py-8">
-              <p className="text-muted-foreground mb-4">Yorum yapmak için giriş yapmalısınız</p>
-              <Button onClick={() => navigate("/login")}>Giriş Yap</Button>
-            </CardContent>
-          </Card>
-        )}
+        {/* Review Form - Anonim */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Yorum Yap</CardTitle>
+            <CardDescription>Deneyimlerinizi diğer kullanıcılarla paylaşın (Üyelik gerektirmez)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ReviewForm siteId={id!} />
+          </CardContent>
+        </Card>
 
         {/* Recommended Sites */}
         <RecommendedSites currentSiteId={id!} currentSiteFeatures={site.features || []} />
