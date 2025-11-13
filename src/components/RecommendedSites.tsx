@@ -39,6 +39,7 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
 
   // Randomly select 4 sites - shuffles every time component mounts or allSites changes
   const [recommendedSites, setRecommendedSites] = useState<any[]>([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!allSites || allSites.length === 0) {
@@ -46,9 +47,15 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
       return;
     }
     
-    // Shuffle array and take first 4
-    const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-    setRecommendedSites(shuffled.slice(0, 4));
+    // Start fade-out transition
+    setIsTransitioning(true);
+    
+    // After fade-out completes, update sites and fade-in
+    setTimeout(() => {
+      const shuffled = [...allSites].sort(() => Math.random() - 0.5);
+      setRecommendedSites(shuffled.slice(0, 4));
+      setIsTransitioning(false);
+    }, 300); // Match fade-out duration
   }, [allSites, currentSiteId]); // Re-shuffle when site changes or allSites changes
 
   if (isLoading) {
@@ -80,7 +87,7 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
         <CardDescription>Kullanıcılar bu sitelere de baktı</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
           {recommendedSites.map((site: any) => (
             <BettingSiteCard
               key={site.id}
