@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
@@ -8,10 +8,21 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Loader2, Search, X, Star, Filter } from 'lucide-react';
 
-export const PixelGrid = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+interface PixelGridProps {
+  initialSearchTerm?: string;
+}
+
+export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [minRating, setMinRating] = useState(0);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+
+  // Update search term when prop changes
+  useEffect(() => {
+    if (initialSearchTerm) {
+      setSearchTerm(initialSearchTerm);
+    }
+  }, [initialSearchTerm]);
 
   const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites'],
