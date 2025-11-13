@@ -187,12 +187,13 @@ export const PixelGrid = () => {
           {filteredSites.map((site) => (
             <BettingSiteCard
               key={site.id}
+              id={site.id}
               name={site.name}
-              logo_url={site.logo_url || undefined}
+              logo={site.logo_url || undefined}
               rating={Number(site.rating) || 0}
               bonus={site.bonus || undefined}
               features={site.features || undefined}
-              affiliate_link={site.affiliate_link}
+              affiliateUrl={site.affiliate_link}
               email={site.email || undefined}
               whatsapp={site.whatsapp || undefined}
               telegram={site.telegram || undefined}

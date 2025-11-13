@@ -1,3 +1,6 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -5,12 +8,13 @@ import { Star, ExternalLink, Mail, MessageCircle, Send } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 
 interface BettingSiteCardProps {
+  id?: string;
   name: string;
-  logo_url?: string;
+  logo?: string;
   rating: number;
   bonus?: string;
   features?: string[];
-  affiliate_link: string;
+  affiliateUrl: string;
   email?: string;
   whatsapp?: string;
   telegram?: string;
@@ -21,12 +25,13 @@ interface BettingSiteCardProps {
 }
 
 export const BettingSiteCard = ({
+  id,
   name,
-  logo_url,
+  logo,
   rating,
   bonus,
   features,
-  affiliate_link,
+  affiliateUrl,
   email,
   whatsapp,
   telegram,
@@ -35,6 +40,48 @@ export const BettingSiteCard = ({
   facebook,
   youtube,
 }: BettingSiteCardProps) => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const trackClickMutation = useMutation({
+    mutationFn: async () => {
+      if (!id) return;
+
+      // Get current stats
+      const { data: stats } = await supabase
+        .from('site_stats')
+        .select('*')
+        .eq('site_id', id)
+        .maybeSingle();
+
+      if (stats) {
+        await supabase
+          .from('site_stats')
+          .update({ clicks: stats.clicks + 1 })
+          .eq('site_id', id);
+      } else {
+        await supabase
+          .from('site_stats')
+          .insert({ site_id: id, clicks: 1, views: 0 });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-stats'] });
+    },
+  });
+
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/site/${id}`);
+    }
+  };
+
+  const handleAffiliateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    trackClickMutation.mutate();
+    window.open(affiliateUrl, '_blank');
+  };
+
   const socialLinks = [
     { url: email, icon: Mail, label: 'Email', href: `mailto:${email}` },
     { url: whatsapp, icon: MessageCircle, label: 'WhatsApp', href: `https://wa.me/${whatsapp}` },
@@ -46,12 +93,15 @@ export const BettingSiteCard = ({
   ].filter(link => link.url);
 
   return (
-    <Card className="group overflow-hidden bg-card border-border hover:border-primary transition-all duration-300 hover:shadow-glow">
+    <Card 
+      className="group overflow-hidden bg-card border-border hover:border-primary transition-all duration-300 hover:shadow-glow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {logo_url ? (
-              <img src={logo_url} alt={name} className="w-12 h-12 object-contain rounded" />
+            {logo ? (
+              <img src={logo} alt={name} className="w-12 h-12 object-contain rounded" />
             ) : (
               <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-lg font-bold">
                 {name.charAt(0)}
@@ -104,6 +154,7 @@ export const BettingSiteCard = ({
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-muted hover:bg-muted-foreground/20 transition-colors"
                   title={link.label}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -114,12 +165,13 @@ export const BettingSiteCard = ({
       </CardContent>
 
       <CardFooter>
-        <a href={affiliate_link} target="_blank" rel="noopener noreferrer" className="w-full">
-          <Button className="w-full bg-gradient-primary group-hover:shadow-glow transition-all">
-            Siteye Git
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Button>
-        </a>
+        <Button 
+          onClick={handleAffiliateClick}
+          className="w-full bg-gradient-primary group-hover:shadow-glow transition-all"
+        >
+          Siteye Git
+          <ExternalLink className="w-4 h-4 ml-2" />
+        </Button>
       </CardFooter>
     </Card>
   );
