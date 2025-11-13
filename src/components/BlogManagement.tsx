@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, Eye, Plus, Save, X, Upload } from 'lucide-react';
+import { Trash2, Edit, Eye, Plus, Save, X, Upload, Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -59,6 +59,8 @@ export const BlogManagement = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [primarySiteId, setPrimarySiteId] = useState<string>('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiTopic, setAiTopic] = useState('');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
