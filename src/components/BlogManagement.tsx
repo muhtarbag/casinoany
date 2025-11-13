@@ -284,53 +284,81 @@ export const BlogManagement = () => {
   });
 
   const handleAiGenerateBlog = async () => {
-    if (!aiTopic) {
-      toast({ title: 'Hata', description: 'Lütfen blog konusu girin.', variant: 'destructive' });
+    if (!aiTopic.trim()) {
+      toast({
+        title: "Hata",
+        description: "Lütfen bir konu girin",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsAiLoading(true);
     try {
+      toast({
+        title: "🚀 AI İçerik Üretimi Başlatıldı",
+        description: "4 aşamalı profesyonel içerik üretimi: Keyword araştırma → Taslak → İçerik → SEO analizi",
+      });
+
       const { data, error } = await supabase.functions.invoke('admin-ai-assistant', {
         body: { 
-          type: 'generate-blog', 
-          data: { 
+          type: 'generate-blog',
+          data: {
             topic: aiTopic,
-            siteName: primarySiteId ? bettingSites?.find(s => s.id === primarySiteId)?.name : undefined
-          } 
+            siteName: primarySiteId ? bettingSites?.find(s => s.id === primarySiteId)?.name : '',
+            targetKeywords: formData.meta_keywords ? formData.meta_keywords.split(',').map(k => k.trim()) : []
+          }
         }
       });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Blog oluşturma başarısız');
 
-      if (data.success) {
-        const blogData = data.data;
-        const wordCount = blogData.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
-        const readTime = Math.ceil(wordCount / 200); // Ortalama okuma hızı: 200 kelime/dakika
+      const blogData = data.data;
+      
+      // Auto-generate slug from title
+      const slug = generateSlug(blogData.title);
+
+      setFormData({
+        ...formData,
+        title: blogData.title,
+        slug: slug,
+        content: blogData.content,
+        excerpt: blogData.excerpt || '',
+        meta_description: blogData.meta_description || '',
+        meta_keywords: blogData.meta_keywords?.join(', ') || '',
+        tags: blogData.tags?.join(', ') || '',
+        read_time: blogData.read_time?.toString() || '5',
+        category: blogData.category || 'Genel',
+        meta_title: blogData.title,
+      });
+
+      // Show detailed success message with SEO analysis
+      if (blogData.seo_analysis) {
+        const seo = blogData.seo_analysis;
+        toast({
+          title: `✨ Profesyonel İçerik Oluşturuldu!`,
+          description: `${blogData.word_count} kelime | ${blogData.read_time} dk okuma | SEO: ${seo.seo_score}/100 | Okunabilirlik: ${seo.readability_score}/100`,
+        });
         
-        setFormData(prev => ({
-          ...prev,
-          title: blogData.title || prev.title,
-          slug: generateSlug(blogData.title || prev.title),
-          content: blogData.content || prev.content,
-          excerpt: blogData.excerpt || prev.excerpt,
-          meta_description: blogData.meta_description || prev.meta_description,
-          meta_title: blogData.title || prev.meta_title,
-          tags: blogData.tags || prev.tags,
-          meta_keywords: blogData.tags || prev.meta_keywords,
-          read_time: readTime.toString(),
-        }));
-        toast({ title: 'Başarılı', description: `AI ile ${wordCount} kelimelik SEO-optimized blog içeriği oluşturuldu! (${readTime} dk okuma süresi)` });
-        setAiTopic('');
+        // Log improvements for user to review
+        console.log('SEO İyileştirme Önerileri:', seo.improvements);
+        console.log('SEO Güçlü Yönler:', seo.strengths);
+        console.log('Keyword Research:', blogData.keywords_research);
       } else {
-        throw new Error(data.error);
+        toast({
+          title: "Başarılı! ✅",
+          description: `${blogData.word_count} kelime, ${blogData.read_time} dk okuma süresi. SEO optimizeli içerik hazır!`,
+        });
       }
+
+      setAiTopic('');
     } catch (error: any) {
       console.error('AI blog generation error:', error);
-      toast({ 
-        title: 'AI Hatası', 
-        description: error.message || 'AI blog oluşturulurken hata oluştu.', 
-        variant: 'destructive' 
+      toast({
+        title: "Hata",
+        description: error.message || "Blog oluşturulurken bir hata oluştu",
+        variant: "destructive",
       });
     } finally {
       setIsAiLoading(false);
