@@ -36,6 +36,8 @@ import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
 import { NotificationManagement } from '@/components/NotificationManagement';
 import { CarouselSettings } from '@/components/CarouselSettings';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
+import { SystemHealthDashboard } from '@/components/SystemHealthDashboard';
+import { SystemLogsViewer } from '@/components/SystemLogsViewer';
 import { RefreshCw, Star } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -832,7 +834,7 @@ export default function Admin() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant={['analytics', 'traffic', 'keywords', 'stats', 'ai', 'history'].includes(activeTab) ? 'default' : 'ghost'}
+                    variant={['analytics', 'traffic', 'keywords', 'stats', 'ai', 'history', 'health', 'logs'].includes(activeTab) ? 'default' : 'ghost'}
                     size="sm"
                     className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
                   >
@@ -853,6 +855,12 @@ export default function Admin() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('stats')}>
                     İstatistikler
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('health')}>
+                    Sistem Sağlığı
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('logs')}>
+                    Sistem Logları
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('ai')}>
                     AI Asistan
@@ -1177,6 +1185,12 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="history">
             <AnalysisHistory />
+          </TabsContent>
+          <TabsContent value="health">
+            <SystemHealthDashboard />
+          </TabsContent>
+          <TabsContent value="logs">
+            <SystemLogsViewer />
           </TabsContent>
         </Tabs>
       </main>
