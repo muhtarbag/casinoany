@@ -32,6 +32,8 @@ interface Review {
   updated_at: string;
 }
 
+import { SEO } from '@/components/SEO';
+
 export default function SiteDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -204,6 +206,28 @@ export default function SiteDetail() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <SEO
+        title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
+        description={`${site.name} bahis sitesi hakkında detaylı bilgiler, kullanıcı yorumları ve bonus kampanyaları. ${site.bonus || ''}`}
+        keywords={[site.name, 'bahis sitesi', 'casino', ...(site.features || [])]}
+        canonical={`${window.location.origin}/site/${id}`}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: site.name,
+          description: site.bonus || `${site.name} bahis sitesi`,
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: averageRating,
+            reviewCount: reviews?.length || 0,
+          },
+          offers: {
+            '@type': 'Offer',
+            availability: 'https://schema.org/InStock',
+            url: site.affiliate_link,
+          },
+        }}
+      />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Breadcrumb */}

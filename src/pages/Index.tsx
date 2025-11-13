@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
@@ -9,6 +10,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-dark">
+      <SEO
+        title="En İyi Bahis Siteleri - Güvenilir ve Lisanslı Bahis Siteleri 2025"
+        description="Türkiye'nin en güvenilir bahis siteleri listesi. Yüksek bonuslar, hızlı ödemeler ve 7/24 destek. 50+ lisanslı bahis sitesi karşılaştırması ve detaylı incelemeleri."
+        keywords={['bahis siteleri', 'güvenilir bahis siteleri', 'casino siteleri', 'bahis bonusları', 'canlı bahis']}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'BahisSiteleri',
+          url: window.location.origin,
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${window.location.origin}/?q={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+        }}
+      />
       <Header />
       
       <main>

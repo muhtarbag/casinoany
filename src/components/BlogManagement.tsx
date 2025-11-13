@@ -12,6 +12,8 @@ import { Trash2, Edit, Eye, Plus, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { RichTextEditor } from './RichTextEditor';
+
 interface BlogPost {
   id: string;
   title: string;
@@ -69,11 +71,11 @@ export const BlogManagement = () => {
     queryKey: ['admin-blog-posts'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('blog_posts' as any)
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as BlogPost[];
+      return (data as unknown) as BlogPost[];
     },
   });
 
@@ -94,7 +96,7 @@ export const BlogManagement = () => {
         published_at: data.is_published ? new Date().toISOString() : null,
         author_id: user?.id,
       };
-      const { error } = await supabase.from('blog_posts').insert([postData]);
+      const { error } = await supabase.from('blog_posts' as any).insert([postData]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -124,7 +126,7 @@ export const BlogManagement = () => {
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null,
       };
-      const { error } = await supabase.from('blog_posts').update(postData).eq('id', id);
+      const { error } = await supabase.from('blog_posts' as any).update(postData).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -140,7 +142,7 @@ export const BlogManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+      const { error } = await supabase.from('blog_posts' as any).delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -274,12 +276,10 @@ export const BlogManagement = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="content">İçerik *</Label>
-                <Textarea
-                  id="content"
+                <RichTextEditor
                   value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={10}
-                  required
+                  onChange={(value) => setFormData({ ...formData, content: value })}
+                  placeholder="Blog içeriğinizi buraya yazın..."
                 />
               </div>
 
