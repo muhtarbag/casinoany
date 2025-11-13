@@ -39,7 +39,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: featuredSites } = useQuery({
     queryKey: ['featured-sites'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
         .select('*')
         .eq('is_active', true)
