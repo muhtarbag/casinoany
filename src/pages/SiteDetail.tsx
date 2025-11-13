@@ -33,6 +33,7 @@ interface Review {
 }
 
 import { SEO } from '@/components/SEO';
+import { SiteBlogSection } from '@/components/SiteBlogSection';
 
 export default function SiteDetail() {
   const { id } = useParams<{ id: string }>();
@@ -420,6 +421,11 @@ export default function SiteDetail() {
             <ReviewForm siteId={id!} />
           </CardContent>
         </Card>
+
+        {/* Site Blog Section */}
+        <div className="mb-8">
+          <SiteBlogSection siteId={id!} siteName={site.name} />
+        </div>
 
         {/* Recommended Sites */}
         <RecommendedSites currentSiteId={id!} currentSiteFeatures={site.features || []} />
