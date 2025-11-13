@@ -16,24 +16,39 @@ export default function SiteStats() {
         .select("*")
         .order("clicks", { ascending: false });
 
-      if (statsError) throw statsError;
+      if (statsError) {
+        console.error("Stats error:", statsError);
+        throw statsError;
+      }
 
       // Fetch betting sites separately
       const { data: sites, error: sitesError } = await (supabase as any)
         .from("betting_sites")
         .select("id, name, slug");
 
-      if (sitesError) throw sitesError;
+      if (sitesError) {
+        console.error("Sites error:", sitesError);
+        throw sitesError;
+      }
+
+      console.log("Stats data:", stats);
+      console.log("Sites data:", sites);
 
       // Manually join the data
-      const statsWithSites = (stats || []).map((stat: any) => ({
-        ...stat,
-        betting_sites: sites?.find((site: any) => site.id === stat.site_id) || null,
-      }));
+      const statsWithSites = (stats || []).map((stat: any) => {
+        const matchingSite = sites?.find((site: any) => site.id === stat.site_id);
+        console.log(`Matching site for ${stat.site_id}:`, matchingSite);
+        return {
+          ...stat,
+          betting_sites: matchingSite || null,
+        };
+      });
 
+      console.log("Stats with sites:", statsWithSites);
       return statsWithSites;
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes cache
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
@@ -45,8 +60,8 @@ export default function SiteStats() {
     );
   }
 
-  const topClicked = [...(statsData || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5);
-  const topViewed = [...(statsData || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5);
+  const topClicked = [...((statsData as any[]) || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5);
+  const topViewed = [...((statsData as any[]) || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5);
 
   const totalClicks = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.clicks, 0);
   const totalViews = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.views, 0);
@@ -63,7 +78,7 @@ export default function SiteStats() {
     views: stat.views,
   }));
 
-  const ctrChartData = [...(statsData || [])]
+  const ctrChartData = [...((statsData as any[]) || [])]
     .filter((stat: any) => stat.views > 0)
     .map((stat: any) => ({
       name: stat.betting_sites?.name || "Bilinmeyen",
