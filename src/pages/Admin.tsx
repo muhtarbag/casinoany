@@ -531,11 +531,12 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="manage">Site Yönetimi</TabsTrigger>
             <TabsTrigger value="featured">Öne Çıkanlar</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="reviews">Yorumlar</TabsTrigger>
+            <TabsTrigger value="ai">AI Asistan</TabsTrigger>
             <TabsTrigger value="stats">İstatistikler</TabsTrigger>
           </TabsList>
           <TabsContent value="manage" className="space-y-8">
@@ -591,6 +592,9 @@ export default function Admin() {
                 <BlogStats />
               </TabsContent>
             </Tabs>
+          </TabsContent>
+          <TabsContent value="ai">
+            <AIAssistant />
           </TabsContent>
         </Tabs>
       </main>
