@@ -33,6 +33,7 @@ import { KeywordPerformance } from '@/components/KeywordPerformance';
 import { AdminLogoInput } from './AdminLogoInput';
 import { CasinoContentManagement } from '@/components/CasinoContentManagement';
 import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
+import { NotificationManagement } from '@/components/NotificationManagement';
 import { CarouselSettings } from '@/components/CarouselSettings';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { RefreshCw, Star } from 'lucide-react';
@@ -799,7 +800,7 @@ export default function Admin() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant={['casino', 'blog', 'planner', 'reviews'].includes(activeTab) ? 'default' : 'ghost'}
+                    variant={['casino', 'blog', 'planner', 'reviews', 'notifications'].includes(activeTab) ? 'default' : 'ghost'}
                     size="sm"
                     className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
                   >
@@ -820,6 +821,9 @@ export default function Admin() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('reviews')}>
                     Yorumlar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('notifications')}>
+                    Bildirimler & Popup
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1151,6 +1155,9 @@ export default function Admin() {
             <KeywordPerformance />
           </TabsContent>
           <TabsContent value="reviews"><ReviewManagement /></TabsContent>
+          <TabsContent value="notifications">
+            <NotificationManagement />
+          </TabsContent>
           <TabsContent value="stats">
             <Tabs defaultValue="site-stats" className="w-full">
               <TabsList className="grid w-full grid-cols-2">

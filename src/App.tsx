@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { NotificationPopup } from "@/components/NotificationPopup";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -59,31 +60,34 @@ const AppContent = () => {
   usePageTracking();
   
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/sitemap.xml" element={<Sitemap />} />
-        <Route path="/site/:id" element={<SiteRedirect />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/cookies" element={<Cookies />} />
-        <Route path="/kvkk" element={<KVKK />} />
-        <Route path="/casino-siteleri" element={<CasinoSites />} />
-        <Route path="/spor-bahisleri" element={<SportsBetting />} />
-        <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
-        <Route path="/mobil-bahis" element={<MobileBetting />} />
-        <Route path="/canli-casino" element={<LiveCasino />} />
-        <Route path="/:slug" element={<SiteDetail />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+    <>
+      <NotificationPopup />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/sitemap.xml" element={<Sitemap />} />
+          <Route path="/site/:id" element={<SiteRedirect />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/cookies" element={<Cookies />} />
+          <Route path="/kvkk" element={<KVKK />} />
+          <Route path="/casino-siteleri" element={<CasinoSites />} />
+          <Route path="/spor-bahisleri" element={<SportsBetting />} />
+          <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
+          <Route path="/mobil-bahis" element={<MobileBetting />} />
+          <Route path="/canli-casino" element={<LiveCasino />} />
+          <Route path="/:slug" element={<SiteDetail />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
   );
 };
 
