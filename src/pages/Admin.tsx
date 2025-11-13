@@ -26,6 +26,7 @@ import { FeaturedSitesManagement } from '@/components/FeaturedSitesManagement';
 import { AIAssistant } from '@/components/AIAssistant';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { ContentPlanner } from '@/components/ContentPlanner';
+import { KeywordPerformance } from '@/components/KeywordPerformance';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
@@ -533,11 +534,12 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="manage">Site Yönetimi</TabsTrigger>
             <TabsTrigger value="featured">Öne Çıkanlar</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="planner">İçerik Planlama</TabsTrigger>
+            <TabsTrigger value="keywords">Keyword Performans</TabsTrigger>
             <TabsTrigger value="reviews">Yorumlar</TabsTrigger>
             <TabsTrigger value="ai">AI Asistan</TabsTrigger>
             <TabsTrigger value="history">Analiz Geçmişi</TabsTrigger>
@@ -584,6 +586,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="planner">
             <ContentPlanner />
+          </TabsContent>
+          <TabsContent value="keywords">
+            <KeywordPerformance />
           </TabsContent>
           <TabsContent value="reviews"><ReviewManagement /></TabsContent>
           <TabsContent value="stats">
