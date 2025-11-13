@@ -396,6 +396,14 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
             <Sparkles className="h-4 w-4 mr-2" />
             Konu Önerileri
           </Button>
+          <Button 
+            onClick={generateContentCalendar} 
+            disabled={isAnalyzing || topicSuggestions.length === 0}
+            variant="default"
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            İçerik Takvimi Oluştur
+          </Button>
         </div>
       </div>
 
