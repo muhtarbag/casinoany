@@ -134,12 +134,12 @@ export const BettingSiteCard = ({
             <h4 className="text-sm font-semibold text-muted-foreground">Özellikler</h4>
             <div className="flex flex-wrap gap-2">
               {features.slice(0, 3).map((feature, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs border-border">
+                <Badge key={idx} variant="success" className="text-xs">
                   {feature}
                 </Badge>
               ))}
               {features.length > 3 && (
-                <Badge variant="outline" className="text-xs border-border">+{features.length - 3} daha</Badge>
+                <Badge variant="success" className="text-xs">+{features.length - 3} daha</Badge>
               )}
             </div>
           </div>
