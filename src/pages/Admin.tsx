@@ -34,6 +34,7 @@ import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
   name: string;
+  slug: string;
   rating: number;
   bonus: string;
   features: string;
@@ -94,7 +95,7 @@ export default function Admin() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<SiteFormData>({ name: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' });
+  const [formData, setFormData] = useState<SiteFormData>({ name: '', slug: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -263,7 +264,7 @@ export default function Admin() {
       }
       const { error } = await supabase.from('betting_sites').insert({
         name: data.formData.name,
-        slug: data.formData.name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'),
+        slug: data.formData.slug,
         rating: data.formData.rating,
         bonus: data.formData.bonus,
         features: data.formData.features.split(',').map(f => f.trim()),
@@ -293,7 +294,7 @@ export default function Admin() {
         const { data: { publicUrl } } = supabase.storage.from('site-logos').getPublicUrl(fileName);
         logoUrl = publicUrl;
       }
-      const updateData: any = { name: data.formData.name, rating: data.formData.rating, bonus: data.formData.bonus, features: data.formData.features.split(',').map(f => f.trim()), affiliate_link: data.formData.affiliate_link, email: data.formData.email || null, whatsapp: data.formData.whatsapp || null, telegram: data.formData.telegram || null, twitter: data.formData.twitter || null, instagram: data.formData.instagram || null, facebook: data.formData.facebook || null, youtube: data.formData.youtube || null };
+      const updateData: any = { name: data.formData.name, slug: data.formData.slug, rating: data.formData.rating, bonus: data.formData.bonus, features: data.formData.features.split(',').map(f => f.trim()), affiliate_link: data.formData.affiliate_link, email: data.formData.email || null, whatsapp: data.formData.whatsapp || null, telegram: data.formData.telegram || null, twitter: data.formData.twitter || null, instagram: data.formData.instagram || null, facebook: data.formData.facebook || null, youtube: data.formData.youtube || null };
       if (logoUrl) updateData.logo_url = logoUrl;
       const { error } = await supabase.from('betting_sites').update(updateData).eq('id', data.id);
       if (error) throw error;
@@ -335,9 +336,40 @@ export default function Admin() {
   };
 
   const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); editingId ? updateSiteMutation.mutate({ id: editingId, formData, logoFile }) : createSiteMutation.mutate({ formData, logoFile }); };
-  const handleEdit = (site: any) => { setEditingId(site.id); setFormData({ name: site.name, rating: site.rating, bonus: site.bonus || '', features: site.features?.join(', ') || '', affiliate_link: site.affiliate_link, email: site.email || '', whatsapp: site.whatsapp || '', telegram: site.telegram || '', twitter: site.twitter || '', instagram: site.instagram || '', facebook: site.facebook || '', youtube: site.youtube || '' }); };
+  
+  // Slug generation function with Turkish character conversion
+  const generateSlug = (text: string): string => {
+    const turkishMap: Record<string, string> = {
+      'ç': 'c', 'Ç': 'c',
+      'ğ': 'g', 'Ğ': 'g',
+      'ı': 'i', 'İ': 'i',
+      'ö': 'o', 'Ö': 'o',
+      'ş': 's', 'Ş': 's',
+      'ü': 'u', 'Ü': 'u',
+    };
+    
+    return text
+      .split('')
+      .map(char => turkishMap[char] || char)
+      .join('')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  };
+  
+  const handleNameChange = (name: string) => {
+    setFormData(prev => ({
+      ...prev,
+      name,
+      slug: generateSlug(name)
+    }));
+  };
+  
+  const handleEdit = (site: any) => { setEditingId(site.id); setFormData({ name: site.name, slug: site.slug || generateSlug(site.name), rating: site.rating, bonus: site.bonus || '', features: site.features?.join(', ') || '', affiliate_link: site.affiliate_link, email: site.email || '', whatsapp: site.whatsapp || '', telegram: site.telegram || '', twitter: site.twitter || '', instagram: site.instagram || '', facebook: site.facebook || '', youtube: site.youtube || '' }); };
   const resetForm = () => { 
-    setFormData({ name: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' }); 
+    setFormData({ name: '', slug: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' }); 
     setLogoFile(null); 
     setLogoPreview(null);
     setEditingId(null); 
@@ -749,7 +781,7 @@ export default function Admin() {
                   </Button>
                 )}
               </CardHeader>
-              <CardContent><form onSubmit={handleSubmit} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><div><Label htmlFor="name">Site Adı</Label><Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div><div><Label htmlFor="rating">Puan</Label><Input id="rating" type="number" min="0" max="5" step="0.1" value={formData.rating} onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })} required /></div><div className="md:col-span-2"><Label htmlFor="bonus">Bonus</Label><Input id="bonus" value={formData.bonus} onChange={(e) => setFormData({ ...formData, bonus: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="features">Özellikler</Label><Input id="features" value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="affiliate_link">Link</Label><Input id="affiliate_link" value={formData.affiliate_link} onChange={(e) => setFormData({ ...formData, affiliate_link: e.target.value })} required /></div><div><Label htmlFor="email">Email</Label><Input id="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /></div><div><Label htmlFor="whatsapp">WhatsApp</Label><Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} /></div><div><Label htmlFor="telegram">Telegram</Label><Input id="telegram" value={formData.telegram} onChange={(e) => setFormData({ ...formData, telegram: e.target.value })} /></div><div><Label htmlFor="twitter">Twitter</Label><Input id="twitter" value={formData.twitter} onChange={(e) => setFormData({ ...formData, twitter: e.target.value })} /></div><div><Label htmlFor="instagram">Instagram</Label><Input id="instagram" value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} /></div><div><Label htmlFor="facebook">Facebook</Label><Input id="facebook" value={formData.facebook} onChange={(e) => setFormData({ ...formData, facebook: e.target.value })} /></div><div><Label htmlFor="youtube">YouTube</Label><Input id="youtube" value={formData.youtube} onChange={(e) => setFormData({ ...formData, youtube: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="logo">Logo</Label><Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} /></div></div><div className="flex gap-2"><Button type="submit" disabled={createSiteMutation.isPending || updateSiteMutation.isPending}>{createSiteMutation.isPending || updateSiteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : editingId ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}{editingId ? 'Güncelle' : 'Ekle'}</Button>{editingId && <Button type="button" variant="outline" onClick={resetForm}><X className="w-4 h-4 mr-2" />İptal</Button>}</div></form></CardContent></Card>
+              <CardContent><form onSubmit={handleSubmit} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><div><Label htmlFor="name">Site Adı</Label><Input id="name" value={formData.name} onChange={(e) => handleNameChange(e.target.value)} required /></div><div><Label htmlFor="slug">URL Slug <span className="text-xs text-muted-foreground">(Otomatik oluşturulur)</span></Label><Input id="slug" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="ornek-site-adi" required /></div><div><Label htmlFor="rating">Puan</Label><Input id="rating" type="number" min="0" max="5" step="0.1" value={formData.rating} onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })} required /></div><div className="md:col-span-2"><Label htmlFor="bonus">Bonus</Label><Input id="bonus" value={formData.bonus} onChange={(e) => setFormData({ ...formData, bonus: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="features">Özellikler</Label><Input id="features" value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="affiliate_link">Link</Label><Input id="affiliate_link" value={formData.affiliate_link} onChange={(e) => setFormData({ ...formData, affiliate_link: e.target.value })} required /></div><div><Label htmlFor="email">Email</Label><Input id="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /></div><div><Label htmlFor="whatsapp">WhatsApp</Label><Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} /></div><div><Label htmlFor="telegram">Telegram</Label><Input id="telegram" value={formData.telegram} onChange={(e) => setFormData({ ...formData, telegram: e.target.value })} /></div><div><Label htmlFor="twitter">Twitter</Label><Input id="twitter" value={formData.twitter} onChange={(e) => setFormData({ ...formData, twitter: e.target.value })} /></div><div><Label htmlFor="instagram">Instagram</Label><Input id="instagram" value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} /></div><div><Label htmlFor="facebook">Facebook</Label><Input id="facebook" value={formData.facebook} onChange={(e) => setFormData({ ...formData, facebook: e.target.value })} /></div><div><Label htmlFor="youtube">YouTube</Label><Input id="youtube" value={formData.youtube} onChange={(e) => setFormData({ ...formData, youtube: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="logo">Logo</Label><Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} /></div></div><div className="flex gap-2"><Button type="submit" disabled={createSiteMutation.isPending || updateSiteMutation.isPending}>{createSiteMutation.isPending || updateSiteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : editingId ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}{editingId ? 'Güncelle' : 'Ekle'}</Button>{editingId && <Button type="button" variant="outline" onClick={resetForm}><X className="w-4 h-4 mr-2" />İptal</Button>}</div></form></CardContent></Card>
             {selectedSites.length > 0 && <Card className="bg-primary/10"><CardContent className="pt-6"><div className="flex items-center gap-4 flex-wrap"><p className="font-semibold">{selectedSites.length} site seçildi</p><div className="flex gap-2"><AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="w-4 h-4 mr-2" />Seçilenleri Sil</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Emin misiniz?</AlertDialogTitle><AlertDialogDescription>{selectedSites.length} site silinecek.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>İptal</AlertDialogCancel><AlertDialogAction onClick={() => bulkDeleteMutation.mutate(selectedSites)}>Sil</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog><Button variant="outline" size="sm" onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: true })}>Aktif Yap</Button><Button variant="outline" size="sm" onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: false })}>Pasif Yap</Button></div></div></CardContent></Card>}
             <Card>
               <CardHeader>
