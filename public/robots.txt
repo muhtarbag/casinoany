@@ -1,12 +1,47 @@
-# robots.txt
+# robots.txt - CasinoAny.com
+# Tüm arama motorları için geçerli kurallar
+
 User-agent: *
 Allow: /
+Allow: /blog
+Allow: /blog/*
+Allow: /site/*
+Allow: /about
+Allow: /casino-siteleri
+Allow: /spor-bahisleri
+Allow: /bonus-kampanyalari
+Allow: /mobil-bahis
+Allow: /canli-casino
+
+# Admin ve kullanıcı sayfalarını engelle
 Disallow: /admin
+Disallow: /admin/*
 Disallow: /login
 Disallow: /signup
 
-# Sitemap
-Sitemap: https://yourdomain.com/sitemap.xml
+# Yasal sayfalar - izin ver ama düşük öncelik
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+Allow: /kvkk
 
-# Crawl-delay
+# Sitemap konumu
+Sitemap: /sitemap.xml
+
+# Google Bot için özel ayarlar
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing Bot için özel ayarlar
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Yandex Bot için özel ayarlar
+User-agent: Yandex
+Allow: /
+Crawl-delay: 1
+
+# Genel crawl delay
 Crawl-delay: 1
