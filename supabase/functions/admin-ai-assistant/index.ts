@@ -57,6 +57,28 @@ JSON formatında yanıt ver:
   "meta_description": "meta açıklama",
   "tags": "etiket1, etiket2, etiket3"
 }`;
+    } else if (type === 'generate-reviews') {
+      systemPrompt = `Sen gerçekçi ve organik kullanıcı yorumları oluşturan bir asistansın. Bahis siteleri hakkında çeşitli profillerde kullanıcıların yazabileceği gerçekçi yorumlar üretiyorsun. Türkçe yazıyorsun.`;
+      userPrompt = `Site adı: ${data.siteName}
+Oluşturulacak yorum sayısı: ${data.count || 3}
+
+Her yorum için gerçekçi ve çeşitli içerik oluştur:
+1. İsim: Türk isimleri kullan (örn: Ahmet Y., Ayşe K., Mehmet D.)
+2. Puan: 1-5 arası, çoğunlukla 4-5 puan ağırlıklı ama 2-3 puan alan yorumlar da olsun
+3. Başlık: Kısa, özgün ve duygusal (10-50 karakter)
+4. Yorum: 50-200 kelime arası detaylı, kişisel deneyim içeren gerçekçi yorum. Her yorum farklı bir perspektif sunmalı (bonuslardan bahseden, müşteri hizmetlerinden, çekim hızından, oyun çeşitliliğinden vs.)
+
+JSON formatında yanıt ver:
+{
+  "reviews": [
+    {
+      "name": "İsim Soyad İlk Harf",
+      "rating": 4,
+      "title": "Yorum başlığı",
+      "comment": "Detaylı yorum metni..."
+    }
+  ]
+}`;
     } else {
       throw new Error('Invalid request type');
     }
