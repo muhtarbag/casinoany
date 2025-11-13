@@ -38,6 +38,10 @@ All colors MUST be HSL.
     /* Success green for bonuses */
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
+    
+    /* Gold for rating stars */
+    --gold: 43 96% 56%;
+    --gold-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -121,6 +125,10 @@ All colors MUST be HSL.
 
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
+    
+    /* Gold for rating stars */
+    --gold: 43 96% 56%;
+    --gold-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;

@@ -363,8 +363,8 @@ export default function SiteDetail() {
                       key={i}
                       className={`w-5 h-5 ${
                         i < Math.floor(site.rating || 0)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
+                          ? "fill-gold text-gold"
+                          : "text-muted-foreground"
                       }`}
                     />
                   ))}
