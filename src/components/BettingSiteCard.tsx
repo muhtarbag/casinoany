@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from 'lucide-react';
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Eye, MousePointer } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 
 interface BettingSiteCardProps {
@@ -24,6 +24,8 @@ interface BettingSiteCardProps {
   instagram?: string;
   facebook?: string;
   youtube?: string;
+  views?: number;
+  clicks?: number;
 }
 
 const BettingSiteCardComponent = ({
@@ -42,6 +44,8 @@ const BettingSiteCardComponent = ({
   instagram,
   facebook,
   youtube,
+  views = 0,
+  clicks = 0,
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -121,12 +125,21 @@ const BettingSiteCardComponent = ({
               <span className="text-2xl font-bold text-muted-foreground">{name[0]}</span>
             )}
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-2">
             <div className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/20">
               <Star className="w-4 h-4 fill-primary text-primary" />
               <span className="font-bold text-sm">{rating.toFixed(1)}</span>
             </div>
-            <span className="text-xs text-muted-foreground">Puan</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 px-2 py-1 bg-accent/10 rounded-md border border-accent/20">
+                <Eye className="w-3 h-3 text-accent" />
+                <span className="text-xs font-medium">{views}</span>
+              </div>
+              <div className="flex items-center gap-1 px-2 py-1 bg-secondary/10 rounded-md border border-secondary/20">
+                <MousePointer className="w-3 h-3 text-secondary" />
+                <span className="text-xs font-medium">{clicks}</span>
+              </div>
+            </div>
           </div>
         </div>
         <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
@@ -163,20 +176,26 @@ const BettingSiteCardComponent = ({
               return (
                 <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center p-2 rounded-lg bg-muted hover:bg-muted/80 transition-all duration-200 group/social"
+                  className="flex items-center justify-center p-2 rounded-lg bg-muted transition-all duration-300 group/social"
                   aria-label={link.label}
-                  style={{ ['--brand-color' as any]: link.color }}
+                  style={{ 
+                    ['--brand-color' as any]: link.color,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = link.color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '';
+                  }}
                 >
                   <Icon 
-                    className="w-4 h-4 transition-all duration-200" 
-                    style={{ color: link.color, opacity: 0.7 }}
+                    className="w-4 h-4 transition-all duration-300 group-hover/social:scale-110" 
+                    style={{ color: link.color }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as SVGElement).style.opacity = '1';
-                      (e.currentTarget as SVGElement).style.transform = 'scale(1.1)';
+                      (e.currentTarget as SVGElement).style.color = '#ffffff';
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as SVGElement).style.opacity = '0.7';
-                      (e.currentTarget as SVGElement).style.transform = 'scale(1)';
+                      (e.currentTarget as SVGElement).style.color = link.color;
                     }}
                   />
                 </a>
