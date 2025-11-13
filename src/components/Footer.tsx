@@ -91,9 +91,9 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="/sitemap.xml" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/sitemap.xml" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🗺️ Site Haritası
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
