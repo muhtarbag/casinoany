@@ -423,6 +423,7 @@ export default function SiteDetail() {
         {/* Casino Review Core Content */}
         <div className="mb-8">
           <CasinoReviewCoreContent
+            siteName={site.name}
             pros={site.pros}
             cons={site.cons}
             verdict={site.verdict}
