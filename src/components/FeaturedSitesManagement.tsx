@@ -4,13 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Star, Loader2, Eye } from 'lucide-react';
+import { Star, Loader2, Eye, Search } from 'lucide-react';
 
 export const FeaturedSitesManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch all sites
   const { data: sites, isLoading } = useQuery({
@@ -59,8 +61,14 @@ export const FeaturedSitesManagement = () => {
     toggleFeaturedMutation.mutate({ id, isFeatured: !currentStatus });
   };
 
-  const featuredSites = sites?.filter((site: any) => site.is_featured) || [];
-  const nonFeaturedSites = sites?.filter((site: any) => !site.is_featured) || [];
+  // Filter sites by search query
+  const filteredSites = sites?.filter((site: any) => 
+    site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    site.bonus?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  const featuredSites = filteredSites.filter((site: any) => site.is_featured) || [];
+  const nonFeaturedSites = filteredSites.filter((site: any) => !site.is_featured) || [];
 
   if (isLoading) {
     return (
@@ -83,6 +91,17 @@ export const FeaturedSitesManagement = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Site adı veya bonus ile ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
           {/* Featured Sites */}
           {featuredSites.length > 0 && (
             <div>
