@@ -204,22 +204,37 @@ JSON formatında yanıt ver:
     }
 
     const result = await response.json();
-    const aiResponse = result.choices[0].message.content;
+    let aiResponse = result.choices[0].message.content;
     
-    // Extract JSON from response
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    console.log('AI Response received:', aiResponse.substring(0, 200));
+    
+    // Remove markdown code blocks if present
+    aiResponse = aiResponse
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
+    
+    // Extract JSON from response - find the first { and last }
+    const firstBrace = aiResponse.indexOf('{');
+    const lastBrace = aiResponse.lastIndexOf('}');
+    
+    if (firstBrace === -1 || lastBrace === -1 || firstBrace >= lastBrace) {
+      console.error('No valid JSON found in AI response');
       throw new Error('AI yanıtından JSON çıkarılamadı');
     }
     
-    // Clean control characters from JSON string before parsing
-    const cleanedJson = jsonMatch[0]
-      .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, '')
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t');
+    const jsonString = aiResponse.substring(firstBrace, lastBrace + 1);
     
-    const suggestion = JSON.parse(cleanedJson);
+    console.log('Extracted JSON (first 200 chars):', jsonString.substring(0, 200));
+    
+    let suggestion;
+    try {
+      suggestion = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      console.error('Failed JSON string (first 500 chars):', jsonString.substring(0, 500));
+      throw new Error(`JSON parse hatası: ${parseError instanceof Error ? parseError.message : 'Bilinmeyen hata'}`);
+    }
 
     return new Response(
       JSON.stringify({ success: true, data: suggestion }),
