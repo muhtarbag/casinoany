@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BettingSiteCard } from './BettingSiteCard';
+import { SmartSearch } from './SmartSearch';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -15,7 +14,12 @@ interface HeroProps {
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [animationType, setAnimationType] = useState<string>('slide');
-  const [emblaRef, emblaApi] = useEmblaCarousel({
+  const [autoScrollDuration, setAutoScrollDuration] = useState<number>(2500);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true, 
     align: 'start',
     skipSnaps: false,
@@ -59,31 +63,42 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     if (!isMobile) return;
 
     // Start auto-scroll for mobile
-    const autoScrollInterval = setInterval(handleAutoScroll, 2500);
+    const autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
 
     return () => clearInterval(autoScrollInterval);
-  }, [emblaApi]);
+  }, [emblaApi, autoScrollDuration]);
 
-  // Fetch carousel animation setting
+  // Fetch carousel settings
   const { data: carouselSettings } = useQuery({
     queryKey: ['carousel-settings'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: animData, error: animError } = await supabase
         .from('site_settings')
         .select('*')
         .eq('setting_key', 'carousel_animation_type')
         .single();
-      if (error) {
-        console.error('Error fetching carousel settings:', error);
-        return { setting_value: 'slide' };
+      
+      const { data: durationData, error: durationError } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('setting_key', 'carousel_auto_scroll_duration')
+        .single();
+      
+      if (animError || durationError) {
+        console.error('Error fetching carousel settings:', animError || durationError);
+        return { animation: { setting_value: 'slide' }, duration: { setting_value: '2500' } };
       }
-      return data;
+      
+      return { animation: animData, duration: durationData };
     },
   });
 
   useEffect(() => {
-    if (carouselSettings?.setting_value) {
-      setAnimationType(carouselSettings.setting_value);
+    if (carouselSettings?.animation?.setting_value) {
+      setAnimationType(carouselSettings.animation.setting_value);
+    }
+    if (carouselSettings?.duration?.setting_value) {
+      setAutoScrollDuration(parseInt(carouselSettings.duration.setting_value));
     }
   }, [carouselSettings]);
 
@@ -103,11 +118,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     staleTime: 0,
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(localSearch);
-    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   return (
     <div className="relative overflow-hidden bg-background">
@@ -124,15 +134,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
           </p>
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row gap-2 sm:relative">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                <Input type="text" placeholder="Bahis sitesi ara..." value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full" />
-              </div>
-              <Button type="submit" className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-4 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full sm:w-auto">Ara</Button>
-            </div>
-          </form>
+          <SmartSearch onSearch={onSearch} searchTerm={localSearch} />
           <div className="flex flex-wrap justify-center gap-6 pt-6">
             <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-card border border-border">
               <TrendingUp className="w-6 h-6 text-primary" />
@@ -163,12 +165,53 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                 <p className="text-muted-foreground text-base sm:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
               </div>
               <div className="relative max-w-7xl mx-auto">
-                <button onClick={scrollPrev} disabled={!canScrollPrev} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Previous"><ChevronLeft className="w-6 h-6" /></button>
-                <button onClick={scrollNext} disabled={!canScrollNext} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Next"><ChevronRight className="w-6 h-6" /></button>
-                <div className="overflow-hidden" ref={emblaRef}>
-                  <div className={`flex gap-6 carousel-${animationType}`}>
+                <button 
+                  onClick={scrollPrev} 
+                  disabled={!canScrollPrev} 
+                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg" 
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button 
+                  onClick={scrollNext} 
+                  disabled={!canScrollNext} 
+                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg" 
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                <div 
+                  className="overflow-hidden relative" 
+                  ref={emblaRef}
+                  onTouchStart={(e) => {
+                    setIsDragging(true);
+                    setDragStartX(e.touches[0].clientX);
+                  }}
+                  onTouchMove={(e) => {
+                    if (isDragging) {
+                      const offset = e.touches[0].clientX - dragStartX;
+                      setDragOffset(offset);
+                    }
+                  }}
+                  onTouchEnd={() => {
+                    setIsDragging(false);
+                    setDragOffset(0);
+                    // Haptic feedback (vibrate)
+                    if ('vibrate' in navigator) {
+                      navigator.vibrate(10);
+                    }
+                  }}
+                >
+                  {isDragging && Math.abs(dragOffset) > 20 && (
+                    <div className="absolute inset-0 bg-primary/5 pointer-events-none z-20 transition-opacity duration-200" />
+                  )}
+                  <div className={`flex gap-6 carousel-${animationType} transition-transform duration-200`} style={{ transform: isDragging ? `translateX(${dragOffset * 0.1}px)` : '' }}>
                     {featuredSites.map((site, index) => (
-                      <div key={site.id} className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''}`}>
+                      <div 
+                        key={site.id} 
+                        className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''} transition-transform duration-300 ${isDragging && selectedIndex === index ? 'scale-[0.98]' : ''}`}
+                      >
                         <BettingSiteCard id={site.id} name={site.name} logo={site.logo_url || undefined} rating={Number(site.rating) || 0} bonus={site.bonus || undefined} features={site.features || undefined} affiliateUrl={site.affiliate_link} email={site.email || undefined} whatsapp={site.whatsapp || undefined} telegram={site.telegram || undefined} twitter={site.twitter || undefined} instagram={site.instagram || undefined} facebook={site.facebook || undefined} youtube={site.youtube || undefined} />
                       </div>
                     ))}
