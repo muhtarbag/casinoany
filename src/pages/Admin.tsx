@@ -32,6 +32,7 @@ import { KeywordPerformance } from '@/components/KeywordPerformance';
 import { AdminLogoInput } from './AdminLogoInput';
 import { CasinoContentManagement } from '@/components/CasinoContentManagement';
 import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
+import { CarouselSettings } from '@/components/CarouselSettings';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
@@ -750,9 +751,10 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-11">
+          <TabsList className="grid w-full grid-cols-12">
             <TabsTrigger value="manage">Site Yönetimi</TabsTrigger>
             <TabsTrigger value="featured">Öne Çıkanlar</TabsTrigger>
+            <TabsTrigger value="settings">Ayarlar</TabsTrigger>
             <TabsTrigger value="casino">Casino İçerik</TabsTrigger>
             <TabsTrigger value="analytics">İçerik Analitiği</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
@@ -827,6 +829,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="featured">
             <FeaturedSitesManagement />
+          </TabsContent>
+          <TabsContent value="settings">
+            <CarouselSettings />
           </TabsContent>
           <TabsContent value="casino">
             <CasinoContentManagement />

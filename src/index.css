@@ -65,6 +65,38 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Carousel animation styles */
+  .carousel-fade .embla__slide {
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+  }
+  
+  .carousel-fade .embla__slide.is-snapped {
+    opacity: 1;
+  }
+  
+  .carousel-zoom .embla__slide {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .carousel-zoom .embla__slide.is-snapped {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .carousel-flip .embla__slide {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(90deg);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .carousel-flip .embla__slide.is-snapped {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0deg);
+  }
+
   .dark {
     --background: 220 20% 8%;
     --foreground: 0 0% 98%;
