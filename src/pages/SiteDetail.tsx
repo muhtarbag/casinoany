@@ -153,6 +153,7 @@ export default function SiteDetail() {
     if (!site?.id || viewTracked) return;
 
     const trackView = async () => {
+      // Track site_stats
       const { data: stats } = await supabase
         .from('site_stats' as any)
         .select('*')
@@ -169,6 +170,18 @@ export default function SiteDetail() {
           .from("site_stats" as any)
           .insert({ site_id: site.id, views: 1, clicks: 0 });
       }
+
+      // Track casino analytics
+      try {
+        await supabase.rpc('increment_casino_analytics', {
+          p_site_id: site.id,
+          p_block_name: null,
+          p_is_affiliate_click: false,
+        });
+      } catch (error) {
+        console.error('Error tracking casino analytics:', error);
+      }
+
       setViewTracked(true);
       queryClient.invalidateQueries({ queryKey: ["site-stats", site.id] });
     };
@@ -204,9 +217,21 @@ export default function SiteDetail() {
     },
   });
 
-  const handleAffiliateClick = () => {
-    if (site?.affiliate_link) {
+  const handleAffiliateClick = async () => {
+    if (site?.affiliate_link && site?.id) {
       trackClickMutation.mutate();
+      
+      // Track affiliate click in analytics
+      try {
+        await supabase.rpc('increment_casino_analytics', {
+          p_site_id: site.id,
+          p_block_name: null,
+          p_is_affiliate_click: true,
+        });
+      } catch (error) {
+        console.error('Error tracking affiliate click:', error);
+      }
+      
       window.open(site.affiliate_link, "_blank");
     }
   };
