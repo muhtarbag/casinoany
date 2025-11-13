@@ -28,7 +28,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
       const siteIds = relations.map((r: any) => r.site_id);
       const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
-        .select('*')
+        .select('id, name, slug, logo_url, rating, bonus, features, affiliate_link, is_active')
         .in('id', siteIds)
         .eq('is_active', true);
 
@@ -67,7 +67,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
             <Card
               key={site.id}
               className="group cursor-pointer hover:border-primary/50 transition-all duration-300"
-              onClick={() => navigate(`/site/${site.id}`)}
+              onClick={() => navigate(site.slug ? `/${site.slug}` : `/site/${site.id}`)}
             >
               <CardContent className="p-4 space-y-3">
                 {/* Logo */}
@@ -133,7 +133,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/site/${site.id}`);
+                      navigate(site.slug ? `/${site.slug}` : `/site/${site.id}`);
                     }}
                   >
                     Detaylar
