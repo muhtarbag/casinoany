@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
@@ -232,7 +232,7 @@ JSON formatında yanıt ver:
       JSON.stringify({ 
         success: true, 
         data: analysisResult,
-        provider: useOpenAI ? 'openai' : 'lovable-ai'
+        provider: 'openai'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
