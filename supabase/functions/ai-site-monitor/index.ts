@@ -208,9 +208,15 @@ JSON formatında yanıt ver:
     }
 
     const result = await response.json();
-    const aiResponse = result.choices[0].message.content;
+    let aiResponse = result.choices[0].message.content;
     
     console.log('AI Response received:', aiResponse.substring(0, 200));
+    
+    // Remove markdown code blocks if present
+    aiResponse = aiResponse
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
     
     // Extract JSON from response - try to find the first { and last }
     const firstBrace = aiResponse.indexOf('{');
@@ -223,25 +229,14 @@ JSON formatında yanıt ver:
     
     const jsonString = aiResponse.substring(firstBrace, lastBrace + 1);
     
-    // Clean control characters and escape sequences
-    const cleanedJson = jsonString
-      // Remove control characters
-      .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, '')
-      // Fix newlines in strings
-      .replace(/([^\\])\n/g, '$1\\n')
-      .replace(/([^\\])\r/g, '$1\\r')
-      .replace(/([^\\])\t/g, '$1\\t')
-      // Remove any trailing commas before closing braces/brackets
-      .replace(/,(\s*[}\]])/g, '$1');
-    
-    console.log('Cleaned JSON (first 200 chars):', cleanedJson.substring(0, 200));
+    console.log('Extracted JSON (first 200 chars):', jsonString.substring(0, 200));
     
     let analysisResult;
     try {
-      analysisResult = JSON.parse(cleanedJson);
+      analysisResult = JSON.parse(jsonString);
     } catch (parseError) {
       console.error('JSON Parse Error:', parseError);
-      console.error('Failed JSON string:', cleanedJson);
+      console.error('Failed JSON string (first 500 chars):', jsonString.substring(0, 500));
       throw new Error(`JSON parse hatası: ${parseError instanceof Error ? parseError.message : 'Bilinmeyen hata'}`);
     }
 
