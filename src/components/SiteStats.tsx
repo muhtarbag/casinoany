@@ -10,44 +10,36 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
-      // Fetch site stats
-      const { data: stats, error: statsError } = await (supabase as any)
-        .from("site_stats")
+      // Use the optimized database view
+      const { data, error } = await (supabase as any)
+        .from("site_stats_with_details")
         .select("*")
         .order("clicks", { ascending: false });
 
-      if (statsError) {
-        console.error("Stats error:", statsError);
-        throw statsError;
+      if (error) {
+        console.error("Stats view error:", error);
+        throw error;
       }
 
-      // Fetch betting sites separately
-      const { data: sites, error: sitesError } = await (supabase as any)
-        .from("betting_sites")
-        .select("id, name, slug");
+      // Map view data to match expected format
+      const formattedData = (data || []).map((row: any) => ({
+        id: row.id,
+        site_id: row.site_id,
+        views: row.views,
+        clicks: row.clicks,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        betting_sites: {
+          id: row.site_id,
+          name: row.site_name,
+          slug: row.site_slug,
+        },
+      }));
 
-      if (sitesError) {
-        console.error("Sites error:", sitesError);
-        throw sitesError;
-      }
-
-      console.log("Stats data:", stats);
-      console.log("Sites data:", sites);
-
-      // Manually join the data
-      const statsWithSites = (stats || []).map((stat: any) => {
-        const matchingSite = sites?.find((site: any) => site.id === stat.site_id);
-        console.log(`Matching site for ${stat.site_id}:`, matchingSite);
-        return {
-          ...stat,
-          betting_sites: matchingSite || null,
-        };
-      });
-
-      console.log("Stats with sites:", statsWithSites);
-      return statsWithSites;
+      console.log("Stats from view:", formattedData);
+      return formattedData;
     },
-    refetchOnMount: true,
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
     refetchOnWindowFocus: false,
   });
 
