@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, TrendingUp, Target, Lightbulb, ArrowRight, Clock, BarChart, Sparkles, Plus, CheckCircle2 } from 'lucide-react';
+import { Calendar, TrendingUp, Target, Lightbulb, ArrowRight, Clock, BarChart, Sparkles, Plus, CheckCircle2, Edit2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -226,6 +226,14 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       case 'low': return 'text-gray-600';
       default: return 'text-gray-600';
     }
+  };
+
+  const handleDeleteCalendarItem = (index: number) => {
+    setContentCalendar(prev => prev.filter((_, i) => i !== index));
+    toast({
+      title: "İçerik Silindi",
+      description: "İçerik takvimden başarıyla kaldırıldı.",
+    });
   };
 
   return (
@@ -508,6 +516,46 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
                             ⚠️ Bağımlılıklar: {item.dependencies.join(', ')}
                           </div>
                         )}
+
+                        <div className="flex items-center gap-2 pt-3 border-t">
+                          <Button 
+                            size="sm" 
+                            variant="default"
+                            onClick={() => {
+                              toast({
+                                title: "Blog Oluşturma",
+                                description: `"${item.title}" için blog oluşturma sayfasına yönlendiriliyorsunuz...`,
+                              });
+                              onNavigateToBlog?.();
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Blog Oluştur
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              toast({
+                                title: "Düzenleme",
+                                description: "İçerik düzenleme özelliği yakında eklenecek.",
+                              });
+                            }}
+                          >
+                            <Edit2 className="h-4 w-4 mr-2" />
+                            Düzenle
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleDeleteCalendarItem(index)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Sil
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
