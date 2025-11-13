@@ -3,6 +3,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
+import { OrganizationSchema } from '@/components/StructuredData';
 
 const Index = () => {
   const handleSearch = (term: string) => {
@@ -27,6 +28,7 @@ const Index = () => {
           },
         }}
       />
+      <OrganizationSchema />
       <Header />
       
       <main>

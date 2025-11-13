@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { ItemListSchema } from '@/components/StructuredData';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,17 @@ const Blog = () => {
         description="Bahis siteleri hakkında en güncel haberler, bonus kampanyaları, strateji ipuçları ve sektör analizleri. Kazancınızı artırın!"
         keywords={['bahis blog', 'casino haberleri', 'bahis ipuçları', 'bonus kampanyaları', 'bahis stratejileri']}
       />
+      
+      {filteredPosts && filteredPosts.length > 0 && (
+        <ItemListSchema
+          title="Bahis Siteleri Blog Yazıları"
+          items={filteredPosts.map(post => ({
+            name: post.title,
+            url: `${window.location.origin}/blog/${post.slug}`,
+            image: post.featured_image
+          }))}
+        />
+      )}
       
       <Header />
       
