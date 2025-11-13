@@ -585,7 +585,7 @@ export default function Admin() {
             </div>
           </TabsContent>
           <TabsContent value="planner">
-            <ContentPlanner />
+            <ContentPlanner onNavigateToBlog={() => setActiveTab('blog')} />
           </TabsContent>
           <TabsContent value="keywords">
             <KeywordPerformance />
