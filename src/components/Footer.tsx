@@ -103,29 +103,29 @@ export const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Kategoriler</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/casino-siteleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🎰 Casino Siteleri
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/spor-bahisleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   ⚽ Spor Bahisleri
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/bonus-kampanyalari" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🎁 Bonus Kampanyaları
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/mobil-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   📱 Mobil Bahis
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/canli-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🎮 Canlı Casino
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
