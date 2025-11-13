@@ -48,7 +48,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* About Section */}
           <div className="lg:col-span-2">
-            <img src={logo} alt="CasinoDoo" className="h-10 w-auto mb-4" />
+            <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
               Türkiye'nin en güvenilir casino ve bahis siteleri rehberi. 
               2020'den beri sektörde, binlerce kullanıcıya en iyi bahis deneyimini yaşatıyoruz.
@@ -136,8 +136,8 @@ export const Footer = () => {
             <div className="space-y-3 text-sm text-muted-foreground mb-6">
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-                <a href="mailto:info@casinodoo.com" className="hover:text-primary transition-colors">
-                  info@casinodoo.com
+                <a href="mailto:info@casinoany.com" className="hover:text-primary transition-colors">
+                  info@casinoany.com
                 </a>
               </div>
               <div className="flex items-start gap-2">
@@ -219,7 +219,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-border pt-8 text-center space-y-3">
           <p className="text-sm text-muted-foreground">
-            &copy; 2025 CasinoDoo. Tüm hakları saklıdır.
+            &copy; 2025 CasinoAny.com. Tüm hakları saklıdır.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
             <a href="#" className="hover:text-primary transition-colors">Gizlilik Politikası</a>
