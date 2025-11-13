@@ -9,7 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Star, User, Check, X, Trash2, Clock, CheckCircle2 } from "lucide-react";
+import { Star, User, Check, X, Trash2, Clock, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 
 interface Review {
@@ -27,6 +29,24 @@ export default function ReviewManagement() {
   const queryClient = useQueryClient();
   const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("pending");
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiSelectedSite, setAiSelectedSite] = useState<string>("");
+  const [aiReviewCount, setAiReviewCount] = useState<string>("3");
+
+  // Fetch betting sites for AI generation
+  const { data: bettingSites = [] } = useQuery({
+    queryKey: ["betting-sites"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("betting_sites")
+        .select("id, name")
+        .eq("is_active", true)
+        .order("name");
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   // Fetch pending reviews
   const { data: pendingReviews, isLoading: pendingLoading } = useQuery({
@@ -40,7 +60,6 @@ export default function ReviewManagement() {
 
       if (reviewsError) throw reviewsError;
 
-      // Fetch related data
       const siteIds = reviewsData.map((r: any) => r.site_id);
       const userIds = reviewsData
         .map((r: any) => r.user_id)
@@ -60,7 +79,6 @@ export default function ReviewManagement() {
         profiles = data || [];
       }
 
-      // Combine data
       return reviewsData.map((review: any) => ({
         ...review,
         betting_sites: sites?.find((s: any) => s.id === review.site_id),
@@ -82,7 +100,6 @@ export default function ReviewManagement() {
 
       if (reviewsError) throw reviewsError;
 
-      // Fetch related data
       const siteIds = reviewsData.map((r: any) => r.site_id);
       const userIds = reviewsData
         .map((r: any) => r.user_id)
@@ -102,7 +119,6 @@ export default function ReviewManagement() {
         profiles = data || [];
       }
 
-      // Combine data
       return reviewsData.map((review: any) => ({
         ...review,
         betting_sites: sites?.find((s: any) => s.id === review.site_id),
@@ -111,11 +127,10 @@ export default function ReviewManagement() {
     },
   });
 
-  // Approve review mutation
   const approveMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      const { error } = await supabase
-        .from("site_reviews" as any)
+      const { error } = await (supabase as any)
+        .from("site_reviews")
         .update({ is_approved: true })
         .eq("id", reviewId);
 
@@ -123,19 +138,24 @@ export default function ReviewManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
-      toast({ title: "Başarılı", description: "Yorum onaylandı" });
+      toast({
+        title: "Başarılı",
+        description: "Yorum onaylandı",
+      });
     },
-    onError: (error: Error) => {
-      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    onError: (error) => {
+      toast({
+        title: "Hata",
+        description: error.message || "Yorum onaylanırken bir hata oluştu",
+        variant: "destructive",
+      });
     },
   });
 
-  // Reject (delete) review mutation
   const rejectMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      const { error } = await supabase
-        .from("site_reviews" as any)
+      const { error } = await (supabase as any)
+        .from("site_reviews")
         .delete()
         .eq("id", reviewId);
 
@@ -143,18 +163,24 @@ export default function ReviewManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      toast({ title: "Başarılı", description: "Yorum reddedildi" });
+      toast({
+        title: "Başarılı",
+        description: "Yorum reddedildi ve silindi",
+      });
     },
-    onError: (error: Error) => {
-      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    onError: (error) => {
+      toast({
+        title: "Hata",
+        description: error.message || "Yorum silinirken bir hata oluştu",
+        variant: "destructive",
+      });
     },
   });
 
-  // Bulk approve mutation
   const bulkApproveMutation = useMutation({
     mutationFn: async (reviewIds: string[]) => {
-      const { error } = await supabase
-        .from("site_reviews" as any)
+      const { error } = await (supabase as any)
+        .from("site_reviews")
         .update({ is_approved: true })
         .in("id", reviewIds);
 
@@ -162,20 +188,25 @@ export default function ReviewManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
+      toast({
+        title: "Başarılı",
+        description: `${selectedReviews.length} yorum onaylandı`,
+      });
       setSelectedReviews([]);
-      toast({ title: "Başarılı", description: `${selectedReviews.length} yorum onaylandı` });
     },
-    onError: (error: Error) => {
-      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    onError: (error) => {
+      toast({
+        title: "Hata",
+        description: error.message || "Yorumlar onaylanırken bir hata oluştu",
+        variant: "destructive",
+      });
     },
   });
 
-  // Bulk reject mutation
   const bulkRejectMutation = useMutation({
     mutationFn: async (reviewIds: string[]) => {
-      const { error } = await supabase
-        .from("site_reviews" as any)
+      const { error } = await (supabase as any)
+        .from("site_reviews")
         .delete()
         .in("id", reviewIds);
 
@@ -183,17 +214,24 @@ export default function ReviewManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      toast({
+        title: "Başarılı",
+        description: `${selectedReviews.length} yorum silindi`,
+      });
       setSelectedReviews([]);
-      toast({ title: "Başarılı", description: `${selectedReviews.length} yorum reddedildi` });
     },
-    onError: (error: Error) => {
-      toast({ title: "Hata", description: error.message, variant: "destructive" });
+    onError: (error) => {
+      toast({
+        title: "Hata",
+        description: error.message || "Yorumlar silinirken bir hata oluştu",
+        variant: "destructive",
+      });
     },
   });
 
-  const toggleReviewSelection = (id: string) => {
+  const toggleReviewSelection = (reviewId: string) => {
     setSelectedReviews((prev) =>
-      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+      prev.includes(reviewId) ? prev.filter((id) => id !== reviewId) : [...prev, reviewId]
     );
   };
 
@@ -202,6 +240,72 @@ export default function ReviewManagement() {
       setSelectedReviews([]);
     } else {
       setSelectedReviews(reviews.map((r) => r.id));
+    }
+  };
+
+  const handleAiGenerateReviews = async () => {
+    if (!aiSelectedSite) {
+      toast({
+        title: "Hata",
+        description: "Lütfen bir site seçin",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const selectedSite = bettingSites.find(s => s.id === aiSelectedSite);
+      
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: { 
+          type: 'generate-reviews',
+          data: {
+            siteName: selectedSite?.name,
+            count: parseInt(aiReviewCount)
+          }
+        }
+      });
+
+      if (aiError) throw aiError;
+      if (!aiData?.success) throw new Error(aiData?.error || 'AI yanıtı alınamadı');
+
+      const reviews = aiData.data.reviews;
+      
+      const reviewsToInsert = reviews.map((review: any) => ({
+        site_id: aiSelectedSite,
+        name: review.name,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        is_approved: false,
+        user_id: null,
+        email: null
+      }));
+
+      const { error: insertError } = await (supabase as any)
+        .from('site_reviews')
+        .insert(reviewsToInsert);
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "Başarılı",
+        description: `${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      
+      setAiSelectedSite("");
+      setAiReviewCount("3");
+    } catch (error) {
+      console.error('AI yorum oluşturma hatası:', error);
+      toast({
+        title: "Hata",
+        description: error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu',
+        variant: "destructive",
+      });
+    } finally {
+      setIsAiLoading(false);
     }
   };
 
@@ -285,7 +389,10 @@ export default function ReviewManagement() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>İptal</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => rejectMutation.mutate(review.id)}>
+                    <AlertDialogAction
+                      onClick={() => rejectMutation.mutate(review.id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
                       Reddet ve Sil
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -300,22 +407,82 @@ export default function ReviewManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Yorum Yönetimi</h2>
-          <p className="text-muted-foreground">
-            Kullanıcı yorumlarını gözden geçirin ve onaylayın
-          </p>
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Yorum Yönetimi</h2>
+        <p className="text-muted-foreground">
+          Kullanıcı yorumlarını görüntüleyin, onaylayın veya silin.
+        </p>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            AI ile Otomatik Yorum Oluştur
+          </CardTitle>
+          <CardDescription>
+            Seçtiğiniz site için AI ile organik görünümlü yorumlar oluşturun
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Site Seçin</label>
+              <Select value={aiSelectedSite} onValueChange={setAiSelectedSite}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Bir site seçin..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {bettingSites.map(site => (
+                    <SelectItem key={site.id} value={site.id}>
+                      {site.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="w-32">
+              <label className="text-sm font-medium mb-2 block">Yorum Sayısı</label>
+              <Input
+                type="number"
+                min="1"
+                max="10"
+                value={aiReviewCount}
+                onChange={(e) => setAiReviewCount(e.target.value)}
+              />
+            </div>
+
+            <Button 
+              onClick={handleAiGenerateReviews} 
+              disabled={isAiLoading || !aiSelectedSite}
+              className="gap-2"
+            >
+              {isAiLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Oluşturuluyor...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Oluştur
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="pending" className="gap-2">
             <Clock className="w-4 h-4" />
             Onay Bekleyenler
             {pendingReviews && pendingReviews.length > 0 && (
-              <Badge variant="secondary">{pendingReviews.length}</Badge>
+              <Badge variant="secondary" className="ml-2">
+                {pendingReviews.length}
+              </Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="approved" className="gap-2">
@@ -326,40 +493,50 @@ export default function ReviewManagement() {
 
         <TabsContent value="pending" className="space-y-4">
           {selectedReviews.length > 0 && (
-            <Card className="bg-primary/10">
+            <Card className="bg-muted/50">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-4 flex-wrap">
-                  <p className="font-semibold">{selectedReviews.length} yorum seçildi</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={selectedReviews.length === (pendingReviews?.length || 0)}
+                      onCheckedChange={() => toggleSelectAll(pendingReviews || [])}
+                    />
+                    <span className="text-sm font-medium">
+                      {selectedReviews.length} yorum seçildi
+                    </span>
+                  </div>
                   <div className="flex gap-2">
                     <Button
                       size="sm"
                       onClick={() => bulkApproveMutation.mutate(selectedReviews)}
                       disabled={bulkApproveMutation.isPending}
                     >
-                      <Check className="w-4 h-4 mr-2" />
-                      Seçilenleri Onayla
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      Toplu Onayla
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button size="sm" variant="destructive">
                           <Trash2 className="w-4 h-4 mr-2" />
-                          Seçilenleri Reddet
+                          Toplu Sil
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+                          <AlertDialogTitle>
+                            {selectedReviews.length} yorumu silmek istediğinize emin misiniz?
+                          </AlertDialogTitle>
                           <AlertDialogDescription>
-                            {selectedReviews.length} yorum kalıcı olarak silinecek. Bu işlem geri
-                            alınamaz.
+                            Bu işlem geri alınamaz. Seçili yorumlar kalıcı olarak silinecektir.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>İptal</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => bulkRejectMutation.mutate(selectedReviews)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Reddet ve Sil
+                            Sil
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -373,36 +550,29 @@ export default function ReviewManagement() {
           {pendingLoading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-48 w-full" />
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-12 w-full" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-20 w-full" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          ) : pendingReviews && pendingReviews.length > 0 ? (
+          ) : !pendingReviews || pendingReviews.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">Onay bekleyen yorum bulunmuyor</p>
+              </CardContent>
+            </Card>
+          ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {pendingReviews.length} yorum onay bekliyor
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => toggleSelectAll(pendingReviews)}
-                >
-                  {selectedReviews.length === pendingReviews.length
-                    ? "Seçimi Kaldır"
-                    : "Tümünü Seç"}
-                </Button>
-              </div>
               {pendingReviews.map((review) => (
                 <ReviewCard key={review.id} review={review} />
               ))}
             </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <CheckCircle2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">Onay bekleyen yorum bulunmuyor</p>
-              </CardContent>
-            </Card>
           )}
         </TabsContent>
 
@@ -410,24 +580,29 @@ export default function ReviewManagement() {
           {approvedLoading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-48 w-full" />
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-12 w-full" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-20 w-full" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          ) : approvedReviews && approvedReviews.length > 0 ? (
+          ) : !approvedReviews || approvedReviews.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">Onaylanmış yorum bulunmuyor</p>
+              </CardContent>
+            </Card>
+          ) : (
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {approvedReviews.length} onaylanmış yorum (son 50)
-              </p>
               {approvedReviews.map((review) => (
                 <ReviewCard key={review.id} review={review} showActions={false} />
               ))}
             </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <p className="text-muted-foreground">Henüz onaylanmış yorum bulunmuyor</p>
-              </CardContent>
-            </Card>
           )}
         </TabsContent>
       </Tabs>
