@@ -185,6 +185,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
 
       const result = data.data;
       setContentCalendar(result.calendar);
+      setSelectedTab('calendar'); // Takvim tabına otomatik geç
 
       toast({
         title: "🎯 İçerik Takvimi Hazır!",
