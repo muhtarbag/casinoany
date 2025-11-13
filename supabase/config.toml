@@ -2,3 +2,6 @@ project_id = "cpaukwimbfoembwwtqhj"
 
 [functions.admin-ai-assistant]
 verify_jwt = false
+
+[functions.ai-site-monitor]
+verify_jwt = false
