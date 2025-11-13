@@ -124,7 +124,7 @@ serve(async (req) => {
 
       console.log(`Returning ${enrichedSites.length} sites to AI`);
 
-      const duration = Date.now() - startTime;
+      const getDuration = Date.now() - startTime;
       
       await logApiCall(
         supabaseClient,
@@ -132,7 +132,7 @@ serve(async (req) => {
         'GET',
         url.pathname,
         200,
-        duration,
+        getDuration,
         null,
         { success: true, count: sites?.length || 0 },
         null,
@@ -140,26 +140,10 @@ serve(async (req) => {
         ipAddress
       );
 
-        const duration = Date.now() - startTime;
-        
-        await logApiCall(
-          supabaseClient,
-          'ai-site-info',
-          'POST',
-          url.pathname + '?action=recommend',
-          200,
-          duration,
-          { userPreferences },
-          { success: true, count: recommendedSites?.length || 0 },
-          null,
-          userAgent,
-          ipAddress
-        );
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            data: {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
             sites: enrichedSites,
             totalSites: enrichedSites.length,
             categories,
@@ -217,7 +201,7 @@ serve(async (req) => {
 
       console.log(`Search found ${sites.length} sites`);
 
-      const duration = Date.now() - startTime;
+      const postDuration = Date.now() - startTime;
       
       await logApiCall(
         supabaseClient,
@@ -225,9 +209,9 @@ serve(async (req) => {
         'POST',
         url.pathname,
         200,
-        duration,
+        postDuration,
         { query, minRating, features, sortBy },
-        { success: true, count: results?.length || 0 },
+        { success: true, count: sites?.length || 0 },
         null,
         userAgent,
         ipAddress
@@ -253,7 +237,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('AI Info Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const duration = Date.now() - startTime;
+    const errorDuration = Date.now() - startTime;
     
     await logApiCall(
       supabaseClient,
@@ -261,7 +245,7 @@ serve(async (req) => {
       req.method,
       new URL(req.url).pathname,
       500,
-      duration,
+      errorDuration,
       null,
       null,
       errorMessage,
