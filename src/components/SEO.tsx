@@ -7,6 +7,7 @@ interface SEOProps {
   canonical?: string;
   ogType?: 'website' | 'article';
   ogImage?: string;
+  ogImageAlt?: string;
   article?: {
     publishedTime?: string;
     modifiedTime?: string;
@@ -23,6 +24,7 @@ export const SEO = ({
   canonical,
   ogType = 'website',
   ogImage = '/og-image.jpg',
+  ogImageAlt,
   article,
   structuredData,
 }: SEOProps) => {
@@ -81,6 +83,9 @@ export const SEO = ({
       <meta property="og:description" content={description} />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:image" content={ogImage} />
+      {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content="BahisSiteleri" />
       <meta property="og:locale" content="tr_TR" />
 
