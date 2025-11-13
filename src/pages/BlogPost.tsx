@@ -145,6 +145,17 @@ export default function BlogPost() {
             </div>
           </header>
 
+          {/* Featured Image */}
+          {post.featured_image && (
+            <div className="mb-8 rounded-lg overflow-hidden border border-border">
+              <img
+                src={post.featured_image}
+                alt={post.title}
+                className="w-full h-auto"
+              />
+            </div>
+          )}
+
           {/* Article Content */}
           <Card className="p-8 mb-8">
             <div 

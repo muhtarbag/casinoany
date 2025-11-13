@@ -23,6 +23,7 @@ interface BlogPost {
   published_at: string;
   read_time?: number;
   view_count: number;
+  featured_image?: string;
 }
 
 const Blog = () => {
@@ -130,9 +131,18 @@ const Blog = () => {
             {filteredPosts.map((post) => (
               <Card
                 key={post.id}
-                className="group cursor-pointer hover:border-primary/50 transition-all duration-300"
+                className="group cursor-pointer hover:border-primary/50 transition-all duration-300 overflow-hidden"
                 onClick={() => navigate(`/blog/${post.slug}`)}
               >
+                {post.featured_image && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img
+                      src={post.featured_image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     {post.category && (
