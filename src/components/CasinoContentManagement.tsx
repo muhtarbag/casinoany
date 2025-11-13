@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save } from 'lucide-react';
 import { CasinoContentEditor } from './CasinoContentEditor';
+import { BlockCustomization } from './casino/BlockCustomization';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const CasinoContentManagement = () => {
   const { toast } = useToast();
@@ -20,6 +22,14 @@ export const CasinoContentManagement = () => {
   const [loginGuide, setLoginGuide] = useState('');
   const [withdrawalGuide, setWithdrawalGuide] = useState('');
   const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>([]);
+  const [blockStyles, setBlockStyles] = useState<Record<string, { icon: string; color: string }>>({
+    verdict: { icon: 'shield', color: '#3b82f6' },
+    expertReview: { icon: 'fileText', color: '#8b5cf6' },
+    gameOverview: { icon: 'gamepad', color: '#10b981' },
+    loginGuide: { icon: 'login', color: '#f59e0b' },
+    withdrawalGuide: { icon: 'wallet', color: '#06b6d4' },
+    faq: { icon: 'help', color: '#ec4899' },
+  });
 
   // Fetch all sites
   const { data: sites, isLoading: sitesLoading } = useQuery({
@@ -42,7 +52,7 @@ export const CasinoContentManagement = () => {
       if (!selectedSiteId) return null;
       const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('pros, cons, verdict, expert_review, game_categories, login_guide, withdrawal_guide, faq')
+        .select('pros, cons, verdict, expert_review, game_categories, login_guide, withdrawal_guide, faq, block_styles')
         .eq('id', selectedSiteId)
         .single();
       if (error) throw error;
@@ -62,6 +72,12 @@ export const CasinoContentManagement = () => {
       setLoginGuide((siteContent.login_guide as string) || '');
       setWithdrawalGuide((siteContent.withdrawal_guide as string) || '');
       setFaq((siteContent.faq as Array<{ question: string; answer: string }>) || []);
+      
+      // Load block styles
+      const styles = siteContent.block_styles as Record<string, { icon: string; color: string }>;
+      if (styles) {
+        setBlockStyles(styles);
+      }
     }
   }, [siteContent]);
 
@@ -83,6 +99,7 @@ export const CasinoContentManagement = () => {
           faq: faq.filter(f => f.question.trim() && f.answer.trim()).length > 0 
             ? faq.filter(f => f.question.trim() && f.answer.trim()) 
             : null,
+          block_styles: blockStyles,
         })
         .eq('id', selectedSiteId);
 
@@ -156,24 +173,121 @@ export const CasinoContentManagement = () => {
 
       {selectedSiteId && !contentLoading && (
         <>
-          <CasinoContentEditor
-            pros={pros}
-            setPros={setPros}
-            cons={cons}
-            setCons={setCons}
-            verdict={verdict}
-            setVerdict={setVerdict}
-            expertReview={expertReview}
-            setExpertReview={setExpertReview}
-            gameCategories={gameCategories}
-            setGameCategories={setGameCategories}
-            loginGuide={loginGuide}
-            setLoginGuide={setLoginGuide}
-            withdrawalGuide={withdrawalGuide}
-            setWithdrawalGuide={setWithdrawalGuide}
-            faq={faq}
-            setFaq={setFaq}
-          />
+          <Tabs defaultValue="content" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="content">İçerik Yönetimi</TabsTrigger>
+              <TabsTrigger value="styling">Görsel Özelleştirme</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="content" className="space-y-6">
+              <CasinoContentEditor
+                pros={pros}
+                setPros={setPros}
+                cons={cons}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="styling" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <BlockCustomization
+                  blockName="Uzman Görüşü"
+                  iconName={blockStyles.verdict?.icon || 'shield'}
+                  iconColor={blockStyles.verdict?.color || '#3b82f6'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    verdict: { ...prev.verdict, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    verdict: { ...prev.verdict, color }
+                  }))}
+                />
+
+                <BlockCustomization
+                  blockName="Detaylı İnceleme"
+                  iconName={blockStyles.expertReview?.icon || 'fileText'}
+                  iconColor={blockStyles.expertReview?.color || '#8b5cf6'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    expertReview: { ...prev.expertReview, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    expertReview: { ...prev.expertReview, color }
+                  }))}
+                />
+
+                <BlockCustomization
+                  blockName="Oyun Çeşitleri"
+                  iconName={blockStyles.gameOverview?.icon || 'gamepad'}
+                  iconColor={blockStyles.gameOverview?.color || '#10b981'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    gameOverview: { ...prev.gameOverview, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    gameOverview: { ...prev.gameOverview, color }
+                  }))}
+                />
+
+                <BlockCustomization
+                  blockName="Giriş Rehberi"
+                  iconName={blockStyles.loginGuide?.icon || 'login'}
+                  iconColor={blockStyles.loginGuide?.color || '#f59e0b'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    loginGuide: { ...prev.loginGuide, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    loginGuide: { ...prev.loginGuide, color }
+                  }))}
+                />
+
+                <BlockCustomization
+                  blockName="Para Çekme Rehberi"
+                  iconName={blockStyles.withdrawalGuide?.icon || 'wallet'}
+                  iconColor={blockStyles.withdrawalGuide?.color || '#06b6d4'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    withdrawalGuide: { ...prev.withdrawalGuide, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    withdrawalGuide: { ...prev.withdrawalGuide, color }
+                  }))}
+                />
+
+                <BlockCustomization
+                  blockName="SSS"
+                  iconName={blockStyles.faq?.icon || 'help'}
+                  iconColor={blockStyles.faq?.color || '#ec4899'}
+                  onIconChange={(icon) => setBlockStyles(prev => ({
+                    ...prev,
+                    faq: { ...prev.faq, icon }
+                  }))}
+                  onColorChange={(color) => setBlockStyles(prev => ({
+                    ...prev,
+                    faq: { ...prev.faq, color }
+                  }))}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <div className="flex justify-end">
             <Button
