@@ -16,7 +16,7 @@ export const CasinoContentAnalytics = () => {
     queryFn: async () => {
       const thirtyDaysAgo = format(subDays(new Date(), 30), 'yyyy-MM-dd');
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('casino_content_analytics')
         .select(`
           site_id,
@@ -57,7 +57,7 @@ export const CasinoContentAnalytics = () => {
     queryFn: async () => {
       const thirtyDaysAgo = format(subDays(new Date(), 30), 'yyyy-MM-dd');
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('casino_content_analytics')
         .select('block_interactions')
         .gte('view_date', thirtyDaysAgo);
@@ -86,7 +86,7 @@ export const CasinoContentAnalytics = () => {
     queryFn: async () => {
       const sevenDaysAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('casino_content_analytics')
         .select('view_date, total_views, affiliate_clicks')
         .gte('view_date', sevenDaysAgo)

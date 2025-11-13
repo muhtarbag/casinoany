@@ -173,7 +173,7 @@ export default function SiteDetail() {
 
       // Track casino analytics
       try {
-        await supabase.rpc('increment_casino_analytics', {
+        await (supabase as any).rpc('increment_casino_analytics', {
           p_site_id: site.id,
           p_block_name: null,
           p_is_affiliate_click: false,
@@ -223,7 +223,7 @@ export default function SiteDetail() {
       
       // Track affiliate click in analytics
       try {
-        await supabase.rpc('increment_casino_analytics', {
+        await (supabase as any).rpc('increment_casino_analytics', {
           p_site_id: site.id,
           p_block_name: null,
           p_is_affiliate_click: true,
