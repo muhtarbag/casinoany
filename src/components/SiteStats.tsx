@@ -8,18 +8,25 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("site_stats")
-        .select(`
-          *,
-          betting_sites (
-            name
-          )
-        `)
+      const { data: stats, error: statsError } = await supabase
+        .from("site_stats" as any)
+        .select("*")
         .order("clicks", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (statsError) throw statsError;
+
+      // Fetch site names separately
+      const siteIds = (stats as any[]).map((s: any) => s.site_id);
+      const { data: sites } = await supabase
+        .from("betting_sites")
+        .select("id, name")
+        .in("id", siteIds);
+
+      // Combine data
+      return (stats as any[]).map((stat: any) => ({
+        ...stat,
+        betting_sites: sites?.find((s: any) => s.id === stat.site_id),
+      }));
     },
   });
 
@@ -32,11 +39,11 @@ export default function SiteStats() {
     );
   }
 
-  const topClicked = [...(statsData || [])].sort((a, b) => b.clicks - a.clicks).slice(0, 5);
-  const topViewed = [...(statsData || [])].sort((a, b) => b.views - a.views).slice(0, 5);
+  const topClicked = [...(statsData || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5);
+  const topViewed = [...(statsData || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5);
 
-  const totalClicks = statsData?.reduce((sum, stat) => sum + stat.clicks, 0) || 0;
-  const totalViews = statsData?.reduce((sum, stat) => sum + stat.views, 0) || 0;
+  const totalClicks = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.clicks, 0);
+  const totalViews = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.views, 0);
 
   return (
     <div className="space-y-6">
@@ -75,7 +82,7 @@ export default function SiteStats() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topClicked.map((stat, index) => (
+              {topClicked.map((stat: any, index: number) => (
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
@@ -101,7 +108,7 @@ export default function SiteStats() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topViewed.map((stat, index) => (
+              {topViewed.map((stat: any, index: number) => (
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>

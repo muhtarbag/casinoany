@@ -60,7 +60,7 @@ export default function SiteDetail() {
     queryKey: ["site-stats", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("site_stats")
+        .from("site_stats" as any)
         .select("*")
         .eq("site_id", id)
         .maybeSingle();
@@ -74,7 +74,7 @@ export default function SiteDetail() {
   const { data: reviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ["site-reviews", id],
     queryFn: async () => {
-      const { data: reviewsData, error: reviewsError } = await supabase
+      const { data: reviewsData, error: reviewsError } = await (supabase as any)
         .from("site_reviews")
         .select("*")
         .eq("site_id", id)
@@ -84,8 +84,8 @@ export default function SiteDetail() {
       if (reviewsError) throw reviewsError;
 
       // Fetch profiles separately
-      const userIds = reviewsData.map((r) => r.user_id);
-      const { data: profilesData, error: profilesError } = await supabase
+      const userIds = reviewsData.map((r: any) => r.user_id);
+      const { data: profilesData, error: profilesError } = await (supabase as any)
         .from("profiles")
         .select("id, username, avatar_url")
         .in("id", userIds);
@@ -93,8 +93,8 @@ export default function SiteDetail() {
       if (profilesError) throw profilesError;
 
       // Combine reviews with profiles
-      const reviewsWithProfiles = reviewsData.map((review) => {
-        const profile = profilesData?.find((p) => p.id === review.user_id);
+      const reviewsWithProfiles = reviewsData.map((review: any) => {
+        const profile = profilesData?.find((p: any) => p.id === review.user_id);
         return {
           ...review,
           profiles: profile ? { username: profile.username || "Anonim", avatar_url: profile.avatar_url } : undefined,
@@ -112,12 +112,12 @@ export default function SiteDetail() {
     const trackView = async () => {
       if (stats) {
         await supabase
-          .from("site_stats")
-          .update({ views: stats.views + 1 })
+          .from("site_stats" as any)
+          .update({ views: (stats as any).views + 1 })
           .eq("site_id", id);
       } else {
         await supabase
-          .from("site_stats")
+          .from("site_stats" as any)
           .insert({ site_id: id, views: 1, clicks: 0 });
       }
       setViewTracked(true);
@@ -132,13 +132,13 @@ export default function SiteDetail() {
     mutationFn: async () => {
       if (stats) {
         const { error } = await supabase
-          .from("site_stats")
-          .update({ clicks: stats.clicks + 1 })
+          .from("site_stats" as any)
+          .update({ clicks: (stats as any).clicks + 1 })
           .eq("site_id", id);
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from("site_stats")
+          .from("site_stats" as any)
           .insert({ site_id: id, clicks: 1, views: 1 });
         if (error) throw error;
       }
@@ -157,7 +157,7 @@ export default function SiteDetail() {
 
   // Calculate average rating
   const averageRating = reviews?.length
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    ? (reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : "0.0";
 
   if (siteLoading) {
@@ -322,8 +322,8 @@ export default function SiteDetail() {
             {stats && (
               <div className="border-t mt-6 pt-6">
                 <div className="flex gap-6 text-sm text-muted-foreground">
-                  <span>👁️ {stats.views} görüntülenme</span>
-                  <span>🖱️ {stats.clicks} tıklama</span>
+                  <span>👁️ {(stats as any).views} görüntülenme</span>
+                  <span>🖱️ {(stats as any).clicks} tıklama</span>
                 </div>
               </div>
             )}
@@ -346,7 +346,7 @@ export default function SiteDetail() {
               </div>
             ) : reviews && reviews.length > 0 ? (
               <div className="space-y-4">
-                {reviews.map((review) => (
+                {reviews.map((review: any) => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
               </div>
