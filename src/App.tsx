@@ -11,6 +11,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NotificationPopup } from "@/components/NotificationPopup";
+import { NotificationBanner } from "@/components/NotificationBanner";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -61,6 +62,7 @@ const AppContent = () => {
   
   return (
     <>
+      <NotificationBanner />
       <NotificationPopup />
       <Suspense fallback={<PageLoader />}>
         <Routes>
