@@ -43,7 +43,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         .from('betting_sites')
         .select('*')
         .eq('is_active', true)
-        .gte('rating', 4.5)
+        .eq('is_featured', true)
         .order('rating', { ascending: false })
         .limit(3);
       if (error) throw error;
