@@ -1,3 +1,4 @@
+import { memo, useState, useEffect, useCallback, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
-import { useState, useEffect } from 'react';
 
 interface BettingSiteCardProps {
   id?: string;
@@ -26,7 +26,7 @@ interface BettingSiteCardProps {
   youtube?: string;
 }
 
-export const BettingSiteCard = ({
+const BettingSiteCardComponent = ({
   id,
   slug,
   name,
@@ -83,21 +83,21 @@ export const BettingSiteCard = ({
     },
   });
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     if (slug) {
       navigate(`/${slug}`);
     } else if (id) {
       navigate(`/site/${id}`);
     }
-  };
+  }, [slug, id, navigate]);
 
-  const handleAffiliateClick = (e: React.MouseEvent) => {
+  const handleAffiliateClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     trackClickMutation.mutate();
     window.open(affiliateUrl, '_blank');
-  };
+  }, [trackClickMutation, affiliateUrl]);
 
-  const socialLinks = [
+  const socialLinks = useMemo(() => [
     { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1' },
     { url: whatsapp, icon: MessageCircle, label: 'WhatsApp', href: `https://wa.me/${whatsapp}`, color: '#25D366' },
     { url: telegram, icon: Send, label: 'Telegram', href: telegram, color: '#0088cc' },
@@ -105,7 +105,7 @@ export const BettingSiteCard = ({
     { url: instagram, icon: FaInstagram, label: 'Instagram', href: instagram, color: '#E4405F' },
     { url: facebook, icon: FaFacebook, label: 'Facebook', href: facebook, color: '#1877F2' },
     { url: youtube, icon: FaYoutube, label: 'YouTube', href: youtube, color: '#FF0000' },
-  ].filter(link => link.url);
+  ].filter(link => link.url), [email, whatsapp, telegram, twitter, instagram, facebook, youtube]);
 
   return (
     <Card 
@@ -203,3 +203,5 @@ export const BettingSiteCard = ({
     </Card>
   );
 };
+
+export const BettingSiteCard = memo(BettingSiteCardComponent);

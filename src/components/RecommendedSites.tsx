@@ -1,16 +1,16 @@
+import { memo, useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BettingSiteCard } from "./BettingSiteCard";
-import { useState, useEffect } from "react";
 
 interface RecommendedSitesProps {
   currentSiteId: string;
   currentSiteFeatures: string[];
 }
 
-export default function RecommendedSites({ currentSiteId, currentSiteFeatures }: RecommendedSitesProps) {
+const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: RecommendedSitesProps) => {
   const { data: allSites, isLoading } = useQuery({
     queryKey: ["recommended-sites-all", currentSiteId],
     queryFn: async () => {
@@ -112,4 +112,6 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
       </CardContent>
     </Card>
   );
-}
+};
+
+export default memo(RecommendedSitesComponent);
