@@ -279,6 +279,54 @@ export const BlogManagement = () => {
     },
   });
 
+  const handleAiGenerateBlog = async () => {
+    if (!aiTopic) {
+      toast({ title: 'Hata', description: 'Lütfen blog konusu girin.', variant: 'destructive' });
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: { 
+          type: 'generate-blog', 
+          data: { 
+            topic: aiTopic,
+            siteName: primarySiteId ? bettingSites?.find(s => s.id === primarySiteId)?.name : undefined
+          } 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setFormData(prev => ({
+          ...prev,
+          title: data.data.title || prev.title,
+          slug: generateSlug(data.data.title || prev.title),
+          content: data.data.content || prev.content,
+          excerpt: data.data.excerpt || prev.excerpt,
+          meta_description: data.data.meta_description || prev.meta_description,
+          meta_title: data.data.title || prev.meta_title,
+          tags: data.data.tags || prev.tags,
+        }));
+        toast({ title: 'Başarılı', description: 'AI blog içeriği başarıyla oluşturuldu!' });
+        setAiTopic('');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('AI blog generation error:', error);
+      toast({ 
+        title: 'AI Hatası', 
+        description: error.message || 'AI blog oluşturulurken hata oluştu.', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -393,6 +441,46 @@ export const BlogManagement = () => {
             <CardTitle>{editingId ? 'Blog Yazısı Düzenle' : 'Yeni Blog Yazısı'}</CardTitle>
           </CardHeader>
           <CardContent>
+            {!editingId && (
+              <div className="mb-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
+                <Label className="text-sm font-semibold mb-2 block">🤖 AI ile Blog Oluştur</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Blog konusu girin (örn: 'Canlı bahis stratejileri')"
+                    value={aiTopic}
+                    onChange={(e) => setAiTopic(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAiGenerateBlog();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleAiGenerateBlog}
+                    disabled={isAiLoading || !aiTopic}
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    {isAiLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Oluşturuluyor...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        AI Oluştur
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  AI, SEO uyumlu başlık, içerik, özet ve etiketler oluşturacak
+                </p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
