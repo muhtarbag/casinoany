@@ -24,13 +24,13 @@ export const AnalysisHistory = () => {
     queryKey: ['analysis-history'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('ai_analysis_history')
+        .from('ai_analysis_history' as any)
         .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
       
       if (error) throw error;
-      return data as AnalysisRecord[];
+      return data as any as AnalysisRecord[];
     },
   });
 
