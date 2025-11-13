@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BettingSiteCard } from './BettingSiteCard';
 import { SmartSearch } from './SmartSearch';
+import { LoadingSpinner } from './LoadingSpinner';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -73,41 +74,40 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     };
   }, [emblaApi, autoScrollDuration]);
 
-  // Fetch carousel settings
+  // Fetch carousel settings (birleştirilmiş tek query)
   const { data: carouselSettings } = useQuery({
     queryKey: ['carousel-settings'],
     queryFn: async () => {
-      const { data: animData, error: animError } = await (supabase as any)
+      const { data, error } = await (supabase as any)
         .from('site_settings')
-        .select('*')
-        .eq('setting_key', 'carousel_animation_type')
-        .single();
+        .select('setting_key, setting_value')
+        .in('setting_key', ['carousel_animation_type', 'carousel_auto_scroll_duration']);
       
-      const { data: durationData, error: durationError } = await (supabase as any)
-        .from('site_settings')
-        .select('*')
-        .eq('setting_key', 'carousel_auto_scroll_duration')
-        .single();
-      
-      if (animError || durationError) {
-        console.error('Error fetching carousel settings:', animError || durationError);
-        return { animation: { setting_value: 'slide' }, duration: { setting_value: '2500' } };
+      if (error) {
+        console.error('Error fetching carousel settings:', error);
+        return { animation: 'slide', duration: 2500 };
       }
       
-      return { animation: animData, duration: durationData };
+      const settings = data?.reduce((acc: any, item: any) => {
+        if (item.setting_key === 'carousel_animation_type') acc.animation = item.setting_value;
+        if (item.setting_key === 'carousel_auto_scroll_duration') acc.duration = parseInt(item.setting_value);
+        return acc;
+      }, { animation: 'slide', duration: 2500 });
+      
+      return settings;
     },
   });
 
   useEffect(() => {
-    if ((carouselSettings as any)?.animation?.setting_value) {
-      setAnimationType((carouselSettings as any).animation.setting_value);
+    if (carouselSettings?.animation) {
+      setAnimationType(carouselSettings.animation);
     }
-    if ((carouselSettings as any)?.duration?.setting_value) {
-      setAutoScrollDuration(parseInt((carouselSettings as any).duration.setting_value));
+    if (carouselSettings?.duration) {
+      setAutoScrollDuration(carouselSettings.duration);
     }
   }, [carouselSettings]);
 
-  const { data: featuredSites } = useQuery({
+  const { data: featuredSites, isLoading: isFeaturedLoading } = useQuery({
     queryKey: ['featured-sites'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -125,10 +125,14 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: siteStats } = useQuery({
     queryKey: ['site-stats'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from('site_stats').select('site_id, views, clicks');
+      const { data, error } = await (supabase as any)
+        .from('site_stats')
+        .select('site_id, views, clicks')
+        .in('site_id', featuredSites?.map((s: any) => s.id) || []);
       if (error) throw error;
       return data;
     },
+    enabled: !!featuredSites && featuredSites.length > 0, // Sadece featured sites yüklendiğinde çalış
   });
 
 
@@ -163,7 +167,9 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             </div>
           </div>
         </div>
-        {featuredSites && featuredSites.length > 0 && (
+        {isFeaturedLoading ? (
+          <LoadingSpinner size="lg" text="Öne çıkan siteler yükleniyor..." />
+        ) : featuredSites && featuredSites.length > 0 ? (
           <div className="relative -mx-4 px-4 py-12 overflow-hidden">
             {/* Animated Background Effects */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
@@ -243,7 +249,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
