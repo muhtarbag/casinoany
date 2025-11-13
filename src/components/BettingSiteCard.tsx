@@ -73,13 +73,17 @@ const BettingSiteCardComponent = ({
   const displayViews = useMemo(() => {
     if (isAdmin) return views; // Admin sees real values
     const baseViews = getRandomBaseFromId(id, 598, 2432);
-    return baseViews + views;
+    const totalViews = baseViews + views;
+    console.log('Views Debug:', { isAdmin, baseViews, views, totalViews, siteId: id });
+    return totalViews;
   }, [isAdmin, views, id]);
 
   const displayClicks = useMemo(() => {
     if (isAdmin) return clicks; // Admin sees real values
     const baseClicks = getRandomBaseFromId(id, 598, 2432);
-    return baseClicks + clicks;
+    const totalClicks = baseClicks + clicks;
+    console.log('Clicks Debug:', { isAdmin, baseClicks, clicks, totalClicks, siteId: id });
+    return totalClicks;
   }, [isAdmin, clicks, id]);
 
   useEffect(() => {
