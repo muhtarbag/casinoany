@@ -47,7 +47,7 @@ interface CalendarItem {
   dependencies: string[];
 }
 
-export const ContentPlanner = () => {
+export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => void }) => {
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [contentGaps, setContentGaps] = useState<ContentGap[]>([]);
@@ -367,7 +367,16 @@ export const ContentPlanner = () => {
                         <span className="text-sm text-muted-foreground">
                           Hedef Kitle: {topic.target_audience}
                         </span>
-                        <Button size="sm">
+                        <Button 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Blog Oluşturma",
+                              description: `"${topic.title}" konusu için blog oluşturma sayfasına yönlendiriliyorsunuz...`,
+                            });
+                            onNavigateToBlog?.();
+                          }}
+                        >
                           <Plus className="h-4 w-4 mr-2" />
                           Blog Oluştur
                         </Button>
@@ -416,7 +425,22 @@ export const ContentPlanner = () => {
                         </span>
                         <Badge variant="outline">{gap.content_type}</Badge>
                       </div>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          if (topicSuggestions.length === 0) {
+                            toast({
+                              title: "Önce Konu Önerileri Oluşturun",
+                              description: "İçerik takvimi için önce konu önerileri oluşturmanız gerekiyor.",
+                              variant: "destructive"
+                            });
+                            setSelectedTab('suggestions');
+                          } else {
+                            generateContentCalendar();
+                          }
+                        }}
+                      >
                         <ArrowRight className="h-4 w-4 mr-2" />
                         Planla
                       </Button>
