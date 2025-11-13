@@ -2,6 +2,7 @@ import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, Shield } from 'lucide-react';
+import { MobileMenu } from '@/components/MobileMenu';
 import logo from '@/assets/casinodoo-logo.svg';
 
 export const Header = () => {
@@ -15,10 +16,11 @@ export const Header = () => {
             <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" />
           </NavLink>
 
-          <div className="flex items-center gap-2 md:gap-6">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-2 md:gap-6">
             <NavLink 
               to="/" 
-              className="hidden md:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
               activeClassName="text-primary font-semibold"
             >
               Ana Sayfa
@@ -58,6 +60,9 @@ export const Header = () => {
               </div>
             )}
           </div>
+
+          {/* Mobile Menu */}
+          <MobileMenu />
         </nav>
       </div>
     </header>
