@@ -121,8 +121,8 @@ export const BettingSiteCard = ({
           {name}
         </h3>
         {bonus && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg border border-border">
-            <Badge className="bg-primary text-primary-foreground border-0 text-xs">BONUS</Badge>
+          <div className="flex items-center gap-2 px-3 py-2 bg-secondary/10 rounded-lg border border-secondary/20">
+            <Badge variant="secondary" className="border-0 text-xs">BONUS</Badge>
             <span className="text-sm font-medium text-foreground">{bonus}</span>
           </div>
         )}
