@@ -1,250 +1,421 @@
-import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
+// Deno edge function
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { type, data } = await req.json();
-    const OPENAI_API_KEY = Deno.env.get('OPENAI');
-    
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI API key is not configured');
+    console.log('Request type:', type);
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY bulunamadı');
     }
 
-    let systemPrompt = '';
-    let userPrompt = '';
+    let result;
 
     if (type === 'suggest-site-details') {
-      systemPrompt = `Sen bahis sitelerini analiz eden bir uzman asistansın. Verilen site bilgilerine göre bonus, özellikler ve rating önerileri yapıyorsun. Türkçe yanıt ver.`;
-      userPrompt = `Site adı: ${data.siteName}
-      
-Lütfen bu bahis sitesi için:
-1. Cazip ve gerçekçi bonus teklifleri öner (virgülle ayrılmış)
-2. Sitenin sahip olması gereken özellikler listesi öner (virgülle ayrılmış)
-3. 1-10 arası rating öner
-
-JSON formatında yanıt ver:
-{
-  "bonus": "bonus1, bonus2, bonus3",
-  "features": "özellik1, özellik2, özellik3",
-  "rating": 8.5
-}`;
+      result = await generateSiteDetails(data, LOVABLE_API_KEY);
     } else if (type === 'generate-blog') {
-      systemPrompt = `Sen SEO ve içerik pazarlama uzmanısın. Arama motorları için optimize edilmiş, kullanıcı deneyimini ön planda tutan blog içerikleri üretiyorsun. Google'ın E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) prensiplerine göre içerik yazıyorsun. Türkçe yazıyorsun.`;
-      userPrompt = `Konu: ${data.topic}
-${data.siteName ? `İlgili Site: ${data.siteName}` : ''}
-
-KRITIK SEO KURALLARI:
-
-1. BAŞLIK (Title - 55-60 karakter):
-   - Ana keyword'ü başa koy
-   - Rakamlar ve güçlü kelimeler kullan (2024, En İyi, Rehber, Tam, Detaylı)
-   - Tıklamayı teşvik edici
-   
-2. İÇERIK YAPISI (Minimum 1500 kelime):
-   - <h2> ana bölümler (3-5 adet, her birinde keyword varyasyonu)
-   - <h3> alt bölümler (daha detaylı konular)
-   - <p> paragraflar (3-4 cümle, okunaklı)
-   - <ul>/<ol> listeler (okuyucu için kolay taranabilir)
-   - <strong> önemli terimler
-   - <blockquote> önemli notlar
-   - Keyword yoğunluğu: %1-2 (doğal kullanım)
-   
-3. SEO OPTIMIZASYONU:
-   - LSI Keywords (ilgili terimler) kullan
-   - Long-tail keywords ekle
-   - Soru formatında başlıklar (H2/H3)
-   - İlk paragrafta ana keyword geçmeli
-   - Son paragrafta CTA (Call to Action)
-   
-4. İÇERIK KALİTESİ:
-   - E-E-A-T prensipleri: Uzmanlık göster, kaynak ver
-   - Güncel bilgiler (2024-2025)
-   - Sayısal veriler ve istatistikler
-   - Karşılaştırma tabloları
-   - Adım adım rehberler
-   - Gerçek kullanıcı senaryoları
-   
-5. KULLANICI DENEYİMİ:
-   - Kısa paragraflar (mobil uyumlu)
-   - Madde işaretleri
-   - Geçiş cümleleri
-   - Soru-cevap bölümü (FAQ)
-   - Özet/Sonuç bölümü
-
-6. SEMANTIC HTML:
-   <article>
-     <header>
-       <h1>Ana Başlık (keyword içeren)</h1>
-     </header>
-     
-     <section>
-       <h2>Giriş - Konuya Genel Bakış</h2>
-       <p>İçerik...</p>
-     </section>
-     
-     <section>
-       <h2>Ana Bölüm 1 (keyword varyasyonu)</h2>
-       <h3>Alt Konu 1</h3>
-       <p>Detaylı açıklama...</p>
-       <ul>
-         <li>Madde 1</li>
-         <li>Madde 2</li>
-       </ul>
-       
-       <h3>Alt Konu 2</h3>
-       <p>Detaylı açıklama...</p>
-     </section>
-     
-     <section>
-       <h2>Ana Bölüm 2</h2>
-       <p>İçerik...</p>
-       <blockquote>
-         <strong>ÖNEMLİ:</strong> Kritik bilgi
-       </blockquote>
-     </section>
-     
-     <section>
-       <h2>Sıkça Sorulan Sorular (FAQ)</h2>
-       <h3>Soru 1?</h3>
-       <p>Cevap...</p>
-       <h3>Soru 2?</h3>
-       <p>Cevap...</p>
-     </section>
-     
-     <section>
-       <h2>Sonuç ve Öneriler</h2>
-       <p>Özet ve CTA...</p>
-     </section>
-   </article>
-
-JSON formatında yanıt ver:
-{
-  "title": "SEO optimized başlık (55-60 karakter, keyword içeren)",
-  "content": "Yukarıdaki semantic HTML yapısında 1500+ kelime içerik",
-  "excerpt": "İlgi çekici özet, keyword içeren (140-160 karakter)",
-  "meta_description": "Arama sonuçları için optimize edilmiş açıklama, CTA içeren (150-160 karakter)",
-  "tags": "ana-keyword, long-tail-keyword-1, long-tail-keyword-2, lsi-keyword-1, lsi-keyword-2, kategori-keyword"
-}
-
-NOT: 
-- Başlıkta sayı kullan (örn: "2024 Rehberi", "10 İpucu", "5 Adımda")
-- Meta description'da aktif fiil kullan (Keşfedin, Öğrenin, İnceleyin)
-- İçerikte sorular sor ve yanıtla
-- Mobil okumaya uygun kısa paragraflar yaz
-- Her bölüm sonunda geçiş cümlesi kullan`;
+      result = await generateBlogContent(data, LOVABLE_API_KEY);
     } else if (type === 'generate-reviews') {
-      systemPrompt = `Sen gerçekçi ve organik kullanıcı yorumları oluşturan bir asistansın. Bahis siteleri hakkında çeşitli profillerde kullanıcıların yazabileceği gerçekçi yorumlar üretiyorsun. Türkçe yazıyorsun.`;
-      userPrompt = `Site adı: ${data.siteName}
-Oluşturulacak yorum sayısı: ${data.count || 3}
-
-Her yorum için gerçekçi ve çeşitli içerik oluştur:
-1. İsim: Türk isimleri kullan (örn: Ahmet Y., Ayşe K., Mehmet D.)
-2. Puan: 1-5 arası, çoğunlukla 4-5 puan ağırlıklı ama 2-3 puan alan yorumlar da olsun
-3. Başlık: Kısa, özgün ve duygusal (10-50 karakter)
-4. Yorum: 50-200 kelime arası detaylı, kişisel deneyim içeren gerçekçi yorum. Her yorum farklı bir perspektif sunmalı (bonuslardan bahseden, müşteri hizmetlerinden, çekim hızından, oyun çeşitliliğinden vs.)
-
-JSON formatında yanıt ver:
-{
-  "reviews": [
-    {
-      "name": "İsim Soyad İlk Harf",
-      "rating": 4,
-      "title": "Yorum başlığı",
-      "comment": "Detaylı yorum metni..."
-    }
-  ]
-}`;
+      result = await generateReviews(data, LOVABLE_API_KEY);
     } else {
-      throw new Error('Invalid request type');
-    }
-
-    console.log(`Processing ${type} request with OpenAI`);
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.8,
-      }),
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit aşıldı, lütfen daha sonra tekrar deneyin.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI kredisi yetersiz, lütfen hesabınıza kredi ekleyin.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    let aiResponse = result.choices[0].message.content;
-    
-    console.log('AI Response received:', aiResponse.substring(0, 200));
-    
-    // Remove markdown code blocks if present
-    aiResponse = aiResponse
-      .replace(/```json\s*/g, '')
-      .replace(/```\s*/g, '')
-      .trim();
-    
-    // Extract JSON from response - find the first { and last }
-    const firstBrace = aiResponse.indexOf('{');
-    const lastBrace = aiResponse.lastIndexOf('}');
-    
-    if (firstBrace === -1 || lastBrace === -1 || firstBrace >= lastBrace) {
-      console.error('No valid JSON found in AI response');
-      throw new Error('AI yanıtından JSON çıkarılamadı');
-    }
-    
-    const jsonString = aiResponse.substring(firstBrace, lastBrace + 1);
-    
-    console.log('Extracted JSON (first 200 chars):', jsonString.substring(0, 200));
-    
-    let suggestion;
-    try {
-      suggestion = JSON.parse(jsonString);
-    } catch (parseError) {
-      console.error('JSON Parse Error:', parseError);
-      console.error('Failed JSON string (first 500 chars):', jsonString.substring(0, 500));
-      throw new Error(`JSON parse hatası: ${parseError instanceof Error ? parseError.message : 'Bilinmeyen hata'}`);
+      throw new Error('Geçersiz istek tipi');
     }
 
     return new Response(
-      JSON.stringify({ success: true, data: suggestion }),
+      JSON.stringify({ success: true, data: result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
   } catch (error) {
-    console.error('Error in admin-ai-assistant:', error);
+    console.error('Error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Bilinmeyen hata' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata' 
+      }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     );
   }
 });
+
+async function generateSiteDetails(data: any, apiKey: string) {
+  const { siteName, description } = data;
+
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        {
+          role: 'system',
+          content: 'Sen bahis sitesi analiz uzmanısın. Verilen site için detaylı ve doğru bilgiler üretmelisin.'
+        },
+        {
+          role: 'user',
+          content: `${siteName} bahis sitesi için detaylı bilgiler oluştur. Açıklama: ${description || 'Yok'}. 
+          
+          Şu bilgileri JSON formatında döndür (sadece JSON, başka metin yok):
+          - name: Site adı
+          - description: 2-3 cümlelik açıklama (150-200 karakter)
+          - rating: 1-5 arası puan
+          - welcome_bonus: Hoş geldin bonusu açıklaması
+          - payment_methods: Ödeme yöntemleri dizisi (en az 5 adet)
+          - sports_coverage: Spor karşılaması dizisi (en az 8 adet)
+          - live_betting: Canlı bahis özellikleri (boolean)
+          - mobile_app: Mobil uygulama durumu (boolean)
+          - customer_support: Müşteri desteği açıklaması
+          - license_info: Lisans bilgisi`
+        }
+      ],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'generate_site_details',
+          description: 'Bahis sitesi için detaylı bilgiler oluştur',
+          parameters: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              description: { type: 'string' },
+              rating: { type: 'number', minimum: 1, maximum: 5 },
+              welcome_bonus: { type: 'string' },
+              payment_methods: { 
+                type: 'array',
+                items: { type: 'string' },
+                minItems: 5
+              },
+              sports_coverage: { 
+                type: 'array',
+                items: { type: 'string' },
+                minItems: 8
+              },
+              live_betting: { type: 'boolean' },
+              mobile_app: { type: 'boolean' },
+              customer_support: { type: 'string' },
+              license_info: { type: 'string' }
+            },
+            required: ['name', 'description', 'rating', 'welcome_bonus', 'payment_methods', 'sports_coverage', 'live_betting', 'mobile_app', 'customer_support', 'license_info'],
+            additionalProperties: false
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'generate_site_details' } }
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Lovable AI Error:', response.status, errorText);
+    throw new Error(`Lovable AI hatası: ${response.status}`);
+  }
+
+  const result = await response.json();
+  const toolCall = result.choices[0].message.tool_calls?.[0];
+  
+  if (!toolCall) {
+    throw new Error('AI tool call yanıtı alınamadı');
+  }
+
+  return JSON.parse(toolCall.function.arguments);
+}
+
+async function generateBlogContent(data: any, apiKey: string) {
+  const { topic, siteName, targetKeywords } = data;
+
+  // Step 1: SEO Keyword Research
+  console.log('Step 1: SEO Keyword Research');
+  const keywordResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [{
+        role: 'user',
+        content: `"${topic}" konusu için SEO keyword araştırması yap. Site: ${siteName || 'Genel'}
+        
+        Şunları belirle:
+        - Ana anahtar kelime
+        - 5-7 ikincil anahtar kelime
+        - 3-5 uzun kuyruk anahtar kelime
+        - Önerilen H2/H3 başlıkları`
+      }],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'keyword_research',
+          parameters: {
+            type: 'object',
+            properties: {
+              primary_keyword: { type: 'string' },
+              secondary_keywords: { type: 'array', items: { type: 'string' }, minItems: 5 },
+              long_tail_keywords: { type: 'array', items: { type: 'string' }, minItems: 3 },
+              suggested_headings: { type: 'array', items: { type: 'string' }, minItems: 5 }
+            },
+            required: ['primary_keyword', 'secondary_keywords', 'long_tail_keywords', 'suggested_headings']
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'keyword_research' } }
+    })
+  });
+
+  const keywordResult = await keywordResponse.json();
+  const keywords = JSON.parse(keywordResult.choices[0].message.tool_calls[0].function.arguments);
+
+  // Step 2: Content Outline
+  console.log('Step 2: Content Outline');
+  const outlineResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [{
+        role: 'user',
+        content: `"${topic}" için detaylı blog taslağı oluştur.
+        
+        Ana keyword: ${keywords.primary_keyword}
+        İkincil keywords: ${keywords.secondary_keywords.join(', ')}
+        
+        Her bölüm için:
+        - Başlık (H2/H3)
+        - Ana noktalar
+        - Hedef kelime sayısı`
+      }],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'create_outline',
+          parameters: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              introduction: { type: 'string' },
+              sections: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    heading: { type: 'string' },
+                    key_points: { type: 'array', items: { type: 'string' } },
+                    target_word_count: { type: 'number' }
+                  }
+                },
+                minItems: 4
+              },
+              conclusion_points: { type: 'array', items: { type: 'string' } }
+            },
+            required: ['title', 'introduction', 'sections', 'conclusion_points']
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'create_outline' } }
+    })
+  });
+
+  const outlineResult = await outlineResponse.json();
+  const outline = JSON.parse(outlineResult.choices[0].message.tool_calls[0].function.arguments);
+
+  // Step 3: Generate Full Content
+  console.log('Step 3: Generate Full Content');
+  const contentResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [{
+        role: 'user',
+        content: `Bu taslağa göre tam blog içeriği oluştur:
+
+Başlık: ${outline.title}
+Giriş: ${outline.introduction}
+
+Bölümler: ${JSON.stringify(outline.sections)}
+
+Sonuç noktaları: ${outline.conclusion_points.join(', ')}
+
+İçerik HTML formatında olmalı:
+- Semantic HTML kullan (article, section, header, h1-h6, p, ul, ol, strong, em)
+- Ana keyword: ${keywords.primary_keyword}
+- İkincil keywords'leri doğal şekilde yerleştir
+- Minimum 1500 kelime
+- Her bölüm için uygun başlıklar
+- Liste ve tablolar kullan
+- CTA bölümleri ekle`
+      }],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'generate_blog_content',
+          parameters: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              content: { type: 'string', description: 'HTML formatted content' },
+              excerpt: { type: 'string', maxLength: 160 },
+              meta_description: { type: 'string', maxLength: 160 },
+              meta_keywords: { type: 'array', items: { type: 'string' }, maxItems: 10 },
+              focus_keyword: { type: 'string' },
+              read_time: { type: 'number', description: 'Estimated read time in minutes' },
+              tags: { type: 'array', items: { type: 'string' }, minItems: 3 },
+              category: { type: 'string' },
+              word_count: { type: 'number' }
+            },
+            required: ['title', 'content', 'excerpt', 'meta_description', 'meta_keywords', 'focus_keyword', 'read_time', 'tags', 'category', 'word_count']
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'generate_blog_content' } }
+    })
+  });
+
+  const contentResult = await contentResponse.json();
+  const content = JSON.parse(contentResult.choices[0].message.tool_calls[0].function.arguments);
+
+  // Step 4: SEO Score Analysis
+  console.log('Step 4: SEO Analysis');
+  const seoResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [{
+        role: 'user',
+        content: `Bu blog içeriği için SEO analizi yap:
+
+Başlık: ${content.title}
+İçerik kelime sayısı: ${content.word_count}
+Focus keyword: ${content.focus_keyword}
+Meta description: ${content.meta_description}
+
+SEO skorunu 0-100 arasında değerlendir ve iyileştirme önerileri sun.`
+      }],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'seo_analysis',
+          parameters: {
+            type: 'object',
+            properties: {
+              seo_score: { type: 'number', minimum: 0, maximum: 100 },
+              keyword_density: { type: 'number' },
+              readability_score: { type: 'number', minimum: 0, maximum: 100 },
+              improvements: { type: 'array', items: { type: 'string' }, minItems: 3 },
+              strengths: { type: 'array', items: { type: 'string' }, minItems: 2 }
+            },
+            required: ['seo_score', 'keyword_density', 'readability_score', 'improvements', 'strengths']
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'seo_analysis' } }
+    })
+  });
+
+  const seoResult = await seoResponse.json();
+  const seoAnalysis = JSON.parse(seoResult.choices[0].message.tool_calls[0].function.arguments);
+
+  return {
+    ...content,
+    seo_analysis: seoAnalysis,
+    keywords_research: keywords,
+    outline: outline
+  };
+}
+
+async function generateReviews(data: any, apiKey: string) {
+  const { siteName, count } = data;
+
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [{
+        role: 'user',
+        content: `${siteName} bahis sitesi için ${count || 5} adet gerçekçi kullanıcı yorumu oluştur.
+        
+        Her yorum için:
+        - Türkçe isim ve soyisim
+        - 1-5 arası puan
+        - 100-200 kelimelik detaylı yorum
+        - Yorumun tarihi (son 3 ay içinde)
+        - Pozitif ve negatif yorumlar karışık olmalı
+        - Gerçekçi kullanıcı deneyimleri`
+      }],
+      tools: [{
+        type: 'function',
+        function: {
+          name: 'generate_reviews',
+          parameters: {
+            type: 'object',
+            properties: {
+              reviews: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    author_name: { type: 'string' },
+                    rating: { type: 'number', minimum: 1, maximum: 5 },
+                    comment: { type: 'string' },
+                    date: { type: 'string', format: 'date' },
+                    pros: { type: 'array', items: { type: 'string' } },
+                    cons: { type: 'array', items: { type: 'string' } }
+                  },
+                  required: ['author_name', 'rating', 'comment', 'date']
+                }
+              }
+            },
+            required: ['reviews']
+          }
+        }
+      }],
+      tool_choice: { type: 'function', function: { name: 'generate_reviews' } }
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Lovable AI Error:', response.status, errorText);
+    throw new Error(`Lovable AI hatası: ${response.status}`);
+  }
+
+  const result = await response.json();
+  const toolCall = result.choices[0].message.tool_calls?.[0];
+  
+  if (!toolCall) {
+    throw new Error('AI tool call yanıtı alınamadı');
+  }
+
+  return JSON.parse(toolCall.function.arguments);
+}
