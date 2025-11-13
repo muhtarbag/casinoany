@@ -114,6 +114,12 @@ export default function Admin() {
         .from('betting_sites')
         .select('*', { count: 'exact', head: true });
 
+      // Get active sites
+      const { count: activeSitesCount } = await supabase
+        .from('betting_sites')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
       // Get total users
       const { count: usersCount } = await (supabase as any)
         .from('profiles')
@@ -125,8 +131,36 @@ export default function Admin() {
         .select('*', { count: 'exact', head: true });
 
       // Get pending reviews
-      const { count: pendingCount } = await (supabase as any)
+      const { count: pendingReviewsCount } = await (supabase as any)
         .from('site_reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', false);
+      
+      // Get approved reviews
+      const { count: approvedReviewsCount } = await (supabase as any)
+        .from('site_reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', true);
+
+      // Get total blog posts
+      const { count: blogPostsCount } = await (supabase as any)
+        .from('blog_posts')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get published blog posts
+      const { count: publishedBlogsCount } = await (supabase as any)
+        .from('blog_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_published', true);
+
+      // Get total blog comments
+      const { count: blogCommentsCount } = await (supabase as any)
+        .from('blog_comments')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get pending blog comments
+      const { count: pendingCommentsCount } = await (supabase as any)
+        .from('blog_comments')
         .select('*', { count: 'exact', head: true })
         .eq('is_approved', false);
 
@@ -137,14 +171,31 @@ export default function Admin() {
 
       const totalViews = statsData?.reduce((sum: number, stat: any) => sum + (stat.views || 0), 0) || 0;
       const totalClicks = statsData?.reduce((sum: number, stat: any) => sum + (stat.clicks || 0), 0) || 0;
+      
+      // Get blog views
+      const { data: blogData } = await (supabase as any)
+        .from('blog_posts')
+        .select('view_count');
+      const totalBlogViews = blogData?.reduce((sum: number, post: any) => sum + (post.view_count || 0), 0) || 0;
+
+      // Calculate CTR (Click Through Rate)
+      const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0';
 
       return {
         totalSites: sitesCount || 0,
+        activeSites: activeSitesCount || 0,
         totalUsers: usersCount || 0,
         totalReviews: reviewsCount || 0,
-        pendingReviews: pendingCount || 0,
+        pendingReviews: pendingReviewsCount || 0,
+        approvedReviews: approvedReviewsCount || 0,
+        totalBlogPosts: blogPostsCount || 0,
+        publishedBlogs: publishedBlogsCount || 0,
+        totalBlogComments: blogCommentsCount || 0,
+        pendingComments: pendingCommentsCount || 0,
         totalViews,
         totalClicks,
+        totalBlogViews,
+        ctr,
       };
     },
   });
@@ -347,7 +398,7 @@ export default function Admin() {
         </div>
 
         {/* Dashboard Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Toplam Siteler</CardTitle>
@@ -355,7 +406,9 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardStats?.totalSites || 0}</div>
-              <p className="text-xs text-muted-foreground">Aktif bahis siteleri</p>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats?.activeSites || 0} aktif
+              </p>
             </CardContent>
           </Card>
 
@@ -377,7 +430,9 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardStats?.totalReviews || 0}</div>
-              <p className="text-xs text-muted-foreground">Kullanıcı yorumu</p>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats?.approvedReviews || 0} onaylı
+              </p>
             </CardContent>
           </Card>
 
@@ -391,26 +446,84 @@ export default function Admin() {
               <p className="text-xs text-muted-foreground">Onay bekliyor</p>
             </CardContent>
           </Card>
+        </div>
 
+        {/* Extended Statistics - Row 2 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blog Yazıları</CardTitle>
+              <MessageSquare className="h-4 w-4 text-purple-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalBlogPosts || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats?.publishedBlogs || 0} yayında
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border-cyan-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blog Görüntüleme</CardTitle>
+              <Eye className="h-4 w-4 text-cyan-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalBlogViews.toLocaleString() || 0}</div>
+              <p className="text-xs text-muted-foreground">Toplam okuma</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blog Yorumları</CardTitle>
+              <MessageSquare className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalBlogComments || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                {dashboardStats?.pendingComments || 0} beklemede
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Tıklama Oranı (CTR)</CardTitle>
+              <TrendingUp className="h-4 w-4 text-emerald-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.ctr || '0'}%</div>
+              <p className="text-xs text-muted-foreground">Dönüşüm performansı</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8">
           <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Toplam Görüntülenme</CardTitle>
+              <CardTitle className="text-sm font-medium">Site Görüntüleme</CardTitle>
               <Eye className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardStats?.totalViews.toLocaleString() || 0}</div>
-              <p className="text-xs text-muted-foreground">Site görüntüleme</p>
+              <p className="text-xs text-muted-foreground">
+                Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalViews / dashboardStats.totalSites) : 0} / site
+              </p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20 hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Toplam Tıklama</CardTitle>
+              <CardTitle className="text-sm font-medium">Affiliate Tıklama</CardTitle>
               <MousePointer className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardStats?.totalClicks.toLocaleString() || 0}</div>
-              <p className="text-xs text-muted-foreground">Affiliate tıklaması</p>
+              <p className="text-xs text-muted-foreground">
+                Ortalama: {dashboardStats?.totalSites ? Math.round(dashboardStats.totalClicks / dashboardStats.totalSites) : 0} / site
+              </p>
             </CardContent>
           </Card>
         </div>
