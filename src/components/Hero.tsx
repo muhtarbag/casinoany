@@ -36,6 +36,24 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
+  // Auto-scroll on mobile every 3 seconds
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) return;
+
+    const autoScroll = setInterval(() => {
+      if (emblaApi.canScrollNext()) {
+        emblaApi.scrollNext();
+      } else {
+        emblaApi.scrollTo(0);
+      }
+    }, 3000);
+
+    return () => clearInterval(autoScroll);
+  }, [emblaApi]);
+
   const { data: featuredSites } = useQuery({
     queryKey: ['featured-sites'],
     queryFn: async () => {
@@ -98,27 +116,41 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           </div>
         </div>
         {featuredSites && featuredSites.length > 0 && (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">Öne Çıkan Siteler</h2>
-              <p className="text-muted-foreground text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
+          <div className="relative -mx-4 px-4 py-12 overflow-hidden">
+            {/* Animated Background Effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+              <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute top-1/2 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
             </div>
-            <div className="relative max-w-7xl mx-auto">
-              <button onClick={scrollPrev} disabled={!canScrollPrev} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Previous"><ChevronLeft className="w-6 h-6" /></button>
-              <button onClick={scrollNext} disabled={!canScrollNext} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Next"><ChevronRight className="w-6 h-6" /></button>
-              <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex gap-6">
-                  {featuredSites.map((site) => (
-                    <div key={site.id} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)]">
-                      <BettingSiteCard id={site.id} name={site.name} logo={site.logo_url || undefined} rating={Number(site.rating) || 0} bonus={site.bonus || undefined} features={site.features || undefined} affiliateUrl={site.affiliate_link} email={site.email || undefined} whatsapp={site.whatsapp || undefined} telegram={site.telegram || undefined} twitter={site.twitter || undefined} instagram={site.instagram || undefined} facebook={site.facebook || undefined} youtube={site.youtube || undefined} />
-                    </div>
+
+            <div className="relative z-10 space-y-8">
+              <div className="text-center">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">Öne Çıkan Siteler</h2>
+                <p className="text-muted-foreground text-base sm:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
+              </div>
+              <div className="relative max-w-7xl mx-auto">
+                <button onClick={scrollPrev} disabled={!canScrollPrev} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Previous"><ChevronLeft className="w-6 h-6" /></button>
+                <button onClick={scrollNext} disabled={!canScrollNext} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Next"><ChevronRight className="w-6 h-6" /></button>
+                <div className="overflow-hidden" ref={emblaRef}>
+                  <div className="flex gap-6 transition-opacity duration-500">
+                    {featuredSites.map((site) => (
+                      <div key={site.id} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)]">
+                        <BettingSiteCard id={site.id} name={site.name} logo={site.logo_url || undefined} rating={Number(site.rating) || 0} bonus={site.bonus || undefined} features={site.features || undefined} affiliateUrl={site.affiliate_link} email={site.email || undefined} whatsapp={site.whatsapp || undefined} telegram={site.telegram || undefined} twitter={site.twitter || undefined} instagram={site.instagram || undefined} facebook={site.facebook || undefined} youtube={site.youtube || undefined} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-center gap-2 mt-6">
+                  {featuredSites.map((_, index) => (
+                    <button 
+                      key={index} 
+                      onClick={() => emblaApi?.scrollTo(index)} 
+                      className={`h-2 rounded-full transition-all duration-300 ${selectedIndex === index ? 'bg-primary w-8' : 'bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50'}`} 
+                      aria-label={`Go to slide ${index + 1}`} 
+                    />
                   ))}
                 </div>
-              </div>
-              <div className="flex md:hidden justify-center gap-2 mt-6">
-                {featuredSites.map((_, index) => (
-                  <button key={index} onClick={() => emblaApi?.scrollTo(index)} className={`w-2 h-2 rounded-full transition-all ${selectedIndex === index ? 'bg-primary w-6' : 'bg-muted-foreground/30'}`} aria-label={`Go to slide ${index + 1}`} />
-                ))}
               </div>
             </div>
           </div>
