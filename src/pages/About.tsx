@@ -10,7 +10,7 @@ const About = () => {
   const organizationStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'CasinoDoo',
+    name: 'CasinoAny.com',
     description: 'Türkiye\'nin en kapsamlı casino ve bahis siteleri karşılaştırma ve inceleme platformu. Güvenilir, lisanslı casino ve bahis siteleri hakkında detaylı analizler ve kullanıcı yorumları.',
     url: window.location.origin,
     logo: `${window.location.origin}/logos/casinodoo-logo.svg`,
@@ -34,10 +34,10 @@ const About = () => {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'BahisSiteleri.com nedir?',
+        name: 'CasinoAny.com nedir?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'BahisSiteleri.com, Türkiye\'deki güvenilir ve lisanslı bahis sitelerini karşılaştıran, inceleyen ve değerlendiren bağımsız bir platformdur. Kullanıcılarımıza en iyi bahis deneyimi için objektif bilgiler sunuyoruz.'
+          text: 'CasinoAny.com, Türkiye\'deki güvenilir ve lisanslı bahis sitelerini karşılaştıran, inceleyen ve değerlendiren bağımsız bir platformdur. Kullanıcılarımıza en iyi bahis deneyimi için objektif bilgiler sunuyoruz.'
         }
       },
       {
@@ -79,7 +79,7 @@ const About = () => {
     <div className="min-h-screen bg-gradient-dark">
       <SEO
         title="Hakkımızda - Türkiye'nin En Kapsamlı Bahis Siteleri Karşılaştırma Platformu"
-        description="BahisSiteleri.com olarak 2024'ten beri güvenilir, lisanslı bahis sitelerini inceleyen ve karşılaştıran bağımsız bir platformuz. Uzman ekibimiz, detaylı analizler ve kullanıcı yorumlarıyla en iyi bahis deneyimi için objektif bilgiler sunuyor."
+        description="CasinoAny.com olarak 2020'den beri güvenilir, lisanslı bahis sitelerini inceleyen ve karşılaştıran bağımsız bir platformuz. Uzman ekibimiz, detaylı analizler ve kullanıcı yorumlarıyla en iyi bahis deneyimi için objektif bilgiler sunuyor."
         keywords={['bahis siteleri hakkında', 'güvenilir bahis platformu', 'bahis sitesi karşılaştırma', 'lisanslı bahis siteleri', 'bahis sitesi inceleme']}
         canonical={`${window.location.origin}/about`}
         structuredData={[organizationStructuredData, faqStructuredData]}
@@ -90,7 +90,7 @@ const About = () => {
         <div className="max-w-5xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4">2024'ten Beri Güvenilir Kaynak</Badge>
+            <Badge variant="outline" className="mb-4">2020'den Beri Güvenilir Kaynak</Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
               Türkiye'nin En Kapsamlı Bahis Siteleri Platformu
             </h1>
@@ -104,9 +104,9 @@ const About = () => {
           <Card className="mb-8">
             <CardContent className="pt-6 space-y-4">
               <p className="text-lg leading-relaxed">
-                <strong>BahisSiteleri.com</strong>, Türkiye'deki bahis severlerin güvenli ve kaliteli bahis siteleri 
+                <strong>CasinoAny.com</strong>, Türkiye'deki bahis severlerin güvenli ve kaliteli bahis siteleri 
                 bulmasına yardımcı olmak için kurulmuş bağımsız bir inceleme ve karşılaştırma platformudur. 
-                2024 yılından bu yana, sektörün önde gelen uzmanlarından oluşan ekibimiz, her bahis sitesini 
+                2020 yılından bu yana, sektörün önde gelen uzmanlarından oluşan ekibimiz, her bahis sitesini 
                 titizlikle test ediyor, analiz ediyor ve objektif değerlendirmeler sunuyor.
               </p>
               <p className="text-lg leading-relaxed text-muted-foreground">
