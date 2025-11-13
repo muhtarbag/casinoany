@@ -106,9 +106,24 @@ export const AIAssistant = () => {
       if (error) throw error;
 
       setAnalysis(data.data);
+      
+      // Save to history
+      await supabase.from('ai_analysis_history').insert({
+        analysis_type: 'seo',
+        score: data.data.score,
+        summary: data.data.summary,
+        seo_data: data.data.seo,
+        serp_data: data.data.serp,
+        technical_data: data.data.technical,
+        content_data: data.data.content,
+        ux_data: data.data.ux,
+        actions: data.data.actions,
+        provider: data.provider || 'openai',
+      });
+
       toast({
         title: "Analiz Tamamlandı",
-        description: `AI Provider: ${data.provider === 'openai' ? 'OpenAI GPT-5' : 'Lovable AI Gemini'}`,
+        description: `AI Provider: ${data.provider === 'openai' ? 'OpenAI GPT-4o-mini' : 'Lovable AI Gemini'}`,
       });
     } catch (error) {
       console.error('Analysis error:', error);
