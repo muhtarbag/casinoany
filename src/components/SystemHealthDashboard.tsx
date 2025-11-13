@@ -4,44 +4,43 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Activity, Database, Zap, HardDrive, TrendingUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
-import { SystemHealthMetric, SystemLog } from '@/types/database';
 
 export const SystemHealthDashboard = () => {
-  const { data: healthMetrics, isLoading } = useQuery<SystemHealthMetric[]>({
+  const { data: healthMetrics, isLoading } = useQuery({
     queryKey: ['system-health'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('system_health_metrics')
         .select('*')
         .order('recorded_at', { ascending: false })
         .limit(50);
       if (error) throw error;
-      return (data as SystemHealthMetric[]) || [];
+      return data;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  const { data: recentErrors } = useQuery<SystemLog[]>({
+  const { data: recentErrors } = useQuery({
     queryKey: ['recent-errors'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('system_logs')
         .select('*')
         .in('severity', ['error', 'critical'])
         .order('created_at', { ascending: false })
         .limit(10);
       if (error) throw error;
-      return (data as SystemLog[]) || [];
+      return data;
     },
     refetchInterval: 30000,
   });
 
-  const getMetricsByType = (type: string): SystemHealthMetric[] => {
-    return healthMetrics?.filter((m) => m.metric_type === type) || [];
+  const getMetricsByType = (type: string) => {
+    return healthMetrics?.filter((m: any) => m.metric_type === type) || [];
   };
 
-  const getLatestMetric = (type: string, name: string): SystemHealthMetric | undefined => {
-    return healthMetrics?.find((m) => m.metric_type === type && m.metric_name === name);
+  const getLatestMetric = (type: string, name: string) => {
+    return healthMetrics?.find((m: any) => m.metric_type === type && m.metric_name === name);
   };
 
   const getStatusIcon = (status: string) => {
