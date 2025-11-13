@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { BlogCommentForm } from '@/components/BlogCommentForm';
 import { BlogCommentList } from '@/components/BlogCommentList';
+import { BlogRelatedSites } from '@/components/BlogRelatedSites';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -174,6 +175,11 @@ export default function BlogPost() {
               dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
             />
           </Card>
+
+          {/* Related Betting Sites */}
+          <div className="my-8">
+            <BlogRelatedSites postId={post.id} />
+          </div>
 
           {/* Comments Section */}
           <div className="space-y-8 my-8">

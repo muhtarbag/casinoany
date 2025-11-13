@@ -55,6 +55,7 @@ export const BlogManagement = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -78,6 +79,20 @@ export const BlogManagement = () => {
         .order('created_at', { ascending: false });
       if (error) throw error;
       return (data as unknown) as BlogPost[];
+    },
+  });
+
+  // Fetch all betting sites for selection
+  const { data: bettingSites } = useQuery({
+    queryKey: ['betting-sites-for-blog'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('id, name, logo_url')
+        .eq('is_active', true)
+        .order('name');
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -135,8 +150,29 @@ export const BlogManagement = () => {
         published_at: data.is_published ? new Date().toISOString() : null,
         author_id: user?.id,
       };
-      const { error } = await supabase.from('blog_posts' as any).insert([postData]);
+      
+      const { data: newPost, error } = await supabase
+        .from('blog_posts' as any)
+        .insert([postData])
+        .select()
+        .single();
+      
       if (error) throw error;
+
+      // Add related sites if any selected
+      if (selectedSites.length > 0 && newPost) {
+        const relatedSitesData = selectedSites.map((siteId, index) => ({
+          post_id: (newPost as any).id,
+          site_id: siteId,
+          display_order: index,
+        }));
+        
+        const { error: relError } = await (supabase as any)
+          .from('blog_post_related_sites')
+          .insert(relatedSitesData);
+        
+        if (relError) throw relError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
@@ -186,6 +222,28 @@ export const BlogManagement = () => {
       };
       const { error } = await supabase.from('blog_posts' as any).update(postData).eq('id', id);
       if (error) throw error;
+
+      // Update related sites
+      // First delete existing relations
+      await (supabase as any)
+        .from('blog_post_related_sites')
+        .delete()
+        .eq('post_id', id);
+
+      // Then add new ones if any selected
+      if (selectedSites.length > 0) {
+        const relatedSitesData = selectedSites.map((siteId, index) => ({
+          post_id: id,
+          site_id: siteId,
+          display_order: index,
+        }));
+        
+        const { error: relError } = await (supabase as any)
+          .from('blog_post_related_sites')
+          .insert(relatedSitesData);
+        
+        if (relError) throw relError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
@@ -229,11 +287,12 @@ export const BlogManagement = () => {
     });
     setImageFile(null);
     setImagePreview(null);
+    setSelectedSites([]);
     setIsEditing(false);
     setEditingId(null);
   };
 
-  const handleEdit = (post: BlogPost) => {
+  const handleEdit = async (post: BlogPost) => {
     setFormData({
       title: post.title,
       slug: post.slug,
@@ -249,6 +308,18 @@ export const BlogManagement = () => {
     });
     setImagePreview(post.featured_image || null);
     setImageFile(null);
+    
+    // Load related sites
+    const { data: relatedSites } = await (supabase as any)
+      .from('blog_post_related_sites')
+      .select('site_id')
+      .eq('post_id', post.id)
+      .order('display_order');
+    
+    if (relatedSites) {
+      setSelectedSites(relatedSites.map((r: any) => r.site_id));
+    }
+    
     setEditingId(post.id);
     setIsEditing(true);
   };
@@ -455,6 +526,58 @@ export const BlogManagement = () => {
                     placeholder="bahis siteleri, casino, bonus"
                   />
                 </div>
+              </div>
+
+              {/* Related Betting Sites Selection */}
+              <div className="space-y-3 border-t pt-4">
+                <Label>İlgili Bahis Siteleri</Label>
+                <p className="text-sm text-muted-foreground">
+                  Bu blog yazısıyla ilgili bahis sitelerini seçin (blog detay sayfasında önerilecek)
+                </p>
+                {bettingSites && bettingSites.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto p-2 border rounded-lg">
+                    {bettingSites.map((site: any) => (
+                      <label
+                        key={site.id}
+                        className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all ${
+                          selectedSites.includes(site.id)
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSites.includes(site.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedSites([...selectedSites, site.id]);
+                            } else {
+                              setSelectedSites(selectedSites.filter((id) => id !== site.id));
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          {site.logo_url && (
+                            <img
+                              src={site.logo_url}
+                              alt={site.name}
+                              className="w-6 h-6 object-contain"
+                            />
+                          )}
+                          <span className="text-sm font-medium truncate">{site.name}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Aktif bahis sitesi bulunmamaktadır.</p>
+                )}
+                {selectedSites.length > 0 && (
+                  <p className="text-sm text-primary">
+                    {selectedSites.length} site seçildi
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center space-x-2 border-t pt-4">
