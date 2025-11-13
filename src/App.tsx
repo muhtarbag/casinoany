@@ -24,6 +24,7 @@ import CasinoSites from "./pages/CasinoSites";
 import SportsBetting from "./pages/SportsBetting";
 import BonusCampaigns from "./pages/BonusCampaigns";
 import MobileBetting from "./pages/MobileBetting";
+import SiteRedirect from "./pages/SiteRedirect";
 import LiveCasino from "./pages/LiveCasino";
 
 const queryClient = new QueryClient();
@@ -46,7 +47,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/sitemap.xml" element={<Sitemap />} />
-              <Route path="/site/:id" element={<SiteDetail />} />
+              <Route path="/site/:id" element={<SiteRedirect />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/cookies" element={<Cookies />} />

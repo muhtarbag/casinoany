@@ -49,7 +49,7 @@ export default function SiteDetail() {
     queryFn: async () => {
       let query = supabase
         .from("betting_sites")
-        .select("*")
+        .select("id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, created_at, updated_at")
         .eq("is_active", true);
       
       if (slug) {
