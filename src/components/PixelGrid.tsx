@@ -19,7 +19,6 @@ export const PixelGrid = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 0,
   });
 
   if (isLoading) {
