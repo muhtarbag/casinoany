@@ -300,17 +300,23 @@ export const BlogManagement = () => {
       if (error) throw error;
 
       if (data.success) {
+        const blogData = data.data;
+        const wordCount = blogData.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+        const readTime = Math.ceil(wordCount / 200); // Ortalama okuma hızı: 200 kelime/dakika
+        
         setFormData(prev => ({
           ...prev,
-          title: data.data.title || prev.title,
-          slug: generateSlug(data.data.title || prev.title),
-          content: data.data.content || prev.content,
-          excerpt: data.data.excerpt || prev.excerpt,
-          meta_description: data.data.meta_description || prev.meta_description,
-          meta_title: data.data.title || prev.meta_title,
-          tags: data.data.tags || prev.tags,
+          title: blogData.title || prev.title,
+          slug: generateSlug(blogData.title || prev.title),
+          content: blogData.content || prev.content,
+          excerpt: blogData.excerpt || prev.excerpt,
+          meta_description: blogData.meta_description || prev.meta_description,
+          meta_title: blogData.title || prev.meta_title,
+          tags: blogData.tags || prev.tags,
+          meta_keywords: blogData.tags || prev.meta_keywords,
+          read_time: readTime.toString(),
         }));
-        toast({ title: 'Başarılı', description: 'AI blog içeriği başarıyla oluşturuldu!' });
+        toast({ title: 'Başarılı', description: `AI ile ${wordCount} kelimelik SEO-optimized blog içeriği oluşturuldu! (${readTime} dk okuma süresi)` });
         setAiTopic('');
       } else {
         throw new Error(data.error);
@@ -443,42 +449,55 @@ export const BlogManagement = () => {
           <CardContent>
             {!editingId && (
               <div className="mb-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
-                <Label className="text-sm font-semibold mb-2 block">🤖 AI ile Blog Oluştur</Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Blog konusu girin (örn: 'Canlı bahis stratejileri')"
-                    value={aiTopic}
-                    onChange={(e) => setAiTopic(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAiGenerateBlog();
-                      }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleAiGenerateBlog}
-                    disabled={isAiLoading || !aiTopic}
-                    className="gap-2 whitespace-nowrap"
-                  >
-                    {isAiLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Oluşturuluyor...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        AI Oluştur
-                      </>
-                    )}
-                  </Button>
+                <Label className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  AI ile SEO-Optimized Blog Oluştur
+                </Label>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Blog konusu girin (örn: 'Canlı bahis stratejileri 2024')"
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAiGenerateBlog();
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="default"
+                      onClick={handleAiGenerateBlog}
+                      disabled={isAiLoading || !aiTopic}
+                      className="gap-2 whitespace-nowrap"
+                    >
+                      {isAiLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Oluşturuluyor...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          AI Oluştur
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-1 pl-1">
+                    <p className="font-medium text-foreground">✨ AI otomatik oluşturacak:</p>
+                    <ul className="list-disc list-inside space-y-0.5 ml-2">
+                      <li>SEO-optimized başlık (55-60 karakter, anahtar kelime içeren)</li>
+                      <li>1500+ kelime detaylı içerik (H2, H3 başlıklar, listeler, FAQ)</li>
+                      <li>Meta açıklama ve etiketler (arama motorları için)</li>
+                      <li>Özet (sosyal medya paylaşımları için)</li>
+                      <li>Otomatik okuma süresi hesaplama</li>
+                    </ul>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  AI, SEO uyumlu başlık, içerik, özet ve etiketler oluşturacak
-                </p>
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">

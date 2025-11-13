@@ -37,26 +37,109 @@ JSON formatında yanıt ver:
   "rating": 8.5
 }`;
     } else if (type === 'generate-blog') {
-      systemPrompt = `Sen SEO uzmanı bir blog yazarısın. Bahis siteleri hakkında profesyonel, bilgilendirici ve SEO optimizasyonlu içerik üretiyorsun. Türkçe yazıyorsun.`;
+      systemPrompt = `Sen SEO ve içerik pazarlama uzmanısın. Arama motorları için optimize edilmiş, kullanıcı deneyimini ön planda tutan blog içerikleri üretiyorsun. Google'ın E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) prensiplerine göre içerik yazıyorsun. Türkçe yazıyorsun.`;
       userPrompt = `Konu: ${data.topic}
 ${data.siteName ? `İlgili Site: ${data.siteName}` : ''}
 
-Lütfen aşağıdaki formatta SEO optimizasyonlu bir blog yazısı oluştur:
+KRITIK SEO KURALLARI:
 
-1. Başlık: Dikkat çekici, SEO uyumlu (60 karakter civarı)
-2. İçerik: En az 1000 kelime, HTML formatında, başlıklar (h2, h3), paragraflar, listeler içeren profesyonel içerik
-3. Özet: 150-160 karakter arası çekici özet
-4. Meta Description: SEO için 150-160 karakter
-5. Etiketler: Virgülle ayrılmış 5-7 SEO etiketi
+1. BAŞLIK (Title - 55-60 karakter):
+   - Ana keyword'ü başa koy
+   - Rakamlar ve güçlü kelimeler kullan (2024, En İyi, Rehber, Tam, Detaylı)
+   - Tıklamayı teşvik edici
+   
+2. İÇERIK YAPISI (Minimum 1500 kelime):
+   - <h2> ana bölümler (3-5 adet, her birinde keyword varyasyonu)
+   - <h3> alt bölümler (daha detaylı konular)
+   - <p> paragraflar (3-4 cümle, okunaklı)
+   - <ul>/<ol> listeler (okuyucu için kolay taranabilir)
+   - <strong> önemli terimler
+   - <blockquote> önemli notlar
+   - Keyword yoğunluğu: %1-2 (doğal kullanım)
+   
+3. SEO OPTIMIZASYONU:
+   - LSI Keywords (ilgili terimler) kullan
+   - Long-tail keywords ekle
+   - Soru formatında başlıklar (H2/H3)
+   - İlk paragrafta ana keyword geçmeli
+   - Son paragrafta CTA (Call to Action)
+   
+4. İÇERIK KALİTESİ:
+   - E-E-A-T prensipleri: Uzmanlık göster, kaynak ver
+   - Güncel bilgiler (2024-2025)
+   - Sayısal veriler ve istatistikler
+   - Karşılaştırma tabloları
+   - Adım adım rehberler
+   - Gerçek kullanıcı senaryoları
+   
+5. KULLANICI DENEYİMİ:
+   - Kısa paragraflar (mobil uyumlu)
+   - Madde işaretleri
+   - Geçiş cümleleri
+   - Soru-cevap bölümü (FAQ)
+   - Özet/Sonuç bölümü
+
+6. SEMANTIC HTML:
+   <article>
+     <header>
+       <h1>Ana Başlık (keyword içeren)</h1>
+     </header>
+     
+     <section>
+       <h2>Giriş - Konuya Genel Bakış</h2>
+       <p>İçerik...</p>
+     </section>
+     
+     <section>
+       <h2>Ana Bölüm 1 (keyword varyasyonu)</h2>
+       <h3>Alt Konu 1</h3>
+       <p>Detaylı açıklama...</p>
+       <ul>
+         <li>Madde 1</li>
+         <li>Madde 2</li>
+       </ul>
+       
+       <h3>Alt Konu 2</h3>
+       <p>Detaylı açıklama...</p>
+     </section>
+     
+     <section>
+       <h2>Ana Bölüm 2</h2>
+       <p>İçerik...</p>
+       <blockquote>
+         <strong>ÖNEMLİ:</strong> Kritik bilgi
+       </blockquote>
+     </section>
+     
+     <section>
+       <h2>Sıkça Sorulan Sorular (FAQ)</h2>
+       <h3>Soru 1?</h3>
+       <p>Cevap...</p>
+       <h3>Soru 2?</h3>
+       <p>Cevap...</p>
+     </section>
+     
+     <section>
+       <h2>Sonuç ve Öneriler</h2>
+       <p>Özet ve CTA...</p>
+     </section>
+   </article>
 
 JSON formatında yanıt ver:
 {
-  "title": "başlık",
-  "content": "html içerik",
-  "excerpt": "özet",
-  "meta_description": "meta açıklama",
-  "tags": "etiket1, etiket2, etiket3"
-}`;
+  "title": "SEO optimized başlık (55-60 karakter, keyword içeren)",
+  "content": "Yukarıdaki semantic HTML yapısında 1500+ kelime içerik",
+  "excerpt": "İlgi çekici özet, keyword içeren (140-160 karakter)",
+  "meta_description": "Arama sonuçları için optimize edilmiş açıklama, CTA içeren (150-160 karakter)",
+  "tags": "ana-keyword, long-tail-keyword-1, long-tail-keyword-2, lsi-keyword-1, lsi-keyword-2, kategori-keyword"
+}
+
+NOT: 
+- Başlıkta sayı kullan (örn: "2024 Rehberi", "10 İpucu", "5 Adımda")
+- Meta description'da aktif fiil kullan (Keşfedin, Öğrenin, İnceleyin)
+- İçerikte sorular sor ve yanıtla
+- Mobil okumaya uygun kısa paragraflar yaz
+- Her bölüm sonunda geçiş cümlesi kullan`;
     } else if (type === 'generate-reviews') {
       systemPrompt = `Sen gerçekçi ve organik kullanıcı yorumları oluşturan bir asistansın. Bahis siteleri hakkında çeşitli profillerde kullanıcıların yazabileceği gerçekçi yorumlar üretiyorsun. Türkçe yazıyorsun.`;
       userPrompt = `Site adı: ${data.siteName}
