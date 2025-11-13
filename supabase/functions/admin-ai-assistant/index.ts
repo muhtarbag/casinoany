@@ -434,8 +434,12 @@ async function generateReviews(data: any, apiKey: string) {
   const toolCall = result.choices[0].message.tool_calls?.[0];
   
   if (!toolCall) {
+    console.error('AI tool call yanıtı alınamadı, result:', JSON.stringify(result));
     throw new Error('AI tool call yanıtı alınamadı');
   }
 
-  return JSON.parse(toolCall.function.arguments);
+  const parsedData = JSON.parse(toolCall.function.arguments);
+  console.log('Generated reviews:', JSON.stringify(parsedData));
+  
+  return parsedData;
 }
