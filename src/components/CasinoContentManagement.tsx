@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Sparkles } from 'lucide-react';
 import { CasinoContentEditor } from './CasinoContentEditor';
 import { BlockCustomization } from './casino/BlockCustomization';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,6 +30,7 @@ export const CasinoContentManagement = () => {
     withdrawalGuide: { icon: 'wallet', color: '#06b6d4' },
     faq: { icon: 'help', color: '#ec4899' },
   });
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Fetch all sites
   const { data: sites, isLoading: sitesLoading } = useQuery({
@@ -80,6 +81,54 @@ export const CasinoContentManagement = () => {
       }
     }
   }, [siteContent]);
+
+  // Generate content with AI
+  const generateWithAI = async () => {
+    if (!selectedSiteId) return;
+    
+    const selectedSite = sites?.find(s => s.id === selectedSiteId);
+    if (!selectedSite) return;
+    
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-casino-content', {
+        body: {
+          siteId: selectedSiteId,
+          siteName: selectedSite.name || '',
+          siteUrl: selectedSite.affiliate_link || '',
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setPros(data.content.pros);
+        setCons(data.content.cons);
+        setVerdict(data.content.verdict);
+        setExpertReview(data.content.expertReview);
+        setGameCategories(data.content.gameCategories);
+        setLoginGuide(data.content.loginGuide);
+        setWithdrawalGuide(data.content.withdrawalGuide);
+        setFaq(data.content.faq);
+
+        toast({
+          title: "Başarılı!",
+          description: "AI ile casino içeriği oluşturuldu ve kaydedildi.",
+        });
+
+        queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
+      }
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast({
+        title: "Hata",
+        description: "İçerik oluşturulurken bir hata oluştu.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Update mutation
   const updateMutation = useMutation({
@@ -149,18 +198,32 @@ export const CasinoContentManagement = () => {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Site Seç</label>
-            <Select value={selectedSiteId} onValueChange={handleSiteChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Bir site seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                {sites?.map((site: any) => (
-                  <SelectItem key={site.id} value={site.id}>
-                    {site.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={selectedSiteId} onValueChange={handleSiteChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Bir site seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sites?.map((site: any) => (
+                    <SelectItem key={site.id} value={site.id}>
+                      {site.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {selectedSiteId && (
+                <Button
+                  onClick={generateWithAI}
+                  disabled={isGenerating}
+                  variant="outline"
+                  className="gap-2 whitespace-nowrap"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {isGenerating ? "Oluşturuluyor..." : "AI ile Oluştur"}
+                </Button>
+              )}
+            </div>
           </div>
 
           {contentLoading && (

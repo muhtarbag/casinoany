@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.content-planner]
 verify_jwt = false
 
+[functions.generate-casino-content]
+verify_jwt = false
+
 [functions.keyword-tracker]
 verify_jwt = false
 
