@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
 import { Button } from '@/components/ui/button';
-import { Loader2, Sparkles, TrendingUp } from 'lucide-react';
+import { Sparkles, TrendingUp, Search } from 'lucide-react';
+import { LoadingSpinner } from './LoadingSpinner';
+import { EmptyState } from './EmptyState';
 
 export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
@@ -21,18 +23,16 @@ export const PixelGrid = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" text="Siteler yükleniyor..." fullScreen={false} className="py-20" />;
   }
 
   if (!sites || sites.length === 0) {
     return (
-      <div className="text-center py-20">
-        <p className="text-muted-foreground text-lg">Henüz kayıtlı bahis sitesi bulunmamaktadır.</p>
-      </div>
+      <EmptyState
+        icon={Search}
+        title="Henüz Site Bulunmuyor"
+        description="Şu anda aktif bahis sitesi bulunmamaktadır. Lütfen daha sonra tekrar kontrol edin."
+      />
     );
   }
 

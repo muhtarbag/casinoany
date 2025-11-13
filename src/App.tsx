@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -77,20 +78,22 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <HelmetProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <AppContent />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </HelmetProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <AppContent />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </HelmetProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

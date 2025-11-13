@@ -3,9 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { EmptyState } from '@/components/EmptyState';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Eye, MousePointerClick, TrendingUp, Users, Target, Clock } from 'lucide-react';
+import { Eye, MousePointerClick, TrendingUp, Users, Target, Clock, BarChart3 } from 'lucide-react';
 
 export const AnalyticsDashboard = () => {
   // Fetch analytics summary
@@ -118,15 +119,18 @@ export const AnalyticsDashboard = () => {
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
   if (summaryLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-96 w-full" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" text="Analytics verileri yükleniyor..." className="py-20" />;
   }
 
-  if (!processedData) return null;
+  if (!processedData || processedData.totalPageViews === 0) {
+    return (
+      <EmptyState
+        icon={BarChart3}
+        title="Henüz Analitik Verisi Yok"
+        description="Analytics verisi görmek için sitenizde etkinlik olması gerekiyor. Kullanıcı etkileşimleri otomatik olarak takip edilecektir."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
