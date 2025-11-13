@@ -56,6 +56,7 @@ export default {
       boxShadow: {
         'glow': 'var(--shadow-glow)',
         'card': 'var(--shadow-card)',
+        'hover': 'var(--shadow-hover)',
       },
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',
