@@ -1,29 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Loader2, Search, X, Star, Filter } from 'lucide-react';
+import { Loader2, Sparkles, TrendingUp } from 'lucide-react';
 
-interface PixelGridProps {
-  initialSearchTerm?: string;
-}
-
-export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const [minRating, setMinRating] = useState(0);
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-
-  // Update search term when prop changes
-  useEffect(() => {
-    if (initialSearchTerm) {
-      setSearchTerm(initialSearchTerm);
-    }
-  }, [initialSearchTerm]);
-
+export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
@@ -38,51 +19,6 @@ export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
     },
     staleTime: 0,
   });
-
-  // Tüm özellikleri topla
-  const allFeatures = useMemo(() => {
-    if (!sites) return [];
-    const featuresSet = new Set<string>();
-    sites.forEach(site => {
-      site.features?.forEach((feature: string) => featuresSet.add(feature));
-    });
-    return Array.from(featuresSet).sort();
-  }, [sites]);
-
-  // Filtrelenmiş siteler
-  const filteredSites = useMemo(() => {
-    if (!sites) return [];
-
-    return sites.filter(site => {
-      // İsme göre arama
-      const matchesSearch = site.name.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      // Puana göre filtreleme
-      const matchesRating = Number(site.rating || 0) >= minRating;
-      
-      // Özelliklere göre filtreleme
-      const matchesFeatures = selectedFeatures.length === 0 || 
-        selectedFeatures.every(feature => site.features?.includes(feature));
-
-      return matchesSearch && matchesRating && matchesFeatures;
-    });
-  }, [sites, searchTerm, minRating, selectedFeatures]);
-
-  const toggleFeature = (feature: string) => {
-    setSelectedFeatures(prev => 
-      prev.includes(feature) 
-        ? prev.filter(f => f !== feature)
-        : [...prev, feature]
-    );
-  };
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setMinRating(0);
-    setSelectedFeatures([]);
-  };
-
-  const hasActiveFilters = searchTerm || minRating > 0 || selectedFeatures.length > 0;
 
   if (isLoading) {
     return (
@@ -101,122 +37,83 @@ export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Filtre Paneli */}
-      <Card className="p-6 bg-card/50 backdrop-blur-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold">Filtrele ve Ara</h2>
-          {hasActiveFilters && (
+    <div className="space-y-8">
+      {/* Animasyonlu CTA */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 p-8 md:p-12 backdrop-blur-sm border border-primary/20 group hover:border-primary/40 transition-all duration-500">
+        {/* Animated Background Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 animate-pulse opacity-50" />
+        
+        {/* Content */}
+        <div className="relative z-10 text-center space-y-6">
+          <div className="flex items-center justify-center gap-2 animate-fade-in">
+            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+              En İyi Seçimler
+            </span>
+            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+          </div>
+          
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground animate-fade-in">
+            Güvenilir Casino Sitelerini Keşfedin
+          </h2>
+          
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in">
+            Yüksek bonuslar, hızlı ödemeler ve 7/24 destek sunan lisanslı casino sitelerini karşılaştırın
+          </p>
+          
+          <div className="flex items-center justify-center gap-4 pt-4 animate-fade-in">
             <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearFilters}
-              className="ml-auto text-muted-foreground hover:text-foreground"
+              size="lg" 
+              className="shadow-glow hover:shadow-hover transition-all duration-300 hover:scale-105 group"
             >
-              <X className="w-4 h-4 mr-1" />
-              Temizle
+              <TrendingUp className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+              Siteleri İncele
             </Button>
-          )}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* Arama */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Site Ara</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Site adı ile ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
           </div>
-
-          {/* Minimum Puan */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Minimum Puan</label>
-            <div className="flex items-center gap-3">
-              {[0, 3, 4, 4.5].map(rating => (
-                <Button
-                  key={rating}
-                  variant={minRating === rating ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setMinRating(rating)}
-                  className="flex items-center gap-1"
-                >
-                  {rating > 0 && <Star className="w-3 h-3 fill-current" />}
-                  {rating === 0 ? 'Tümü' : rating}
-                </Button>
-              ))}
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span>50+ Lisanslı Site</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span>Güncel Bonuslar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              <span>Detaylı İncelemeler</span>
             </div>
           </div>
         </div>
-
-        {/* Özellik Filtreleri */}
-        {allFeatures.length > 0 && (
-          <div className="mt-4 space-y-2">
-            <label className="text-sm font-medium">Özellikler</label>
-            <div className="flex flex-wrap gap-2">
-              {allFeatures.map(feature => (
-                <Badge
-                  key={feature}
-                  variant={selectedFeatures.includes(feature) ? 'default' : 'outline'}
-                  className="cursor-pointer hover:bg-primary/20 transition-colors"
-                  onClick={() => toggleFeature(feature)}
-                >
-                  {feature}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-      </Card>
-
-      {/* Sonuç Sayısı */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {filteredSites.length} site bulundu
-        </p>
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
-      {/* Site Kartları */}
-      {filteredSites.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-muted-foreground text-lg">Filtrelere uygun site bulunamadı.</p>
-          <Button 
-            variant="outline" 
-            onClick={clearFilters}
-            className="mt-4"
-          >
-            Filtreleri Temizle
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 auto-rows-fr">
-          {filteredSites.map((site) => (
-            <BettingSiteCard
-              key={site.id}
-              id={site.id}
-              name={site.name}
-              logo={site.logo_url || undefined}
-              rating={Number(site.rating) || 0}
-              bonus={site.bonus || undefined}
-              features={site.features || undefined}
-              affiliateUrl={site.affiliate_link}
-              email={site.email || undefined}
-              whatsapp={site.whatsapp || undefined}
-              telegram={site.telegram || undefined}
-              twitter={site.twitter || undefined}
-              instagram={site.instagram || undefined}
-              facebook={site.facebook || undefined}
-              youtube={site.youtube || undefined}
-            />
-          ))}
-        </div>
-      )}
+      {/* Site Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sites.map((site) => (
+          <BettingSiteCard
+            key={site.id}
+            id={site.id}
+            name={site.name}
+            logo={site.logo_url || ''}
+            rating={site.rating || 0}
+            bonus={site.bonus || ''}
+            features={site.features || []}
+            affiliateUrl={site.affiliate_link || ''}
+            email={site.email || ''}
+            whatsapp={site.whatsapp || ''}
+            telegram={site.telegram || ''}
+            twitter={site.twitter || ''}
+            instagram={site.instagram || ''}
+            facebook={site.facebook || ''}
+            youtube={site.youtube || ''}
+          />
+        ))}
+      </div>
     </div>
   );
 };

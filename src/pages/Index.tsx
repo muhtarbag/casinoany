@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -6,7 +5,9 @@ import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
 
 const Index = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearch = (term: string) => {
+    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-dark">
@@ -29,10 +30,10 @@ const Index = () => {
       <Header />
       
       <main>
-        <Hero onSearch={setSearchTerm} searchTerm={searchTerm} />
+        <Hero onSearch={handleSearch} searchTerm="" />
         
         <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-          <PixelGrid initialSearchTerm={searchTerm} />
+          <PixelGrid />
         </div>
       </main>
 
