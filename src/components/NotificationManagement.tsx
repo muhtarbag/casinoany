@@ -13,7 +13,6 @@ import { Plus, Edit, Trash2, Eye, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { NotificationAnalytics } from './NotificationAnalytics';
 
 interface Notification {
   id: string;
@@ -64,7 +63,7 @@ export const NotificationManagement = () => {
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications-admin'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('site_notifications')
         .select('*')
         .order('created_at', { ascending: false });
@@ -76,7 +75,7 @@ export const NotificationManagement = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('site_notifications')
         .insert([data]);
       
@@ -95,7 +94,7 @@ export const NotificationManagement = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<typeof formData> }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('site_notifications')
         .update(data)
         .eq('id', id);
@@ -112,7 +111,7 @@ export const NotificationManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('site_notifications')
         .delete()
         .eq('id', id);
@@ -220,13 +219,7 @@ export const NotificationManagement = () => {
   }
 
   return (
-    <Tabs defaultValue="notifications" className="space-y-6">
-      <TabsList>
-        <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
-        <TabsTrigger value="analytics">Analitik</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="notifications" className="space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Bildirim Yönetimi</h2>
@@ -550,11 +543,6 @@ export const NotificationManagement = () => {
           </Card>
         ))}
       </div>
-      </TabsContent>
-
-      <TabsContent value="analytics">
-        <NotificationAnalytics />
-      </TabsContent>
-    </Tabs>
+    </div>
   );
 };
