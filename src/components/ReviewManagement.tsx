@@ -42,17 +42,23 @@ export default function ReviewManagement() {
 
       // Fetch related data
       const siteIds = reviewsData.map((r: any) => r.site_id);
-      const userIds = reviewsData.map((r: any) => r.user_id);
+      const userIds = reviewsData
+        .map((r: any) => r.user_id)
+        .filter((id: string | null) => id !== null);
 
       const { data: sites } = await (supabase as any)
         .from("betting_sites")
         .select("id, name")
         .in("id", siteIds);
 
-      const { data: profiles } = await (supabase as any)
-        .from("profiles")
-        .select("id, username, avatar_url")
-        .in("id", userIds);
+      let profiles = [];
+      if (userIds.length > 0) {
+        const { data } = await (supabase as any)
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", userIds);
+        profiles = data || [];
+      }
 
       // Combine data
       return reviewsData.map((review: any) => ({
@@ -78,17 +84,23 @@ export default function ReviewManagement() {
 
       // Fetch related data
       const siteIds = reviewsData.map((r: any) => r.site_id);
-      const userIds = reviewsData.map((r: any) => r.user_id);
+      const userIds = reviewsData
+        .map((r: any) => r.user_id)
+        .filter((id: string | null) => id !== null);
 
       const { data: sites } = await (supabase as any)
         .from("betting_sites")
         .select("id, name")
         .in("id", siteIds);
 
-      const { data: profiles } = await (supabase as any)
-        .from("profiles")
-        .select("id, username, avatar_url")
-        .in("id", userIds);
+      let profiles = [];
+      if (userIds.length > 0) {
+        const { data } = await (supabase as any)
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", userIds);
+        profiles = data || [];
+      }
 
       // Combine data
       return reviewsData.map((review: any) => ({
@@ -194,7 +206,7 @@ export default function ReviewManagement() {
   };
 
   const ReviewCard = ({ review, showActions = true }: { review: any; showActions?: boolean }) => {
-    const username = review.profiles?.username || "Anonim";
+    const username = review.name || review.profiles?.username || "Anonim";
     const avatarUrl = review.profiles?.avatar_url;
     const siteName = review.betting_sites?.name || "Bilinmeyen Site";
     const date = new Date(review.created_at).toLocaleDateString("tr-TR", {

@@ -13,8 +13,10 @@ import { Star } from "lucide-react";
 import { toast } from "sonner";
 
 const reviewSchema = z.object({
-  title: z.string().min(5, "Başlık en az 5 karakter olmalıdır").max(100, "Başlık en fazla 100 karakter olabilir"),
-  comment: z.string().min(20, "Yorum en az 20 karakter olmalıdır").max(1000, "Yorum en fazla 1000 karakter olabilir"),
+  name: z.string().trim().min(2, "İsim en az 2 karakter olmalıdır").max(100, "İsim en fazla 100 karakter olabilir"),
+  email: z.string().trim().email("Geçerli bir email adresi giriniz").max(255, "Email en fazla 255 karakter olabilir"),
+  title: z.string().trim().min(5, "Başlık en az 5 karakter olmalıdır").max(100, "Başlık en fazla 100 karakter olabilir"),
+  comment: z.string().trim().min(20, "Yorum en az 20 karakter olmalıdır").max(1000, "Yorum en fazla 1000 karakter olabilir"),
   rating: z.number().min(1, "En az 1 yıldız vermelisiniz").max(5, "En fazla 5 yıldız verebilirsiniz"),
 });
 
@@ -32,6 +34,8 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
   const form = useForm<ReviewFormData>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
+      name: "",
+      email: "",
       title: "",
       comment: "",
       rating: 0,
@@ -42,7 +46,9 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
     mutationFn: async (data: ReviewFormData) => {
       const { error } = await supabase.from("site_reviews" as any).insert({
         site_id: siteId,
-        user_id: user!.id,
+        user_id: user?.id || null,
+        name: data.name,
+        email: data.email,
         title: data.title,
         comment: data.comment,
         rating: data.rating,
@@ -66,10 +72,6 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
   });
 
   const onSubmit = (data: ReviewFormData) => {
-    if (!user) {
-      toast.error("Yorum yapmak için giriş yapmalısınız");
-      return;
-    }
     createReviewMutation.mutate(data);
   };
 
@@ -106,6 +108,36 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
                     </button>
                   ))}
                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Name */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>İsminiz</FormLabel>
+              <FormControl>
+                <Input placeholder="Adınız ve Soyadınız" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Adresiniz</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="ornek@email.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

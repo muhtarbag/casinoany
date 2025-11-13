@@ -9,6 +9,8 @@ interface ReviewCardProps {
     title: string;
     comment: string;
     created_at: string;
+    name?: string;
+    email?: string;
     profiles?: {
       username: string;
       avatar_url: string | null;
@@ -17,7 +19,7 @@ interface ReviewCardProps {
 }
 
 export default function ReviewCard({ review }: ReviewCardProps) {
-  const username = review.profiles?.username || "Anonim";
+  const username = review.name || review.profiles?.username || "Anonim";
   const avatarUrl = review.profiles?.avatar_url;
   const date = new Date(review.created_at).toLocaleDateString("tr-TR", {
     year: "numeric",
