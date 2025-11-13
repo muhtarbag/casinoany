@@ -275,7 +275,7 @@ export default function ReviewManagement() {
       const reviewsToInsert = reviews.map((review: any) => ({
         site_id: aiSelectedSite,
         name: review.name,
-        rating: review.rating,
+        rating: Math.round(review.rating), // Convert to integer
         title: review.title,
         comment: review.comment,
         is_approved: false,
