@@ -10,9 +10,9 @@ export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('*')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 

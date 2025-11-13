@@ -13,7 +13,7 @@ export const Header = () => {
       <div className="container mx-auto px-4 py-3 md:py-4">
         <nav className="flex items-center justify-between">
           <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" />
+            <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" loading="eager" />
           </NavLink>
 
           {/* Desktop Navigation */}

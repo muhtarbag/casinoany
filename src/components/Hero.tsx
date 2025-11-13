@@ -112,7 +112,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('*')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
@@ -125,7 +125,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: siteStats } = useQuery({
     queryKey: ['site-stats'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('site_stats' as any).select('*');
+      const { data, error } = await (supabase as any).from('site_stats').select('site_id, views, clicks');
       if (error) throw error;
       return data;
     },
