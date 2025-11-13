@@ -826,6 +826,9 @@ export default function Admin() {
           <TabsContent value="featured">
             <FeaturedSitesManagement />
           </TabsContent>
+          <TabsContent value="casino">
+            <CasinoContentManagement />
+          </TabsContent>
           <TabsContent value="blog">
             <div className="space-y-6">
               <BlogManagement />

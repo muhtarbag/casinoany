@@ -40,7 +40,7 @@ export const CasinoContentManagement = () => {
     queryKey: ['site-casino-content', selectedSiteId],
     queryFn: async () => {
       if (!selectedSiteId) return null;
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
         .select('pros, cons, verdict, expert_review, game_categories, login_guide, withdrawal_guide, faq')
         .eq('id', selectedSiteId)
@@ -70,7 +70,7 @@ export const CasinoContentManagement = () => {
     mutationFn: async () => {
       if (!selectedSiteId) throw new Error('Site seçilmedi');
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('betting_sites')
         .update({
           pros: pros.filter(p => p.trim()),
