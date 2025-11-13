@@ -69,7 +69,7 @@ export const AIAssistant = () => {
   const [selectedAction, setSelectedAction] = useState<any>(null);
   const [isApplying, setIsApplying] = useState(false);
 
-  // Fetch sites and blogs for analysis
+  // Fetch sites for analysis
   const { data: sites } = useQuery({
     queryKey: ['betting-sites'],
     queryFn: async () => {
@@ -83,28 +83,22 @@ export const AIAssistant = () => {
     },
   });
 
-  const { data: blogs } = useQuery({
-    queryKey: ['admin-blogs'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blogs')
-        .select('*');
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const runAnalysis = async () => {
     setIsAnalyzing(true);
     try {
+      // Fetch blog count - using type assertion to avoid TS issues
+      const blogResponse = await supabase
+        .from('blog_posts' as any)
+        .select('*', { count: 'exact', head: true });
+      const blogCount = blogResponse.count || 0;
+
       const { data, error } = await supabase.functions.invoke('ai-site-monitor', {
         body: {
           action: 'analyze-seo',
           data: {
             siteUrl: window.location.origin,
             sites: sites?.map(s => ({ name: s.name, rating: s.rating })) || [],
-            blogCount: blogs?.length || 0,
+            blogCount: blogCount || 0,
           }
         }
       });
