@@ -33,6 +33,7 @@ import { AdminLogoInput } from './AdminLogoInput';
 import { CasinoContentManagement } from '@/components/CasinoContentManagement';
 import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
 import { CarouselSettings } from '@/components/CarouselSettings';
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
@@ -838,6 +839,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="analytics">
             <CasinoContentAnalytics />
+          </TabsContent>
+          <TabsContent value="traffic">
+            <AnalyticsDashboard />
           </TabsContent>
           <TabsContent value="blog">
             <div className="space-y-6">
