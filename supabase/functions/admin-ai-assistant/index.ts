@@ -384,7 +384,7 @@ async function generateReviews(data: any, apiKey: string) {
         Her yorum için:
         - Türkçe isim ve soyisim (name alanında)
         - Kısa başlık (title alanında, 50-80 karakter)
-        - 1-5 arası puan
+        - 1-5 arası TAM SAYI puan (örn: 1, 2, 3, 4, 5 - ondalıklı değil!)
         - 150-250 kelimelik detaylı yorum (comment alanında)
         - Yorumun tarihi (son 3 ay içinde, YYYY-MM-DD formatında)
         - Pozitif (4-5 yıldız) ve negatif (1-3 yıldız) yorumlar karışık olmalı
@@ -405,7 +405,7 @@ async function generateReviews(data: any, apiKey: string) {
                   properties: {
                     name: { type: 'string', description: 'Kullanıcının adı soyadı' },
                     title: { type: 'string', description: 'Yorumun kısa başlığı (50-80 karakter)' },
-                    rating: { type: 'number', minimum: 1, maximum: 5 },
+                    rating: { type: 'integer', minimum: 1, maximum: 5, description: 'Tam sayı puan (1-5)' },
                     comment: { type: 'string', description: 'Detaylı yorum metni (150-250 kelime)' },
                     date: { type: 'string', format: 'date', description: 'YYYY-MM-DD formatında tarih' },
                     pros: { type: 'array', items: { type: 'string' }, description: 'Artılar listesi' },
