@@ -34,6 +34,7 @@ interface Review {
 
 import { SEO } from '@/components/SEO';
 import { SiteBlogSection } from '@/components/SiteBlogSection';
+import { CasinoReviewCoreContent } from '@/components/casino/CasinoReviewCoreContent';
 
 export default function SiteDetail() {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -418,6 +419,20 @@ export default function SiteDetail() {
             )}
           </CardContent>
         </Card>
+
+        {/* Casino Review Core Content */}
+        <div className="mb-8">
+          <CasinoReviewCoreContent
+            pros={site.pros}
+            cons={site.cons}
+            verdict={site.verdict}
+            expertReview={site.expert_review}
+            gameCategories={site.game_categories}
+            loginGuide={site.login_guide}
+            withdrawalGuide={site.withdrawal_guide}
+            faq={site.faq}
+          />
+        </div>
 
         {/* Reviews Section */}
         <Card className="mb-8">
