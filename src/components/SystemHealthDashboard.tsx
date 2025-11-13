@@ -2,11 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Database, Zap, HardDrive, TrendingUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Activity, Database, Zap, HardDrive, TrendingUp, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { useToast } from '@/hooks/use-toast';
 
 export const SystemHealthDashboard = () => {
-  const { data: healthMetrics, isLoading } = useQuery({
+  const { toast } = useToast();
+
+  const { data: healthMetrics, isLoading, refetch } = useQuery({
     queryKey: ['system-health'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -34,6 +38,38 @@ export const SystemHealthDashboard = () => {
     },
     refetchInterval: 30000,
   });
+
+  const triggerHealthCheck = async () => {
+    try {
+      toast({
+        title: 'Sağlık kontrolü başlatılıyor...',
+        description: 'Sistem metrikleri güncelleniyor',
+      });
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/system-health-monitor`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error('Health check failed');
+
+      await refetch();
+      
+      toast({
+        title: 'Başarılı',
+        description: 'Sistem sağlığı güncellendi',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Hata',
+        description: 'Sağlık kontrolü başarısız oldu',
+      });
+    }
+  };
 
   const getMetricsByType = (type: string) => {
     return healthMetrics?.filter((m: any) => m.metric_type === type) || [];
@@ -80,9 +116,15 @@ export const SystemHealthDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Sistem Sağlığı</h2>
-        <p className="text-muted-foreground">Anlık sistem metrikleri ve durum bilgileri</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Sistem Sağlığı</h2>
+          <p className="text-muted-foreground">Anlık sistem metrikleri ve durum bilgileri</p>
+        </div>
+        <Button onClick={triggerHealthCheck} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Metrikleri Güncelle
+        </Button>
       </div>
 
       {/* Overview Cards */}
