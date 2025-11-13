@@ -6,21 +6,64 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper function to log API calls
+async function logApiCall(
+  supabaseClient: any,
+  functionName: string,
+  method: string,
+  endpoint: string,
+  statusCode: number,
+  durationMs: number,
+  requestBody: any = null,
+  responseBody: any = null,
+  errorMessage: string | null = null,
+  userAgent: string | null = null,
+  ipAddress: string | null = null
+) {
+  try {
+    await supabaseClient
+      .from('api_call_logs')
+      .insert({
+        function_name: functionName,
+        method,
+        endpoint,
+        status_code: statusCode,
+        duration_ms: durationMs,
+        request_body: requestBody,
+        response_body: responseBody,
+        error_message: errorMessage,
+        user_agent: userAgent,
+        ip_address: ipAddress,
+      });
+  } catch (error) {
+    console.error('Failed to log API call:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
+  const startTime = Date.now();
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+  );
+  
+  const userAgent = req.headers.get('user-agent');
+  const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
 
+  try {
     const url = new URL(req.url);
     const method = req.method;
+    let requestBody = null;
 
     console.log(`AI Info Request: ${method} ${url.pathname}`);
+    
+    if (method === 'POST') {
+      requestBody = await req.json();
+    }
 
     // GET - Return all sites
     if (method === 'GET') {
@@ -81,10 +124,42 @@ serve(async (req) => {
 
       console.log(`Returning ${enrichedSites.length} sites to AI`);
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          data: {
+      const duration = Date.now() - startTime;
+      
+      await logApiCall(
+        supabaseClient,
+        'ai-site-info',
+        'GET',
+        url.pathname,
+        200,
+        duration,
+        null,
+        { success: true, count: sites?.length || 0 },
+        null,
+        userAgent,
+        ipAddress
+      );
+
+        const duration = Date.now() - startTime;
+        
+        await logApiCall(
+          supabaseClient,
+          'ai-site-info',
+          'POST',
+          url.pathname + '?action=recommend',
+          200,
+          duration,
+          { userPreferences },
+          { success: true, count: recommendedSites?.length || 0 },
+          null,
+          userAgent,
+          ipAddress
+        );
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
             sites: enrichedSites,
             totalSites: enrichedSites.length,
             categories,
@@ -142,13 +217,29 @@ serve(async (req) => {
 
       console.log(`Search found ${sites.length} sites`);
 
+      const duration = Date.now() - startTime;
+      
+      await logApiCall(
+        supabaseClient,
+        'ai-site-info',
+        'POST',
+        url.pathname,
+        200,
+        duration,
+        { query, minRating, features, sortBy },
+        { success: true, count: results?.length || 0 },
+        null,
+        userAgent,
+        ipAddress
+      );
+
       return new Response(
         JSON.stringify({
           success: true,
           data: {
             sites,
             count: sites.length,
-            query: body,
+            query: requestBody,
           },
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -162,6 +253,22 @@ serve(async (req) => {
   } catch (error) {
     console.error('AI Info Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const duration = Date.now() - startTime;
+    
+    await logApiCall(
+      supabaseClient,
+      'ai-site-info',
+      req.method,
+      new URL(req.url).pathname,
+      500,
+      duration,
+      null,
+      null,
+      errorMessage,
+      userAgent,
+      ipAddress
+    );
+    
     return new Response(
       JSON.stringify({ success: false, error: errorMessage }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
