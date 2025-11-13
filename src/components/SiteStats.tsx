@@ -10,21 +10,30 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
+      // Fetch site stats
       const { data: stats, error: statsError } = await (supabase as any)
         .from("site_stats")
-        .select(`
-          *,
-          betting_sites (
-            id,
-            name,
-            slug
-          )
-        `)
+        .select("*")
         .order("clicks", { ascending: false });
 
       if (statsError) throw statsError;
-      return stats || [];
+
+      // Fetch betting sites separately
+      const { data: sites, error: sitesError } = await (supabase as any)
+        .from("betting_sites")
+        .select("id, name, slug");
+
+      if (sitesError) throw sitesError;
+
+      // Manually join the data
+      const statsWithSites = (stats || []).map((stat: any) => ({
+        ...stat,
+        betting_sites: sites?.find((site: any) => site.id === stat.site_id) || null,
+      }));
+
+      return statsWithSites;
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
   if (isLoading) {
