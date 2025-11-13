@@ -46,7 +46,7 @@ export const Footer = () => {
         </div>
 
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* About Section */}
           <div className="lg:col-span-2">
             <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />

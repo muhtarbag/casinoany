@@ -66,18 +66,20 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <Award className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold">
             <span className="text-primary">En İyi Bahis Siteleri</span><br />
-            <span className="text-foreground text-2xl md:text-4xl lg:text-5xl font-normal mt-2 block">Güvenilir ve Kazançlı</span>
+            <span className="text-foreground text-xl sm:text-2xl md:text-4xl lg:text-5xl font-normal mt-2 block">Güvenilir ve Kazançlı</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
           </p>
           <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-              <Input type="text" placeholder="Bahis sitesi ara..." value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} className="pl-12 pr-24 py-6 text-lg rounded-lg border-2 border-border focus:border-primary w-full" />
-              <Button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-4 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90">Ara</Button>
+            <div className="flex flex-col sm:flex-row gap-2 sm:relative">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
+                <Input type="text" placeholder="Bahis sitesi ara..." value={localSearch} onChange={(e) => setLocalSearch(e.target.value)} className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full" />
+              </div>
+              <Button type="submit" className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-4 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full sm:w-auto">Ara</Button>
             </div>
           </form>
           <div className="flex flex-wrap justify-center gap-6 pt-6">
