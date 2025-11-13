@@ -163,7 +163,7 @@ const BettingSiteCardComponent = ({
               return (
                 <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-all duration-200 group/social"
+                  className="flex items-center justify-center p-2 rounded-lg bg-muted hover:bg-muted/80 transition-all duration-200 group/social"
                   aria-label={link.label}
                   style={{ ['--brand-color' as any]: link.color }}
                 >
