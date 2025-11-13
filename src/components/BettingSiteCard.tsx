@@ -7,6 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Eye, MousePointer } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Helper function to generate consistent random number from site ID
+const getRandomBaseFromId = (id: string | undefined, min: number, max: number): number => {
+  if (!id) return min;
+  
+  // Simple hash function to convert ID to number
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash) + id.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  // Convert to range
+  const normalized = Math.abs(hash) % (max - min + 1);
+  return min + normalized;
+};
 
 interface BettingSiteCardProps {
   id?: string;
@@ -50,6 +67,20 @@ const BettingSiteCardComponent = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
+
+  // Calculate displayed values
+  const displayViews = useMemo(() => {
+    if (isAdmin) return views; // Admin sees real values
+    const baseViews = getRandomBaseFromId(id, 598, 2432);
+    return baseViews + views;
+  }, [isAdmin, views, id]);
+
+  const displayClicks = useMemo(() => {
+    if (isAdmin) return clicks; // Admin sees real values
+    const baseClicks = getRandomBaseFromId(id, 598, 2432);
+    return baseClicks + clicks;
+  }, [isAdmin, clicks, id]);
 
   useEffect(() => {
     if (logo) {
@@ -133,11 +164,11 @@ const BettingSiteCardComponent = ({
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 px-2 py-1 bg-accent/10 rounded-md border border-accent/20">
                 <Eye className="w-3 h-3 text-accent" />
-                <span className="text-xs font-medium">{views}</span>
+                <span className="text-xs font-medium">{displayViews.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-1 px-2 py-1 bg-secondary/10 rounded-md border border-secondary/20">
                 <MousePointer className="w-3 h-3 text-secondary" />
-                <span className="text-xs font-medium">{clicks}</span>
+                <span className="text-xs font-medium">{displayClicks.toLocaleString()}</span>
               </div>
             </div>
           </div>
