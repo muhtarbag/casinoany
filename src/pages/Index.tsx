@@ -1,12 +1,31 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { PixelGrid } from '@/components/PixelGrid';
+import { Trophy } from 'lucide-react';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-dark">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Trophy className="w-12 h-12 text-secondary" />
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              En İyi Bahis Siteleri
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Türkiye'nin en güvenilir ve kazançlı bahis sitelerini keşfedin. 
+            Güncel bonuslar ve kampanyalardan yararlanın.
+          </p>
+        </div>
+
+        <PixelGrid />
+      </main>
+
+      <Footer />
     </div>
   );
 };
