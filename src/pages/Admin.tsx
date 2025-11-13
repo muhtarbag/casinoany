@@ -24,6 +24,7 @@ import { BlogManagement } from '@/components/BlogManagement';
 import { BlogCommentManagement } from '@/components/BlogCommentManagement';
 import { FeaturedSitesManagement } from '@/components/FeaturedSitesManagement';
 import { AIAssistant } from '@/components/AIAssistant';
+import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
