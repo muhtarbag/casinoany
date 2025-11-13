@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   const [email, setEmail] = useState('');
