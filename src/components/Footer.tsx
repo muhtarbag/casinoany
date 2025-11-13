@@ -222,6 +222,9 @@ export const Footer = () => {
           <p className="text-sm text-muted-foreground">
             &copy; 2025 CasinoAny.com. Tüm hakları saklıdır.
           </p>
+          <p className="text-xs text-muted-foreground/70">
+            Powered by <a href="https://visiontech.co" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">visiontech.co</a> • Built with ❤️
+          </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
             <Link to="/privacy" className="hover:text-primary transition-colors">Gizlilik Politikası</Link>
             <span>•</span>
