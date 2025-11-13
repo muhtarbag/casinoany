@@ -14,7 +14,7 @@ const Index = () => {
       <main>
         <Hero onSearch={setSearchTerm} searchTerm={searchTerm} />
         
-        <div id="sites-grid" className="container mx-auto px-4 py-12">
+        <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
           <PixelGrid initialSearchTerm={searchTerm} />
         </div>
       </main>
