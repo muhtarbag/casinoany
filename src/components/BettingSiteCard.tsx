@@ -176,27 +176,30 @@ const BettingSiteCardComponent = ({
               return (
                 <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center p-2 rounded-lg bg-muted transition-all duration-300 group/social"
+                  className="flex items-center justify-center p-2 rounded-lg transition-all duration-300 group/social relative overflow-hidden"
                   aria-label={link.label}
                   style={{ 
+                    backgroundColor: 'hsl(var(--muted))',
                     ['--brand-color' as any]: link.color,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = link.color;
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) {
+                      (icon as SVGElement).style.color = '#ffffff';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '';
+                    e.currentTarget.style.backgroundColor = 'hsl(var(--muted))';
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) {
+                      (icon as SVGElement).style.color = link.color;
+                    }
                   }}
                 >
                   <Icon 
                     className="w-4 h-4 transition-all duration-300 group-hover/social:scale-110" 
                     style={{ color: link.color }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as SVGElement).style.color = '#ffffff';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as SVGElement).style.color = link.color;
-                    }}
                   />
                 </a>
               );
