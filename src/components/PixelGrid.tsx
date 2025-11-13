@@ -94,7 +94,7 @@ export const PixelGrid = () => {
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site) => (
+        {sites.map((site: any) => (
           <BettingSiteCard
             key={site.id}
             id={site.id}

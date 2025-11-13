@@ -28,7 +28,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
       const siteIds = relations.map((r: any) => r.site_id);
       const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
-        .select('id, name, slug, logo_url, rating, bonus, features, affiliate_link, is_active')
+        .select('*')
         .in('id', siteIds)
         .eq('is_active', true);
 
