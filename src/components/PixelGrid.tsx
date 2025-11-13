@@ -98,6 +98,7 @@ export const PixelGrid = () => {
           <BettingSiteCard
             key={site.id}
             id={site.id}
+            slug={site.slug}
             name={site.name}
             logo={site.logo_url || ''}
             rating={site.rating || 0}

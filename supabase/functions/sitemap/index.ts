@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
     // Get all active betting sites
     const { data: sites, error: sitesError } = await supabase
       .from('betting_sites')
-      .select('id, updated_at, created_at')
+      .select('id, slug, updated_at, created_at')
       .eq('is_active', true);
 
     if (sitesError) throw sitesError;
@@ -86,9 +86,10 @@ Deno.serve(async (req) => {
     // Add betting site detail pages
     sites?.forEach((site) => {
       const lastmod = site.updated_at || site.created_at;
+      const url = site.slug ? `${baseUrl}/${site.slug}` : `${baseUrl}/site/${site.id}`;
       sitemap += `
   <url>
-    <loc>${baseUrl}/site/${site.id}</loc>
+    <loc>${url}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

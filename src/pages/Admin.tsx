@@ -262,11 +262,20 @@ export default function Admin() {
         logoUrl = publicUrl;
       }
       const { error } = await supabase.from('betting_sites').insert({
-        name: data.formData.name, rating: data.formData.rating, bonus: data.formData.bonus,
-        features: data.formData.features.split(',').map(f => f.trim()), affiliate_link: data.formData.affiliate_link,
-        logo_url: logoUrl, email: data.formData.email || null, whatsapp: data.formData.whatsapp || null,
-        telegram: data.formData.telegram || null, twitter: data.formData.twitter || null,
-        instagram: data.formData.instagram || null, facebook: data.formData.facebook || null, youtube: data.formData.youtube || null,
+        name: data.formData.name,
+        slug: data.formData.name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'),
+        rating: data.formData.rating,
+        bonus: data.formData.bonus,
+        features: data.formData.features.split(',').map(f => f.trim()),
+        affiliate_link: data.formData.affiliate_link,
+        logo_url: logoUrl,
+        email: data.formData.email || null,
+        whatsapp: data.formData.whatsapp || null,
+        telegram: data.formData.telegram || null,
+        twitter: data.formData.twitter || null,
+        instagram: data.formData.instagram || null,
+        facebook: data.formData.facebook || null,
+        youtube: data.formData.youtube || null,
       });
       if (error) throw error;
     },
