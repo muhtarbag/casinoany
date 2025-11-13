@@ -29,8 +29,8 @@ export default function SportsBetting() {
       <SEO
         title="Spor Bahis Siteleri 2025 - Yüksek Oranlar & Canlı Bahis | CasinoAny.com"
         description="En yüksek bahis oranları, canlı maç izleme ve hızlı ödeme garantili spor bahis siteleri. Futbol, basketbol ve daha fazlası için uzman önerileri."
-        canonicalUrl="https://casinoany.com/spor-bahisleri"
-        keywords="spor bahisleri, canlı bahis, yüksek oranlar, iddaa siteleri, bahis oranları"
+        canonical="https://casinoany.com/spor-bahisleri"
+        keywords={["spor bahisleri", "canlı bahis", "yüksek oranlar", "iddaa siteleri", "bahis oranları"]}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
@@ -105,7 +105,23 @@ export default function SportsBetting() {
             <h2 className="text-3xl font-bold mb-6">Önerilen Bahis Siteleri</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard key={site.id} site={site} />
+                <BettingSiteCard 
+                  key={site.id} 
+                  id={site.id}
+                  name={site.name}
+                  logo={site.logo_url}
+                  rating={site.rating}
+                  bonus={site.bonus}
+                  features={site.features}
+                  affiliateUrl={site.affiliate_link}
+                  email={site.email}
+                  whatsapp={site.whatsapp}
+                  telegram={site.telegram}
+                  twitter={site.twitter}
+                  instagram={site.instagram}
+                  facebook={site.facebook}
+                  youtube={site.youtube}
+                />
               ))}
             </div>
           </section>

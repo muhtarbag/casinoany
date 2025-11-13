@@ -29,8 +29,8 @@ export default function MobileBetting() {
       <SEO
         title="Mobil Bahis Siteleri 2025 - iOS & Android Uygulamaları | CasinoAny.com"
         description="En iyi mobil bahis uygulamaları ve mobil uyumlu casino siteleri. iOS ve Android için optimize edilmiş, hızlı ve güvenli mobil bahis deneyimi."
-        canonicalUrl="https://casinoany.com/mobil-bahis"
-        keywords="mobil bahis, mobil casino, ios bahis uygulaması, android casino, mobil ödeme bahis"
+        canonical="https://casinoany.com/mobil-bahis"
+        keywords={["mobil bahis", "mobil casino", "ios bahis uygulaması", "android casino", "mobil ödeme bahis"]}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
@@ -105,7 +105,23 @@ export default function MobileBetting() {
             <h2 className="text-3xl font-bold mb-6">En İyi Mobil Bahis Platformları</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard key={site.id} site={site} />
+                <BettingSiteCard 
+                  key={site.id} 
+                  id={site.id}
+                  name={site.name}
+                  logo={site.logo_url}
+                  rating={site.rating}
+                  bonus={site.bonus}
+                  features={site.features}
+                  affiliateUrl={site.affiliate_link}
+                  email={site.email}
+                  whatsapp={site.whatsapp}
+                  telegram={site.telegram}
+                  twitter={site.twitter}
+                  instagram={site.instagram}
+                  facebook={site.facebook}
+                  youtube={site.youtube}
+                />
               ))}
             </div>
           </section>
@@ -150,7 +166,7 @@ export default function MobileBetting() {
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   Android cihazlarda bahis uygulamaları <strong>APK dosyası</strong> olarak sitenin mobil versiyonundan 
-                  indirilebilir. APK indirmeden önce "Bilinmeyen Kaynaklar" seçeneğini Ayarlar > Güvenlik'ten aktif etmelisiniz.
+                  indirilebilir. APK indirmeden önce "Bilinmeyen Kaynaklar" seçeneğini Ayarlar {'->'} Güvenlik'ten aktif etmelisiniz.
                   Uygulama kurulumu 1-2 dakika sürer ve otomatik güncelleme özelliği bulunur. Android uygulamaları genellikle 
                   15-30 MB boyutundadır ve minimum Android 5.0 gerektirir. Google Play Store'da olmayan uygulamalar için 
                   sadece resmi siteden indirin.

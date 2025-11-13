@@ -20,6 +20,11 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import KVKK from "./pages/KVKK";
+import CasinoSites from "./pages/CasinoSites";
+import SportsBetting from "./pages/SportsBetting";
+import BonusCampaigns from "./pages/BonusCampaigns";
+import MobileBetting from "./pages/MobileBetting";
+import LiveCasino from "./pages/LiveCasino";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +51,11 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/kvkk" element={<KVKK />} />
+              <Route path="/casino-siteleri" element={<CasinoSites />} />
+              <Route path="/spor-bahisleri" element={<SportsBetting />} />
+              <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
+              <Route path="/mobil-bahis" element={<MobileBetting />} />
+              <Route path="/canli-casino" element={<LiveCasino />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

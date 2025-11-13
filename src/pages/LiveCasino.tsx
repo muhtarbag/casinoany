@@ -29,8 +29,8 @@ export default function LiveCasino() {
       <SEO
         title="Canlı Casino Siteleri 2025 - Gerçek Krupiyelerle Oyna | CasinoAny.com"
         description="En kaliteli canlı casino siteleri ve gerçek krupiyelerle oyun deneyimi. Canlı rulet, blackjack, poker ve bakara için en iyi platformlar."
-        canonicalUrl="https://casinoany.com/canli-casino"
-        keywords="canlı casino, live casino, canlı rulet, canlı blackjack, gerçek krupiye, evolution gaming"
+        canonical="https://casinoany.com/canli-casino"
+        keywords={["canlı casino", "live casino", "canlı rulet", "canlı blackjack", "gerçek krupiye", "evolution gaming"]}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
@@ -105,7 +105,23 @@ export default function LiveCasino() {
             <h2 className="text-3xl font-bold mb-6">En Popüler Canlı Casino Siteleri</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard key={site.id} site={site} />
+                <BettingSiteCard 
+                  key={site.id} 
+                  id={site.id}
+                  name={site.name}
+                  logo={site.logo_url}
+                  rating={site.rating}
+                  bonus={site.bonus}
+                  features={site.features}
+                  affiliateUrl={site.affiliate_link}
+                  email={site.email}
+                  whatsapp={site.whatsapp}
+                  telegram={site.telegram}
+                  twitter={site.twitter}
+                  instagram={site.instagram}
+                  facebook={site.facebook}
+                  youtube={site.youtube}
+                />
               ))}
             </div>
           </section>

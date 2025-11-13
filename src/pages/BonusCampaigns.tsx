@@ -29,8 +29,8 @@ export default function BonusCampaigns() {
       <SEO
         title="Casino ve Bahis Bonus Kampanyaları 2025 - %300 Hoş Geldin Bonusu | CasinoAny.com"
         description="En yüksek casino ve bahis bonusları burada! %300 hoş geldin bonusu, kayıp bonusları, freespin kampanyaları ve daha fazlası. Güncel bonus kodları."
-        canonicalUrl="https://casinoany.com/bonus-kampanyalari"
-        keywords="casino bonusu, bahis bonusu, hoş geldin bonusu, freespin, kayıp bonusu, bonus kampanyaları"
+        canonical="https://casinoany.com/bonus-kampanyalari"
+        keywords={["casino bonusu", "bahis bonusu", "hoş geldin bonusu", "freespin", "kayıp bonusu", "bonus kampanyaları"]}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
@@ -105,7 +105,23 @@ export default function BonusCampaigns() {
             <h2 className="text-3xl font-bold mb-6">En Yüksek Bonuslu Siteler</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard key={site.id} site={site} />
+                <BettingSiteCard 
+                  key={site.id} 
+                  id={site.id}
+                  name={site.name}
+                  logo={site.logo_url}
+                  rating={site.rating}
+                  bonus={site.bonus}
+                  features={site.features}
+                  affiliateUrl={site.affiliate_link}
+                  email={site.email}
+                  whatsapp={site.whatsapp}
+                  telegram={site.telegram}
+                  twitter={site.twitter}
+                  instagram={site.instagram}
+                  facebook={site.facebook}
+                  youtube={site.youtube}
+                />
               ))}
             </div>
           </section>

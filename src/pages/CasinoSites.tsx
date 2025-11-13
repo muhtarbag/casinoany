@@ -29,8 +29,8 @@ export default function CasinoSites() {
       <SEO
         title="En İyi Casino Siteleri 2025 - Güvenilir Online Casino Rehberi | CasinoAny.com"
         description="Türkiye'nin en güvenilir casino siteleri rehberi. Lisanslı, yüksek bonuslu ve hızlı ödemeli casino sitelerini keşfedin. Detaylı incelemeler ve kullanıcı yorumları."
-        canonicalUrl="https://casinoany.com/casino-siteleri"
-        keywords="casino siteleri, online casino, güvenilir casino, casino bonusu, canlı casino"
+        canonical="https://casinoany.com/casino-siteleri"
+        keywords={["casino siteleri", "online casino", "güvenilir casino", "casino bonusu", "canlı casino"]}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
@@ -108,7 +108,23 @@ export default function CasinoSites() {
             <h2 className="text-3xl font-bold mb-6">Önerilen Casino Siteleri</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard key={site.id} site={site} />
+                <BettingSiteCard 
+                  key={site.id} 
+                  id={site.id}
+                  name={site.name}
+                  logo={site.logo_url}
+                  rating={site.rating}
+                  bonus={site.bonus}
+                  features={site.features}
+                  affiliateUrl={site.affiliate_link}
+                  email={site.email}
+                  whatsapp={site.whatsapp}
+                  telegram={site.telegram}
+                  twitter={site.twitter}
+                  instagram={site.instagram}
+                  facebook={site.facebook}
+                  youtube={site.youtube}
+                />
               ))}
             </div>
           </section>
