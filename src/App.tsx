@@ -33,6 +33,8 @@ const Cookies = lazy(() => import("./pages/Cookies"));
 const KVKK = lazy(() => import("./pages/KVKK"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const SiteRedirect = lazy(() => import("./pages/SiteRedirect"));
+const AMPBlogPost = lazy(() => import("./pages/amp/AMPBlogPost"));
+const AMPSiteDetail = lazy(() => import("./pages/amp/AMPSiteDetail"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -83,6 +85,8 @@ const AppContent = () => {
           <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
           <Route path="/mobil-bahis" element={<MobileBetting />} />
           <Route path="/canli-casino" element={<LiveCasino />} />
+          <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
+          <Route path="/amp/:slug" element={<AMPSiteDetail />} />
           <Route path="/:slug" element={<SiteDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
