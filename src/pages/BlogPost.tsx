@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
+import { BlogCommentForm } from '@/components/BlogCommentForm';
+import { BlogCommentList } from '@/components/BlogCommentList';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -172,6 +174,12 @@ export default function BlogPost() {
               dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
             />
           </Card>
+
+          {/* Comments Section */}
+          <div className="space-y-8 my-8">
+            <BlogCommentList postId={post.id} />
+            <BlogCommentForm postId={post.id} />
+          </div>
 
           {/* Share Section */}
           <Card className="p-6 text-center">
