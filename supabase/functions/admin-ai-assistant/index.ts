@@ -382,12 +382,14 @@ async function generateReviews(data: any, apiKey: string) {
         content: `${siteName} bahis sitesi için ${count || 5} adet gerçekçi kullanıcı yorumu oluştur.
         
         Her yorum için:
-        - Türkçe isim ve soyisim
+        - Türkçe isim ve soyisim (name alanında)
+        - Kısa başlık (title alanında, 50-80 karakter)
         - 1-5 arası puan
-        - 100-200 kelimelik detaylı yorum
-        - Yorumun tarihi (son 3 ay içinde)
-        - Pozitif ve negatif yorumlar karışık olmalı
-        - Gerçekçi kullanıcı deneyimleri`
+        - 150-250 kelimelik detaylı yorum (comment alanında)
+        - Yorumun tarihi (son 3 ay içinde, YYYY-MM-DD formatında)
+        - Pozitif (4-5 yıldız) ve negatif (1-3 yıldız) yorumlar karışık olmalı
+        - Gerçekçi kullanıcı deneyimleri
+        - Pros ve cons listesi (her biri 2-4 madde)`
       }],
       tools: [{
         type: 'function',
@@ -401,14 +403,16 @@ async function generateReviews(data: any, apiKey: string) {
                 items: {
                   type: 'object',
                   properties: {
-                    author_name: { type: 'string' },
+                    name: { type: 'string', description: 'Kullanıcının adı soyadı' },
+                    title: { type: 'string', description: 'Yorumun kısa başlığı (50-80 karakter)' },
                     rating: { type: 'number', minimum: 1, maximum: 5 },
-                    comment: { type: 'string' },
-                    date: { type: 'string', format: 'date' },
-                    pros: { type: 'array', items: { type: 'string' } },
-                    cons: { type: 'array', items: { type: 'string' } }
+                    comment: { type: 'string', description: 'Detaylı yorum metni (150-250 kelime)' },
+                    date: { type: 'string', format: 'date', description: 'YYYY-MM-DD formatında tarih' },
+                    pros: { type: 'array', items: { type: 'string' }, description: 'Artılar listesi' },
+                    cons: { type: 'array', items: { type: 'string' }, description: 'Eksiler listesi' }
                   },
-                  required: ['author_name', 'rating', 'comment', 'date']
+                  required: ['name', 'title', 'rating', 'comment', 'date'],
+                  additionalProperties: false
                 }
               }
             },
