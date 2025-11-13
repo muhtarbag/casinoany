@@ -13,7 +13,7 @@ export default function Sitemap() {
     const fetchSitemap = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dynamic-sitemap`,
           {
             headers: {
               'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
