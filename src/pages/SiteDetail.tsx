@@ -92,14 +92,21 @@ export default function SiteDetail() {
 
       if (reviewsError) throw reviewsError;
 
-      // Fetch profiles separately
-      const userIds = reviewsData.map((r: any) => r.user_id);
-      const { data: profilesData, error: profilesError } = await (supabase as any)
-        .from("profiles")
-        .select("id, username, avatar_url")
-        .in("id", userIds);
+      // Fetch profiles separately (only for reviews with user_id)
+      const userIds = reviewsData
+        .map((r: any) => r.user_id)
+        .filter((id: string | null) => id !== null);
+      
+      let profilesData = [];
+      if (userIds.length > 0) {
+        const { data, error: profilesError } = await (supabase as any)
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", userIds);
 
-      if (profilesError) throw profilesError;
+        if (profilesError) throw profilesError;
+        profilesData = data || [];
+      }
 
       // Combine reviews with profiles
       const reviewsWithProfiles = reviewsData.map((review: any) => {
