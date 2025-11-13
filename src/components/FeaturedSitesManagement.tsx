@@ -30,7 +30,7 @@ export const FeaturedSitesManagement = () => {
   const toggleFeaturedMutation = useMutation({
     mutationFn: async ({ id, isFeatured }: { id: string; isFeatured: boolean }) => {
       setUpdatingId(id);
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('betting_sites')
         .update({ is_featured: isFeatured })
         .eq('id', id);
@@ -59,8 +59,8 @@ export const FeaturedSitesManagement = () => {
     toggleFeaturedMutation.mutate({ id, isFeatured: !currentStatus });
   };
 
-  const featuredSites = sites?.filter(site => site.is_featured) || [];
-  const nonFeaturedSites = sites?.filter(site => !site.is_featured) || [];
+  const featuredSites = sites?.filter((site: any) => site.is_featured) || [];
+  const nonFeaturedSites = sites?.filter((site: any) => !site.is_featured) || [];
 
   if (isLoading) {
     return (

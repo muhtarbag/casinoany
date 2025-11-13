@@ -163,7 +163,7 @@ export const BettingSiteCard = ({
       </CardContent>
 
       <CardFooter className="px-6 pb-6 pt-0 gap-2">
-        <Button variant="outline" size="sm" className="flex-1 group/btn border-border hover:border-accent hover:text-accent"
+        <Button variant="outline" size="sm" className="flex-1 group/btn"
           onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
         >
           Detaylar
