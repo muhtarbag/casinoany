@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles, Search } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -85,6 +85,7 @@ export default function Admin() {
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('manage');
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   useEffect(() => {
@@ -225,6 +226,12 @@ export default function Admin() {
 
   const [orderedSites, setOrderedSites] = useState(sites || []);
   useEffect(() => { if (sites) setOrderedSites(sites); }, [sites]);
+
+  // Filter sites based on search query
+  const filteredSites = orderedSites.filter((site: any) =>
+    site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    site.bonus?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const createSiteMutation = useMutation({
     mutationFn: async (data: { formData: SiteFormData; logoFile: File | null }) => {
@@ -573,7 +580,39 @@ export default function Admin() {
               </CardHeader>
               <CardContent><form onSubmit={handleSubmit} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><div><Label htmlFor="name">Site Adı</Label><Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div><div><Label htmlFor="rating">Puan</Label><Input id="rating" type="number" min="0" max="5" step="0.1" value={formData.rating} onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })} required /></div><div className="md:col-span-2"><Label htmlFor="bonus">Bonus</Label><Input id="bonus" value={formData.bonus} onChange={(e) => setFormData({ ...formData, bonus: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="features">Özellikler</Label><Input id="features" value={formData.features} onChange={(e) => setFormData({ ...formData, features: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="affiliate_link">Link</Label><Input id="affiliate_link" value={formData.affiliate_link} onChange={(e) => setFormData({ ...formData, affiliate_link: e.target.value })} required /></div><div><Label htmlFor="email">Email</Label><Input id="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /></div><div><Label htmlFor="whatsapp">WhatsApp</Label><Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} /></div><div><Label htmlFor="telegram">Telegram</Label><Input id="telegram" value={formData.telegram} onChange={(e) => setFormData({ ...formData, telegram: e.target.value })} /></div><div><Label htmlFor="twitter">Twitter</Label><Input id="twitter" value={formData.twitter} onChange={(e) => setFormData({ ...formData, twitter: e.target.value })} /></div><div><Label htmlFor="instagram">Instagram</Label><Input id="instagram" value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} /></div><div><Label htmlFor="facebook">Facebook</Label><Input id="facebook" value={formData.facebook} onChange={(e) => setFormData({ ...formData, facebook: e.target.value })} /></div><div><Label htmlFor="youtube">YouTube</Label><Input id="youtube" value={formData.youtube} onChange={(e) => setFormData({ ...formData, youtube: e.target.value })} /></div><div className="md:col-span-2"><Label htmlFor="logo">Logo</Label><Input id="logo" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} /></div></div><div className="flex gap-2"><Button type="submit" disabled={createSiteMutation.isPending || updateSiteMutation.isPending}>{createSiteMutation.isPending || updateSiteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : editingId ? <Edit className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}{editingId ? 'Güncelle' : 'Ekle'}</Button>{editingId && <Button type="button" variant="outline" onClick={resetForm}><X className="w-4 h-4 mr-2" />İptal</Button>}</div></form></CardContent></Card>
             {selectedSites.length > 0 && <Card className="bg-primary/10"><CardContent className="pt-6"><div className="flex items-center gap-4 flex-wrap"><p className="font-semibold">{selectedSites.length} site seçildi</p><div className="flex gap-2"><AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="w-4 h-4 mr-2" />Seçilenleri Sil</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Emin misiniz?</AlertDialogTitle><AlertDialogDescription>{selectedSites.length} site silinecek.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>İptal</AlertDialogCancel><AlertDialogAction onClick={() => bulkDeleteMutation.mutate(selectedSites)}>Sil</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog><Button variant="outline" size="sm" onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: true })}>Aktif Yap</Button><Button variant="outline" size="sm" onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: false })}>Pasif Yap</Button></div></div></CardContent></Card>}
-            <Card><CardHeader><div className="flex justify-between items-center"><CardTitle>Mevcut Siteler ({orderedSites.length})</CardTitle><Button variant="outline" size="sm" onClick={toggleSelectAll}><CheckSquare className="w-4 h-4 mr-2" />{selectedSites.length === orderedSites.length ? 'Seçimi Kaldır' : 'Tümünü Seç'}</Button></div></CardHeader><CardContent><DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}><SortableContext items={orderedSites.map(s => s.id)} strategy={verticalListSortingStrategy}><div className="space-y-2">{orderedSites.map((site) => { const siteStatData = (siteStats as any[] || []).find((s: any) => s.site_id === site.id); return <SortableItem key={site.id} id={site.id} site={site} editingId={editingId} selectedSites={selectedSites} onToggleSelect={toggleSiteSelection} onEdit={handleEdit} onDelete={(id) => deleteSiteMutation.mutate(id)} isDeleting={deletingId === site.id} stats={siteStatData} />; })}</div></SortableContext></DndContext></CardContent></Card>
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Mevcut Siteler ({filteredSites.length})</CardTitle>
+                  <Button variant="outline" size="sm" onClick={toggleSelectAll}>
+                    <CheckSquare className="w-4 h-4 mr-2" />
+                    {selectedSites.length === orderedSites.length ? 'Seçimi Kaldır' : 'Tümünü Seç'}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Site adı veya bonus ile ara..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={filteredSites.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-2">
+                      {filteredSites.map((site) => { 
+                        const siteStatData = (siteStats as any[] || []).find((s: any) => s.site_id === site.id); 
+                        return <SortableItem key={site.id} id={site.id} site={site} editingId={editingId} selectedSites={selectedSites} onToggleSelect={toggleSiteSelection} onEdit={handleEdit} onDelete={(id) => deleteSiteMutation.mutate(id)} isDeleting={deletingId === site.id} stats={siteStatData} />; 
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </CardContent>
+            </Card>
           </TabsContent>
           <TabsContent value="featured">
             <FeaturedSitesManagement />
