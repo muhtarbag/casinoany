@@ -16,7 +16,7 @@ export default function SiteRedirect() {
         .from('betting_sites')
         .select('slug')
         .eq('id', id)
-        .single();
+        .single() as any;
 
       if (error) throw error;
       return data;

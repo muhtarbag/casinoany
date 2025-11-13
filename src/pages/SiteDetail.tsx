@@ -46,22 +46,29 @@ export default function SiteDetail() {
   // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading } = useQuery({
     queryKey: ["betting-site", slug || id],
-    queryFn: async () => {
-      let query = supabase
-        .from("betting_sites")
-        .select("id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, created_at, updated_at")
-        .eq("is_active", true);
-      
+    queryFn: async (): Promise<any> => {
       if (slug) {
-        query = query.eq("slug", slug);
+        const { data, error } = await (supabase as any)
+          .from("betting_sites")
+          .select("*")
+          .eq("is_active", true)
+          .eq("slug", slug)
+          .single();
+        
+        if (error) throw error;
+        return data;
       } else if (id) {
-        query = query.eq("id", id);
+        const { data, error } = await (supabase as any)
+          .from("betting_sites")
+          .select("*")
+          .eq("is_active", true)
+          .eq("id", id)
+          .single();
+        
+        if (error) throw error;
+        return data;
       }
-      
-      const { data, error } = await query.single();
-
-      if (error) throw error;
-      return data;
+      throw new Error("No slug or id provided");
     },
   });
 

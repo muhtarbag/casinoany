@@ -15,7 +15,7 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
     queryFn: async () => {
       const { data, error } = await supabase
         .from("betting_sites")
-        .select("id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active")
+        .select("*")
         .eq("is_active", true)
         .neq("id", currentSiteId)
         .order("rating", { ascending: false })
@@ -67,7 +67,7 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {recommendedSites.map((site) => (
+          {recommendedSites.map((site: any) => (
             <BettingSiteCard
               key={site.id}
               id={site.id}
