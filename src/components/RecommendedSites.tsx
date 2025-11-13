@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BettingSiteCard } from "./BettingSiteCard";
+import { useMemo } from "react";
 
 interface RecommendedSitesProps {
   currentSiteId: string;
@@ -10,16 +11,15 @@ interface RecommendedSitesProps {
 }
 
 export default function RecommendedSites({ currentSiteId, currentSiteFeatures }: RecommendedSitesProps) {
-  const { data: recommendedSites, isLoading } = useQuery({
-    queryKey: ["recommended-sites", currentSiteId],
+  const { data: allSites, isLoading } = useQuery({
+    queryKey: ["recommended-sites-all", currentSiteId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("betting_sites")
         .select("*")
         .eq("is_active", true)
         .neq("id", currentSiteId)
-        .order("rating", { ascending: false })
-        .limit(4);
+        .order("rating", { ascending: false });
 
       if (error) throw error;
 
@@ -30,12 +30,21 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
           return currentSiteFeatures.some((feature) => siteFeatures.includes(feature));
         });
 
-        return sitesWithMatchingFeatures.length > 0 ? sitesWithMatchingFeatures.slice(0, 4) : data;
+        return sitesWithMatchingFeatures.length > 0 ? sitesWithMatchingFeatures : data;
       }
 
       return data;
     },
   });
+
+  // Randomly select 4 sites on each render
+  const recommendedSites = useMemo(() => {
+    if (!allSites || allSites.length === 0) return [];
+    
+    // Shuffle array and take first 4
+    const shuffled = [...allSites].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 4);
+  }, [allSites]);
 
   if (isLoading) {
     return (

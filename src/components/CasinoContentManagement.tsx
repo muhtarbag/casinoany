@@ -5,10 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Sparkles } from 'lucide-react';
+import { Loader2, Save, Sparkles, Layers } from 'lucide-react';
 import { CasinoContentEditor } from './CasinoContentEditor';
 import { BlockCustomization } from './casino/BlockCustomization';
+import { ContentVersions } from './casino/ContentVersions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const CasinoContentManagement = () => {
   const { toast } = useToast();
@@ -31,6 +43,7 @@ export const CasinoContentManagement = () => {
     faq: { icon: 'help', color: '#ec4899' },
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
 
   // Fetch all sites
   const { data: sites, isLoading: sitesLoading } = useQuery({
@@ -81,6 +94,62 @@ export const CasinoContentManagement = () => {
       }
     }
   }, [siteContent]);
+
+  // Bulk generate for all sites
+  const generateBulkAI = async () => {
+    if (!sites || sites.length === 0) return;
+    
+    setIsBulkGenerating(true);
+    try {
+      const siteIds = sites.map(s => s.id);
+      const { data, error } = await supabase.functions.invoke('generate-casino-content', {
+        body: {
+          isBulk: true,
+          siteIds,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        const successCount = data.results.filter((r: any) => r.success).length;
+        const failCount = data.results.filter((r: any) => !r.success).length;
+        
+        toast({
+          title: "Toplu İçerik Oluşturma Tamamlandı!",
+          description: `${successCount} site başarılı, ${failCount} site başarısız.`,
+        });
+
+        queryClient.invalidateQueries({ queryKey: ['betting-sites-casino-content'] });
+        queryClient.invalidateQueries({ queryKey: ['site-casino-content'] });
+      }
+    } catch (error) {
+      console.error('Bulk generation error:', error);
+      toast({
+        title: "Hata",
+        description: "Toplu içerik oluşturulurken bir hata oluştu.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkGenerating(false);
+    }
+  };
+
+  const handleVersionRestore = (version: any) => {
+    setPros(version.pros || []);
+    setCons(version.cons || []);
+    setVerdict(version.verdict || '');
+    setExpertReview(version.expert_review || '');
+    setGameCategories(version.game_categories || {});
+    setLoginGuide(version.login_guide || '');
+    setWithdrawalGuide(version.withdrawal_guide || '');
+    setFaq(version.faq || []);
+    if (version.block_styles) {
+      setBlockStyles(version.block_styles);
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
+  };
 
   // Generate content with AI
   const generateWithAI = async () => {
@@ -193,7 +262,35 @@ export const CasinoContentManagement = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Casino İçerik Yönetimi</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Casino İçerik Yönetimi</span>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={isBulkGenerating || !sites || sites.length === 0}
+                  variant="default"
+                  className="gap-2"
+                >
+                  <Layers className="w-4 h-4" />
+                  {isBulkGenerating ? "Oluşturuluyor..." : "Toplu AI Oluştur"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Toplu İçerik Oluştur</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tüm aktif siteler için AI ile casino içeriği oluşturulacak. Bu işlem birkaç dakika sürebilir. Devam etmek istiyor musunuz?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>İptal</AlertDialogCancel>
+                  <AlertDialogAction onClick={generateBulkAI}>
+                    Oluştur
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -237,9 +334,10 @@ export const CasinoContentManagement = () => {
       {selectedSiteId && !contentLoading && (
         <>
           <Tabs defaultValue="content" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="content">İçerik Yönetimi</TabsTrigger>
-              <TabsTrigger value="styling">Görsel Özelleştirme</TabsTrigger>
+              <TabsTrigger value="customization">Görsel Özelleştirme</TabsTrigger>
+              <TabsTrigger value="versions">Versiyon Geçmişi</TabsTrigger>
             </TabsList>
 
             <TabsContent value="content" className="space-y-6">
@@ -263,7 +361,7 @@ export const CasinoContentManagement = () => {
               />
             </TabsContent>
 
-            <TabsContent value="styling" className="space-y-6">
+            <TabsContent value="customization" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <BlockCustomization
                   blockName="Uzman Görüşü"
@@ -349,6 +447,13 @@ export const CasinoContentManagement = () => {
                   }))}
                 />
               </div>
+            </TabsContent>
+
+            <TabsContent value="versions" className="space-y-6">
+              <ContentVersions 
+                siteId={selectedSiteId}
+                onRestore={handleVersionRestore}
+              />
             </TabsContent>
           </Tabs>
 
