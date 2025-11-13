@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ export const CasinoContentManagement = () => {
   });
 
   // Load content when site is selected
-  useState(() => {
+  useEffect(() => {
     if (siteContent) {
       setPros((siteContent.pros as string[]) || []);
       setCons((siteContent.cons as string[]) || []);
@@ -63,7 +63,7 @@ export const CasinoContentManagement = () => {
       setWithdrawalGuide((siteContent.withdrawal_guide as string) || '');
       setFaq((siteContent.faq as Array<{ question: string; answer: string }>) || []);
     }
-  });
+  }, [siteContent]);
 
   // Update mutation
   const updateMutation = useMutation({
