@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, ExternalLink, Mail, MessageCircle, Send, Twitter, Instagram, Facebook, Youtube } from "lucide-react";
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from "lucide-react";
+import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { toast } from "sonner";
 import ReviewCard from "@/components/ReviewCard";
 import ReviewForm from "@/components/ReviewForm";
@@ -377,7 +378,7 @@ export default function SiteDetail() {
                 {site.email && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={`mailto:${site.email}`} target="_blank" rel="noopener noreferrer">
-                      <Mail className="w-4 h-4 mr-2" />
+                      <Mail className="w-4 h-4 mr-2" style={{ color: '#6366f1' }} />
                       Email
                     </a>
                   </Button>
@@ -385,7 +386,7 @@ export default function SiteDetail() {
                 {site.whatsapp && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.whatsapp} target="_blank" rel="noopener noreferrer">
-                      <MessageCircle className="w-4 h-4 mr-2" />
+                      <MessageCircle className="w-4 h-4 mr-2" style={{ color: '#25D366' }} />
                       WhatsApp
                     </a>
                   </Button>
@@ -393,7 +394,7 @@ export default function SiteDetail() {
                 {site.telegram && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.telegram} target="_blank" rel="noopener noreferrer">
-                      <Send className="w-4 h-4 mr-2" />
+                      <Send className="w-4 h-4 mr-2" style={{ color: '#0088cc' }} />
                       Telegram
                     </a>
                   </Button>
@@ -401,7 +402,7 @@ export default function SiteDetail() {
                 {site.twitter && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.twitter} target="_blank" rel="noopener noreferrer">
-                      <Twitter className="w-4 h-4 mr-2" />
+                      <FaTwitter className="w-4 h-4 mr-2" style={{ color: '#1DA1F2' }} />
                       Twitter
                     </a>
                   </Button>
@@ -409,7 +410,7 @@ export default function SiteDetail() {
                 {site.instagram && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.instagram} target="_blank" rel="noopener noreferrer">
-                      <Instagram className="w-4 h-4 mr-2" />
+                      <FaInstagram className="w-4 h-4 mr-2" style={{ color: '#E4405F' }} />
                       Instagram
                     </a>
                   </Button>
@@ -417,7 +418,7 @@ export default function SiteDetail() {
                 {site.facebook && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.facebook} target="_blank" rel="noopener noreferrer">
-                      <Facebook className="w-4 h-4 mr-2" />
+                      <FaFacebook className="w-4 h-4 mr-2" style={{ color: '#1877F2' }} />
                       Facebook
                     </a>
                   </Button>
@@ -425,7 +426,7 @@ export default function SiteDetail() {
                 {site.youtube && (
                   <Button variant="outline" size="sm" asChild>
                     <a href={site.youtube} target="_blank" rel="noopener noreferrer">
-                      <Youtube className="w-4 h-4 mr-2" />
+                      <FaYoutube className="w-4 h-4 mr-2" style={{ color: '#FF0000' }} />
                       YouTube
                     </a>
                   </Button>
