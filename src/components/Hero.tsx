@@ -120,33 +120,33 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
 
   return (
-    <div className="relative overflow-hidden bg-background">
-      <div className="container mx-auto px-4 py-12 md:py-20">
-        <div className="text-center space-y-6 md:space-y-8 mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-            <Award className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
+    <div className="relative overflow-hidden bg-background touch-manipulation">
+      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-20">
+        <div className="text-center space-y-4 md:space-y-6 lg:space-y-8 mb-8 md:mb-12 lg:mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary/10 border border-primary/20">
+            <Award className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+            <span className="text-xs md:text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold leading-tight">
             <span className="text-primary">En İyi Bahis Siteleri</span><br />
-            <span className="text-foreground text-xl sm:text-2xl md:text-4xl lg:text-5xl font-normal mt-2 block">Güvenilir ve Kazançlı</span>
+            <span className="text-foreground text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">Güvenilir ve Kazançlı</span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
           </p>
           <SmartSearch onSearch={onSearch} searchTerm={localSearch} />
-          <div className="flex flex-wrap justify-center gap-6 pt-6">
-            <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-card border border-border">
-              <TrendingUp className="w-6 h-6 text-primary" />
-              <div className="text-left"><div className="text-2xl font-bold">50+</div><div className="text-sm text-muted-foreground">Bahis Sitesi</div></div>
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6 pt-4 md:pt-6">
+            <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
+              <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-primary flex-shrink-0" />
+              <div className="text-left"><div className="text-lg md:text-2xl font-bold">50+</div><div className="text-xs md:text-sm text-muted-foreground">Bahis Sitesi</div></div>
             </div>
-            <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-card border border-border">
-              <Shield className="w-6 h-6 text-secondary" />
-              <div className="text-left"><div className="text-2xl font-bold">%100</div><div className="text-sm text-muted-foreground">Lisanslı</div></div>
+            <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
+              <Shield className="w-4 h-4 md:w-6 md:h-6 text-secondary flex-shrink-0" />
+              <div className="text-left"><div className="text-lg md:text-2xl font-bold">%100</div><div className="text-xs md:text-sm text-muted-foreground">Lisanslı</div></div>
             </div>
-            <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-card border border-border">
-              <Award className="w-6 h-6 text-accent" />
-              <div className="text-left"><div className="text-2xl font-bold">1000+</div><div className="text-sm text-muted-foreground">Kullanıcı</div></div>
+            <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
+              <Award className="w-4 h-4 md:w-6 md:h-6 text-accent flex-shrink-0" />
+              <div className="text-left"><div className="text-lg md:text-2xl font-bold">1000+</div><div className="text-xs md:text-sm text-muted-foreground">Kullanıcı</div></div>
             </div>
           </div>
         </div>
@@ -161,28 +161,28 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
             <div className="relative z-10 space-y-8">
               <div className="text-center">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">Öne Çıkan Siteler</h2>
-                <p className="text-muted-foreground text-base sm:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">Öne Çıkan Siteler</h2>
+                <p className="text-muted-foreground text-sm sm:text-base md:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
               </div>
               <div className="relative max-w-7xl mx-auto">
                 <button 
                   onClick={scrollPrev} 
                   disabled={!canScrollPrev} 
-                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg" 
+                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg touch-manipulation" 
                   aria-label="Previous"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
                 </button>
                 <button 
                   onClick={scrollNext} 
                   disabled={!canScrollNext} 
-                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg" 
+                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg touch-manipulation" 
                   aria-label="Next"
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
                 </button>
                 <div 
-                  className="overflow-hidden relative" 
+                  className="overflow-hidden relative cursor-grab active:cursor-grabbing" 
                   ref={emblaRef}
                   onTouchStart={(e) => {
                     setIsDragging(true);
@@ -222,8 +222,9 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                     <button 
                       key={index} 
                       onClick={() => emblaApi?.scrollTo(index)} 
-                      className={`h-2 rounded-full transition-all duration-300 ${selectedIndex === index ? 'bg-primary w-8' : 'bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50'}`} 
-                      aria-label={`Go to slide ${index + 1}`} 
+                      className={`h-2.5 rounded-full transition-all duration-300 touch-manipulation ${selectedIndex === index ? 'bg-primary w-8' : 'bg-muted-foreground/30 w-2.5 hover:bg-muted-foreground/50'}`} 
+                      aria-label={`Go to slide ${index + 1}`}
+                      style={{ minWidth: '44px', minHeight: '44px', padding: '20px 8px' }}
                     />
                   ))}
                 </div>
