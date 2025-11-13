@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Activity, AlertTriangle, Code, Shield, Zap, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { SystemLog, ApiCallLog } from '@/types/database';
 
 type LogType = 'all' | 'user_action' | 'system_error' | 'api_call' | 'admin_action' | 'performance';
 
@@ -17,10 +18,10 @@ export const SystemLogsViewer = () => {
   const [severity, setSeverity] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: logs, isLoading } = useQuery({
+  const { data: logs, isLoading } = useQuery<SystemLog[]>({
     queryKey: ['system-logs', logType, severity],
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('system_logs')
         .select('*')
         .order('created_at', { ascending: false })
@@ -36,26 +37,26 @@ export const SystemLogsViewer = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return (data as SystemLog[]) || [];
     },
     refetchInterval: 10000, // Refresh every 10 seconds
   });
 
-  const { data: apiLogs } = useQuery({
+  const { data: apiLogs } = useQuery<ApiCallLog[]>({
     queryKey: ['api-logs'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('api_call_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
       if (error) throw error;
-      return data;
+      return (data as ApiCallLog[]) || [];
     },
     refetchInterval: 10000,
   });
 
-  const filteredLogs = logs?.filter((log: any) => {
+  const filteredLogs = logs?.filter((log) => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
