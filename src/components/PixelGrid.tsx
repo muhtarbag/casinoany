@@ -53,11 +53,11 @@ export const PixelGrid = () => {
             <Sparkles className="w-6 h-6 text-primary animate-pulse" />
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground animate-fade-in">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground animate-fade-in">
             Güvenilir Casino Sitelerini Keşfedin
           </h2>
           
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in px-4">
             Yüksek bonuslar, hızlı ödemeler ve 7/24 destek sunan lisanslı casino sitelerini karşılaştırın
           </p>
           

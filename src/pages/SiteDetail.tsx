@@ -309,25 +309,25 @@ export default function SiteDetail() {
             <div className="flex flex-col gap-6">
               {/* Logo - Horizontal Layout */}
               {logoUrl ? (
-                <div className="flex items-center justify-center w-full min-h-[120px] bg-card/50 rounded-xl border border-border p-6">
+                <div className="flex items-center justify-center w-full min-h-[80px] sm:min-h-[120px] bg-card/50 rounded-xl border border-border p-4 sm:p-6">
                   <img
                     src={logoUrl}
                     alt={site.name}
-                    className="max-w-full max-h-[120px] object-contain"
+                    className="max-w-full max-h-[80px] sm:max-h-[120px] object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `<div class="text-5xl font-bold text-foreground">${site.name}</div>`;
+                      e.currentTarget.parentElement!.innerHTML = `<div class="text-3xl sm:text-5xl font-bold text-foreground">${site.name}</div>`;
                     }}
                   />
                 </div>
               ) : (
-                <div className="flex items-center justify-center w-full min-h-[120px] bg-gradient-primary rounded-xl p-6">
-                  <h2 className="text-5xl font-bold text-primary-foreground">{site.name}</h2>
+                <div className="flex items-center justify-center w-full min-h-[80px] sm:min-h-[120px] bg-gradient-primary rounded-xl p-4 sm:p-6">
+                  <h2 className="text-3xl sm:text-5xl font-bold text-primary-foreground">{site.name}</h2>
                 </div>
               )}
               
               <div className="space-y-4">
-                <CardTitle className="text-3xl mb-2">{site.name}</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl mb-2">{site.name}</CardTitle>
                 <div className="flex items-center gap-2 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
