@@ -137,12 +137,12 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-20 h-20 bg-muted rounded-lg flex items-center justify-center overflow-hidden border border-border">
+          <div className="flex-shrink-0 w-28 h-28 bg-muted rounded-lg flex items-center justify-center overflow-hidden border border-border">
             {logoUrl ? (
               <img 
                 src={logoUrl} 
                 alt={name} 
-                className="w-full h-full object-contain p-2" 
+                className="w-full h-full object-contain p-1"
                 loading="lazy"
                 decoding="async"
               />
