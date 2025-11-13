@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ExternalLink, Mail, MessageCircle, Send } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 
 interface BettingSiteCardProps {
   id?: string;
@@ -42,6 +43,14 @@ export const BettingSiteCard = ({
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (logo) {
+      const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
+      setLogoUrl(data.publicUrl);
+    }
+  }, [logo]);
 
   const trackClickMutation = useMutation({
     mutationFn: async () => {
@@ -100,10 +109,20 @@ export const BettingSiteCard = ({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {logo ? (
-              <img src={logo} alt={name} className="w-12 h-12 object-contain rounded" />
+            {logoUrl ? (
+              <div className="w-16 h-16 bg-card rounded-lg border border-border flex items-center justify-center p-2 shadow-sm group-hover:shadow-md transition-shadow">
+                <img 
+                  src={logoUrl} 
+                  alt={name} 
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-2xl font-bold text-primary">${name.charAt(0)}</div>`;
+                  }}
+                />
+              </div>
             ) : (
-              <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-lg font-bold">
+              <div className="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center text-2xl font-bold text-primary-foreground shadow-sm">
                 {name.charAt(0)}
               </div>
             )}
