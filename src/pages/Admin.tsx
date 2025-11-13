@@ -20,6 +20,7 @@ import { CSS } from '@dnd-kit/utilities';
 import SiteStats from '@/components/SiteStats';
 import ReviewManagement from '@/components/ReviewManagement';
 import { BlogManagement } from '@/components/BlogManagement';
+import { BlogCommentManagement } from '@/components/BlogCommentManagement';
 import { FeaturedSitesManagement } from '@/components/FeaturedSitesManagement';
 import { RefreshCw, Star } from 'lucide-react';
 
@@ -392,7 +393,12 @@ export default function Admin() {
           <TabsContent value="featured">
             <FeaturedSitesManagement />
           </TabsContent>
-          <TabsContent value="blog"><BlogManagement /></TabsContent>
+          <TabsContent value="blog">
+            <div className="space-y-6">
+              <BlogManagement />
+              <BlogCommentManagement />
+            </div>
+          </TabsContent>
           <TabsContent value="reviews"><ReviewManagement /></TabsContent>
           <TabsContent value="stats"><SiteStats /></TabsContent>
         </Tabs>
