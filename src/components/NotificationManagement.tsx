@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Eye, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { NotificationAnalytics } from './NotificationAnalytics';
 
 interface Notification {
   id: string;
@@ -56,6 +57,8 @@ export const NotificationManagement = () => {
     priority: 0,
     background_color: '#3b82f6',
     text_color: '#ffffff',
+    trigger_type: 'instant',
+    trigger_conditions: {},
   });
 
   const { data: notifications, isLoading } = useQuery({
@@ -179,6 +182,8 @@ export const NotificationManagement = () => {
       priority: notification.priority,
       background_color: notification.background_color || '#3b82f6',
       text_color: notification.text_color || '#ffffff',
+      trigger_type: (notification as any).trigger_type || 'instant',
+      trigger_conditions: (notification as any).trigger_conditions || {},
     });
     setIsDialogOpen(true);
   };
@@ -200,6 +205,8 @@ export const NotificationManagement = () => {
       priority: 0,
       background_color: '#3b82f6',
       text_color: '#ffffff',
+      trigger_type: 'instant',
+      trigger_conditions: {},
     });
     setEditingNotification(null);
   };
@@ -213,7 +220,13 @@ export const NotificationManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <Tabs defaultValue="notifications" className="space-y-6">
+      <TabsList>
+        <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
+        <TabsTrigger value="analytics">Analitik</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="notifications" className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Bildirim Yönetimi</h2>
@@ -401,6 +414,64 @@ export const NotificationManagement = () => {
                 </div>
               </div>
 
+              {/* Tetikleyici Ayarları */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="font-semibold">Tetikleyici Ayarları</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="trigger_type">Tetikleyici Tipi</Label>
+                  <Select
+                    value={formData.trigger_type}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, trigger_type: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="instant">Anında Göster</SelectItem>
+                      <SelectItem value="time_on_page">Sayfada Geçirilen Süre</SelectItem>
+                      <SelectItem value="scroll_depth">Scroll Derinliği</SelectItem>
+                      <SelectItem value="exit_intent">Çıkış Niyeti</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.trigger_type === 'time_on_page' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="trigger_seconds">Saniye</Label>
+                    <Input
+                      id="trigger_seconds"
+                      type="number"
+                      min="1"
+                      value={(formData.trigger_conditions as any)?.seconds || 10}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        trigger_conditions: { seconds: parseInt(e.target.value) }
+                      }))}
+                      placeholder="10"
+                    />
+                  </div>
+                )}
+
+                {formData.trigger_type === 'scroll_depth' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="trigger_scroll">Scroll Yüzdesi</Label>
+                    <Input
+                      id="trigger_scroll"
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={(formData.trigger_conditions as any)?.percentage || 50}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        trigger_conditions: { percentage: parseInt(e.target.value) }
+                      }))}
+                      placeholder="50"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="is_active"
@@ -479,6 +550,11 @@ export const NotificationManagement = () => {
           </Card>
         ))}
       </div>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="analytics">
+        <NotificationAnalytics />
+      </TabsContent>
+    </Tabs>
   );
 };

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -23,7 +23,6 @@ interface Notification {
   trigger_conditions: any;
 }
 
-// Oturum ID'si oluştur
 const getSessionId = () => {
   let sessionId = sessionStorage.getItem('notification_session_id');
   if (!sessionId) {
@@ -33,19 +32,15 @@ const getSessionId = () => {
   return sessionId;
 };
 
-export const NotificationPopup = () => {
+export const NotificationBanner = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [openNotificationId, setOpenNotificationId] = useState<string | null>(null);
+  const [visibleBannerId, setVisibleBannerId] = useState<string | null>(null);
   const sessionId = getSessionId();
 
-  // Aktif bildirimleri getir
-  const [timeOnPage, setTimeOnPage] = useState(0);
-  const [shouldShow, setShouldShow] = useState(false);
-
   const { data: notifications } = useQuery({
-    queryKey: ['active-notifications', location.pathname],
+    queryKey: ['banner-notifications', location.pathname],
     queryFn: async () => {
       const now = new Date().toISOString();
       
@@ -53,7 +48,7 @@ export const NotificationPopup = () => {
         .from('site_notifications')
         .select('*')
         .eq('is_active', true)
-        .eq('notification_type', 'popup')
+        .eq('notification_type', 'banner')
         .or(`start_date.is.null,start_date.lte.${now}`)
         .or(`end_date.is.null,end_date.gte.${now}`)
         .order('priority', { ascending: false });
@@ -68,9 +63,8 @@ export const NotificationPopup = () => {
     },
   });
 
-  // Görüntülenenleri getir
   const { data: viewedNotifications } = useQuery({
-    queryKey: ['viewed-notifications', sessionId],
+    queryKey: ['viewed-banner-notifications', sessionId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('notification_views')
@@ -90,8 +84,7 @@ export const NotificationPopup = () => {
           notification_id: notificationId,
           user_id: user?.id,
           session_id: sessionId,
-          dismissed: false,
-          clicked: false
+          dismissed: false
         }]);
       
       if (error) throw error;
@@ -110,7 +103,6 @@ export const NotificationPopup = () => {
     },
   });
 
-  // Kapatma kaydı
   const trackDismissMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       const { error } = await supabase
@@ -123,157 +115,104 @@ export const NotificationPopup = () => {
     },
   });
 
-  // Timer for time_on_page trigger
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeOnPage(prev => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
 
     const notificationToShow = notifications.find(notification => {
       const viewed = viewedNotifications.find(v => v.notification_id === notification.id);
       
-      if (!viewed) {
-        return checkTrigger(notification);
-      }
+      if (!viewed) return true;
       
-      if (notification.display_frequency === 'always') {
-        return checkTrigger(notification);
-      }
+      if (notification.display_frequency === 'always') return true;
       
       if (notification.display_frequency === 'daily') {
         const lastViewed = new Date(viewed.viewed_at);
         const now = new Date();
         const hoursSinceViewed = (now.getTime() - lastViewed.getTime()) / (1000 * 60 * 60);
-        return hoursSinceViewed >= 24 && checkTrigger(notification);
-      }
-      
-      if (notification.display_frequency === 'session') {
-        return false;
+        return hoursSinceViewed >= 24;
       }
       
       return false;
     });
 
-    if (notificationToShow && shouldShow) {
-      setOpenNotificationId(notificationToShow.id);
+    if (notificationToShow) {
+      setVisibleBannerId(notificationToShow.id);
       trackViewMutation.mutate(notificationToShow.id);
     }
-  }, [notifications, viewedNotifications, timeOnPage, shouldShow]);
-
-  const checkTrigger = (notification: Notification) => {
-    const { trigger_type, trigger_conditions } = notification;
-
-    switch (trigger_type) {
-      case 'instant':
-        setShouldShow(true);
-        return true;
-      
-      case 'time_on_page':
-        const requiredTime = trigger_conditions?.seconds || 10;
-        if (timeOnPage >= requiredTime) {
-          setShouldShow(true);
-          return true;
-        }
-        return false;
-      
-      case 'scroll_depth':
-        // Can be implemented with scroll tracking
-        return false;
-      
-      case 'exit_intent':
-        // Can be implemented with mouse tracking
-        return false;
-      
-      default:
-        setShouldShow(true);
-        return true;
-    }
-  };
+  }, [notifications, viewedNotifications]);
 
   const handleClose = () => {
-    if (openNotificationId) {
-      trackDismissMutation.mutate(openNotificationId);
-      setOpenNotificationId(null);
+    if (visibleBannerId) {
+      trackDismissMutation.mutate(visibleBannerId);
+      setVisibleBannerId(null);
     }
   };
 
-  const handleButtonClick = (url: string | null) => {
-    if (openNotificationId) {
-      trackClickMutation.mutate(openNotificationId);
-    }
+  const handleButtonClick = (notification: Notification) => {
+    trackClickMutation.mutate(notification.id);
     
-    if (url) {
-      if (url.startsWith('http')) {
-        window.open(url, '_blank');
+    if (notification.button_url) {
+      if (notification.button_url.startsWith('http')) {
+        window.open(notification.button_url, '_blank');
       } else {
-        navigate(url);
+        navigate(notification.button_url);
       }
-      handleClose();
     }
   };
 
-  const currentNotification = notifications?.find(n => n.id === openNotificationId);
+  const currentNotification = notifications?.find(n => n.id === visibleBannerId);
 
-  if (!currentNotification) return null;
+  if (!currentNotification || !visibleBannerId) return null;
 
   return (
-    <Dialog open={!!openNotificationId} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent 
-        className="max-w-2xl p-0 overflow-hidden"
-        style={{
-          backgroundColor: currentNotification.background_color || undefined,
-          color: currentNotification.text_color || undefined,
-        }}
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 z-10"
-          onClick={handleClose}
-        >
-          <X className="w-4 h-4" />
-        </Button>
-
-        <div className="space-y-4">
+    <div 
+      className="fixed top-0 left-0 right-0 z-50 shadow-lg"
+      style={{
+        backgroundColor: currentNotification.background_color || undefined,
+        color: currentNotification.text_color || undefined,
+      }}
+    >
+      <Alert className="rounded-none border-0 relative" style={{ backgroundColor: 'transparent' }}>
+        <div className="container mx-auto flex items-center justify-between gap-4 py-2">
           {currentNotification.image_url && (
-            <div className="w-full">
-              <img
-                src={currentNotification.image_url}
-                alt={currentNotification.title}
-                className="w-full h-auto object-cover"
-              />
-            </div>
+            <img
+              src={currentNotification.image_url}
+              alt={currentNotification.title}
+              className="h-12 w-12 object-cover rounded"
+            />
           )}
-
-          <div className="p-6 space-y-4">
-            <DialogTitle className="text-2xl font-bold">
+          
+          <div className="flex-1">
+            <AlertTitle className="text-lg font-bold mb-1">
               {currentNotification.title}
-            </DialogTitle>
-
+            </AlertTitle>
             {currentNotification.content && (
-              <p className="text-lg opacity-90">
+              <AlertDescription className="opacity-90">
                 {currentNotification.content}
-              </p>
-            )}
-
-            {currentNotification.button_text && (
-              <Button
-                onClick={() => handleButtonClick(currentNotification.button_url)}
-                className="w-full"
-                size="lg"
-              >
-                {currentNotification.button_text}
-              </Button>
+              </AlertDescription>
             )}
           </div>
+
+          {currentNotification.button_text && (
+            <Button
+              onClick={() => handleButtonClick(currentNotification)}
+              size="sm"
+              className="whitespace-nowrap"
+            >
+              {currentNotification.button_text}
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClose}
+            className="flex-shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </Alert>
+    </div>
   );
 };
