@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, Eye, Plus, Save, X } from 'lucide-react';
+import { Trash2, Edit, Eye, Plus, Save, X, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -53,6 +53,8 @@ export const BlogManagement = () => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -81,11 +83,48 @@ export const BlogManagement = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      let imageUrl = null;
+      
+      // Upload image if provided
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('blog-images')
+          .upload(fileName, imageFile);
+        
+        if (uploadError) {
+          // Try to create bucket if it doesn't exist
+          const { error: bucketError } = await supabase.storage.createBucket('blog-images', {
+            public: true,
+          });
+          
+          if (!bucketError) {
+            // Retry upload after creating bucket
+            const { error: retryError } = await supabase.storage
+              .from('blog-images')
+              .upload(fileName, imageFile);
+            if (!retryError) {
+              const { data: urlData } = supabase.storage
+                .from('blog-images')
+                .getPublicUrl(fileName);
+              imageUrl = urlData.publicUrl;
+            }
+          }
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(fileName);
+          imageUrl = urlData.publicUrl;
+        }
+      }
+      
       const postData = {
         title: data.title,
         slug: data.slug,
         excerpt: data.excerpt,
         content: data.content,
+        featured_image: imageUrl,
         meta_title: data.meta_title || data.title,
         meta_description: data.meta_description || data.excerpt,
         meta_keywords: data.meta_keywords ? data.meta_keywords.split(',').map(k => k.trim()) : [],
@@ -112,11 +151,30 @@ export const BlogManagement = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
+      let imageUrl = imagePreview; // Keep existing image
+      
+      // Upload new image if provided
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('blog-images')
+          .upload(fileName, imageFile);
+        
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(fileName);
+          imageUrl = urlData.publicUrl;
+        }
+      }
+      
       const postData = {
         title: data.title,
         slug: data.slug,
         excerpt: data.excerpt,
         content: data.content,
+        featured_image: imageUrl,
         meta_title: data.meta_title || data.title,
         meta_description: data.meta_description || data.excerpt,
         meta_keywords: data.meta_keywords ? data.meta_keywords.split(',').map(k => k.trim()) : [],
@@ -169,6 +227,8 @@ export const BlogManagement = () => {
       read_time: '5',
       is_published: false,
     });
+    setImageFile(null);
+    setImagePreview(null);
     setIsEditing(false);
     setEditingId(null);
   };
@@ -187,8 +247,22 @@ export const BlogManagement = () => {
       read_time: post.read_time?.toString() || '5',
       is_published: post.is_published,
     });
+    setImagePreview(post.featured_image || null);
+    setImageFile(null);
     setEditingId(post.id);
     setIsEditing(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -261,6 +335,37 @@ export const BlogManagement = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="featured_image">Kapak Görseli</Label>
+                <Input
+                  id="featured_image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                {imagePreview && (
+                  <div className="mt-2 relative w-full h-48 rounded-lg overflow-hidden border border-border">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
