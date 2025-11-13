@@ -23,7 +23,9 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     loop: true, 
     align: 'start',
     skipSnaps: false,
-    dragFree: false
+    dragFree: false,
+    duration: 20,
+    containScroll: 'trimSnaps'
   });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -46,26 +48,29 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  // Auto-scroll on mobile every 3 seconds
+  // Auto-scroll on mobile
   useEffect(() => {
     if (!emblaApi) return;
     
-    // Always check on mount and resize
-    const handleAutoScroll = () => {
-      const isMobile = window.innerWidth < 768;
-      if (!isMobile) return;
-      
-      // Use scrollNext which automatically handles loop
-      emblaApi.scrollNext();
-    };
-
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
 
-    // Start auto-scroll for mobile
+    const handleAutoScroll = () => {
+      if (!emblaApi) return;
+      emblaApi.scrollNext();
+    };
+
+    // Start auto-scroll for mobile with smoother transition
     const autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
 
-    return () => clearInterval(autoScrollInterval);
+    // Clear interval on user interaction
+    const clearAutoScroll = () => clearInterval(autoScrollInterval);
+    emblaApi.on('pointerDown', clearAutoScroll);
+
+    return () => {
+      clearInterval(autoScrollInterval);
+      emblaApi.off('pointerDown', clearAutoScroll);
+    };
   }, [emblaApi, autoScrollDuration]);
 
   // Fetch carousel settings
@@ -190,37 +195,16 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                   <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
                 </button>
                 <div 
-                  className="overflow-hidden relative cursor-grab active:cursor-grabbing" 
+                  className="overflow-hidden relative touch-pan-x" 
                   ref={emblaRef}
-                  onTouchStart={(e) => {
-                    setIsDragging(true);
-                    setDragStartX(e.touches[0].clientX);
-                  }}
-                  onTouchMove={(e) => {
-                    if (isDragging) {
-                      const offset = e.touches[0].clientX - dragStartX;
-                      setDragOffset(offset);
-                    }
-                  }}
-                  onTouchEnd={() => {
-                    setIsDragging(false);
-                    setDragOffset(0);
-                    // Haptic feedback (vibrate)
-                    if ('vibrate' in navigator) {
-                      navigator.vibrate(10);
-                    }
-                  }}
                 >
-                  {isDragging && Math.abs(dragOffset) > 20 && (
-                    <div className="absolute inset-0 bg-primary/5 pointer-events-none z-20 transition-opacity duration-200" />
-                  )}
-                  <div className={`flex gap-6 carousel-${animationType} transition-transform duration-200`} style={{ transform: isDragging ? `translateX(${dragOffset * 0.1}px)` : '' }}>
+                  <div className="flex gap-4 md:gap-6">
                     {featuredSites.map((site, index) => {
                       const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
                       return (
                         <div 
                           key={site.id} 
-                          className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''} transition-transform duration-300 ${isDragging && selectedIndex === index ? 'scale-[0.98]' : ''}`}
+                          className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-opacity duration-300"
                         >
                           <BettingSiteCard 
                             id={site.id} 

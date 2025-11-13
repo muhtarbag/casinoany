@@ -41,15 +41,12 @@ export const NotificationPopup = () => {
   const sessionId = getSessionId();
 
   // Aktif bildirimleri getir
-  const [timeOnPage, setTimeOnPage] = useState(0);
-  const [shouldShow, setShouldShow] = useState(false);
-
   const { data: notifications } = useQuery({
     queryKey: ['active-notifications', location.pathname],
     queryFn: async () => {
       const now = new Date().toISOString();
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('site_notifications')
         .select('*')
         .eq('is_active', true)
@@ -68,11 +65,13 @@ export const NotificationPopup = () => {
     },
   });
 
-  // Görüntülenenleri getir
+  const [timeOnPage, setTimeOnPage] = useState(0);
+  const [shouldShow, setShouldShow] = useState(false);
+
   const { data: viewedNotifications } = useQuery({
     queryKey: ['viewed-notifications', sessionId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notification_views')
         .select('notification_id, viewed_at')
         .eq('session_id', sessionId);
@@ -84,7 +83,7 @@ export const NotificationPopup = () => {
 
   const trackViewMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notification_views')
         .insert([{
           notification_id: notificationId,
@@ -100,7 +99,7 @@ export const NotificationPopup = () => {
 
   const trackClickMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notification_views')
         .update({ clicked: true, clicked_at: new Date().toISOString() })
         .eq('notification_id', notificationId)
@@ -110,10 +109,9 @@ export const NotificationPopup = () => {
     },
   });
 
-  // Kapatma kaydı
   const trackDismissMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notification_views')
         .update({ dismissed: true })
         .eq('notification_id', notificationId)
