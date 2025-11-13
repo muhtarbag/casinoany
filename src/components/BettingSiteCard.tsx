@@ -47,8 +47,14 @@ export const BettingSiteCard = ({
 
   useEffect(() => {
     if (logo) {
-      const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
-      setLogoUrl(data.publicUrl);
+      // Eğer logo zaten tam bir URL ise direkt kullan
+      if (logo.startsWith('http')) {
+        setLogoUrl(logo);
+      } else {
+        // Değilse storage'dan al
+        const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
+        setLogoUrl(data.publicUrl);
+      }
     }
   }, [logo]);
 
