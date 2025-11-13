@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BettingSiteCard } from "./BettingSiteCard";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface RecommendedSitesProps {
   currentSiteId: string;
@@ -37,14 +37,19 @@ export default function RecommendedSites({ currentSiteId, currentSiteFeatures }:
     },
   });
 
-  // Randomly select 4 sites on each render
-  const recommendedSites = useMemo(() => {
-    if (!allSites || allSites.length === 0) return [];
+  // Randomly select 4 sites - shuffles every time component mounts or allSites changes
+  const [recommendedSites, setRecommendedSites] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!allSites || allSites.length === 0) {
+      setRecommendedSites([]);
+      return;
+    }
     
     // Shuffle array and take first 4
     const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 4);
-  }, [allSites]);
+    setRecommendedSites(shuffled.slice(0, 4));
+  }, [allSites, currentSiteId]); // Re-shuffle when site changes or allSites changes
 
   if (isLoading) {
     return (
