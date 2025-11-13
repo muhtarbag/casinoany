@@ -469,17 +469,17 @@ export default function SiteDetail() {
             <CardDescription>Deneyimlerinizi diğer kullanıcılarla paylaşın (Üyelik gerektirmez)</CardDescription>
           </CardHeader>
           <CardContent>
-            <ReviewForm siteId={id!} />
+            <ReviewForm siteId={site.id} />
           </CardContent>
         </Card>
 
         {/* Site Blog Section */}
         <div className="mb-8">
-          <SiteBlogSection siteId={id!} siteName={site.name} />
+          <SiteBlogSection siteId={site.id} siteName={site.name} />
         </div>
 
         {/* Recommended Sites */}
-        <RecommendedSites currentSiteId={id!} currentSiteFeatures={site.features || []} />
+        <RecommendedSites currentSiteId={site.id} currentSiteFeatures={site.features || []} />
       </main>
       <Footer />
     </div>
