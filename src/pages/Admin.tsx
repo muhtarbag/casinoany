@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -82,6 +82,66 @@ export default function Admin() {
       toast({ title: 'Yetkisiz Erişim', description: 'Bu sayfaya erişim yetkiniz yok.', variant: 'destructive' });
     }
   }, [user, isAdmin, authLoading, navigate, toast]);
+
+  // Fetch user profile for welcome message
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await (supabase as any)
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch dashboard statistics
+  const { data: dashboardStats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      // Get total sites
+      const { count: sitesCount } = await supabase
+        .from('betting_sites')
+        .select('*', { count: 'exact', head: true });
+
+      // Get total users
+      const { count: usersCount } = await (supabase as any)
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      // Get total reviews
+      const { count: reviewsCount } = await (supabase as any)
+        .from('site_reviews')
+        .select('*', { count: 'exact', head: true });
+
+      // Get pending reviews
+      const { count: pendingCount } = await (supabase as any)
+        .from('site_reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', false);
+
+      // Get total views and clicks
+      const { data: statsData } = await supabase
+        .from('site_stats' as any)
+        .select('views, clicks');
+
+      const totalViews = statsData?.reduce((sum: number, stat: any) => sum + (stat.views || 0), 0) || 0;
+      const totalClicks = statsData?.reduce((sum: number, stat: any) => sum + (stat.clicks || 0), 0) || 0;
+
+      return {
+        totalSites: sitesCount || 0,
+        totalUsers: usersCount || 0,
+        totalReviews: reviewsCount || 0,
+        pendingReviews: pendingCount || 0,
+        totalViews,
+        totalClicks,
+      };
+    },
+  });
 
   const { data: sites, isLoading: sitesLoading } = useQuery({
     queryKey: ['betting-sites'],
@@ -191,7 +251,85 @@ export default function Admin() {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Admin Paneli</h1>
+        {/* Welcome Message */}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+            Hoş Geldin, {userProfile?.username || 'Admin'}! 👋
+          </h1>
+          <p className="text-muted-foreground">
+            İşte platformunuzun genel durumu
+          </p>
+        </div>
+
+        {/* Dashboard Statistics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Siteler</CardTitle>
+              <TrendingUp className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalSites || 0}</div>
+              <p className="text-xs text-muted-foreground">Aktif bahis siteleri</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Kullanıcılar</CardTitle>
+              <Users className="h-4 w-4 text-secondary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalUsers || 0}</div>
+              <p className="text-xs text-muted-foreground">Kayıtlı kullanıcı</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Yorumlar</CardTitle>
+              <MessageSquare className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalReviews || 0}</div>
+              <p className="text-xs text-muted-foreground">Kullanıcı yorumu</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border-yellow-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Bekleyen Yorumlar</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.pendingReviews || 0}</div>
+              <p className="text-xs text-muted-foreground">Onay bekliyor</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Görüntülenme</CardTitle>
+              <Eye className="h-4 w-4 text-blue-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalViews.toLocaleString() || 0}</div>
+              <p className="text-xs text-muted-foreground">Site görüntüleme</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20 hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Tıklama</CardTitle>
+              <MousePointer className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{dashboardStats?.totalClicks.toLocaleString() || 0}</div>
+              <p className="text-xs text-muted-foreground">Affiliate tıklaması</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="manage" className="w-full">
           <TabsList className="grid w-full grid-cols-3"><TabsTrigger value="manage">Site Yönetimi</TabsTrigger><TabsTrigger value="reviews">Yorumlar</TabsTrigger><TabsTrigger value="stats">İstatistikler</TabsTrigger></TabsList>
           <TabsContent value="manage" className="space-y-8">
