@@ -377,20 +377,54 @@ async function generateReviews(data: any, apiKey: string) {
     },
     body: JSON.stringify({
       model: 'google/gemini-2.5-flash',
-      messages: [{
-        role: 'user',
-        content: `${siteName} bahis sitesi için ${count || 5} adet gerçekçi kullanıcı yorumu oluştur.
+      temperature: 0.9, // Yüksek yaratıcılık için
+      messages: [
+        {
+          role: 'system',
+          content: 'Sen gerçek kullanıcı yorumları yazan bir uzman yazarsın. Her yorumun benzersiz, organik ve gerçekçi olması gerekir. Asla aynı ismi veya benzer ifadeleri tekrar etme. Her yorumcu farklı bir kişilik ve deneyime sahip olmalı.'
+        },
+        {
+          role: 'user',
+          content: `${siteName} bahis sitesi için ${count || 5} adet BENZERSIZ ve ORGANIK kullanıcı yorumu oluştur.
+
+        🎯 UNIQUE İSİM KURALLARI (ÇOK ÖNEMLİ):
+        - Her yorumcu için FARKLI bir Türkçe isim-soyisim kombinasyonu kullan
+        - Popüler Türkçe isimleri kullan: Ahmet, Mehmet, Ali, Mustafa, Hasan, Hüseyin, İbrahim, Yusuf, Emre, Burak, Cem, Deniz, Fatma, Ayşe, Elif, Zeynep, Merve, Selin, Ebru, Gülşen vb.
+        - Çeşitli soyisimler: Yılmaz, Demir, Çelik, Aydın, Özdemir, Arslan, Doğan, Kaya, Şahin, Kılıç, Polat, Karaca, Koç, Öztürk vb.
+        - Asla aynı ismi tekrar etme!
+        - Erkek ve kadın isimleri karıştır
         
-        Her yorum için:
-        - Türkçe isim ve soyisim (name alanında)
-        - Kısa başlık (title alanında, 50-80 karakter)
-        - 1-5 arası TAM SAYI puan (örn: 1, 2, 3, 4, 5 - ondalıklı değil!)
-        - 150-250 kelimelik detaylı yorum (comment alanında)
-        - Yorumun tarihi (son 3 ay içinde, YYYY-MM-DD formatında)
-        - Pozitif (4-5 yıldız) ve negatif (1-3 yıldız) yorumlar karışık olmalı
-        - Gerçekçi kullanıcı deneyimleri
-        - Pros ve cons listesi (her biri 2-4 madde)`
-      }],
+        👤 KULLANICI ÇEŞİTLİLİĞİ:
+        - Farklı yaş grupları (20'li yaşlar: genç dil, 30'lu yaşlar: deneyimli, 40+: muhafazakâr üslup)
+        - Farklı deneyim seviyeleri (yeni başlayan, orta seviye, profesyonel)
+        - Farklı bahis tarzları (spor bahisleri, canlı bahis, casino oyunları)
+        - Bazıları teknik detaylara girerken, bazıları genel izlenimlerini paylaşsın
+        
+        📝 ORGANİK YORUM İÇERİĞİ:
+        - Her yorum FARKLI konulara odaklansın
+        - Bazıları bonuslardan bahsetsin
+        - Bazıları çekim süreçlerinden
+        - Bazıları müşteri hizmetlerinden
+        - Bazıları mobil uygulamadan
+        - Bazıları bahis oranlarından
+        - GERÇEK kullanıcı tecrübesi gibi yaz (gramer hataları, günlük dil, emoji kullanımı dahil)
+        
+        ⭐ PUAN DAĞILIMI:
+        - ${Math.ceil((count || 5) * 0.6)} adet 4-5 yıldız (pozitif deneyim)
+        - ${Math.floor((count || 5) * 0.4)} adet 1-3 yıldız (negatif/orta deneyim)
+        - Her puan için farklı gerekçeler
+        
+        📅 TARİH ÇEŞİTLİLİĞİ:
+        - Son 3 ay içinde farklı tarihler
+        - Aynı günde birden fazla yorum olmasın
+        
+        ✍️ YORUM DETAYLARI:
+        - Başlık: 50-80 karakter, dikkat çekici ve özgün
+        - Yorum: 150-250 kelime, detaylı ve kişisel
+        - Pros: 2-4 madde, spesifik avantajlar
+        - Cons: 1-3 madde (pozitif yorumlarda az, negatif yorumlarda çok)`
+        }
+      ],
       tools: [{
         type: 'function',
         function: {

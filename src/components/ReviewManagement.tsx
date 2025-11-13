@@ -421,7 +421,7 @@ export default function ReviewManagement() {
             AI ile Otomatik Yorum Oluştur
           </CardTitle>
           <CardDescription>
-            Seçtiğiniz site için AI ile organik görünümlü yorumlar oluşturun
+            AI her yorum için benzersiz isimler ve farklı kullanıcı profilleri oluşturur. Organik ve gerçekçi yorumlar üretilir.
           </CardDescription>
         </CardHeader>
         <CardContent>
