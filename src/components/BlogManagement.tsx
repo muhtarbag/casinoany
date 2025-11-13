@@ -31,6 +31,7 @@ interface BlogPost {
   category?: string;
   tags?: string[];
   display_order: number;
+  primary_site_id?: string;
 }
 
 interface BlogFormData {
@@ -45,6 +46,7 @@ interface BlogFormData {
   tags: string;
   read_time: string;
   is_published: boolean;
+  primary_site_id: string;
 }
 
 export const BlogManagement = () => {
@@ -56,6 +58,7 @@ export const BlogManagement = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
+  const [primarySiteId, setPrimarySiteId] = useState<string>('');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -68,6 +71,7 @@ export const BlogManagement = () => {
     tags: '',
     read_time: '5',
     is_published: false,
+    primary_site_id: '',
   });
 
   const { data: posts, isLoading } = useQuery({
@@ -149,6 +153,7 @@ export const BlogManagement = () => {
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null,
         author_id: user?.id,
+        primary_site_id: data.primary_site_id || null,
       };
       
       const { data: newPost, error } = await supabase
@@ -219,6 +224,7 @@ export const BlogManagement = () => {
         read_time: parseInt(data.read_time) || 5,
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null,
+        primary_site_id: data.primary_site_id || null,
       };
       const { error } = await supabase.from('blog_posts' as any).update(postData).eq('id', id);
       if (error) throw error;
@@ -284,10 +290,12 @@ export const BlogManagement = () => {
       tags: '',
       read_time: '5',
       is_published: false,
+      primary_site_id: '',
     });
     setImageFile(null);
     setImagePreview(null);
     setSelectedSites([]);
+    setPrimarySiteId('');
     setIsEditing(false);
     setEditingId(null);
   };
@@ -305,9 +313,11 @@ export const BlogManagement = () => {
       tags: post.tags?.join(', ') || '',
       read_time: post.read_time?.toString() || '5',
       is_published: post.is_published,
+      primary_site_id: post.primary_site_id || '',
     });
     setImagePreview(post.featured_image || null);
     setImageFile(null);
+    setPrimarySiteId(post.primary_site_id || '');
     
     // Load related sites
     const { data: relatedSites } = await (supabase as any)
@@ -526,6 +536,27 @@ export const BlogManagement = () => {
                     placeholder="bahis siteleri, casino, bonus"
                   />
                 </div>
+              </div>
+
+              {/* Primary Site Selection */}
+              <div className="space-y-3 border-t pt-4">
+                <Label htmlFor="primary_site">Ana Bahis Sitesi (Önemli!)</Label>
+                <p className="text-sm text-muted-foreground">
+                  Bu blog yazısının hangi bahis sitesi hakkında olduğunu seçin. Site detay sayfasında bu yazı gösterilecek.
+                </p>
+                <select
+                  id="primary_site"
+                  value={formData.primary_site_id}
+                  onChange={(e) => setFormData({ ...formData, primary_site_id: e.target.value })}
+                  className="w-full p-3 rounded-lg border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">Site Seçiniz (Opsiyonel)</option>
+                  {bettingSites && bettingSites.map((site: any) => (
+                    <option key={site.id} value={site.id}>
+                      {site.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Related Betting Sites Selection */}
