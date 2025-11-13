@@ -76,19 +76,19 @@ export const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Keşfet</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🏠 Ana Sayfa
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/about" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   ℹ️ Hakkımızda
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/blog" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   📝 Blog
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="/sitemap.xml" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
@@ -223,13 +223,13 @@ export const Footer = () => {
             &copy; 2025 CasinoAny.com. Tüm hakları saklıdır.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">Gizlilik Politikası</a>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Gizlilik Politikası</Link>
             <span>•</span>
-            <a href="#" className="hover:text-primary transition-colors">Kullanım Şartları</a>
+            <Link to="/terms" className="hover:text-primary transition-colors">Kullanım Şartları</Link>
             <span>•</span>
-            <a href="#" className="hover:text-primary transition-colors">Çerez Politikası</a>
+            <Link to="/cookies" className="hover:text-primary transition-colors">Çerez Politikası</Link>
             <span>•</span>
-            <a href="#" className="hover:text-primary transition-colors">KVKK</a>
+            <Link to="/kvkk" className="hover:text-primary transition-colors">KVKK</Link>
           </div>
           <p className="text-xs text-muted-foreground">
             ⚠️ 18 yaşından küçüklerin bahis ve şans oyunları oynaması yasaktır. Kumar bağımlılığına karşı dikkatli olun.
