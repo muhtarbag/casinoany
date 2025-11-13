@@ -7,6 +7,7 @@ import { WithdrawalGuideBlock } from "./WithdrawalGuideBlock";
 import { FAQBlock } from "./FAQBlock";
 
 interface CasinoReviewCoreContentProps {
+  siteName?: string;
   pros?: string[];
   cons?: string[];
   verdict?: string;
@@ -18,6 +19,7 @@ interface CasinoReviewCoreContentProps {
 }
 
 export const CasinoReviewCoreContent = ({
+  siteName,
   pros,
   cons,
   verdict,
@@ -30,7 +32,7 @@ export const CasinoReviewCoreContent = ({
   return (
     <div className="space-y-6">
       <ProsConsBlock pros={pros} cons={cons} />
-      <CasinoVerdictBlock verdict={verdict} />
+      <CasinoVerdictBlock verdict={verdict} siteName={siteName} />
       <ExpertReviewBlock expertReview={expertReview} />
       <GameOverviewBlock gameCategories={gameCategories} />
       <LoginGuideBlock loginGuide={loginGuide} />
