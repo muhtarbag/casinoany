@@ -6,12 +6,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { analytics } from "@/lib/analytics";
+import { handleError, handleSuccess } from "@/lib/errorHandling";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
-import { toast } from "sonner";
 
 const reviewSchema = z.object({
   name: z.string().trim().min(2, "İsim en az 2 karakter olmalıdır").max(100, "İsim en fazla 100 karakter olabilir"),
@@ -63,15 +63,17 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
       // Track review submission in analytics
       analytics.trackReviewSubmit(siteId, data.rating);
       
-      toast.success("Yorumunuz başarıyla gönderildi!", {
-        description: "Admin onayından sonra yayınlanacaktır.",
-      });
+      handleSuccess(
+        "Yorumunuz başarıyla gönderildi! Admin onayından sonra yayınlanacaktır.",
+        "İnceleme Gönderildi"
+      );
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["site-reviews", siteId] });
     },
     onError: (error: Error) => {
-      toast.error("Yorum gönderilemedi", {
-        description: error.message,
+      handleError(error, {
+        title: "Yorum Gönderilemedi",
+        description: "Lütfen tekrar deneyin veya daha sonra tekrar gelin.",
       });
     },
   });

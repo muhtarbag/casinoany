@@ -6,11 +6,13 @@ import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { ItemListSchema } from '@/components/StructuredData';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { EmptyState } from '@/components/EmptyState';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar, Clock, Eye, Search, Tag, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Eye, Search, Tag, ArrowRight, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState, useMemo } from 'react';
@@ -132,17 +134,28 @@ const Blog = () => {
         </div>
 
         {isLoading ? (
-          <div className="text-center py-20">
-            <div className="text-muted-foreground">Yükleniyor...</div>
-          </div>
+          <LoadingSpinner size="lg" text="Blog yazıları yükleniyor..." className="py-20" />
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground text-lg">
-              {searchTerm || selectedCategory
-                ? 'Arama kriterlerine uygun blog yazısı bulunamadı.'
-                : 'Henüz yayınlanmış blog yazısı bulunmamaktadır.'}
-            </p>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title={searchTerm || selectedCategory ? 'Sonuç Bulunamadı' : 'Henüz Blog Yazısı Yok'}
+            description={
+              searchTerm || selectedCategory
+                ? 'Arama kriterlerine uygun blog yazısı bulunamadı. Farklı bir arama deneyin.'
+                : 'Henüz yayınlanmış blog yazısı bulunmamaktadır. Yakında yeni içerikler eklenecek.'
+            }
+            action={
+              searchTerm || selectedCategory
+                ? {
+                    label: 'Filtreleri Temizle',
+                    onClick: () => {
+                      setSearchTerm('');
+                      setSelectedCategory(null);
+                    },
+                  }
+                : undefined
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post) => (
