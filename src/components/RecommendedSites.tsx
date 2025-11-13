@@ -14,9 +14,9 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
   const { data: allSites, isLoading } = useQuery({
     queryKey: ["recommended-sites-all", currentSiteId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("betting_sites")
-        .select("*")
+        .select("id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube")
         .eq("is_active", true)
         .neq("id", currentSiteId)
         .order("rating", { ascending: false });
@@ -25,7 +25,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
 
       // Filter by similar features if possible
       if (currentSiteFeatures.length > 0) {
-        const sitesWithMatchingFeatures = data.filter((site) => {
+        const sitesWithMatchingFeatures = data.filter((site: any) => {
           const siteFeatures = site.features || [];
           return currentSiteFeatures.some((feature) => siteFeatures.includes(feature));
         });
@@ -40,7 +40,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
   const { data: siteStats } = useQuery({
     queryKey: ['site-stats'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('site_stats' as any).select('*');
+      const { data, error } = await (supabase as any).from('site_stats').select('site_id, views, clicks');
       if (error) throw error;
       return data;
     },

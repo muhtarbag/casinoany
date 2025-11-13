@@ -13,9 +13,9 @@ export default function BonusCampaigns() {
   const { data: sites } = useQuery({
     queryKey: ['bonus-sites'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('*')
+        .select('id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .order('rating', { ascending: false })
         .limit(6);
       

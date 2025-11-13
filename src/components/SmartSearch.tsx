@@ -38,7 +38,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('search_history')
-        .select('*')
+        .select('search_term, search_count')
         .order('search_count', { ascending: false })
         .limit(8);
       if (error) throw error;
