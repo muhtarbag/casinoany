@@ -25,7 +25,7 @@ export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
   }, [initialSearchTerm]);
 
   const { data: sites, isLoading } = useQuery({
-    queryKey: ['betting-sites'],
+    queryKey: ['betting-sites-active'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
@@ -36,6 +36,7 @@ export const PixelGrid = ({ initialSearchTerm = '' }: PixelGridProps) => {
       if (error) throw error;
       return data;
     },
+    staleTime: 0,
   });
 
   // Tüm özellikleri topla
