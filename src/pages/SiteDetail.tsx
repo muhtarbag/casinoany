@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { analytics } from "@/lib/analytics";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -229,6 +230,9 @@ export default function SiteDetail() {
           p_block_name: null,
           p_is_affiliate_click: true,
         });
+        
+        // Track in new analytics system
+        analytics.trackAffiliateClick(site.id, site.name);
       } catch (error) {
         console.error('Error tracking affiliate click:', error);
       }

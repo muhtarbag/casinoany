@@ -5,6 +5,7 @@ import * as z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { analytics } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -56,8 +57,12 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
       });
 
       if (error) throw error;
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Track review submission in analytics
+      analytics.trackReviewSubmit(siteId, data.rating);
+      
       toast.success("Yorumunuz başarıyla gönderildi!", {
         description: "Admin onayından sonra yayınlanacaktır.",
       });
