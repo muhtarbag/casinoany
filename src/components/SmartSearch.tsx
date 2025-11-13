@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, TrendingUp } from 'lucide-react';
+import { Search, TrendingUp, Flame } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
 
 interface SmartSearchProps {
   onSearch: (searchTerm: string) => void;
@@ -13,6 +14,7 @@ interface SmartSearchProps {
 export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showPopular, setShowPopular] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +30,21 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Fetch popular searches
+  const { data: popularSearches } = useQuery({
+    queryKey: ['popular-searches'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('search_history')
+        .select('*')
+        .order('search_count', { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   // Fuzzy search algorithm
@@ -91,6 +108,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
+        setShowPopular(false);
       }
     };
 
@@ -98,17 +116,40 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Track search
+  const trackSearch = async (term: string) => {
+    if (!term.trim()) return;
+    
+    try {
+      await supabase.rpc('track_search', { p_search_term: term });
+    } catch (error) {
+      console.error('Error tracking search:', error);
+    }
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    trackSearch(localSearch);
     onSearch(localSearch);
     setShowSuggestions(false);
+    setShowPopular(false);
     document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleSuggestionClick = (siteName: string) => {
     setLocalSearch(siteName);
+    trackSearch(siteName);
     onSearch(siteName);
     setShowSuggestions(false);
+    setShowPopular(false);
+    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handlePopularClick = (term: string) => {
+    setLocalSearch(term);
+    trackSearch(term);
+    onSearch(term);
+    setShowPopular(false);
     document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -123,11 +164,52 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             onFocus={() => {
-              if (suggestions.length > 0) setShowSuggestions(true);
+              if (!localSearch.trim() && popularSearches && popularSearches.length > 0) {
+                setShowPopular(true);
+              } else if (suggestions.length > 0) {
+                setShowSuggestions(true);
+              }
             }}
             className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
           
+          {/* Popular Searches Dropdown */}
+          {showPopular && popularSearches && popularSearches.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
+              <div className="px-4 py-3 bg-primary/5 border-b border-border flex items-center gap-2">
+                <Flame className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">Popüler Aramalar</span>
+              </div>
+              <div className="p-3 flex flex-wrap gap-2">
+                {popularSearches.map((search) => (
+                  <button
+                    key={search.id}
+                    type="button"
+                    onClick={() => handlePopularClick(search.search_term)}
+                    className="group"
+                  >
+                    <Badge
+                      variant="secondary"
+                      className="cursor-pointer hover:bg-primary/20 hover:text-primary transition-all duration-200 flex items-center gap-2"
+                    >
+                      <span className="capitalize">{search.search_term}</span>
+                      {search.search_count > 5 && (
+                        <span className="text-xs bg-primary/20 px-1.5 py-0.5 rounded">
+                          {search.search_count}
+                        </span>
+                      )}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+              <div className="px-4 py-2 bg-muted/50 border-t border-border">
+                <p className="text-xs text-muted-foreground text-center">
+                  En çok aranan siteler ve özellikler
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Suggestions Dropdown */}
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
