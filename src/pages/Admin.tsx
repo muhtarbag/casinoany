@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock, Sparkles } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -79,6 +79,7 @@ export default function Admin() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('manage');
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   useEffect(() => {
@@ -253,6 +254,43 @@ export default function Admin() {
   const clearCache = () => {
     queryClient.clear();
     toast({ title: 'Cache Temizlendi', description: 'Tüm cache başarıyla temizlendi.' });
+  };
+
+  const handleAiSuggestSite = async () => {
+    if (!formData.name) {
+      toast({ title: 'Hata', description: 'Lütfen önce site adını girin.', variant: 'destructive' });
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: { type: 'suggest-site-details', data: { siteName: formData.name } }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setFormData(prev => ({
+          ...prev,
+          bonus: data.data.bonus || prev.bonus,
+          features: data.data.features || prev.features,
+          rating: data.data.rating || prev.rating,
+        }));
+        toast({ title: 'Başarılı', description: 'AI önerileri başarıyla uygulandı!' });
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      console.error('AI suggestion error:', error);
+      toast({ 
+        title: 'AI Hatası', 
+        description: error.message || 'AI önerisi alınırken hata oluştu.', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   if (authLoading || sitesLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>;
