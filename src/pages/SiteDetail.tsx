@@ -93,7 +93,7 @@ export default function SiteDetail() {
     }
   }, [site?.logo_url]);
 
-  // Fetch site stats
+  // Fetch site stats with staleTime
   const { data: stats } = useQuery({
     queryKey: ["site-stats", site?.id],
     queryFn: async () => {
@@ -108,9 +108,10 @@ export default function SiteDetail() {
       return data;
     },
     enabled: !!site?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
-  // Fetch reviews with profiles
+  // Fetch reviews with profiles - optimized with staleTime
   const { data: reviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ["site-reviews", site?.id],
     queryFn: async () => {
@@ -152,6 +153,7 @@ export default function SiteDetail() {
       return reviewsWithProfiles;
     },
     enabled: !!site?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes - reviews don't change frequently
   });
 
   // Track view on mount
@@ -189,7 +191,11 @@ export default function SiteDetail() {
       }
 
       setViewTracked(true);
-      queryClient.invalidateQueries({ queryKey: ["site-stats", site.id] });
+      // Only invalidate site-stats, not all queries
+      queryClient.setQueryData(["site-stats", site.id], (old: any) => {
+        if (!old) return old;
+        return { ...old, views: (old.views || 0) + 1 };
+      });
     };
 
     trackView();
