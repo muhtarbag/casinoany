@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Eye, MousePointer } from 'lucide-react';
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -69,22 +69,6 @@ const BettingSiteCardComponent = ({
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const { isAdmin } = useAuth();
 
-  // Calculate displayed values
-  const displayViews = useMemo(() => {
-    if (isAdmin) return views; // Admin sees real values
-    const baseViews = getRandomBaseFromId(id, 598, 2432);
-    const totalViews = baseViews + views;
-    console.log('Views Debug:', { isAdmin, baseViews, views, totalViews, siteId: id });
-    return totalViews;
-  }, [isAdmin, views, id]);
-
-  const displayClicks = useMemo(() => {
-    if (isAdmin) return clicks; // Admin sees real values
-    const baseClicks = getRandomBaseFromId(id, 598, 2432);
-    const totalClicks = baseClicks + clicks;
-    console.log('Clicks Debug:', { isAdmin, baseClicks, clicks, totalClicks, siteId: id });
-    return totalClicks;
-  }, [isAdmin, clicks, id]);
 
   useEffect(() => {
     if (logo) {
@@ -164,16 +148,6 @@ const BettingSiteCardComponent = ({
             <div className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/20">
               <Star className="w-4 h-4 fill-primary text-primary" />
               <span className="font-bold text-sm">{rating.toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 bg-accent/10 rounded-md border border-accent/20">
-                <Eye className="w-3 h-3 text-accent" />
-                <span className="text-xs font-medium">{displayViews.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center gap-1 px-2 py-1 bg-secondary/10 rounded-md border border-secondary/20">
-                <MousePointer className="w-3 h-3 text-secondary" />
-                <span className="text-xs font-medium">{displayClicks.toLocaleString()}</span>
-              </div>
             </div>
           </div>
         </div>
