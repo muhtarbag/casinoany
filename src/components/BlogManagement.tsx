@@ -552,20 +552,29 @@ export const BlogManagement = () => {
                     id="title"
                     value={formData.title}
                     onChange={(e) => {
-                      setFormData({ ...formData, title: e.target.value });
+                      const newTitle = e.target.value;
                       if (!editingId) {
-                        setFormData(prev => ({ ...prev, slug: generateSlug(e.target.value) }));
+                        // Otomatik slug oluştur (sadece yeni yazılarda)
+                        setFormData({ ...formData, title: newTitle, slug: generateSlug(newTitle) });
+                      } else {
+                        setFormData({ ...formData, title: newTitle });
                       }
                     }}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug (URL) *</Label>
+                  <Label htmlFor="slug">
+                    URL Slug * 
+                    <span className="text-xs text-muted-foreground ml-2">
+                      (Otomatik oluşturulur, manuel düzenlenebilir)
+                    </span>
+                  </Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder="ornek-blog-yazisi"
                     required
                   />
                 </div>

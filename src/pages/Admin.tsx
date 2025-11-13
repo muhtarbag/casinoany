@@ -63,6 +63,9 @@ const SortableItem = ({ id, site, editingId, selectedSites, onToggleSelect, onEd
         {site.logo_url && <img src={site.logo_url} alt={site.name} className="w-10 h-10 object-contain rounded" />}
         <div className="flex-1">
           <p className="font-medium">{site.name}</p>
+          {site.slug && (
+            <p className="text-xs text-primary/70 font-mono">/{site.slug}</p>
+          )}
           <p className="text-xs text-muted-foreground">Puan: {site.rating} | {site.features?.length || 0} özellik</p>
           <div className="flex items-center gap-4 flex-wrap">
             {stats && (
@@ -248,7 +251,8 @@ export default function Admin() {
   // Filter sites based on search query
   const filteredSites = orderedSites.filter((site: any) =>
     site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    site.bonus?.toLowerCase().includes(searchQuery.toLowerCase())
+    site.bonus?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    site.slug?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const createSiteMutation = useMutation({
