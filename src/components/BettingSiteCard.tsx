@@ -98,13 +98,13 @@ export const BettingSiteCard = ({
   };
 
   const socialLinks = [
-    { url: email, icon: Mail, label: 'Email', href: `mailto:${email}` },
-    { url: whatsapp, icon: MessageCircle, label: 'WhatsApp', href: `https://wa.me/${whatsapp}` },
-    { url: telegram, icon: Send, label: 'Telegram', href: telegram },
-    { url: twitter, icon: FaTwitter, label: 'Twitter', href: twitter },
-    { url: instagram, icon: FaInstagram, label: 'Instagram', href: instagram },
-    { url: facebook, icon: FaFacebook, label: 'Facebook', href: facebook },
-    { url: youtube, icon: FaYoutube, label: 'YouTube', href: youtube },
+    { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1' },
+    { url: whatsapp, icon: MessageCircle, label: 'WhatsApp', href: `https://wa.me/${whatsapp}`, color: '#25D366' },
+    { url: telegram, icon: Send, label: 'Telegram', href: telegram, color: '#0088cc' },
+    { url: twitter, icon: FaTwitter, label: 'Twitter', href: twitter, color: '#1DA1F2' },
+    { url: instagram, icon: FaInstagram, label: 'Instagram', href: instagram, color: '#E4405F' },
+    { url: facebook, icon: FaFacebook, label: 'Facebook', href: facebook, color: '#1877F2' },
+    { url: youtube, icon: FaYoutube, label: 'YouTube', href: youtube, color: '#FF0000' },
   ].filter(link => link.url);
 
   return (
@@ -163,10 +163,22 @@ export const BettingSiteCard = ({
               return (
                 <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                  className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-all duration-200 group/social"
                   aria-label={link.label}
+                  style={{ ['--brand-color' as any]: link.color }}
                 >
-                  <Icon className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
+                  <Icon 
+                    className="w-4 h-4 transition-all duration-200" 
+                    style={{ color: link.color, opacity: 0.7 }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as SVGElement).style.opacity = '1';
+                      (e.currentTarget as SVGElement).style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as SVGElement).style.opacity = '0.7';
+                      (e.currentTarget as SVGElement).style.transform = 'scale(1)';
+                    }}
+                  />
                 </a>
               );
             })}
