@@ -85,10 +85,40 @@ export default function BlogPost() {
         keywords={post.meta_keywords || []}
         canonical={`${window.location.origin}/blog/${post.slug}`}
         ogType="article"
+        ogImage={post.featured_image || undefined}
         article={{
           publishedTime: post.published_at || undefined,
           modifiedTime: post.updated_at,
           tags: post.tags || undefined,
+        }}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post.title,
+          description: post.excerpt,
+          image: post.featured_image,
+          datePublished: post.published_at || post.created_at,
+          dateModified: post.updated_at,
+          author: {
+            '@type': 'Organization',
+            name: 'BahisSiteleri',
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'BahisSiteleri',
+            logo: {
+              '@type': 'ImageObject',
+              url: `${window.location.origin}/logo.png`,
+            },
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `${window.location.origin}/blog/${post.slug}`,
+          },
+          wordCount: post.content?.replace(/<[^>]*>/g, '').split(/\s+/).length,
+          keywords: post.tags?.join(', '),
+          inLanguage: 'tr-TR',
+          articleBody: post.excerpt,
         }}
       />
       
