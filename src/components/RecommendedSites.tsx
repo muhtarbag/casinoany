@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,8 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
         .select("id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube")
         .eq("is_active", true)
         .neq("id", currentSiteId)
-        .order("rating", { ascending: false });
+        .order("rating", { ascending: false })
+        .limit(20); // Limit to top 20 sites instead of fetching all
 
       if (error) throw error;
 
@@ -35,6 +36,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
 
       return data;
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
   });
 
   const { data: siteStats } = useQuery({
@@ -44,28 +46,16 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
       if (error) throw error;
       return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
-  // Randomly select 4 sites - shuffles every time component mounts or allSites changes
-  const [recommendedSites, setRecommendedSites] = useState<any[]>([]);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    if (!allSites || allSites.length === 0) {
-      setRecommendedSites([]);
-      return;
-    }
+  // Memoize recommended sites selection - only recalculate when dependencies change
+  const recommendedSites = useMemo(() => {
+    if (!allSites || allSites.length === 0) return [];
     
-    // Start fade-out transition
-    setIsTransitioning(true);
-    
-    // After fade-out completes, update sites and fade-in
-    setTimeout(() => {
-      const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-      setRecommendedSites(shuffled.slice(0, 4));
-      setIsTransitioning(false);
-    }, 300); // Match fade-out duration
-  }, [allSites, currentSiteId]); // Re-shuffle when site changes or allSites changes
+    const shuffled = [...allSites].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 4);
+  }, [allSites]);
 
   if (isLoading) {
     return (
@@ -96,7 +86,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
         <CardDescription>Kullanıcılar bu sitelere de baktı</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
           {recommendedSites.map((site: any) => {
             const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
             return (
