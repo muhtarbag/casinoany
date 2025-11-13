@@ -22,7 +22,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const { data: allSites } = useQuery({
     queryKey: ['all-sites'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
         .select('id, name, slug, rating, bonus, features')
         .eq('is_active', true)
@@ -36,7 +36,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const { data: popularSearches } = useQuery({
     queryKey: ['popular-searches'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('search_history')
         .select('*')
         .order('search_count', { ascending: false })
@@ -87,7 +87,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     }
 
     const searchResults = allSites
-      .map(site => ({
+      .map((site: any) => ({
         ...site,
         score: Math.max(
           fuzzyMatch(localSearch, site.name),
@@ -121,7 +121,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     if (!term.trim()) return;
     
     try {
-      await supabase.rpc('track_search', { p_search_term: term });
+      await (supabase as any).rpc('track_search', { p_search_term: term });
     } catch (error) {
       console.error('Error tracking search:', error);
     }
@@ -181,7 +181,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
                 <span className="text-sm font-semibold text-foreground">Popüler Aramalar</span>
               </div>
               <div className="p-3 flex flex-wrap gap-2">
-                {popularSearches.map((search) => (
+                {popularSearches.map((search: any) => (
                   <button
                     key={search.id}
                     type="button"

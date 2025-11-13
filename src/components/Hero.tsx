@@ -72,13 +72,13 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: carouselSettings } = useQuery({
     queryKey: ['carousel-settings'],
     queryFn: async () => {
-      const { data: animData, error: animError } = await supabase
+      const { data: animData, error: animError } = await (supabase as any)
         .from('site_settings')
         .select('*')
         .eq('setting_key', 'carousel_animation_type')
         .single();
       
-      const { data: durationData, error: durationError } = await supabase
+      const { data: durationData, error: durationError } = await (supabase as any)
         .from('site_settings')
         .select('*')
         .eq('setting_key', 'carousel_auto_scroll_duration')
@@ -94,11 +94,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   });
 
   useEffect(() => {
-    if (carouselSettings?.animation?.setting_value) {
-      setAnimationType(carouselSettings.animation.setting_value);
+    if ((carouselSettings as any)?.animation?.setting_value) {
+      setAnimationType((carouselSettings as any).animation.setting_value);
     }
-    if (carouselSettings?.duration?.setting_value) {
-      setAutoScrollDuration(parseInt(carouselSettings.duration.setting_value));
+    if ((carouselSettings as any)?.duration?.setting_value) {
+      setAutoScrollDuration(parseInt((carouselSettings as any).duration.setting_value));
     }
   }, [carouselSettings]);
 
