@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, TrendingUp, Award, Shield } from 'lucide-react';
+import { Search, TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BettingSiteCard } from './BettingSiteCard';
+import useEmblaCarousel from 'embla-carousel-react';
+import { useCallback, useEffect } from 'react';
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -13,6 +15,32 @@ interface HeroProps {
 
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    align: 'start',
+    skipSnaps: false,
+    dragFree: false,
+  });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
 
   // Öne çıkan siteleri getir (en yüksek puanlı 3 site)
   const { data: featuredSites } = useQuery({
@@ -129,31 +157,71 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-7xl mx-auto px-4">
-              {featuredSites.map((site, index) => (
-                <div 
-                  key={site.id} 
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <BettingSiteCard
-                    id={site.id}
-                    name={site.name}
-                    logo={site.logo_url || undefined}
-                    rating={Number(site.rating) || 0}
-                    bonus={site.bonus || undefined}
-                    features={site.features || undefined}
-                    affiliateUrl={site.affiliate_link}
-                    email={site.email || undefined}
-                    whatsapp={site.whatsapp || undefined}
-                    telegram={site.telegram || undefined}
-                    twitter={site.twitter || undefined}
-                    instagram={site.instagram || undefined}
-                    facebook={site.facebook || undefined}
-                    youtube={site.youtube || undefined}
-                  />
+            {/* Carousel Container */}
+            <div className="relative max-w-7xl mx-auto px-4">
+              {/* Navigation Buttons - Desktop */}
+              <button
+                onClick={scrollPrev}
+                disabled={!canScrollPrev}
+                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm border border-border hover:bg-card hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={scrollNext}
+                disabled={!canScrollNext}
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm border border-border hover:bg-card hover:border-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Next"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              {/* Embla Carousel */}
+              <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex gap-4 md:gap-6 lg:gap-8 touch-pan-y">
+                  {featuredSites.map((site, index) => (
+                    <div 
+                      key={site.id} 
+                      className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <BettingSiteCard
+                        id={site.id}
+                        name={site.name}
+                        logo={site.logo_url || undefined}
+                        rating={Number(site.rating) || 0}
+                        bonus={site.bonus || undefined}
+                        features={site.features || undefined}
+                        affiliateUrl={site.affiliate_link}
+                        email={site.email || undefined}
+                        whatsapp={site.whatsapp || undefined}
+                        telegram={site.telegram || undefined}
+                        twitter={site.twitter || undefined}
+                        instagram={site.instagram || undefined}
+                        facebook={site.facebook || undefined}
+                        youtube={site.youtube || undefined}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Carousel Indicators - Mobile */}
+              <div className="flex md:hidden justify-center gap-2 mt-6">
+                {featuredSites.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => emblaApi?.scrollTo(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      selectedIndex === index 
+                        ? 'bg-primary w-6' 
+                        : 'bg-muted-foreground/30'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         )}
