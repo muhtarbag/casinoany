@@ -39,10 +39,17 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: featuredSites } = useQuery({
     queryKey: ['featured-sites'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('betting_sites').select('*').eq('is_active', true).order('rating', { ascending: false }).limit(3);
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .eq('is_active', true)
+        .gte('rating', 4.5)
+        .order('rating', { ascending: false })
+        .limit(3);
       if (error) throw error;
       return data;
     },
+    staleTime: 0,
   });
 
   const handleSearch = (e: React.FormEvent) => {
