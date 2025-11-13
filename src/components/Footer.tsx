@@ -1,4 +1,4 @@
-import { Mail, Twitter, Facebook, Instagram, Youtube, Linkedin, Shield, CreditCard, Lock, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Twitter, Facebook, Instagram, Youtube, Linkedin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -137,13 +137,21 @@ export const Footer = () => {
             <div className="space-y-3 text-sm text-muted-foreground mb-6">
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-                <a href="mailto:info@casinoany.com" className="hover:text-primary transition-colors">
-                  info@casinoany.com
+                <a href="mailto:hello@visiontech.co" className="hover:text-primary transition-colors">
+                  hello@visiontech.co
                 </a>
               </div>
               <div className="flex items-start gap-2">
-                <Phone className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-                <span>+90 (555) 123 45 67</span>
+                <Send className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                <a href="https://t.me/visiontechco" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  @visiontechco
+                </a>
+              </div>
+              <div className="flex items-start gap-2">
+                <Users className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                <a href="https://teams.live.com/l/invite/FEApcki6o2KLboqgAU?v=g1" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  Microsoft Teams
+                </a>
               </div>
               <div className="flex items-start gap-2">
                 <Clock className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
