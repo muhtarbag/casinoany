@@ -55,6 +55,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
   const [contentCalendar, setContentCalendar] = useState<CalendarItem[]>([]);
   const [selectedTab, setSelectedTab] = useState('suggestions');
   const [isCreatingBlog, setIsCreatingBlog] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   // Fetch existing blog posts
   const { data: existingPosts } = useQuery({
@@ -107,11 +108,13 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       });
     } finally {
       setIsAnalyzing(false);
+      setLoadingMessage('');
     }
   };
 
   const generateTopicSuggestions = async () => {
     setIsAnalyzing(true);
+    setLoadingMessage('AI Konu Önerilerini Oluşturuyor Lütfen Bekleyin');
     try {
       toast({
         title: "💡 Konu Önerileri Oluşturuluyor",
@@ -148,6 +151,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       });
     } finally {
       setIsAnalyzing(false);
+      setLoadingMessage('');
     }
   };
 
@@ -162,6 +166,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
     }
 
     setIsAnalyzing(true);
+    setLoadingMessage('İçerik Takvimi Oluşturuluyor');
     try {
       toast({
         title: "📅 İçerik Takvimi Oluşturuluyor",
@@ -200,6 +205,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       });
     } finally {
       setIsAnalyzing(false);
+      setLoadingMessage('');
     }
   };
 
@@ -379,7 +385,27 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Loading Overlay */}
+      {isAnalyzing && loadingMessage && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <Card className="w-96 shadow-2xl">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                <div className="text-center space-y-2">
+                  <h3 className="text-xl font-semibold">{loadingMessage}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Bu işlem birkaç saniye sürebilir...
+                  </p>
+                </div>
+                <Progress className="w-full" value={undefined} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">İçerik Planlama Asistanı</h2>
