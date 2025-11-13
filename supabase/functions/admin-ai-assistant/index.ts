@@ -250,7 +250,7 @@ async function generateBlogContent(data: any, apiKey: string) {
       model: 'google/gemini-2.5-flash',
       messages: [{
         role: 'user',
-        content: `Bu taslağa göre tam blog içeriği oluştur:
+        content: `Bu taslağa göre SEO optimize edilmiş tam blog içeriği oluştur:
 
 Başlık: ${outline.title}
 Giriş: ${outline.introduction}
@@ -259,14 +259,30 @@ Bölümler: ${JSON.stringify(outline.sections)}
 
 Sonuç noktaları: ${outline.conclusion_points.join(', ')}
 
+🎯 SEO KEYWORD STRATEJİSİ (ÇOK ÖNEMLİ):
+
+Primary Keyword: "${keywords.primary_keyword}"
+Secondary Keywords: ${keywords.secondary_keywords.join(', ')}
+Long-tail Keywords: ${keywords.long_tail_keywords.join(', ')}
+
+**KEYWORD PLACEMENT KURALLARI:**
+1. İlk 100 kelimede primary keyword'ü mutlaka kullan
+2. Her ana bölümde (H2) en az bir primary veya secondary keyword kullan
+3. Alt başlıklarda (H3) secondary ve long-tail keywords'leri kullan
+4. Keyword density %1-2 arasında tut
+5. Kelimeleri DOĞAL ve OKUNABILIR şekilde yerleştir
+6. Keyword stuffing yapma - aşırı tekrar etme
+7. Bold/Strong etiketlerinde önemli kelimeleri vurgula
+8. Liste öğelerinde ve tablo başlıklarında keywords kullan
+
 İçerik HTML formatında olmalı:
 - Semantic HTML kullan (article, section, header, h1-h6, p, ul, ol, strong, em)
-- Ana keyword: ${keywords.primary_keyword}
-- İkincil keywords'leri doğal şekilde yerleştir
-- Minimum 1500 kelime
+- Minimum 1500 kelime (ideal 2000-2500)
 - Her bölüm için uygun başlıklar
-- Liste ve tablolar kullan
-- CTA bölümleri ekle`
+- Liste ve tablolar kullan (SEO keywords dahil et)
+- CTA bölümleri ekle
+- İç linkler için placeholder'lar bırak
+- Meta description'da primary keyword olmalı`
       }],
       tools: [{
         type: 'function',
