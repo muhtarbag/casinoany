@@ -103,97 +103,80 @@ export const BettingSiteCard = ({
 
   return (
     <Card 
-      className="group relative overflow-hidden bg-gradient-to-br from-card via-card to-card/50 border-2 border-border/50 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 cursor-pointer backdrop-blur-sm"
+      className="group relative overflow-hidden bg-card hover:bg-card/80 border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      <CardHeader className="relative pb-6 pt-6">
-        {/* Logo Section with Premium Design */}
-        <div className="flex items-center justify-center mb-6">
+      <CardHeader className="pb-4">
+        {/* Logo Section - Horizontal Layout */}
+        <div className="flex items-center justify-center min-h-[80px] mb-4">
           {logoUrl ? (
-            <div className="relative w-32 h-32 bg-gradient-to-br from-background to-muted/30 rounded-2xl border-2 border-border shadow-lg group-hover:shadow-2xl group-hover:shadow-primary/20 group-hover:scale-105 transition-all duration-500 p-4 flex items-center justify-center overflow-hidden">
-              {/* Glow effect behind logo */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="w-full max-w-[280px] h-[80px] flex items-center justify-center">
               <img 
                 src={logoUrl} 
                 alt={name} 
-                className="relative w-full h-full object-contain z-10 group-hover:scale-110 transition-transform duration-500"
+                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">${name.charAt(0)}</div>`;
+                  e.currentTarget.parentElement!.innerHTML = `<div class="text-3xl font-bold text-foreground">${name}</div>`;
                 }}
               />
             </div>
           ) : (
-            <div className="w-32 h-32 bg-gradient-primary rounded-2xl flex items-center justify-center text-4xl font-bold text-primary-foreground shadow-lg group-hover:shadow-2xl group-hover:shadow-primary/30 group-hover:scale-105 transition-all duration-500">
-              {name.charAt(0)}
-            </div>
+            <h3 className="text-2xl font-bold text-foreground">{name}</h3>
           )}
         </div>
 
-        {/* Site Name & Rating */}
-        <div className="text-center space-y-3">
-          <h3 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-            {name}
-          </h3>
-          
-          <div className="flex items-center justify-center gap-1.5">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-5 h-5 transition-all duration-300 ${
-                  i < Math.floor(rating)
-                    ? 'fill-secondary text-secondary group-hover:scale-110'
-                    : 'text-muted-foreground/40'
-                }`}
-              />
-            ))}
-            <span className="ml-2 text-sm font-semibold text-muted-foreground">
-              {rating.toFixed(1)}
-            </span>
-          </div>
+        {/* Rating */}
+        <div className="flex items-center justify-center gap-1 py-2">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`w-5 h-5 transition-all duration-300 ${
+                i < Math.floor(rating)
+                  ? 'fill-yellow-500 text-yellow-500'
+                  : 'fill-muted text-muted'
+              }`}
+            />
+          ))}
+          <span className="ml-2 text-sm font-semibold text-foreground">
+            {rating.toFixed(1)}
+          </span>
         </div>
       </CardHeader>
 
-      <CardContent className="relative space-y-5 px-6 pb-6">
-        {/* Bonus Section with Premium Design */}
+      <CardContent className="space-y-4 pb-4">
+        {/* Bonus Section */}
         {bonus && (
-          <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 p-4 rounded-xl border border-primary/20 shadow-inner group-hover:shadow-lg group-hover:border-primary/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
-            <p className="relative text-center text-sm font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-3 rounded-lg border border-primary/10">
+            <p className="text-center text-sm font-semibold text-foreground line-clamp-2">
               {bonus}
             </p>
           </div>
         )}
 
-        {/* Features with Modern Badges */}
+        {/* Features */}
         {features && features.length > 0 && (
-          <div className="flex flex-wrap gap-2 justify-center">
-            {features.slice(0, 3).map((feature, idx) => (
+          <div className="flex flex-wrap gap-2">
+            {features.slice(0, 4).map((feature, idx) => (
               <Badge 
                 key={idx} 
-                variant="outline" 
-                className="bg-muted/50 border-border/50 hover:bg-muted hover:border-primary/30 transition-all duration-300 backdrop-blur-sm"
+                variant="secondary"
+                className="text-xs"
               >
                 {feature}
               </Badge>
             ))}
-            {features.length > 3 && (
-              <Badge 
-                variant="outline" 
-                className="bg-primary/10 border-primary/20 text-primary font-semibold"
-              >
-                +{features.length - 3}
+            {features.length > 4 && (
+              <Badge variant="outline" className="text-xs">
+                +{features.length - 4}
               </Badge>
             )}
           </div>
         )}
 
-        {/* Social Links with Hover Effects */}
+        {/* Social Links */}
         {socialLinks.length > 0 && (
-          <div className="flex flex-wrap gap-2.5 justify-center pt-2">
+          <div className="flex flex-wrap gap-2 pt-1">
             {socialLinks.map((link, idx) => {
               const Icon = link.icon;
               return (
@@ -202,11 +185,11 @@ export const BettingSiteCard = ({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 rounded-xl bg-muted/50 hover:bg-primary/20 hover:scale-110 transition-all duration-300 border border-border/50 hover:border-primary/30 backdrop-blur-sm group/social"
+                  className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
                   title={link.label}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Icon className="w-4 h-4 group-hover/social:text-primary transition-colors" />
+                  <Icon className="w-4 h-4" />
                 </a>
               );
             })}
@@ -214,16 +197,14 @@ export const BettingSiteCard = ({
         )}
       </CardContent>
 
-      <CardFooter className="relative px-6 pb-6">
+      <CardFooter className="pt-2 pb-4">
         <Button 
           onClick={handleAffiliateClick}
-          className="w-full bg-gradient-primary hover:shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 text-base font-bold py-6 rounded-xl relative overflow-hidden group/btn"
+          className="w-full bg-gradient-primary hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-semibold"
+          size="lg"
         >
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-1000" />
-          <span className="relative flex items-center justify-center gap-2">
-            Siteye Git
-            <ExternalLink className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-          </span>
+          Siteye Git
+          <ExternalLink className="w-4 h-4 ml-2" />
         </Button>
       </CardFooter>
     </Card>

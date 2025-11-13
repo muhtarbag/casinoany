@@ -211,25 +211,27 @@ export default function SiteDetail() {
         {/* Site Header Card */}
         <Card className="mb-8">
           <CardHeader>
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+            <div className="flex flex-col gap-6">
+              {/* Logo - Horizontal Layout */}
               {logoUrl ? (
-                <div className="w-32 h-32 bg-card rounded-lg border-2 border-border flex items-center justify-center p-4 shadow-md">
+                <div className="flex items-center justify-center w-full min-h-[120px] bg-card/50 rounded-xl border border-border p-6">
                   <img
                     src={logoUrl}
                     alt={site.name}
-                    className="w-full h-full object-contain"
+                    className="max-w-full max-h-[120px] object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-4xl font-bold text-primary">${site.name.charAt(0)}</div>`;
+                      e.currentTarget.parentElement!.innerHTML = `<div class="text-5xl font-bold text-foreground">${site.name}</div>`;
                     }}
                   />
                 </div>
               ) : (
-                <div className="w-32 h-32 bg-gradient-primary rounded-lg flex items-center justify-center text-4xl font-bold text-primary-foreground shadow-md">
-                  {site.name.charAt(0)}
+                <div className="flex items-center justify-center w-full min-h-[120px] bg-gradient-primary rounded-xl p-6">
+                  <h2 className="text-5xl font-bold text-primary-foreground">{site.name}</h2>
                 </div>
               )}
-              <div className="flex-1">
+              
+              <div className="space-y-4">
                 <CardTitle className="text-3xl mb-2">{site.name}</CardTitle>
                 <div className="flex items-center gap-2 mb-4">
                   {[...Array(5)].map((_, i) => (
