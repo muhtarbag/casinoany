@@ -272,23 +272,37 @@ export default function SiteDetail() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
       <SEO
         title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
-        description={`${site.name} bahis sitesi hakkında detaylı bilgiler, kullanıcı yorumları ve bonus kampanyaları. ${site.bonus || ''}`}
-        keywords={[site.name, 'bahis sitesi', 'casino', ...(site.features || [])]}
+        description={`${site.name} bahis sitesi hakkında detaylı inceleme. ${site.bonus || 'Bonus kampanyaları'}, kullanıcı yorumları ve ${averageRating} puan değerlendirmesi. ${site.features?.slice(0, 3).join(', ')}`}
+        keywords={[site.name, 'bahis sitesi', 'casino', 'bonus', ...(site.features || [])]}
         canonical={`${window.location.origin}/${site.slug || `site/${site.id}`}`}
+        ogImage={logoUrl || `${window.location.origin}/og-image.jpg`}
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'Product',
           name: site.name,
           description: site.bonus || `${site.name} bahis sitesi`,
+          image: logoUrl,
+          brand: {
+            '@type': 'Brand',
+            name: site.name,
+            logo: logoUrl,
+          },
           aggregateRating: {
             '@type': 'AggregateRating',
             ratingValue: averageRating,
             reviewCount: reviews?.length || 0,
+            bestRating: 5,
+            worstRating: 1,
           },
           offers: {
             '@type': 'Offer',
             availability: 'https://schema.org/InStock',
             url: site.affiliate_link,
+            priceSpecification: {
+              '@type': 'PriceSpecification',
+              priceCurrency: 'TRY',
+              price: '0',
+            },
           },
         }}
       />
