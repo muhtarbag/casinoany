@@ -16,6 +16,10 @@ import BlogPost from "./pages/BlogPost";
 import Sitemap from "./pages/Sitemap";
 import SiteDetail from "./pages/SiteDetail";
 import NotFound from "./pages/NotFound";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
+import KVKK from "./pages/KVKK";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,10 @@ const App = () => (
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/sitemap.xml" element={<Sitemap />} />
               <Route path="/site/:id" element={<SiteDetail />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/kvkk" element={<KVKK />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
