@@ -32,7 +32,9 @@ Deno.serve(async (req) => {
 
     if (sitesError) throw sitesError;
 
-    const baseUrl = req.headers.get('origin') || 'https://yourdomain.com';
+    // Get the actual domain from the request
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.replace(/\/$/, '') || '';
+    const baseUrl = origin || `https://${req.headers.get('host')}` || 'https://casinoany.com';
     const currentDate = new Date().toISOString();
 
     // Build sitemap XML
