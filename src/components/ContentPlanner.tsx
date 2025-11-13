@@ -59,12 +59,12 @@ export const ContentPlanner = () => {
   const { data: existingPosts } = useQuery({
     queryKey: ['blog-posts-for-planning'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts' as any)
+      const { data, error } = await (supabase as any)
+        .from('blog_posts')
         .select('title, category, tags, created_at')
         .eq('is_published', true);
       if (error) throw error;
-      return data;
+      return data as any[];
     },
   });
 
