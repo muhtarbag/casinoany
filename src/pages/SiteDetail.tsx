@@ -84,7 +84,11 @@ export default function SiteDetail() {
       } else {
         // Otherwise, get the public URL from storage
         const { data } = supabase.storage.from('site-logos').getPublicUrl(site.logo_url);
-        setLogoUrl(data.publicUrl);
+        // Ensure absolute URL for Open Graph
+        const absoluteUrl = data.publicUrl.startsWith('http') 
+          ? data.publicUrl 
+          : `${window.location.origin}${data.publicUrl}`;
+        setLogoUrl(absoluteUrl);
       }
     }
   }, [site?.logo_url]);
@@ -279,7 +283,8 @@ export default function SiteDetail() {
         description={`${site.name} bahis sitesi hakkında detaylı inceleme. ${site.bonus || 'Bonus kampanyaları'}, kullanıcı yorumları ve ${averageRating} puan değerlendirmesi. ${site.features?.slice(0, 3).join(', ')}`}
         keywords={[site.name, 'bahis sitesi', 'casino', 'bonus', ...(site.features || [])]}
         canonical={`${window.location.origin}/${site.slug || `site/${site.id}`}`}
-        ogImage={logoUrl || `${window.location.origin}/og-image.jpg`}
+        ogImage={logoUrl ? logoUrl : `${window.location.origin}/og-image.jpg`}
+        ogImageAlt={`${site.name} Logo`}
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'Product',
