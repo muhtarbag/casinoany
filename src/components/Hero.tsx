@@ -118,6 +118,15 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     staleTime: 0,
   });
 
+  const { data: siteStats } = useQuery({
+    queryKey: ['site-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('site_stats' as any).select('*');
+      if (error) throw error;
+      return data;
+    },
+  });
+
 
   return (
     <div className="relative overflow-hidden bg-background touch-manipulation">
@@ -207,14 +216,34 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                     <div className="absolute inset-0 bg-primary/5 pointer-events-none z-20 transition-opacity duration-200" />
                   )}
                   <div className={`flex gap-6 carousel-${animationType} transition-transform duration-200`} style={{ transform: isDragging ? `translateX(${dragOffset * 0.1}px)` : '' }}>
-                    {featuredSites.map((site, index) => (
-                      <div 
-                        key={site.id} 
-                        className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''} transition-transform duration-300 ${isDragging && selectedIndex === index ? 'scale-[0.98]' : ''}`}
-                      >
-                        <BettingSiteCard id={site.id} name={site.name} logo={site.logo_url || undefined} rating={Number(site.rating) || 0} bonus={site.bonus || undefined} features={site.features || undefined} affiliateUrl={site.affiliate_link} email={site.email || undefined} whatsapp={site.whatsapp || undefined} telegram={site.telegram || undefined} twitter={site.twitter || undefined} instagram={site.instagram || undefined} facebook={site.facebook || undefined} youtube={site.youtube || undefined} />
-                      </div>
-                    ))}
+                    {featuredSites.map((site, index) => {
+                      const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
+                      return (
+                        <div 
+                          key={site.id} 
+                          className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''} transition-transform duration-300 ${isDragging && selectedIndex === index ? 'scale-[0.98]' : ''}`}
+                        >
+                          <BettingSiteCard 
+                            id={site.id} 
+                            name={site.name} 
+                            logo={site.logo_url || undefined} 
+                            rating={Number(site.rating) || 0} 
+                            bonus={site.bonus || undefined} 
+                            features={site.features || undefined} 
+                            affiliateUrl={site.affiliate_link} 
+                            email={site.email || undefined} 
+                            whatsapp={site.whatsapp || undefined} 
+                            telegram={site.telegram || undefined} 
+                            twitter={site.twitter || undefined} 
+                            instagram={site.instagram || undefined} 
+                            facebook={site.facebook || undefined} 
+                            youtube={site.youtube || undefined}
+                            views={stats?.views || 0}
+                            clicks={stats?.clicks || 0}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="flex justify-center gap-2 mt-6">

@@ -37,6 +37,15 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     },
   });
 
+  const { data: siteStats } = useQuery({
+    queryKey: ['site-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('site_stats' as any).select('*');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Randomly select 4 sites - shuffles every time component mounts or allSites changes
   const [recommendedSites, setRecommendedSites] = useState<any[]>([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -88,26 +97,31 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
       </CardHeader>
       <CardContent>
         <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
-          {recommendedSites.map((site: any) => (
-            <BettingSiteCard
-              key={site.id}
-              id={site.id}
-              slug={site.slug}
-              name={site.name}
-              logo={site.logo_url}
-              rating={site.rating}
-              bonus={site.bonus}
-              features={site.features || []}
-              affiliateUrl={site.affiliate_link}
-              email={site.email}
-              whatsapp={site.whatsapp}
-              telegram={site.telegram}
-              twitter={site.twitter}
-              instagram={site.instagram}
-              facebook={site.facebook}
-              youtube={site.youtube}
-            />
-          ))}
+          {recommendedSites.map((site: any) => {
+            const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
+            return (
+              <BettingSiteCard
+                key={site.id}
+                id={site.id}
+                slug={site.slug}
+                name={site.name}
+                logo={site.logo_url}
+                rating={site.rating}
+                bonus={site.bonus}
+                features={site.features || []}
+                affiliateUrl={site.affiliate_link}
+                email={site.email}
+                whatsapp={site.whatsapp}
+                telegram={site.telegram}
+                twitter={site.twitter}
+                instagram={site.instagram}
+                facebook={site.facebook}
+                youtube={site.youtube}
+                views={stats?.views || 0}
+                clicks={stats?.clicks || 0}
+              />
+            );
+          })}
         </div>
       </CardContent>
     </Card>
