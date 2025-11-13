@@ -49,19 +49,19 @@ export const BettingSiteCard = ({
 
       // Get current stats
       const { data: stats } = await supabase
-        .from('site_stats')
+        .from('site_stats' as any)
         .select('*')
         .eq('site_id', id)
         .maybeSingle();
 
       if (stats) {
         await supabase
-          .from('site_stats')
-          .update({ clicks: stats.clicks + 1 })
+          .from('site_stats' as any)
+          .update({ clicks: (stats as any).clicks + 1 })
           .eq('site_id', id);
       } else {
         await supabase
-          .from('site_stats')
+          .from('site_stats' as any)
           .insert({ site_id: id, clicks: 1, views: 0 });
       }
     },
