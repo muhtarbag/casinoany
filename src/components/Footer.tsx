@@ -1,4 +1,5 @@
 import { Mail, Twitter, Facebook, Instagram } from 'lucide-react';
+import logo from '@/assets/casinodoo-logo.svg';
 
 export const Footer = () => {
   return (
@@ -6,9 +7,9 @@ export const Footer = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4 text-primary">BahisSiteleri</h3>
+            <img src={logo} alt="CasinoDoo" className="h-8 w-auto mb-4" />
             <p className="text-sm text-muted-foreground">
-              Türkiye'nin en güvenilir bahis siteleri rehberi. 
+              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi. 
               Güncel bonuslar ve kampanyalar hakkında bilgi alın.
             </p>
           </div>
@@ -54,7 +55,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 BahisSiteleri. Tüm hakları saklıdır.</p>
+          <p>&copy; 2025 CasinoDoo. Tüm hakları saklıdır.</p>
           <p className="mt-2">18+ | Sorumlu bahis oynayın</p>
         </div>
       </div>

@@ -11,13 +11,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-dark">
       <SEO
-        title="En İyi Bahis Siteleri - Güvenilir ve Lisanslı Bahis Siteleri 2025"
-        description="Türkiye'nin en güvenilir bahis siteleri listesi. Yüksek bonuslar, hızlı ödemeler ve 7/24 destek. 50+ lisanslı bahis sitesi karşılaştırması ve detaylı incelemeleri."
-        keywords={['bahis siteleri', 'güvenilir bahis siteleri', 'casino siteleri', 'bahis bonusları', 'canlı bahis']}
+        title="CasinoDoo - En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu 2025"
+        description="Türkiye'nin en güvenilir casino ve bahis siteleri listesi. Yüksek bonuslar, hızlı ödemeler ve 7/24 destek. 50+ lisanslı casino sitesi karşılaştırması ve detaylı incelemeleri."
+        keywords={['casino siteleri', 'bahis siteleri', 'güvenilir casino', 'casino bonusları', 'canlı bahis', 'online casino']}
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',
-          name: 'BahisSiteleri',
+          name: 'CasinoDoo',
           url: window.location.origin,
           potentialAction: {
             '@type': 'SearchAction',

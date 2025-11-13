@@ -8,84 +8,84 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark purple/navy background like Casino Analyzer */
-    --background: 240 30% 7%;
+    /* Dark purple background matching CasinoDoo brand */
+    --background: 280 40% 8%;
     --foreground: 0 0% 98%;
 
     /* Slightly lighter card background */
-    --card: 240 20% 11%;
+    --card: 280 30% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 20% 11%;
+    --popover: 280 30% 12%;
     --popover-foreground: 0 0% 98%;
 
-    /* Orange/Yellow accent for bonus buttons */
-    --primary: 35 100% 55%;
-    --primary-foreground: 0 0% 0%;
+    /* Purple accent matching logo #BF64FE */
+    --primary: 280 98% 69%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Neon green for main CTAs */
-    --secondary: 142 76% 50%;
-    --secondary-foreground: 0 0% 0%;
+    /* Lighter purple for secondary actions */
+    --secondary: 280 80% 75%;
+    --secondary-foreground: 280 40% 8%;
 
     /* Muted dark backgrounds */
-    --muted: 240 15% 15%;
-    --muted-foreground: 240 10% 65%;
+    --muted: 280 25% 15%;
+    --muted-foreground: 280 15% 65%;
 
-    /* Blue accent for links */
-    --accent: 210 100% 56%;
+    /* Blue-purple accent for links */
+    --accent: 260 90% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
     /* Subtle borders */
-    --border: 240 15% 18%;
-    --input: 240 15% 18%;
-    --ring: 35 100% 55%;
+    --border: 280 20% 20%;
+    --input: 280 20% 20%;
+    --ring: 280 98% 69%;
 
     --radius: 0.5rem;
 
-    /* Minimal gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(35 100% 55%), hsl(25 100% 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(142 76% 50%), hsl(142 76% 45%));
-    --gradient-dark: linear-gradient(180deg, hsl(240 30% 7%), hsl(240 30% 9%));
+    /* Purple-themed gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(280 98% 69%), hsl(260 95% 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(280 80% 75%), hsl(280 70% 70%));
+    --gradient-dark: linear-gradient(180deg, hsl(280 40% 8%), hsl(280 35% 10%));
     
-    /* Subtle shadows */
-    --shadow-glow: 0 0 20px hsl(35 100% 55% / 0.2);
-    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.5);
-    --shadow-hover: 0 8px 30px -6px hsl(35 100% 55% / 0.3);
+    /* Purple shadows */
+    --shadow-glow: 0 0 30px hsl(280 98% 69% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.6);
+    --shadow-hover: 0 8px 40px -6px hsl(280 98% 69% / 0.4);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 240 30% 7%;
+    --background: 280 40% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 240 20% 11%;
+    --card: 280 30% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 20% 11%;
+    --popover: 280 30% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 35 100% 55%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 280 98% 69%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 142 76% 50%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 280 80% 75%;
+    --secondary-foreground: 280 40% 8%;
 
-    --muted: 240 15% 15%;
-    --muted-foreground: 240 10% 65%;
+    --muted: 280 25% 15%;
+    --muted-foreground: 280 15% 65%;
 
-    --accent: 210 100% 56%;
+    --accent: 260 90% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 15% 18%;
-    --input: 240 15% 18%;
-    --ring: 35 100% 55%;
+    --border: 280 20% 20%;
+    --input: 280 20% 20%;
+    --ring: 280 98% 69%;
   }
 }
 

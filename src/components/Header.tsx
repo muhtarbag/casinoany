@@ -1,7 +1,8 @@
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, Shield, Trophy } from 'lucide-react';
+import { LogOut, Shield } from 'lucide-react';
+import logo from '@/assets/casinodoo-logo.svg';
 
 export const Header = () => {
   const { user, isAdmin, signOut } = useAuth();
@@ -10,9 +11,8 @@ export const Header = () => {
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 md:py-4">
         <nav className="flex items-center justify-between">
-          <NavLink to="/" className="flex items-center gap-1.5 md:gap-2 text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            <Trophy className="w-5 h-5 md:w-7 md:h-7 text-primary" />
-            <span className="hidden sm:inline">BahisSiteleri</span>
+          <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <img src={logo} alt="CasinoDoo" className="h-6 md:h-8 w-auto" />
           </NavLink>
 
           <div className="flex items-center gap-2 md:gap-6">

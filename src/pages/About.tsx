@@ -10,11 +10,11 @@ const About = () => {
   const organizationStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'BahisSiteleri.com',
-    description: 'Türkiye\'nin en kapsamlı bahis siteleri karşılaştırma ve inceleme platformu. Güvenilir, lisanslı bahis siteleri hakkında detaylı analizler ve kullanıcı yorumları.',
+    name: 'CasinoDoo',
+    description: 'Türkiye\'nin en kapsamlı casino ve bahis siteleri karşılaştırma ve inceleme platformu. Güvenilir, lisanslı casino ve bahis siteleri hakkında detaylı analizler ve kullanıcı yorumları.',
     url: window.location.origin,
-    logo: `${window.location.origin}/logos/fanatik-logo.png`,
-    foundingDate: '2024',
+    logo: `${window.location.origin}/logos/casinodoo-logo.svg`,
+    foundingDate: '2020',
     areaServed: 'TR',
     sameAs: [
       // Sosyal medya linkleri buraya eklenebilir
