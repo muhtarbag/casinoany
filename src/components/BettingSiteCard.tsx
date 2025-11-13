@@ -103,26 +103,35 @@ export const BettingSiteCard = ({
 
   return (
     <Card 
-      className="group relative overflow-hidden bg-card hover:bg-card/80 border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl cursor-pointer"
+      className="group relative overflow-hidden bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/60 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 cursor-pointer hover:-translate-y-2 hover:bg-card/80"
       onClick={handleCardClick}
     >
-      <CardHeader className="pb-4">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:via-transparent group-hover:to-secondary/5 transition-all duration-700 ease-out" />
+      
+      {/* Shine effect on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
+      </div>
+      <CardHeader className="relative pb-4 z-10">
         {/* Logo Section - Horizontal Layout */}
         <div className="flex items-center justify-center min-h-[80px] mb-4">
           {logoUrl ? (
-            <div className="w-full max-w-[280px] h-[80px] flex items-center justify-center">
+            <div className="w-full max-w-[280px] h-[80px] flex items-center justify-center relative">
+              {/* Logo glow on hover */}
+              <div className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-700 bg-primary/20" />
               <img 
                 src={logoUrl} 
                 alt={name} 
-                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                className="relative max-w-full max-h-full object-contain group-hover:scale-110 group-hover:brightness-110 transition-all duration-500 ease-out drop-shadow-lg"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = `<div class="text-3xl font-bold text-foreground">${name}</div>`;
+                  e.currentTarget.parentElement!.innerHTML = `<div class="text-3xl font-bold text-foreground group-hover:scale-110 transition-transform duration-500">${name}</div>`;
                 }}
               />
             </div>
           ) : (
-            <h3 className="text-2xl font-bold text-foreground">{name}</h3>
+            <h3 className="text-2xl font-bold text-foreground group-hover:scale-110 group-hover:text-primary transition-all duration-500">{name}</h3>
           )}
         </div>
 
@@ -131,24 +140,25 @@ export const BettingSiteCard = ({
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`w-5 h-5 transition-all duration-300 ${
+              className={`w-5 h-5 transition-all duration-500 ease-out ${
                 i < Math.floor(rating)
-                  ? 'fill-yellow-500 text-yellow-500'
-                  : 'fill-muted text-muted'
+                  ? 'fill-yellow-500 text-yellow-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]'
+                  : 'fill-muted text-muted group-hover:fill-muted-foreground/30'
               }`}
+              style={{ transitionDelay: `${i * 50}ms` }}
             />
           ))}
-          <span className="ml-2 text-sm font-semibold text-foreground">
+          <span className="ml-2 text-sm font-semibold text-foreground group-hover:text-primary group-hover:scale-105 transition-all duration-300">
             {rating.toFixed(1)}
           </span>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 pb-4">
+      <CardContent className="relative space-y-4 pb-4 z-10">
         {/* Bonus Section */}
         {bonus && (
-          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-3 rounded-lg border border-primary/10">
-            <p className="text-center text-sm font-semibold text-foreground line-clamp-2">
+          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 group-hover:from-primary/10 group-hover:to-secondary/10 p-3 rounded-lg border border-primary/10 group-hover:border-primary/30 transition-all duration-500 group-hover:shadow-lg">
+            <p className="text-center text-sm font-semibold text-foreground group-hover:scale-105 transition-transform duration-300 line-clamp-2">
               {bonus}
             </p>
           </div>
@@ -161,13 +171,18 @@ export const BettingSiteCard = ({
               <Badge 
                 key={idx} 
                 variant="secondary"
-                className="text-xs"
+                className="text-xs group-hover:scale-105 transition-all duration-300 hover:bg-primary/20"
+                style={{ transitionDelay: `${idx * 50}ms` }}
               >
                 {feature}
               </Badge>
             ))}
             {features.length > 4 && (
-              <Badge variant="outline" className="text-xs">
+              <Badge 
+                variant="outline" 
+                className="text-xs group-hover:scale-105 group-hover:bg-primary/10 transition-all duration-300"
+                style={{ transitionDelay: `${4 * 50}ms` }}
+              >
                 +{features.length - 4}
               </Badge>
             )}
@@ -185,11 +200,11 @@ export const BettingSiteCard = ({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
+                  className="p-2 rounded-lg bg-muted hover:bg-primary/20 hover:scale-125 hover:rotate-6 transition-all duration-300 ease-out hover:shadow-lg"
                   title={link.label}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 hover:text-primary transition-colors duration-300" />
                 </a>
               );
             })}
@@ -197,14 +212,18 @@ export const BettingSiteCard = ({
         )}
       </CardContent>
 
-      <CardFooter className="pt-2 pb-4">
+      <CardFooter className="relative pt-2 pb-4 z-10">
         <Button 
           onClick={handleAffiliateClick}
-          className="w-full bg-gradient-primary hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-semibold"
+          className="w-full bg-gradient-primary hover:shadow-2xl hover:shadow-primary/40 hover:scale-[1.03] transition-all duration-500 ease-out font-semibold relative overflow-hidden group/btn"
           size="lg"
         >
-          Siteye Git
-          <ExternalLink className="w-4 h-4 ml-2" />
+          {/* Button shine effect */}
+          <div className="absolute inset-0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <span className="relative flex items-center justify-center gap-2">
+            Siteye Git
+            <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
+          </span>
         </Button>
       </CardFooter>
     </Card>
