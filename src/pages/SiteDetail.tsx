@@ -38,6 +38,7 @@ export default function SiteDetail() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [viewTracked, setViewTracked] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   // Fetch site data
   const { data: site, isLoading: siteLoading } = useQuery({
@@ -54,6 +55,14 @@ export default function SiteDetail() {
       return data;
     },
   });
+
+  // Load logo from storage
+  useEffect(() => {
+    if (site?.logo_url) {
+      const { data } = supabase.storage.from('site-logos').getPublicUrl(site.logo_url);
+      setLogoUrl(data.publicUrl);
+    }
+  }, [site?.logo_url]);
 
   // Fetch site stats
   const { data: stats } = useQuery({
@@ -203,12 +212,22 @@ export default function SiteDetail() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-              {site.logo_url && (
-                <img
-                  src={site.logo_url}
-                  alt={site.name}
-                  className="w-32 h-32 object-contain rounded-lg border"
-                />
+              {logoUrl ? (
+                <div className="w-32 h-32 bg-card rounded-lg border-2 border-border flex items-center justify-center p-4 shadow-md">
+                  <img
+                    src={logoUrl}
+                    alt={site.name}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-4xl font-bold text-primary">${site.name.charAt(0)}</div>`;
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="w-32 h-32 bg-gradient-primary rounded-lg flex items-center justify-center text-4xl font-bold text-primary-foreground shadow-md">
+                  {site.name.charAt(0)}
+                </div>
               )}
               <div className="flex-1">
                 <CardTitle className="text-3xl mb-2">{site.name}</CardTitle>
