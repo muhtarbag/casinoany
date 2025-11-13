@@ -58,7 +58,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     if (!isMobile) return;
 
     // Start auto-scroll for mobile
-    const autoScrollInterval = setInterval(handleAutoScroll, 3000);
+    const autoScrollInterval = setInterval(handleAutoScroll, 2500);
 
     return () => clearInterval(autoScrollInterval);
   }, [emblaApi]);
