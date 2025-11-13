@@ -142,7 +142,7 @@ export default function Sitemap() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              XML Sitemap <ExternalLink className="w-4 h-4" />
+              XML Sitemap <ExternalLink className="w-4 h-4 opacity-0" />
             </a>
           </CardContent>
         </Card>
