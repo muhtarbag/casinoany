@@ -1,0 +1,267 @@
+openapi: 3.0.1
+info:
+  title: CasinoAny API
+  description: API for accessing Turkish betting and casino sites information, including bonuses, ratings, reviews, and expert analysis.
+  version: 1.0.0
+servers:
+  - url: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1
+paths:
+  /ai-site-info:
+    get:
+      operationId: getAllSites
+      summary: Get all betting sites with comprehensive information
+      description: Returns a list of all active betting and casino sites with detailed information including bonuses, features, ratings, and contact details.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sites:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BettingSite'
+                      totalSites:
+                        type: integer
+                      categories:
+                        type: array
+                        items:
+                          type: string
+    post:
+      operationId: searchSites
+      summary: Search and filter betting sites
+      description: Search for betting sites by name, bonus, rating, or specific features. Supports filtering and sorting.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Search query (site name, bonus keywords)
+                minRating:
+                  type: number
+                  description: Minimum rating filter (1-5)
+                features:
+                  type: array
+                  items:
+                    type: string
+                  description: Filter by specific features
+                sortBy:
+                  type: string
+                  enum: [rating, name, bonus]
+                  description: Sort results by field
+      responses:
+        '200':
+          description: Successful search
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sites:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BettingSite'
+                      count:
+                        type: integer
+  /ai-blog-info:
+    get:
+      operationId: getBlogPosts
+      summary: Get blog posts and articles
+      description: Returns published blog posts with detailed content, tags, and related betting sites.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      posts:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BlogPost'
+  /ai-reviews-info:
+    get:
+      operationId: getReviews
+      summary: Get user reviews for betting sites
+      description: Returns approved user reviews with ratings and comments for specific sites or all sites.
+      parameters:
+        - name: siteId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: minRating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      reviews:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Review'
+components:
+  schemas:
+    BettingSite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        rating:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 5
+        bonus:
+          type: string
+          description: Welcome bonus details
+        features:
+          type: array
+          items:
+            type: string
+        pros:
+          type: array
+          items:
+            type: string
+        cons:
+          type: array
+          items:
+            type: string
+        expertReview:
+          type: string
+        verdict:
+          type: string
+        loginGuide:
+          type: string
+        withdrawalGuide:
+          type: string
+        gameCategories:
+          type: object
+        faq:
+          type: array
+          items:
+            type: object
+            properties:
+              question:
+                type: string
+              answer:
+                type: string
+        affiliateLink:
+          type: string
+        email:
+          type: string
+        whatsapp:
+          type: string
+        telegram:
+          type: string
+        twitter:
+          type: string
+        instagram:
+          type: string
+        facebook:
+          type: string
+        youtube:
+          type: string
+        isFeatured:
+          type: boolean
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+        readTime:
+          type: integer
+        viewCount:
+          type: integer
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        siteName:
+          type: string
+        title:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
