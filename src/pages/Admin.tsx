@@ -18,7 +18,7 @@ import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, Chec
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import SiteStats from '@/components/SiteStats';
 import BlogStats from '@/components/BlogStats';
@@ -36,6 +36,7 @@ import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
 import { CarouselSettings } from '@/components/CarouselSettings';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { RefreshCw, Star } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface SiteFormData {
   name: string;
@@ -249,6 +250,93 @@ export default function Admin() {
       return data;
     },
   });
+
+  // Dashboard analytics data
+  const { data: dailyPageViews } = useQuery({
+    queryKey: ['daily-page-views'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('page_views')
+        .select('created_at')
+        .gte('created_at', subDays(new Date(), 30).toISOString());
+      
+      if (error) throw error;
+      
+      // Group by date
+      const viewsByDate = data.reduce((acc: any, view: any) => {
+        const date = format(new Date(view.created_at), 'dd MMM', { locale: tr });
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+      
+      return Object.entries(viewsByDate).map(([date, count]) => ({ date, count }));
+    },
+  });
+
+  const { data: deviceStats } = useQuery({
+    queryKey: ['device-stats'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('page_views')
+        .select('device_type')
+        .gte('created_at', subDays(new Date(), 30).toISOString());
+      
+      if (error) throw error;
+      
+      const deviceCounts = data.reduce((acc: any, view: any) => {
+        const device = view.device_type || 'Unknown';
+        acc[device] = (acc[device] || 0) + 1;
+        return acc;
+      }, {});
+      
+      return Object.entries(deviceCounts).map(([name, value]) => ({ name, value }));
+    },
+  });
+
+  const { data: topPages } = useQuery({
+    queryKey: ['top-pages'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('page_views')
+        .select('page_path')
+        .gte('created_at', subDays(new Date(), 30).toISOString());
+      
+      if (error) throw error;
+      
+      const pageCounts = data.reduce((acc: any, view: any) => {
+        const path = view.page_path || '/';
+        acc[path] = (acc[path] || 0) + 1;
+        return acc;
+      }, {});
+      
+      return Object.entries(pageCounts)
+        .map(([page, views]) => ({ page, views }))
+        .sort((a: any, b: any) => b.views - a.views)
+        .slice(0, 5);
+    },
+  });
+
+  const { data: dailyConversions } = useQuery({
+    queryKey: ['daily-conversions'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('conversions')
+        .select('created_at')
+        .gte('created_at', subDays(new Date(), 30).toISOString());
+      
+      if (error) throw error;
+      
+      const conversionsByDate = data.reduce((acc: any, conversion: any) => {
+        const date = format(new Date(conversion.created_at), 'dd MMM', { locale: tr });
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+      
+      return Object.entries(conversionsByDate).map(([date, count]) => ({ date, count }));
+    },
+  });
+
+  const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', 'hsl(var(--chart-1))', 'hsl(var(--chart-2))'];
 
   const [orderedSites, setOrderedSites] = useState(sites || []);
   useEffect(() => { if (sites) setOrderedSites(sites); }, [sites]);
@@ -852,6 +940,123 @@ export default function Admin() {
                     <MessageSquare className="w-4 h-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Bekleyen yorumlar: {dashboardStats?.pendingReviews || 0}</span>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Analytics Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5" />
+                    Günlük Sayfa Görüntüleme Trendi
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={dailyPageViews || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: 'hsl(var(--primary))' }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    En Popüler Sayfalar
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={topPages || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="page" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Bar dataKey="views" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Ziyaretçi Cihaz Dağılımı
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={deviceStats || []}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="hsl(var(--primary))"
+                        dataKey="value"
+                      >
+                        {(deviceStats || []).map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckSquare className="w-5 h-5" />
+                    Günlük Conversion Trendi
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={dailyConversions || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Bar dataKey="count" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
