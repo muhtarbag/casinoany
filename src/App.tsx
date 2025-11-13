@@ -56,6 +56,7 @@ const App = () => (
               <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
               <Route path="/mobil-bahis" element={<MobileBetting />} />
               <Route path="/canli-casino" element={<LiveCasino />} />
+              <Route path="/:slug" element={<SiteDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -36,23 +36,29 @@ import { SEO } from '@/components/SEO';
 import { SiteBlogSection } from '@/components/SiteBlogSection';
 
 export default function SiteDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [viewTracked, setViewTracked] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-  // Fetch site data
+  // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading } = useQuery({
-    queryKey: ["betting-site", id],
+    queryKey: ["betting-site", slug || id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("betting_sites")
         .select("*")
-        .eq("id", id)
-        .eq("is_active", true)
-        .single();
+        .eq("is_active", true);
+      
+      if (slug) {
+        query = query.eq("slug", slug);
+      } else if (id) {
+        query = query.eq("id", id);
+      }
+      
+      const { data, error } = await query.single();
 
       if (error) throw error;
       return data;
@@ -75,27 +81,30 @@ export default function SiteDetail() {
 
   // Fetch site stats
   const { data: stats } = useQuery({
-    queryKey: ["site-stats", id],
+    queryKey: ["site-stats", site?.id],
     queryFn: async () => {
+      if (!site?.id) return null;
       const { data, error } = await supabase
         .from("site_stats" as any)
         .select("*")
-        .eq("site_id", id)
+        .eq("site_id", site.id)
         .maybeSingle();
 
       if (error) throw error;
       return data;
     },
+    enabled: !!site?.id,
   });
 
   // Fetch reviews with profiles
   const { data: reviews, isLoading: reviewsLoading } = useQuery({
-    queryKey: ["site-reviews", id],
+    queryKey: ["site-reviews", site?.id],
     queryFn: async () => {
+      if (!site?.id) return [];
       const { data: reviewsData, error: reviewsError } = await (supabase as any)
         .from("site_reviews")
         .select("*")
-        .eq("site_id", id)
+        .eq("site_id", site.id)
         .eq("is_approved", true)
         .order("created_at", { ascending: false });
 
@@ -128,33 +137,47 @@ export default function SiteDetail() {
 
       return reviewsWithProfiles;
     },
+    enabled: !!site?.id,
   });
 
   // Track view on mount
   useEffect(() => {
-    if (!id || viewTracked) return;
+    if (!site?.id || viewTracked) return;
 
     const trackView = async () => {
+      const { data: stats } = await supabase
+        .from('site_stats' as any)
+        .select('*')
+        .eq('site_id', site.id)
+        .maybeSingle();
+
       if (stats) {
         await supabase
           .from("site_stats" as any)
           .update({ views: (stats as any).views + 1 })
-          .eq("site_id", id);
+          .eq("site_id", site.id);
       } else {
         await supabase
           .from("site_stats" as any)
-          .insert({ site_id: id, views: 1, clicks: 0 });
+          .insert({ site_id: site.id, views: 1, clicks: 0 });
       }
       setViewTracked(true);
-      queryClient.invalidateQueries({ queryKey: ["site-stats", id] });
+      queryClient.invalidateQueries({ queryKey: ["site-stats", site.id] });
     };
 
     trackView();
-  }, [id, stats, viewTracked, queryClient]);
+  }, [site?.id, viewTracked, queryClient]);
 
   // Track click mutation
   const trackClickMutation = useMutation({
     mutationFn: async () => {
+      if (!site?.id) return;
+      const { data: stats } = await supabase
+        .from('site_stats' as any)
+        .select('*')
+        .eq('site_id', site.id)
+        .maybeSingle();
+
       if (stats) {
         const { error } = await supabase
           .from("site_stats" as any)
@@ -217,7 +240,7 @@ export default function SiteDetail() {
         title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
         description={`${site.name} bahis sitesi hakkında detaylı bilgiler, kullanıcı yorumları ve bonus kampanyaları. ${site.bonus || ''}`}
         keywords={[site.name, 'bahis sitesi', 'casino', ...(site.features || [])]}
-        canonical={`${window.location.origin}/site/${id}`}
+        canonical={`${window.location.origin}/${site.slug || `site/${site.id}`}`}
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'Product',

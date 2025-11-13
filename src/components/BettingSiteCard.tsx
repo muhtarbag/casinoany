@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 
 interface BettingSiteCardProps {
   id?: string;
+  slug?: string;
   name: string;
   logo?: string;
   rating: number;
@@ -27,6 +28,7 @@ interface BettingSiteCardProps {
 
 export const BettingSiteCard = ({
   id,
+  slug,
   name,
   logo,
   rating,
@@ -82,7 +84,11 @@ export const BettingSiteCard = ({
   });
 
   const handleCardClick = () => {
-    if (id) navigate(`/site/${id}`);
+    if (slug) {
+      navigate(`/${slug}`);
+    } else if (id) {
+      navigate(`/site/${id}`);
+    }
   };
 
   const handleAffiliateClick = (e: React.MouseEvent) => {
