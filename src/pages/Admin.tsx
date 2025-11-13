@@ -10,7 +10,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X } from 'lucide-react';
+import { Loader2, Trash2, Upload, Edit, X, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface SiteFormData {
   name: string;
@@ -27,6 +44,84 @@ interface SiteFormData {
   youtube: string;
 }
 
+interface SortableItemProps {
+  id: string;
+  site: any;
+  editingId: string | null;
+  onEdit: (site: any) => void;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+}
+
+const SortableItem = ({ id, site, editingId, onEdit, onDelete, isDeleting }: SortableItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+        editingId === site.id 
+          ? 'bg-primary/20 border-2 border-primary' 
+          : 'bg-muted hover:bg-muted/80'
+      }`}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+      >
+        <GripVertical className="w-5 h-5" />
+      </div>
+      
+      <div className="flex items-center gap-3 flex-1">
+        {site.logo_url && (
+          <img src={site.logo_url} alt={site.name} className="w-10 h-10 object-contain rounded" />
+        )}
+        <div className="flex-1">
+          <p className="font-medium">{site.name}</p>
+          <p className="text-xs text-muted-foreground">
+            Puan: {site.rating} | {site.features?.length || 0} özellik
+          </p>
+        </div>
+      </div>
+      
+      <div className="flex gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onEdit(site)}
+          className="text-primary hover:text-primary"
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(site.id)}
+          className="text-destructive hover:text-destructive"
+          disabled={isDeleting || editingId === site.id}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const Admin = () => {
   const { isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -34,6 +129,7 @@ const Admin = () => {
   const queryClient = useQueryClient();
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [orderedSites, setOrderedSites] = useState<any[]>([]);
   const [formData, setFormData] = useState<SiteFormData>({
     name: '',
     rating: 5,
@@ -50,6 +146,13 @@ const Admin = () => {
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -74,6 +177,60 @@ const Admin = () => {
     },
     enabled: isAdmin,
   });
+
+  // Siteleri orderedSites'a sync et
+  useEffect(() => {
+    if (sites) {
+      setOrderedSites(sites);
+    }
+  }, [sites]);
+
+  const updateOrderMutation = useMutation({
+    mutationFn: async (sites: any[]) => {
+      const updates = sites.map((site, index) => ({
+        id: site.id,
+        display_order: index,
+      }));
+
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('betting_sites')
+          .update({ display_order: update.display_order })
+          .eq('id', update.id);
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-betting-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
+      toast({ title: 'Başarılı!', description: 'Site sıralaması güncellendi' });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setOrderedSites((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // Backend'e kaydet
+        updateOrderMutation.mutate(newOrder);
+        
+        return newOrder;
+      });
+    }
+  };
 
   const createSiteMutation = useMutation({
     mutationFn: async (data: SiteFormData) => {
@@ -424,6 +581,9 @@ const Admin = () => {
           <Card>
             <CardHeader>
               <CardTitle>Mevcut Siteler</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Siteleri sürükleyerek sıralamayı değiştirebilirsiniz
+              </p>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -431,49 +591,30 @@ const Admin = () => {
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               ) : (
-                <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                  {sites?.map((site) => (
-                    <div
-                      key={site.id}
-                      className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
-                        editingId === site.id 
-                          ? 'bg-primary/20 border-2 border-primary' 
-                          : 'bg-muted hover:bg-muted/80'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        {site.logo_url && (
-                          <img src={site.logo_url} alt={site.name} className="w-10 h-10 object-contain rounded" />
-                        )}
-                        <div className="flex-1">
-                          <p className="font-medium">{site.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Puan: {site.rating} | {site.features?.length || 0} özellik
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(site)}
-                          className="text-primary hover:text-primary"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteSiteMutation.mutate(site.id)}
-                          className="text-destructive hover:text-destructive"
-                          disabled={editingId === site.id}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={orderedSites.map(s => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {orderedSites.map((site) => (
+                        <SortableItem
+                          key={site.id}
+                          id={site.id}
+                          site={site}
+                          editingId={editingId}
+                          onEdit={handleEdit}
+                          onDelete={(id) => deleteSiteMutation.mutate(id)}
+                          isDeleting={deleteSiteMutation.isPending}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </CardContent>
           </Card>
