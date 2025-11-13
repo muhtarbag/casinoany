@@ -16,25 +16,25 @@ export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { data: post, isLoading } = useQuery({
+    const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', slug],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('blog_posts' as any)
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
         .maybeSingle();
       
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!slug,
   });
 
   const incrementViewMutation = useMutation({
     mutationFn: async (postId: string) => {
-      const { error } = await supabase.rpc('increment_blog_view_count', { post_id: postId });
+      const { error } = await supabase.rpc('increment_blog_view_count' as any, { post_id: postId });
       if (error) throw error;
     },
   });

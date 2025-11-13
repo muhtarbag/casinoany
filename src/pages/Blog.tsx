@@ -34,13 +34,13 @@ const Blog = () => {
     queryKey: ['blog-posts'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_posts')
+        .from('blog_posts' as any)
         .select('*')
         .eq('is_published', true)
         .order('published_at', { ascending: false });
       
       if (error) throw error;
-      return data as BlogPost[];
+      return (data as unknown) as BlogPost[];
     },
   });
 

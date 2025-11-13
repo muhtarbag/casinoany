@@ -248,6 +248,11 @@ export default function Admin() {
   const toggleSiteSelection = (id: string) => { setSelectedSites(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]); };
   const toggleSelectAll = () => { selectedSites.length === orderedSites.length ? setSelectedSites([]) : setSelectedSites(orderedSites.map(s => s.id)); };
 
+  const clearCache = () => {
+    queryClient.clear();
+    toast({ title: 'Cache Temizlendi', description: 'Tüm cache başarıyla temizlendi.' });
+  };
+
   if (authLoading || sitesLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin" /></div>;
 
   return (
@@ -255,13 +260,24 @@ export default function Admin() {
       <Header />
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Message */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-            Hoş Geldin, {userProfile?.username || 'Admin'}! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            İşte platformunuzun genel durumu
-          </p>
+        <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+              Hoş Geldin, {userProfile?.username || 'Admin'}! 👋
+            </h1>
+            <p className="text-muted-foreground">
+              İşte platformunuzun genel durumu
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearCache}
+            className="gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Cache Temizle
+          </Button>
         </div>
 
         {/* Quick Action Buttons */}
