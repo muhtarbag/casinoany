@@ -14,7 +14,12 @@ interface HeroProps {
 
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    align: 'start',
+    skipSnaps: false,
+    dragFree: false
+  });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -40,18 +45,22 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   useEffect(() => {
     if (!emblaApi) return;
     
+    // Always check on mount and resize
+    const handleAutoScroll = () => {
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile) return;
+      
+      // Use scrollNext which automatically handles loop
+      emblaApi.scrollNext();
+    };
+
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
 
-    const autoScroll = setInterval(() => {
-      if (emblaApi.canScrollNext()) {
-        emblaApi.scrollNext();
-      } else {
-        emblaApi.scrollTo(0);
-      }
-    }, 3000);
+    // Start auto-scroll for mobile
+    const autoScrollInterval = setInterval(handleAutoScroll, 3000);
 
-    return () => clearInterval(autoScroll);
+    return () => clearInterval(autoScrollInterval);
   }, [emblaApi]);
 
   const { data: featuredSites } = useQuery({
