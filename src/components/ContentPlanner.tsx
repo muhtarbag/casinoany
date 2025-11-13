@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, TrendingUp, Target, Lightbulb, ArrowRight, Clock, BarChart, Sparkles, Plus, CheckCircle2, Edit2, Trash2 } from 'lucide-react';
+import { Calendar, TrendingUp, Target, Lightbulb, ArrowRight, Clock, BarChart, Sparkles, Plus, CheckCircle2, Edit2, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -54,6 +54,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
   const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>([]);
   const [contentCalendar, setContentCalendar] = useState<CalendarItem[]>([]);
   const [selectedTab, setSelectedTab] = useState('suggestions');
+  const [isCreatingBlog, setIsCreatingBlog] = useState(false);
 
   // Fetch existing blog posts
   const { data: existingPosts } = useQuery({
@@ -236,6 +237,146 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
     });
   };
 
+  const handleCreateBlogFromTopic = async (topic: TopicSuggestion) => {
+    setIsCreatingBlog(true);
+    try {
+      toast({
+        title: "Blog Oluşturuluyor",
+        description: "AI ile içerik üretiliyor, lütfen bekleyin...",
+      });
+
+      // Generate blog content using AI
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: {
+          type: 'blog',
+          data: {
+            topic: topic.title,
+            siteName: 'Bahis Siteleri',
+            targetKeywords: topic.keywords.join(', ')
+          }
+        }
+      });
+
+      if (aiError) throw aiError;
+      if (!aiData?.success) throw new Error('Blog içeriği oluşturulamadı');
+
+      const blogContent = aiData.data;
+
+      // Create slug from title
+      const slug = topic.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+
+      // Save to database
+      const { error: insertError } = await (supabase as any)
+        .from('blog_posts')
+        .insert({
+          title: topic.title,
+          slug: slug,
+          excerpt: topic.description,
+          content: blogContent.content,
+          meta_title: blogContent.seoAnalysis?.suggestedTitle || topic.title,
+          meta_description: blogContent.seoAnalysis?.suggestedMetaDescription || topic.description,
+          meta_keywords: topic.keywords,
+          category: topic.content_type,
+          tags: topic.keywords,
+          read_time: Math.ceil(topic.estimated_word_count / 200),
+          is_published: false,
+          display_order: 0
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "✅ Blog Başarıyla Oluşturuldu!",
+        description: "Blog yazısı taslak olarak kaydedildi. Blog yönetim sekmesinden düzenleyebilirsiniz.",
+      });
+
+      onNavigateToBlog?.();
+    } catch (error: any) {
+      console.error('Blog creation error:', error);
+      toast({
+        title: "Hata",
+        description: error.message || "Blog oluşturulurken bir hata oluştu",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingBlog(false);
+    }
+  };
+
+  const handleCreateBlogFromCalendar = async (item: CalendarItem) => {
+    setIsCreatingBlog(true);
+    try {
+      toast({
+        title: "Blog Oluşturuluyor",
+        description: "AI ile içerik üretiliyor, lütfen bekleyin...",
+      });
+
+      // Generate blog content using AI
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: {
+          type: 'blog',
+          data: {
+            topic: item.title,
+            siteName: 'Bahis Siteleri',
+            targetKeywords: item.keywords.join(', ')
+          }
+        }
+      });
+
+      if (aiError) throw aiError;
+      if (!aiData?.success) throw new Error('Blog içeriği oluşturulamadı');
+
+      const blogContent = aiData.data;
+
+      // Create slug from title
+      const slug = item.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+
+      // Save to database
+      const { error: insertError } = await (supabase as any)
+        .from('blog_posts')
+        .insert({
+          title: item.title,
+          slug: slug,
+          excerpt: `${item.content_type} - ${item.goal}`,
+          content: blogContent.content,
+          meta_title: blogContent.seoAnalysis?.suggestedTitle || item.title,
+          meta_description: blogContent.seoAnalysis?.suggestedMetaDescription || item.title,
+          meta_keywords: item.keywords,
+          category: item.content_type,
+          tags: item.keywords,
+          read_time: Math.ceil(item.target_words / 200),
+          is_published: false,
+          display_order: 0
+        });
+
+      if (insertError) throw insertError;
+
+      toast({
+        title: "✅ Blog Başarıyla Oluşturuldu!",
+        description: "Blog yazısı taslak olarak kaydedildi. Blog yönetim sekmesinden düzenleyebilirsiniz.",
+      });
+
+      onNavigateToBlog?.();
+    } catch (error: any) {
+      console.error('Blog creation error:', error);
+      toast({
+        title: "Hata",
+        description: error.message || "Blog oluşturulurken bir hata oluştu",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingBlog(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -377,16 +518,20 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
                         </span>
                         <Button 
                           size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Blog Oluşturma",
-                              description: `"${topic.title}" konusu için blog oluşturma sayfasına yönlendiriliyorsunuz...`,
-                            });
-                            onNavigateToBlog?.();
-                          }}
+                          onClick={() => handleCreateBlogFromTopic(topic)}
+                          disabled={isCreatingBlog}
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Blog Oluştur
+                          {isCreatingBlog ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Oluşturuluyor...
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4 mr-2" />
+                              Blog Oluştur
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -521,16 +666,20 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
                           <Button 
                             size="sm" 
                             variant="default"
-                            onClick={() => {
-                              toast({
-                                title: "Blog Oluşturma",
-                                description: `"${item.title}" için blog oluşturma sayfasına yönlendiriliyorsunuz...`,
-                              });
-                              onNavigateToBlog?.();
-                            }}
+                            onClick={() => handleCreateBlogFromCalendar(item)}
+                            disabled={isCreatingBlog}
                           >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Blog Oluştur
+                            {isCreatingBlog ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Oluşturuluyor...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Blog Oluştur
+                              </>
+                            )}
                           </Button>
                           
                           <Button 
