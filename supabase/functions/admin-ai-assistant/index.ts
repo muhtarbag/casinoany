@@ -208,7 +208,14 @@ JSON formatında yanıt ver:
       throw new Error('AI yanıtından JSON çıkarılamadı');
     }
     
-    const suggestion = JSON.parse(jsonMatch[0]);
+    // Clean control characters from JSON string before parsing
+    const cleanedJson = jsonMatch[0]
+      .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t');
+    
+    const suggestion = JSON.parse(cleanedJson);
 
     return new Response(
       JSON.stringify({ success: true, data: suggestion }),
