@@ -29,6 +29,7 @@ import { AIAssistant } from '@/components/AIAssistant';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { ContentPlanner } from '@/components/ContentPlanner';
 import { KeywordPerformance } from '@/components/KeywordPerformance';
+import { AdminLogoInput } from './AdminLogoInput';
 import { RefreshCw, Star } from 'lucide-react';
 
 interface SiteFormData {
@@ -95,6 +96,7 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<SiteFormData>({ name: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' });
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
@@ -325,7 +327,152 @@ export default function Admin() {
 
   const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); editingId ? updateSiteMutation.mutate({ id: editingId, formData, logoFile }) : createSiteMutation.mutate({ formData, logoFile }); };
   const handleEdit = (site: any) => { setEditingId(site.id); setFormData({ name: site.name, rating: site.rating, bonus: site.bonus || '', features: site.features?.join(', ') || '', affiliate_link: site.affiliate_link, email: site.email || '', whatsapp: site.whatsapp || '', telegram: site.telegram || '', twitter: site.twitter || '', instagram: site.instagram || '', facebook: site.facebook || '', youtube: site.youtube || '' }); };
-  const resetForm = () => { setFormData({ name: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' }); setLogoFile(null); setEditingId(null); };
+  const resetForm = () => { 
+    setFormData({ name: '', rating: 0, bonus: '', features: '', affiliate_link: '', email: '', whatsapp: '', telegram: '', twitter: '', instagram: '', facebook: '', youtube: '' }); 
+    setLogoFile(null); 
+    setLogoPreview(null);
+    setEditingId(null); 
+  };
+
+  // Logo optimization function
+  const optimizeLogo = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set target dimensions (max 400x400, maintain aspect ratio)
+        const maxSize = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const optimizedFile = new File([blob], file.name, {
+                type: 'image/webp',
+                lastModified: Date.now(),
+              });
+              resolve(optimizedFile);
+            } else {
+              reject(new Error('Logo optimizasyonu başarısız'));
+            }
+          },
+          'image/webp',
+          0.85
+        );
+      };
+
+      img.onerror = () => reject(new Error('Logo yüklenemedi'));
+      reader.onerror = () => reject(new Error('Dosya okunamadı'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setLogoFile(null);
+      setLogoPreview(null);
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: 'Geçersiz Format',
+        description: 'Sadece JPG, PNG, WebP veya SVG formatları desteklenir.',
+        variant: 'destructive',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast({
+        title: 'Dosya Çok Büyük',
+        description: 'Logo dosyası maksimum 5MB olabilir.',
+        variant: 'destructive',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      // SVG files don't need optimization
+      if (file.type === 'image/svg+xml') {
+        setLogoFile(file);
+        const reader = new FileReader();
+        reader.onload = (e) => setLogoPreview(e.target?.result as string);
+        reader.readAsDataURL(file);
+        toast({
+          title: 'Logo Yüklendi',
+          description: `${file.name} başarıyla yüklendi.`,
+        });
+      } else {
+        // Optimize other image formats
+        toast({
+          title: 'Logo Optimize Ediliyor',
+          description: 'Lütfen bekleyin...',
+        });
+        
+        const optimizedFile = await optimizeLogo(file);
+        setLogoFile(optimizedFile);
+        
+        const reader = new FileReader();
+        reader.onload = (e) => setLogoPreview(e.target?.result as string);
+        reader.readAsDataURL(optimizedFile);
+
+        const originalSizeKB = (file.size / 1024).toFixed(0);
+        const optimizedSizeKB = (optimizedFile.size / 1024).toFixed(0);
+        
+        toast({
+          title: 'Logo Optimize Edildi',
+          description: `${originalSizeKB}KB → ${optimizedSizeKB}KB (WebP formatı, 400x400 max)`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: error instanceof Error ? error.message : 'Logo işlenirken hata oluştu',
+        variant: 'destructive',
+      });
+      e.target.value = '';
+    }
+  };
+
+  const clearLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    const fileInput = document.getElementById('logo') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
   const toggleSiteSelection = (id: string) => { setSelectedSites(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]); };
   const toggleSelectAll = () => { selectedSites.length === orderedSites.length ? setSelectedSites([]) : setSelectedSites(orderedSites.map(s => s.id)); };
 
