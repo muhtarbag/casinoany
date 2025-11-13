@@ -1,0 +1,387 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Star, ExternalLink, Mail, MessageCircle, Send, Twitter, Instagram, Facebook, Youtube } from "lucide-react";
+import { toast } from "sonner";
+import ReviewCard from "@/components/ReviewCard";
+import ReviewForm from "@/components/ReviewForm";
+import RecommendedSites from "@/components/RecommendedSites";
+
+interface Profile {
+  username: string;
+  avatar_url: string | null;
+}
+
+interface Review {
+  id: string;
+  site_id: string;
+  user_id: string;
+  rating: number;
+  title: string;
+  comment: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export default function SiteDetail() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [viewTracked, setViewTracked] = useState(false);
+
+  // Fetch site data
+  const { data: site, isLoading: siteLoading } = useQuery({
+    queryKey: ["betting-site", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("betting_sites")
+        .select("*")
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch site stats
+  const { data: stats } = useQuery({
+    queryKey: ["site-stats", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_stats")
+        .select("*")
+        .eq("site_id", id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch reviews with profiles
+  const { data: reviews, isLoading: reviewsLoading } = useQuery({
+    queryKey: ["site-reviews", id],
+    queryFn: async () => {
+      const { data: reviewsData, error: reviewsError } = await supabase
+        .from("site_reviews")
+        .select("*")
+        .eq("site_id", id)
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false });
+
+      if (reviewsError) throw reviewsError;
+
+      // Fetch profiles separately
+      const userIds = reviewsData.map((r) => r.user_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, username, avatar_url")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine reviews with profiles
+      const reviewsWithProfiles = reviewsData.map((review) => {
+        const profile = profilesData?.find((p) => p.id === review.user_id);
+        return {
+          ...review,
+          profiles: profile ? { username: profile.username || "Anonim", avatar_url: profile.avatar_url } : undefined,
+        };
+      });
+
+      return reviewsWithProfiles;
+    },
+  });
+
+  // Track view on mount
+  useEffect(() => {
+    if (!id || viewTracked) return;
+
+    const trackView = async () => {
+      if (stats) {
+        await supabase
+          .from("site_stats")
+          .update({ views: stats.views + 1 })
+          .eq("site_id", id);
+      } else {
+        await supabase
+          .from("site_stats")
+          .insert({ site_id: id, views: 1, clicks: 0 });
+      }
+      setViewTracked(true);
+      queryClient.invalidateQueries({ queryKey: ["site-stats", id] });
+    };
+
+    trackView();
+  }, [id, stats, viewTracked, queryClient]);
+
+  // Track click mutation
+  const trackClickMutation = useMutation({
+    mutationFn: async () => {
+      if (stats) {
+        const { error } = await supabase
+          .from("site_stats")
+          .update({ clicks: stats.clicks + 1 })
+          .eq("site_id", id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("site_stats")
+          .insert({ site_id: id, clicks: 1, views: 1 });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-stats", id] });
+    },
+  });
+
+  const handleAffiliateClick = () => {
+    if (site?.affiliate_link) {
+      trackClickMutation.mutate();
+      window.open(site.affiliate_link, "_blank");
+    }
+  };
+
+  // Calculate average rating
+  const averageRating = reviews?.length
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : "0.0";
+
+  if (siteLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+        <Header />
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <Skeleton className="h-64 w-full mb-8" />
+          <Skeleton className="h-96 w-full" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!site) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+        <Header />
+        <main className="flex-1 container mx-auto px-4 py-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Site bulunamadı</h1>
+          <Button onClick={() => navigate("/")}>Ana Sayfaya Dön</Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <Header />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <div className="text-sm text-muted-foreground mb-6">
+          <button onClick={() => navigate("/")} className="hover:text-foreground transition-colors">
+            Ana Sayfa
+          </button>
+          {" / "}
+          <span className="text-foreground">{site.name}</span>
+        </div>
+
+        {/* Site Header Card */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+              {site.logo_url && (
+                <img
+                  src={site.logo_url}
+                  alt={site.name}
+                  className="w-32 h-32 object-contain rounded-lg border"
+                />
+              )}
+              <div className="flex-1">
+                <CardTitle className="text-3xl mb-2">{site.name}</CardTitle>
+                <div className="flex items-center gap-2 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(site.rating || 0)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                  <span className="font-semibold ml-2">{site.rating}/5</span>
+                </div>
+                {site.bonus && (
+                  <div className="bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg p-4 mb-4">
+                    <p className="text-lg font-bold">{site.bonus}</p>
+                  </div>
+                )}
+                <Button
+                  size="lg"
+                  onClick={handleAffiliateClick}
+                  className="w-full md:w-auto"
+                >
+                  Siteye Git <ExternalLink className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Features */}
+            {site.features && site.features.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Özellikler</h3>
+                <div className="flex flex-wrap gap-2">
+                  {site.features.map((feature, index) => (
+                    <Badge key={index} variant="secondary">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Social Media Links */}
+            <div className="border-t pt-6">
+              <h3 className="font-semibold mb-3">İletişim</h3>
+              <div className="flex flex-wrap gap-3">
+                {site.email && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`mailto:${site.email}`} target="_blank" rel="noopener noreferrer">
+                      <Mail className="w-4 h-4 mr-2" />
+                      Email
+                    </a>
+                  </Button>
+                )}
+                {site.whatsapp && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.whatsapp} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp
+                    </a>
+                  </Button>
+                )}
+                {site.telegram && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.telegram} target="_blank" rel="noopener noreferrer">
+                      <Send className="w-4 h-4 mr-2" />
+                      Telegram
+                    </a>
+                  </Button>
+                )}
+                {site.twitter && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.twitter} target="_blank" rel="noopener noreferrer">
+                      <Twitter className="w-4 h-4 mr-2" />
+                      Twitter
+                    </a>
+                  </Button>
+                )}
+                {site.instagram && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.instagram} target="_blank" rel="noopener noreferrer">
+                      <Instagram className="w-4 h-4 mr-2" />
+                      Instagram
+                    </a>
+                  </Button>
+                )}
+                {site.facebook && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.facebook} target="_blank" rel="noopener noreferrer">
+                      <Facebook className="w-4 h-4 mr-2" />
+                      Facebook
+                    </a>
+                  </Button>
+                )}
+                {site.youtube && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={site.youtube} target="_blank" rel="noopener noreferrer">
+                      <Youtube className="w-4 h-4 mr-2" />
+                      YouTube
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Stats */}
+            {stats && (
+              <div className="border-t mt-6 pt-6">
+                <div className="flex gap-6 text-sm text-muted-foreground">
+                  <span>👁️ {stats.views} görüntülenme</span>
+                  <span>🖱️ {stats.clicks} tıklama</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Reviews Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Kullanıcı Yorumları</CardTitle>
+            <CardDescription>
+              Ortalama Puan: {averageRating} / 5.0 ({reviews?.length || 0} yorum)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {reviewsLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+              </div>
+            ) : reviews && reviews.length > 0 ? (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                Henüz yorum yapılmamış. İlk yorumu siz yapın!
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Review Form */}
+        {user ? (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Yorum Yap</CardTitle>
+              <CardDescription>Deneyimlerinizi diğer kullanıcılarla paylaşın</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReviewForm siteId={id!} />
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-8">
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground mb-4">Yorum yapmak için giriş yapmalısınız</p>
+              <Button onClick={() => navigate("/login")}>Giriş Yap</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recommended Sites */}
+        <RecommendedSites currentSiteId={id!} currentSiteFeatures={site.features || []} />
+      </main>
+      <Footer />
+    </div>
+  );
+}
