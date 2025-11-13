@@ -248,7 +248,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       // Generate blog content using AI
       const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
         body: {
-          type: 'blog',
+          type: 'generate-blog',
           data: {
             topic: topic.title,
             siteName: 'Bahis Siteleri',
@@ -318,7 +318,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
       // Generate blog content using AI
       const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
         body: {
-          type: 'blog',
+          type: 'generate-blog',
           data: {
             topic: item.title,
             siteName: 'Bahis Siteleri',
