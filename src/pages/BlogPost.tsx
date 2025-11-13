@@ -9,8 +9,8 @@ import { BlogCommentList } from '@/components/BlogCommentList';
 import { BlogRelatedSites } from '@/components/BlogRelatedSites';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { ArrowLeft, Calendar, Clock, Eye, Tag } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useEffect } from 'react';
@@ -19,7 +19,7 @@ export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-    const { data: post, isLoading } = useQuery({
+  const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', slug],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -33,6 +33,36 @@ export default function BlogPost() {
       return data as any;
     },
     enabled: !!slug,
+  });
+
+  // Fetch related posts based on tags
+  const { data: relatedPosts } = useQuery({
+    queryKey: ['related-posts', post?.id, post?.tags],
+    queryFn: async () => {
+      if (!post?.tags || post.tags.length === 0) return [];
+      
+      const { data, error } = await supabase
+        .from('blog_posts' as any)
+        .select('id, title, slug, excerpt, featured_image, tags, read_time, view_count, published_at')
+        .eq('is_published', true)
+        .neq('id', post.id)
+        .limit(20);
+      
+      if (error) throw error;
+      
+      // Score posts by matching tags
+      const scored = data.map((p: any) => {
+        const matchingTags = p.tags?.filter((tag: string) => post.tags.includes(tag)).length || 0;
+        return { ...p, score: matchingTags };
+      });
+      
+      // Sort by score and take top 4
+      return scored
+        .sort((a, b) => b.score - a.score)
+        .filter(p => p.score > 0)
+        .slice(0, 4);
+    },
+    enabled: !!post?.id && !!post?.tags,
   });
 
   const incrementViewMutation = useMutation({
@@ -205,6 +235,69 @@ export default function BlogPost() {
               dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
             />
           </Card>
+
+          {/* Related Posts Section */}
+          {relatedPosts && relatedPosts.length > 0 && (
+            <Card className="p-6 mb-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-primary" />
+                İlgili Yazılar
+              </h2>
+              <div className="grid md:grid-cols-2 gap-4">
+                {relatedPosts.map((relatedPost: any) => (
+                  <Card 
+                    key={relatedPost.id}
+                    className="group cursor-pointer hover:border-primary transition-all overflow-hidden"
+                    onClick={() => {
+                      navigate(`/blog/${relatedPost.slug}`);
+                      window.scrollTo(0, 0);
+                    }}
+                  >
+                    {relatedPost.featured_image && (
+                      <div className="relative h-32 overflow-hidden">
+                        <img 
+                          src={relatedPost.featured_image} 
+                          alt={relatedPost.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                        {relatedPost.title}
+                      </h3>
+                      {relatedPost.excerpt && (
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {relatedPost.excerpt}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        {relatedPost.read_time && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {relatedPost.read_time} dk
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {relatedPost.view_count || 0}
+                        </span>
+                        {relatedPost.tags && relatedPost.tags.length > 0 && (
+                          <div className="flex gap-1 flex-wrap">
+                            {relatedPost.tags.slice(0, 2).map((tag: string) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Related Betting Sites */}
           <div className="my-8">
