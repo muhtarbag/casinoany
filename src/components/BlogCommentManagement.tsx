@@ -32,7 +32,7 @@ export const BlogCommentManagement = () => {
 
       let profilesData = [];
       if (userIds.length > 0) {
-        const { data, error: profilesError } = await supabase
+        const { data, error: profilesError } = await (supabase as any)
           .from('profiles')
           .select('id, username')
           .in('id', userIds);
