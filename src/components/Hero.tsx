@@ -115,7 +115,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
       if (error) throw error;
       return data;
     },
-    staleTime: 0,
   });
 
   const { data: siteStats } = useQuery({
