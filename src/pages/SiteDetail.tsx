@@ -59,11 +59,17 @@ export default function SiteDetail() {
     },
   });
 
-  // Load logo from storage
+  // Load logo from storage or use direct URL
   useEffect(() => {
     if (site?.logo_url) {
-      const { data } = supabase.storage.from('site-logos').getPublicUrl(site.logo_url);
-      setLogoUrl(data.publicUrl);
+      // If logo_url is already a full URL, use it directly
+      if (site.logo_url.startsWith('http')) {
+        setLogoUrl(site.logo_url);
+      } else {
+        // Otherwise, get the public URL from storage
+        const { data } = supabase.storage.from('site-logos').getPublicUrl(site.logo_url);
+        setLogoUrl(data.publicUrl);
+      }
     }
   }, [site?.logo_url]);
 
