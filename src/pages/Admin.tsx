@@ -752,20 +752,23 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-12">
-            <TabsTrigger value="manage">Site Yönetimi</TabsTrigger>
-            <TabsTrigger value="featured">Öne Çıkanlar</TabsTrigger>
-            <TabsTrigger value="settings">Ayarlar</TabsTrigger>
-            <TabsTrigger value="casino">Casino İçerik</TabsTrigger>
-            <TabsTrigger value="analytics">İçerik Analitiği</TabsTrigger>
-            <TabsTrigger value="blog">Blog</TabsTrigger>
-            <TabsTrigger value="planner">İçerik Planlama</TabsTrigger>
-            <TabsTrigger value="keywords">Keyword Performans</TabsTrigger>
-            <TabsTrigger value="reviews">Yorumlar</TabsTrigger>
-            <TabsTrigger value="ai">AI Asistan</TabsTrigger>
-            <TabsTrigger value="history">Analiz Geçmişi</TabsTrigger>
-            <TabsTrigger value="stats">İstatistikler</TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin">
+            <TabsList className="inline-flex h-auto flex-nowrap w-auto min-w-full justify-start gap-1">
+              <TabsTrigger value="manage" className="whitespace-nowrap">Site Yönetimi</TabsTrigger>
+              <TabsTrigger value="featured" className="whitespace-nowrap">Öne Çıkanlar</TabsTrigger>
+              <TabsTrigger value="settings" className="whitespace-nowrap">Ayarlar</TabsTrigger>
+              <TabsTrigger value="casino" className="whitespace-nowrap">Casino İçerik</TabsTrigger>
+              <TabsTrigger value="analytics" className="whitespace-nowrap">İçerik Analitiği</TabsTrigger>
+              <TabsTrigger value="traffic" className="whitespace-nowrap">Analytics</TabsTrigger>
+              <TabsTrigger value="blog" className="whitespace-nowrap">Blog</TabsTrigger>
+              <TabsTrigger value="planner" className="whitespace-nowrap">İçerik Planlama</TabsTrigger>
+              <TabsTrigger value="keywords" className="whitespace-nowrap">Keyword Performans</TabsTrigger>
+              <TabsTrigger value="reviews" className="whitespace-nowrap">Yorumlar</TabsTrigger>
+              <TabsTrigger value="ai" className="whitespace-nowrap">AI Asistan</TabsTrigger>
+              <TabsTrigger value="history" className="whitespace-nowrap">Analiz Geçmişi</TabsTrigger>
+              <TabsTrigger value="stats" className="whitespace-nowrap">İstatistikler</TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="manage" className="space-y-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
