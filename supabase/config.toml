@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ai-site-monitor]
 verify_jwt = false
+
+[functions.content-planner]
+verify_jwt = false
