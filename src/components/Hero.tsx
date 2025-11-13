@@ -14,7 +14,8 @@ interface HeroProps {
 
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const [animationType, setAnimationType] = useState<string>('slide');
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true, 
     align: 'start',
     skipSnaps: false,
@@ -62,6 +63,29 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
     return () => clearInterval(autoScrollInterval);
   }, [emblaApi]);
+
+  // Fetch carousel animation setting
+  const { data: carouselSettings } = useQuery({
+    queryKey: ['carousel-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('setting_key', 'carousel_animation_type')
+        .single();
+      if (error) {
+        console.error('Error fetching carousel settings:', error);
+        return { setting_value: 'slide' };
+      }
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (carouselSettings?.setting_value) {
+      setAnimationType(carouselSettings.setting_value);
+    }
+  }, [carouselSettings]);
 
   const { data: featuredSites } = useQuery({
     queryKey: ['featured-sites'],
@@ -142,9 +166,9 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                 <button onClick={scrollPrev} disabled={!canScrollPrev} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Previous"><ChevronLeft className="w-6 h-6" /></button>
                 <button onClick={scrollNext} disabled={!canScrollNext} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary disabled:opacity-30 transition-all" aria-label="Next"><ChevronRight className="w-6 h-6" /></button>
                 <div className="overflow-hidden" ref={emblaRef}>
-                  <div className="flex gap-6 transition-opacity duration-500">
-                    {featuredSites.map((site) => (
-                      <div key={site.id} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)]">
+                  <div className={`flex gap-6 carousel-${animationType}`}>
+                    {featuredSites.map((site, index) => (
+                      <div key={site.id} className={`flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-1rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] embla__slide ${selectedIndex === index ? 'is-snapped' : ''}`}>
                         <BettingSiteCard id={site.id} name={site.name} logo={site.logo_url || undefined} rating={Number(site.rating) || 0} bonus={site.bonus || undefined} features={site.features || undefined} affiliateUrl={site.affiliate_link} email={site.email || undefined} whatsapp={site.whatsapp || undefined} telegram={site.telegram || undefined} twitter={site.twitter || undefined} instagram={site.instagram || undefined} facebook={site.facebook || undefined} youtube={site.youtube || undefined} />
                       </div>
                     ))}
