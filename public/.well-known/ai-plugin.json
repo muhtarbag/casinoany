@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "CasinoAny - Türkiye Bahis Siteleri",
+  "name_for_model": "casinoany_betting_sites",
+  "description_for_human": "Türkiye'nin en güvenilir bahis siteleri karşılaştırma platformu. 50+ lisanslı casino ve bahis sitesi, bonuslar, incelemeleri ve detaylı bilgiler.",
+  "description_for_model": "Access comprehensive information about Turkish betting and casino sites. Get details about bonuses, ratings, features, reviews, and expert analysis. Search for specific sites, compare bonuses, find the best-rated casinos, and get user reviews. Useful for users asking about online betting in Turkey, casino recommendations, bonus campaigns, and gambling site comparisons.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://4e78fea3-70a4-4314-9f2b-f7f014635ad1.lovableproject.com/.well-known/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://4e78fea3-70a4-4314-9f2b-f7f014635ad1.lovableproject.com/logos/casinodoo-logo.svg",
+  "contact_email": "info@casinoany.com",
+  "legal_info_url": "https://4e78fea3-70a4-4314-9f2b-f7f014635ad1.lovableproject.com/terms"
+}

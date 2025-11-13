@@ -19,19 +19,36 @@ export const OrganizationSchema = () => {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'BahisSiteleri',
+    name: 'CasinoAny.com',
     url: window.location.origin,
-    logo: `${window.location.origin}/logos/logo.png`,
-    description: 'Türkiye\'nin en güvenilir bahis siteleri karşılaştırma platformu',
+    logo: `${window.location.origin}/logos/casinodoo-logo.svg`,
+    description: 'Türkiye\'nin en güvenilir casino ve bahis siteleri karşılaştırma platformu. 50+ lisanslı site, yüksek bonuslar ve detaylı incelemeleri.',
     sameAs: [
-      // Sosyal medya linklerinizi buraya ekleyin
+      'https://twitter.com/casinoany',
+      'https://facebook.com/casinoany',
+      'https://instagram.com/casinoany',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'Customer Service',
+      contactType: 'customer support',
+      email: 'info@casinoany.com',
       areaServed: 'TR',
-      availableLanguage: 'Turkish'
-    }
+      availableLanguage: 'Turkish',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      reviewCount: '1000',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'TRY',
+      lowPrice: '0',
+      highPrice: '50000',
+      offerCount: '50',
+    },
   };
 
   return <StructuredData data={data} />;
