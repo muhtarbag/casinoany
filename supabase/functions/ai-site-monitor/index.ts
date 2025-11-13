@@ -13,19 +13,16 @@ serve(async (req) => {
 
   try {
     const { action, data } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI');
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI API key is not configured');
     }
 
     let systemPrompt = '';
     let userPrompt = '';
-    let useOpenAI = false;
 
     if (action === 'analyze-seo') {
-      useOpenAI = !!OPENAI_API_KEY;
       systemPrompt = `Sen bir SEO ve web analiz uzmanısın. Verilen site bilgilerini analiz edip detaylı öneriler sunuyorsun. Google arama sonuçları, SERP pozisyonları, teknik SEO, içerik kalitesi ve kullanıcı deneyimi açısından değerlendirme yapıyorsun. Türkçe yanıt ver.`;
       userPrompt = `Site Analizi:
 Site URL: ${data.siteUrl || 'Belirtilmemiş'}
@@ -112,7 +109,6 @@ JSON formatında yanıt ver:
   ]
 }`;
     } else if (action === 'suggest-improvements') {
-      useOpenAI = !!OPENAI_API_KEY;
       systemPrompt = `Sen bir web geliştirme ve optimizasyon uzmanısın. Verilen site için iyileştirme önerileri sunuyorsun. Türkçe yanıt ver.`;
       userPrompt = `Kategori: ${data.category}
 Mevcut Durum: ${JSON.stringify(data.currentState)}
@@ -163,29 +159,21 @@ JSON formatında yanıt ver:
       throw new Error('Invalid action type');
     }
 
-    // Determine which API to use
-    const apiUrl = useOpenAI && OPENAI_API_KEY
-      ? 'https://api.openai.com/v1/chat/completions'
-      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
-    
-    const apiKey = useOpenAI && OPENAI_API_KEY ? OPENAI_API_KEY : LOVABLE_API_KEY;
-    const model = useOpenAI && OPENAI_API_KEY ? 'gpt-5-mini-2025-08-07' : 'google/gemini-2.5-flash';
+    console.log(`Using OpenAI for action: ${action}`);
 
-    console.log(`Using ${useOpenAI ? 'OpenAI' : 'Lovable AI'} for action: ${action}`);
-
-    const response = await fetch(apiUrl, {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model,
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: useOpenAI ? undefined : 0.7,
+        temperature: 0.7,
       }),
     });
 
