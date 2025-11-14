@@ -42,6 +42,21 @@ All colors MUST be HSL.
     /* Gold for rating stars */
     --gold: 43 96% 56%;
     --gold-foreground: 0 0% 0%;
+    
+    /* Warning for alerts */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    /* Info for notifications */
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    
+    /* Chart colors for analytics */
+    --chart-1: 280 98% 69%;
+    --chart-2: 195 85% 55%;
+    --chart-3: 142 70% 45%;
+    --chart-4: 35 95% 55%;
+    --chart-5: 0 84% 60%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;

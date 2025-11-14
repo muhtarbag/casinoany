@@ -45,58 +45,48 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
 
   const navigationGroups = [
     {
-      label: 'Genel Bakış',
+      label: 'Gösterge Paneli',
       items: [
-        { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { id: 'analytics', icon: BarChart3, label: 'Analytics' },
-        { id: 'realtime', icon: Activity, label: 'Canlı İstatistikler' },
+        { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', badge: null },
+        { id: 'realtime', icon: Activity, label: 'Canlı Takip', badge: null },
       ],
     },
     {
-      label: 'İçerik Yönetimi',
+      label: 'İçerik',
       items: [
-        { id: 'manage', icon: Globe, label: 'Siteler' },
-        { id: 'featured', icon: Star, label: 'Öne Çıkan Siteler' },
-        { id: 'bonus', icon: Gift, label: 'Bonus Yönetimi' },
-        { id: 'cms', icon: FileEdit, label: 'İçerik Yönetimi (CMS)' },
-        { id: 'affiliate', icon: DollarSign, label: 'Affiliate Yönetimi' },
-        { id: 'blog', icon: FileText, label: 'Blog Yönetimi' },
-        { id: 'news', icon: Newspaper, label: 'Haber Yönetimi' },
-        { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik' },
+        { id: 'manage', icon: Globe, label: 'Site Yönetimi', badge: null },
+        { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null },
+        { id: 'blog', icon: FileText, label: 'Blog', badge: null },
+        { id: 'news', icon: Newspaper, label: 'Haberler', badge: null },
       ],
     },
     {
-      label: 'Kullanıcı İşlemleri',
+      label: 'Finans',
       items: [
-        { id: 'reviews', icon: MessageSquare, label: 'Site Yorumları' },
-        { id: 'comments', icon: MessageSquare, label: 'Blog Yorumları' },
-        { id: 'notifications', icon: Bell, label: 'Bildirimler' },
+        { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null },
+        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null },
       ],
     },
     {
-      label: 'SEO & Analytics',
+      label: 'Etkileşim',
       items: [
-        { id: 'site-stats', icon: PieChart, label: 'Site İstatistikleri' },
-        { id: 'blog-stats', icon: TrendingUp, label: 'Blog İstatistikleri' },
-        { id: 'casino-analytics', icon: BarChart3, label: 'Casino Analytics' },
-        { id: 'keywords', icon: Search, label: 'Anahtar Kelimeler' },
-        { id: 'content-planner', icon: Calendar, label: 'İçerik Planlayıcı' },
-        { id: 'gsc', icon: TrendingUp, label: 'Google Search Console' },
+        { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', badge: null },
+        { id: 'notifications', icon: Bell, label: 'Bildirimler', badge: null },
       ],
     },
     {
-      label: 'AI & Otomasyon',
+      label: 'Analiz & SEO',
       items: [
-        { id: 'ai', icon: Gamepad2, label: 'AI Asistan' },
-        { id: 'ai-history', icon: FileCode, label: 'AI Analiz Geçmişi' },
+        { id: 'analytics', icon: BarChart3, label: 'Analytics', badge: null },
+        { id: 'keywords', icon: Search, label: 'SEO Takip', badge: null },
+        { id: 'content-planner', icon: Calendar, label: 'İçerik Planlama', badge: null },
       ],
     },
     {
       label: 'Sistem',
       items: [
-        { id: 'health', icon: Activity, label: 'Sistem Sağlığı' },
-        { id: 'logs', icon: FileCode, label: 'Sistem Logları' },
-        { id: 'carousel', icon: Settings, label: 'Carousel Ayarları' },
+        { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null },
+        { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA' },
       ],
     },
   ];
@@ -118,11 +108,18 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
                     <SidebarMenuButton
                       onClick={() => onTabChange(item.id)}
                       isActive={activeTab === item.id}
-                      className="w-full"
+                      className="w-full justify-between"
                       tooltip={collapsed ? item.label : undefined}
                     >
-                      <item.icon className="w-4 h-4" />
-                      {!collapsed && <span>{item.label}</span>}
+                      <div className="flex items-center gap-2">
+                        <item.icon className="w-4 h-4" />
+                        {!collapsed && <span>{item.label}</span>}
+                      </div>
+                      {!collapsed && item.badge && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning/20 text-warning font-semibold">
+                          {item.badge}
+                        </span>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
