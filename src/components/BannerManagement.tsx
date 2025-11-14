@@ -160,10 +160,7 @@ export const BannerManagement = () => {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadImage = async (file: File) => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -184,6 +181,46 @@ export const BannerManagement = () => {
     } catch (error: any) {
       toast.error('Görsel yüklenirken hata: ' + error.message);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadImage(file);
+  };
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen bir görsel dosyası yükleyin');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Görsel boyutu 5MB\'dan küçük olmalıdır');
+      return;
+    }
+
+    await uploadImage(file);
   };
 
   if (isLoading) {
@@ -220,21 +257,51 @@ export const BannerManagement = () => {
 
               <div>
                 <Label htmlFor="image">Banner Görseli</Label>
-                <div className="space-y-2">
-                  <Input
+                <div
+                  className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                    isDragging
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {isDragging
+                      ? 'Görseli buraya bırakın'
+                      : 'Görseli sürükleyin veya tıklayın'}
+                  </p>
+                  <input
                     id="image"
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  {formData.image_url && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    PNG, JPG, WEBP (Maks. 5MB)
+                  </p>
+                </div>
+                {formData.image_url && (
+                  <div className="mt-4 relative">
                     <img
                       src={formData.image_url}
                       alt="Preview"
-                      className="w-full h-32 object-cover rounded"
+                      className="w-full h-48 object-cover rounded-lg"
                     />
-                  )}
-                </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => setFormData({ ...formData, image_url: '' })}
+                    >
+                      Kaldır
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div>
