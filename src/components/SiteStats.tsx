@@ -36,32 +36,51 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
+      console.log("🔍 Fetching stats from view...");
+      
       // Use the optimized database view
       const { data, error } = await (supabase as any)
         .from("site_stats_with_details")
         .select("*")
         .order("clicks", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ View error:", error);
+        throw error;
+      }
+
+      console.log("✅ Raw data from view:", data);
+      console.log("📊 First row sample:", data?.[0]);
 
       // Map view data to match expected format
-      const formattedData = (data || []).map((row: any) => ({
-        id: row.id,
-        site_id: row.site_id,
-        views: row.views,
-        clicks: row.clicks,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        betting_sites: {
-          id: row.site_id,
-          name: row.site_name,
-          slug: row.site_slug,
-        },
-      }));
+      const formattedData = (data || []).map((row: any) => {
+        console.log("🔄 Processing row:", {
+          id: row.id,
+          site_name: row.site_name,
+          site_slug: row.site_slug,
+          clicks: row.clicks,
+          views: row.views
+        });
+        
+        return {
+          id: row.id,
+          site_id: row.site_id,
+          views: row.views,
+          clicks: row.clicks,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          betting_sites: {
+            id: row.site_id,
+            name: row.site_name,
+            slug: row.site_slug,
+          },
+        };
+      });
 
+      console.log("✨ Final formatted data:", formattedData);
       return formattedData;
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes cache
+    staleTime: 0, // No cache for debugging
     refetchOnWindowFocus: false,
   });
 
