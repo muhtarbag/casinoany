@@ -7,16 +7,16 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.ai-blog-info]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-reviews-info]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-site-info]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-site-monitor]
-verify_jwt = false
+verify_jwt = true
 
 [functions.content-planner]
 verify_jwt = true
