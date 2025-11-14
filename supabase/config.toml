@@ -1,7 +1,7 @@
 project_id = "cpaukwimbfoembwwtqhj"
 
 [functions.admin-ai-assistant]
-verify_jwt = false
+verify_jwt = true
 
 [functions.rss-news-processor]
 verify_jwt = false
