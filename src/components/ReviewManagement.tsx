@@ -13,6 +13,7 @@ import { Star, User, Check, X, Trash2, Clock, CheckCircle2, Sparkles, Loader2 } 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { VirtualList } from "@/components/VirtualList";
 
 interface Review {
   id: string;
@@ -568,11 +569,13 @@ export default function ReviewManagement() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {pendingReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} />
-              ))}
-            </div>
+            <VirtualList
+              items={pendingReviews}
+              height={600}
+              estimateSize={200}
+              renderItem={(review: any) => <ReviewCard key={review.id} review={review} />}
+              className="rounded-lg space-y-4"
+            />
           )}
         </TabsContent>
 
@@ -598,11 +601,13 @@ export default function ReviewManagement() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {approvedReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} showActions={false} />
-              ))}
-            </div>
+            <VirtualList
+              items={approvedReviews}
+              height={600}
+              estimateSize={200}
+              renderItem={(review: any) => <ReviewCard key={review.id} review={review} showActions={false} />}
+              className="rounded-lg space-y-4"
+            />
           )}
         </TabsContent>
       </Tabs>
