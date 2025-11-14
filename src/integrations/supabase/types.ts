@@ -1664,6 +1664,7 @@ export type Database = {
         }
         Returns: string
       }
+      trigger_affiliate_metrics_sync: { Args: never; Returns: undefined }
       undo_change: { Args: { p_change_id: string }; Returns: boolean }
     }
     Enums: {
