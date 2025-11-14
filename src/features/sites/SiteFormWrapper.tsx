@@ -210,11 +210,11 @@ export function SiteFormWrapper({
           )} />
 
           {/* ============ AFFILIATE ANLAŞMA BİLGİLERİ ============ */}
-          <div className="md:col-span-2 mt-6 p-6 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-lg border-2 border-orange-500/50">
-            <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <div className="md:col-span-2 mt-6 p-6 bg-secondary/50 rounded-lg border border-border">
+            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
               🤝 Affiliate Anlaşma Bilgileri
             </h3>
-            <p className="text-sm text-muted-foreground mb-4 bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded border border-yellow-300 dark:border-yellow-700">
+            <p className="text-sm text-muted-foreground mb-4 bg-muted p-3 rounded border border-border">
               💡 <strong>ÖNEMLİ:</strong> Anlaşma tarihi doldurduğunuz siteler <strong>"Affiliate Yönetimi"</strong> sekmesinde otomatik görünür.
             </p>
 
@@ -292,7 +292,7 @@ export function SiteFormWrapper({
               <FormField control={form.control} name="affiliate_panel_password" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Panel Şifresi</FormLabel>
-                  <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                  <FormControl><Input type="text" placeholder="Şifre" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
