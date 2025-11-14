@@ -26,11 +26,11 @@ export const Header = () => {
               Ana Sayfa
             </NavLink>
             <NavLink 
-              to="/about" 
-              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
+              to="/deneme-bonusu" 
+              className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
               activeClassName="text-primary font-semibold"
             >
-              Hakkımızda
+              Deneme Bonusu
             </NavLink>
             <NavLink 
               to="/blog" 
@@ -38,6 +38,13 @@ export const Header = () => {
               activeClassName="text-primary font-semibold"
             >
               Blog
+            </NavLink>
+            <NavLink 
+              to="/about" 
+              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
+              activeClassName="text-primary font-semibold"
+            >
+              Hakkımızda
             </NavLink>
 
             {user && isAdmin && (
