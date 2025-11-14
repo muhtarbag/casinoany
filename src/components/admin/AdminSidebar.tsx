@@ -22,7 +22,8 @@ import {
   History,
   Gauge,
   Mail,
-  Shield
+  Shield,
+  Image
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -70,6 +71,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
         { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino', roles: ['content_editor'] },
         { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
         { id: 'news', icon: Newspaper, label: 'Haberler', badge: null, route: '/admin/news', roles: ['content_editor'] },
+        { id: 'banners', icon: Image, label: 'Banner Yönetimi', badge: null, route: '/admin/sites/banners', roles: ['content_editor'] },
       ],
     },
     {

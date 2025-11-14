@@ -1258,6 +1258,48 @@ export type Database = {
           },
         ]
       }
+      site_banners: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          display_order: number | null
+          display_pages: string[] | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          position: number
+          target_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          display_order?: number | null
+          display_pages?: string[] | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          position?: number
+          target_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          display_order?: number | null
+          display_pages?: string[] | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          position?: number
+          target_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_notifications: {
         Row: {
           background_color: string | null
