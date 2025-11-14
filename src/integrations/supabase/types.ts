@@ -1675,6 +1675,21 @@ export type Database = {
           unique_sessions: number
         }[]
       }
+      get_daily_site_metrics_advanced: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: {
+          affiliate_clicks: number
+          avg_duration_seconds: number
+          logged_in_users: number
+          metric_date: string
+          site_id: string
+          site_name: string
+          site_slug: string
+          total_conversions: number
+          total_views: number
+          unique_sessions: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
