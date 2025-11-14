@@ -235,29 +235,22 @@ const BettingSiteCardComponent = ({
         </Button>
         <Button 
           size="sm" 
-          className="flex-1 relative font-bold overflow-hidden group/cta transition-all duration-300 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.03] text-white border-0"
+          className="flex-1 relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0"
           onClick={handleAffiliateClick}
         >
-          {/* Animated shimmer overlay */}
+          {/* Animated shimmer overlay - more visible and slower */}
           <div className="absolute inset-0 w-full h-full">
-            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
+            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
           </div>
           
-          {/* Pulse glow background */}
-          <div className="absolute inset-0 animate-glow opacity-50" />
+          {/* Subtle pulse glow background */}
+          <div className="absolute inset-0 bg-white/5 animate-glow" />
           
           {/* Button content */}
           <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
             Siteye Git
-            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 group-hover/cta:scale-110 transition-all duration-300 drop-shadow-md" />
+            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
           </span>
-          
-          {/* Hover sparkle effect */}
-          <div className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300">
-            <div className="absolute top-1/2 left-1/4 w-2 h-2 bg-white rounded-full blur-sm animate-ping" />
-            <div className="absolute top-1/4 right-1/3 w-1.5 h-1.5 bg-white rounded-full blur-sm animate-ping delay-75" />
-            <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-white rounded-full blur-sm animate-ping delay-150" />
-          </div>
         </Button>
       </CardFooter>
     </Card>
