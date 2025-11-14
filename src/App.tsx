@@ -42,6 +42,7 @@ const AdminBlogComments = lazy(() => import("./pages/admin/blog/BlogComments"));
 const AdminCasinoAnalytics = lazy(() => import("./pages/admin/content/CasinoAnalytics"));
 const AdminAIHistory = lazy(() => import("./pages/admin/ai/AIHistory"));
 const AdminSystemLogs = lazy(() => import("./pages/admin/system/SystemLogs"));
+const AdminRoleManagement = lazy(() => import("./pages/admin/system/RoleManagement"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const News = lazy(() => import("./pages/News"));
@@ -118,6 +119,7 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/performance" element={<AdminPerformance />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
+            <Route path="system/roles" element={<AdminRoleManagement />} />
             <Route path="ai" element={<AdminAI />} />
             <Route path="ai/history" element={<AdminAIHistory />} />
           </Route>

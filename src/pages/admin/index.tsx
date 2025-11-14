@@ -108,6 +108,7 @@ export default function AdminRoot() {
       'logs': '/admin/system/logs',
       'history': '/admin/system/history',
       'performance': '/admin/system/performance',
+      'roles': '/admin/system/roles',
     };
     
     const route = tabToRouteMap[tabId] || `/admin/${tabId}`;
@@ -148,6 +149,7 @@ export default function AdminRoot() {
       'health': 'Sağlık Durumu',
       'logs': 'Loglar',
       'performance': 'Performans',
+      'roles': 'Rol Yönetimi',
     };
     
     const items = [];
