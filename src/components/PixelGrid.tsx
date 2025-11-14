@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
-import { SlotBanner } from './SlotBanner';
-import { CardsBanner } from './CardsBanner';
+import { DynamicBanner } from './DynamicBanner';
 
 export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
@@ -16,6 +15,22 @@ export const PixelGrid = () => {
         .from('betting_sites')
         .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order')
         .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: banners } = useQuery({
+    queryKey: ['site-banners-home'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_banners')
+        .select('*')
+        .eq('is_active', true)
+        .contains('display_pages', ['home'])
+        .order('position', { ascending: true })
         .order('display_order', { ascending: true });
 
       if (error) throw error;
@@ -95,38 +110,46 @@ export const PixelGrid = () => {
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site: any, index: number) => (
-          <>
-            <BettingSiteCard
-              key={site.id}
-              id={site.id}
-              slug={site.slug}
-              name={site.name}
-              logo={site.logo_url || ''}
-              rating={site.rating || 0}
-              bonus={site.bonus || ''}
-              features={site.features || []}
-              affiliateUrl={site.affiliate_link || ''}
-              email={site.email || ''}
-              whatsapp={site.whatsapp || ''}
-              telegram={site.telegram || ''}
-              twitter={site.twitter || ''}
-              instagram={site.instagram || ''}
-              facebook={site.facebook || ''}
-              youtube={site.youtube || ''}
-            />
-            {index === 8 && (
-              <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                <SlotBanner />
-              </div>
-            )}
-            {index === 32 && (
-              <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                <CardsBanner />
-              </div>
-            )}
-          </>
-        ))}
+        {sites.map((site: any, index: number) => {
+          // Find banners for this position
+          const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
+          
+          return (
+            <>
+              <BettingSiteCard
+                key={site.id}
+                id={site.id}
+                slug={site.slug}
+                name={site.name}
+                logo={site.logo_url || ''}
+                rating={site.rating || 0}
+                bonus={site.bonus || ''}
+                features={site.features || []}
+                affiliateUrl={site.affiliate_link || ''}
+                email={site.email || ''}
+                whatsapp={site.whatsapp || ''}
+                telegram={site.telegram || ''}
+                twitter={site.twitter || ''}
+                instagram={site.instagram || ''}
+                facebook={site.facebook || ''}
+                youtube={site.youtube || ''}
+              />
+              {bannersAtPosition.length > 0 && (
+                <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                  {bannersAtPosition.map(banner => (
+                    <DynamicBanner
+                      key={banner.id}
+                      imageUrl={banner.image_url}
+                      altText={banner.alt_text}
+                      targetUrl={banner.target_url}
+                      title={banner.title}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })}
       </div>
     </div>
   );
