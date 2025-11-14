@@ -175,33 +175,9 @@ export const trackWebVitals = (onMetric: VitalHandler) => {
 };
 
 /**
- * Send vitals to analytics endpoint - Optimized with batching
+ * Send vitals to database - Integrated with performance monitor
  */
-const vitalsBatch: WebVitalMetric[] = [];
-let batchTimeout: number | null = null;
-
-const flushVitalsBatch = async () => {
-  if (vitalsBatch.length === 0) return;
-  
-  const batch = [...vitalsBatch];
-  vitalsBatch.length = 0;
-  
-  try {
-    // Send batch to custom endpoint (non-blocking)
-    if ('sendBeacon' in navigator) {
-      const blob = new Blob([JSON.stringify({
-        metrics: batch,
-        url: window.location.href,
-        timestamp: Date.now()
-      })], { type: 'application/json' });
-      navigator.sendBeacon('/api/web-vitals', blob);
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Failed to send vitals batch:', error);
-    }
-  }
-};
+import { trackWebVitals as recordWebVital } from '@/lib/performanceMonitor';
 
 export const sendVitalsToAnalytics = (metric: WebVitalMetric) => {
   // Log for development only
@@ -212,21 +188,13 @@ export const sendVitalsToAnalytics = (metric: WebVitalMetric) => {
     });
   }
 
-  // Add to batch
-  vitalsBatch.push(metric);
-  
-  // Schedule batch send (debounced)
-  if (batchTimeout) clearTimeout(batchTimeout);
-  batchTimeout = window.setTimeout(flushVitalsBatch, 1000);
-  
-  // Also flush on page unload
-  if (typeof window !== 'undefined' && vitalsBatch.length === 1) {
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        flushVitalsBatch();
-      }
-    }, { once: true });
-  }
+  // Send to performance monitor for database recording
+  recordWebVital({
+    name: metric.name,
+    value: metric.value,
+    rating: metric.rating,
+    id: metric.id
+  });
 };
 
 /**

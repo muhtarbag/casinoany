@@ -238,6 +238,36 @@ const recordMetric = async (metric: PerformanceMetric) => {
  * Create performance observer for automatic tracking
  */
 export const initPerformanceObserver = () => {
+  // Track initial page load metrics
+  if (window.performance && window.performance.timing) {
+    // Wait for page load to complete
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const perfData = window.performance.timing;
+        const navigationStart = perfData.navigationStart;
+        
+        // Track TTFB
+        const ttfb = perfData.responseStart - perfData.requestStart;
+        if (ttfb > 0) {
+          trackTTFB(ttfb);
+        }
+        
+        // Track FCP if available
+        const paintEntries = performance.getEntriesByType('paint');
+        const fcpEntry = paintEntries.find((entry: any) => entry.name === 'first-contentful-paint');
+        if (fcpEntry) {
+          recordMetric({
+            metric_name: 'FCP',
+            metric_value: fcpEntry.startTime,
+            metric_type: 'timing',
+            status: getMetricStatus(fcpEntry.startTime, 'FCP'),
+            metadata: { page: window.location.pathname },
+          });
+        }
+      }, 0);
+    });
+  }
+
   // Track Navigation Timing
   if ('PerformanceObserver' in window) {
     try {
