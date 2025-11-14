@@ -19,7 +19,8 @@ import {
   Gift,
   FileEdit,
   DollarSign,
-  History
+  History,
+  Gauge
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
@@ -88,6 +89,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       items: [
         { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null },
         { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null },
+        { id: 'performance', icon: Gauge, label: 'Performance İzleme', badge: null },
         { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA' },
       ],
     },

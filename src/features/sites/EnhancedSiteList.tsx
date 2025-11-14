@@ -11,6 +11,8 @@ import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
 import { EnhancedTablePagination } from '@/components/table/EnhancedTablePagination';
 import { EnhancedEmptyState } from '@/components/table/EnhancedEmptyState';
 import { SiteListSkeleton } from './SiteListSkeleton';
+import { DataExportDialog } from '@/components/export/DataExportDialog';
+import { SavedFiltersDialog } from '@/components/search/SavedFiltersDialog';
 import { GripVertical, Edit, Trash2, Eye, MousePointer, Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -277,6 +279,16 @@ export function EnhancedSiteList({
     setCurrentPage(1);
   };
 
+  const handleApplySavedFilter = (filters: Record<string, any>) => {
+    if (filters.searchQuery) setSearchQuery(filters.searchQuery);
+    if (filters.statusFilter) setStatusFilter(filters.statusFilter);
+  };
+
+  const currentFilters = {
+    searchQuery,
+    statusFilter: statusFilter !== 'all' ? statusFilter : undefined,
+  };
+
   if (isLoading) {
     return <SiteListSkeleton />;
   }
@@ -298,6 +310,8 @@ export function EnhancedSiteList({
         totalItems={sites.length}
         filteredItems={filteredAndSortedSites.length}
         onClearFilters={handleClearFilters}
+        onExport={() => setShowExportDialog(true)}
+        onSavedFilters={() => setShowFiltersDialog(true)}
       />
 
       {/* List */}

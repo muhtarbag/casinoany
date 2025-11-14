@@ -36,6 +36,7 @@ const BonusManagement = lazy(() => import('@/components/BonusManagement').then(m
 const CMSContentManagement = lazy(() => import('@/components/CMSContentManagement').then(m => ({ default: m.CMSContentManagement })));
 const AffiliateManagement = lazy(() => import('@/components/AffiliateManagement').then(m => ({ default: m.AffiliateManagement })));
 const ChangeHistoryViewer = lazy(() => import('@/components/history/ChangeHistoryViewer').then(m => ({ default: m.ChangeHistoryViewer })));
+const PerformanceMonitor = lazy(() => import('@/components/performance/PerformanceMonitor').then(m => ({ default: m.PerformanceMonitor })));
 
 export default function Admin() {
   const { user, isAdmin, loading: authLoading } = useAuth();
@@ -125,7 +126,8 @@ export default function Admin() {
         {activeTab === 'bonus' && <BonusManagement />}
         {activeTab === 'cms' && <CMSContentManagement />}
         {activeTab === 'affiliate' && <AffiliateManagement />}
-        {activeTab === 'history' && <ChangeHistoryViewer />}
+        {activeTab === 'history' && <ChangeHistoryViewer tableFilter="betting_sites" limit={50} />}
+        {activeTab === 'performance' && <PerformanceMonitor />}
       </Suspense>
     </AdminLayout>
   );
