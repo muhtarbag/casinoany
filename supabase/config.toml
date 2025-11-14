@@ -30,6 +30,9 @@ verify_jwt = true
 [functions.keyword-tracker]
 verify_jwt = true
 
+[functions.sitemap-xml]
+verify_jwt = false
+
 [functions.update-sitemap]
 verify_jwt = false
 

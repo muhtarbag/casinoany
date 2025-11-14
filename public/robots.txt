@@ -26,7 +26,7 @@ Allow: /cookies
 Allow: /kvkk
 
 # Sitemap konumu
-Sitemap: https://casinoany.com/sitemap.xml
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-xml
 
 # Google Bot için özel ayarlar
 User-agent: Googlebot
