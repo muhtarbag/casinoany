@@ -18,7 +18,8 @@ export const useAdminStats = () => {
         { count: publishedBlogsCount },
         { count: blogCommentsCount },
         { count: pendingCommentsCount },
-        { data: statsData },
+        { count: totalViewsCount },
+        { count: totalClicksCount },
         { data: blogData },
         { data: paymentsData },
       ] = await Promise.all([
@@ -32,13 +33,15 @@ export const useAdminStats = () => {
         (supabase as any).from('blog_posts').select('*', { count: 'exact', head: true }).eq('is_published', true),
         (supabase as any).from('blog_comments').select('*', { count: 'exact', head: true }),
         (supabase as any).from('blog_comments').select('*', { count: 'exact', head: true }).eq('is_approved', false),
-        (supabase as any).from('site_stats').select('views, clicks'),
+        // ✅ FIX: Use actual page_views instead of site_stats
+        supabase.from('page_views').select('*', { count: 'exact', head: true }),
+        supabase.from('conversions').select('*', { count: 'exact', head: true }).eq('conversion_type', 'affiliate_click'),
         (supabase as any).from('blog_posts').select('view_count'),
         supabase.from('affiliate_payments').select('payment_amount, payment_status'),
       ]);
 
-      const totalViews = statsData?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
-      const totalClicks = statsData?.reduce((sum, stat) => sum + (stat.clicks || 0), 0) || 0;
+      const totalViews = totalViewsCount || 0;
+      const totalClicks = totalClicksCount || 0;
       const totalBlogViews = blogData?.reduce((sum, post) => sum + (post.view_count || 0), 0) || 0;
       const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0';
       
