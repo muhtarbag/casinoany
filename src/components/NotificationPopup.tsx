@@ -3,6 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +23,13 @@ interface Notification {
   text_color: string | null;
   trigger_type: string;
   trigger_conditions: any;
+  form_fields?: {
+    email_label: string;
+    phone_label: string;
+    submit_text: string;
+    success_message: string;
+    privacy_text: string;
+  } | null;
 }
 
 // Oturum ID'si oluştur
@@ -38,6 +47,10 @@ export const NotificationPopup = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [openNotificationId, setOpenNotificationId] = useState<string | null>(null);
+  const [formEmail, setFormEmail] = useState('');
+  const [formPhone, setFormPhone] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const sessionId = getSessionId();
 
   // Aktif bildirimleri getir
@@ -198,6 +211,9 @@ export const NotificationPopup = () => {
     if (openNotificationId) {
       trackDismissMutation.mutate(openNotificationId);
       setOpenNotificationId(null);
+      setFormEmail('');
+      setFormPhone('');
+      setFormSubmitted(false);
     }
   };
 
@@ -213,6 +229,42 @@ export const NotificationPopup = () => {
         navigate(url);
       }
       handleClose();
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!openNotificationId || !formEmail || !formPhone) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await (supabase as any)
+        .from('bonus_requests')
+        .insert([{
+          notification_id: openNotificationId,
+          email: formEmail,
+          phone: formPhone,
+          ip_address: null, // Can be collected from headers if needed
+          user_agent: navigator.userAgent,
+        }]);
+      
+      if (error) throw error;
+      
+      trackClickMutation.mutate(openNotificationId);
+      setFormSubmitted(true);
+      
+      // Auto close after 3 seconds
+      setTimeout(() => {
+        handleClose();
+      }, 3000);
+      
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -260,7 +312,67 @@ export const NotificationPopup = () => {
               </p>
             )}
 
-            {currentNotification.button_text && (
+            {/* Form Section - if form_fields exist */}
+            {currentNotification.form_fields && !formSubmitted && (
+              <form onSubmit={handleFormSubmit} className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <Label htmlFor="bonus-email" className="text-sm font-medium">
+                    {currentNotification.form_fields.email_label}
+                  </Label>
+                  <Input
+                    id="bonus-email"
+                    type="email"
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    placeholder="ornek@email.com"
+                    required
+                    className="bg-background/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bonus-phone" className="text-sm font-medium">
+                    {currentNotification.form_fields.phone_label}
+                  </Label>
+                  <Input
+                    id="bonus-phone"
+                    type="tel"
+                    value={formPhone}
+                    onChange={(e) => setFormPhone(e.target.value)}
+                    placeholder="+90 5XX XXX XX XX"
+                    required
+                    className="bg-background/50"
+                  />
+                </div>
+
+                {currentNotification.form_fields.privacy_text && (
+                  <p className="text-xs opacity-75">
+                    {currentNotification.form_fields.privacy_text}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Gönderiliyor...' : currentNotification.form_fields.submit_text}
+                </Button>
+              </form>
+            )}
+
+            {/* Success Message */}
+            {formSubmitted && currentNotification.form_fields && (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-lg font-semibold">
+                  {currentNotification.form_fields.success_message}
+                </p>
+              </div>
+            )}
+
+            {/* Regular Button - only show if no form_fields or form already submitted */}
+            {!currentNotification.form_fields && currentNotification.button_text && (
               <Button
                 onClick={() => handleButtonClick(currentNotification.button_url)}
                 className="w-full"
