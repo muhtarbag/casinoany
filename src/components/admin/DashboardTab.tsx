@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Eye, MousePointer, CheckSquare, TrendingUp, MessageSquare } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Eye, TrendingUp, MessageSquare, FileText, AlertTriangle, Globe } from 'lucide-react';
 import { 
   LineChart, 
   Line, 
@@ -11,11 +11,10 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip as RechartsTooltip, 
+  Tooltip as RechartsTooltip,
+  Legend, 
   ResponsiveContainer 
 } from 'recharts';
-
-const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 interface DashboardStats {
   totalSites: number;
@@ -44,66 +43,82 @@ export function DashboardTab({
 }: DashboardTabProps) {
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+      {/* Priority Alert Banner */}
+      {dashboardStats.pendingReviews > 5 && (
+        <div className="p-4 rounded-lg border border-warning bg-warning/10 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-warning">Dikkat: Bekleyen Yorumlar</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {dashboardStats.pendingReviews} yorum onay bekliyor. Kullanıcı deneyimi için hızlı aksiyon önerilir.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Cards with Priority Indicators */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-l-4 border-l-primary">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium">Toplam Site</h3>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Toplam Site</CardTitle>
+            <Globe className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.totalSites}</div>
+            <div className="text-2xl font-bold text-primary">{dashboardStats.totalSites}</div>
             <p className="text-xs text-muted-foreground">
-              {dashboardStats.activeSites} aktif
+              {dashboardStats.activeSites} aktif site
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-accent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium">Toplam Görüntülenme</h3>
-            <Eye className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Toplam Görüntüleme</CardTitle>
+            <Eye className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-accent">{dashboardStats.totalViews.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">CTR: {dashboardStats.ctr}%</p>
+          </CardContent>
+        </Card>
+
+        <Card className={`border-l-4 ${dashboardStats.pendingReviews > 5 ? 'border-l-warning' : 'border-l-success'}`}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Bekleyen Yorumlar</CardTitle>
+            <MessageSquare className={`h-4 w-4 ${dashboardStats.pendingReviews > 5 ? 'text-warning' : 'text-success'}`} />
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${dashboardStats.pendingReviews > 5 ? 'text-warning' : 'text-success'}`}>
+              {dashboardStats.pendingReviews}
+            </div>
             <p className="text-xs text-muted-foreground">
-              CTR: {dashboardStats.ctr}%
+              {dashboardStats.pendingReviews > 5 ? '⚠️ Yüksek öncelik' : '✓ İyi durumda'}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-info">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium">Bekleyen Yorumlar</h3>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Blog Yazıları</CardTitle>
+            <FileText className="h-4 w-4 text-info" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.pendingReviews}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats.totalReviews} toplam yorum
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium">Blog Yazıları</h3>
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.publishedBlogs}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats.totalBlogPosts} toplam yazı
-            </p>
+            <div className="text-2xl font-bold text-info">{dashboardStats.publishedBlogs}</div>
+            <p className="text-xs text-muted-foreground">{dashboardStats.totalBlogPosts} toplam yazı</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+      {/* Charts Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Daily Page Views */}
+        <Card className="border-t-2 border-t-primary">
           <CardHeader>
-            <h3 className="font-semibold">Günlük Görüntülenme</h3>
+            <CardTitle className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+              Günlük Görüntülemeler
+            </CardTitle>
+            <CardDescription>Son 7 gün trendi</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -111,16 +126,35 @@ export function DashboardTab({
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
-                <RechartsTooltip />
-                <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} />
+                <RechartsTooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--popover))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }} 
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="hsl(var(--chart-1))" 
+                  strokeWidth={3}
+                  dot={{ fill: 'hsl(var(--chart-1))', r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Device Stats */}
+        <Card className="border-t-2 border-t-accent">
           <CardHeader>
-            <h3 className="font-semibold">Cihaz Dağılımı</h3>
+            <CardTitle className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-accent" />
+              Cihaz Dağılımı
+            </CardTitle>
+            <CardDescription>Platform bazlı kullanım</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -130,24 +164,42 @@ export function DashboardTab({
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, value }) => `${name}: ${value}`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
                   {(deviceStats || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={[
+                        'hsl(var(--chart-1))', 
+                        'hsl(var(--chart-4))', 
+                        'hsl(var(--chart-3))'
+                      ][index % 3]} 
+                    />
                   ))}
                 </Pie>
-                <RechartsTooltip />
+                <RechartsTooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--popover))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Top Pages */}
+        <Card className="border-t-2 border-t-success">
           <CardHeader>
-            <h3 className="font-semibold">En Çok Görüntülenen Sayfalar</h3>
+            <CardTitle className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-success" />
+              En Çok Ziyaret Edilen
+            </CardTitle>
+            <CardDescription>Popüler içerikler</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -155,8 +207,23 @@ export function DashboardTab({
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="path" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
-                <RechartsTooltip />
-                <Bar dataKey="count" fill="hsl(var(--primary))" />
+                <RechartsTooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--popover))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Legend />
+                <Bar 
+                  dataKey="count" 
+                  fill="hsl(var(--chart-3))"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
