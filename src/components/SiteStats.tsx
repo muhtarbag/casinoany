@@ -146,21 +146,19 @@ export default function SiteStats() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={clicksChartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={100}
-                    className="text-xs"
-                  />
-                  <YAxis className="text-xs" />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="clicks" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarChart data={clicksChartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={100}
+                  className="text-xs"
+                />
+                <YAxis className="text-xs" />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="clicks" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
@@ -175,21 +173,19 @@ export default function SiteStats() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={viewsChartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={100}
-                    className="text-xs"
-                  />
-                  <YAxis className="text-xs" />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="views" fill="hsl(var(--secondary))" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarChart data={viewsChartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={100}
+                  className="text-xs"
+                />
+                <YAxis className="text-xs" />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="views" fill="hsl(var(--secondary))" radius={[8, 8, 0, 0]} />
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
@@ -206,7 +202,7 @@ export default function SiteStats() {
             <CardDescription>Top 5 sitenin tıklama payları</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            <ChartContainer config={chartConfig} className="h-[300px]">
               <RechartsPie>
                 <Pie
                   data={pieChartData}
@@ -215,7 +211,7 @@ export default function SiteStats() {
                   labelLine={false}
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="hsl(var(--primary))"
                   dataKey="value"
                 >
                   {pieChartData.map((entry: any, index: number) => (
@@ -224,7 +220,7 @@ export default function SiteStats() {
                 </Pie>
                 <Tooltip />
               </RechartsPie>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
 
@@ -238,21 +234,19 @@ export default function SiteStats() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={ctrChartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={100}
-                    className="text-xs"
-                  />
-                  <YAxis className="text-xs" label={{ value: 'CTR %', angle: -90, position: 'insideLeft' }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="ctr" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarChart data={ctrChartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={100}
+                  className="text-xs"
+                />
+                <YAxis className="text-xs" label={{ value: 'CTR %', angle: -90, position: 'insideLeft' }} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="ctr" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
