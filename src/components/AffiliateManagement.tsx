@@ -28,15 +28,18 @@ export function AffiliateManagement() {
   const queryClient = useQueryClient();
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
 
-  // Fetch sites with affiliate contracts
+  // Fetch sites with affiliate contracts - NORMALIZED SCHEMA
   const { data: sites, isLoading: sitesLoading, error: sitesError, refetch } = useQuery({
     queryKey: ['affiliate-sites'],
     queryFn: async () => {
       console.log('🔍 Affiliate sites query başlatılıyor...');
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('*')
-        .not('affiliate_contract_date', 'is', null)
+        .select(`
+          *,
+          affiliate_data:site_affiliate_data(*)
+        `)
+        .not('site_affiliate_data.contract_date', 'is', null)
         .order('name');
       
       if (error) {
@@ -45,21 +48,25 @@ export function AffiliateManagement() {
       }
       
       console.log('✅ Affiliate sites query başarılı. Site sayısı:', data?.length || 0);
-      console.log('📋 Siteler:', data?.map(s => s.name).join(', '));
+      console.log('📋 Siteler:', data?.map((s: any) => s.name).join(', '));
       return data;
     },
-    staleTime: 0, // Always fetch fresh data
-    refetchOnMount: true, // Refetch when component mounts
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
-  // Fetch selected site details
+  // Fetch selected site details - NORMALIZED SCHEMA
   const { data: selectedSite } = useQuery({
     queryKey: ['site-details', selectedSiteId],
     queryFn: async () => {
       if (!selectedSiteId) return null;
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('*')
+        .select(`
+          *,
+          affiliate_data:site_affiliate_data(*),
+          social_media:site_social_media(*)
+        `)
         .eq('id', selectedSiteId)
         .single();
       if (error) throw error;
@@ -210,12 +217,12 @@ export function AffiliateManagement() {
                       <div>
                         <CardTitle className="text-2xl">{selectedSite.name}</CardTitle>
                         <CardDescription className="mt-2">
-                          Anlaşma Tarihi: {selectedSite.affiliate_contract_date ? new Date(selectedSite.affiliate_contract_date).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                          Anlaşma Tarihi: {(selectedSite as any).affiliate_data?.contract_date ? new Date((selectedSite as any).affiliate_data.contract_date).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
                         </CardDescription>
                       </div>
-                      {selectedSite.affiliate_panel_url && (
+                      {(selectedSite as any).affiliate_data?.panel_url && (
                         <Button variant="outline" size="sm" asChild>
-                          <a href={selectedSite.affiliate_panel_url} target="_blank" rel="noopener noreferrer">
+                          <a href={(selectedSite as any).affiliate_data.panel_url} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4 mr-2" />
                             Panel'i Aç
                           </a>
@@ -228,14 +235,14 @@ export function AffiliateManagement() {
                       <div>
                         <p className="text-sm text-muted-foreground">Komisyon %</p>
                         <p className="text-xl font-bold">
-                          {selectedSite.affiliate_commission_percentage || '-'}%
+                          {(selectedSite as any).affiliate_data?.commission_percentage || '-'}%
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Aylık Ödeme</p>
                         <p className="text-xl font-bold">
-                          {selectedSite.affiliate_has_monthly_payment ? (
-                            `${selectedSite.affiliate_monthly_payment || 0} TL`
+                          {(selectedSite as any).affiliate_data?.has_monthly_payment ? (
+                            `${(selectedSite as any).affiliate_data?.monthly_payment || 0} TL`
                           ) : (
                             <Badge variant="secondary">Yok</Badge>
                           )}
@@ -243,19 +250,19 @@ export function AffiliateManagement() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Panel Kullanıcı</p>
-                        <p className="text-sm font-mono">{selectedSite.affiliate_panel_username || '-'}</p>
+                        <p className="text-sm font-mono">{(selectedSite as any).affiliate_data?.panel_username || '-'}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Panel Şifre</p>
                         <p className="text-sm font-mono">
-                          {selectedSite.affiliate_panel_password ? '••••••••' : '-'}
+                          {(selectedSite as any).affiliate_data?.panel_password ? '••••••••' : '-'}
                         </p>
                       </div>
                     </div>
-                    {selectedSite.affiliate_contract_terms && (
+                    {(selectedSite as any).affiliate_data?.contract_terms && (
                       <div className="pt-3 border-t">
                         <p className="text-sm text-muted-foreground mb-1">Anlaşma Şartları:</p>
-                        <p className="text-sm">{selectedSite.affiliate_contract_terms}</p>
+                        <p className="text-sm">{(selectedSite as any).affiliate_data.contract_terms}</p>
                       </div>
                     )}
                   </CardContent>
