@@ -34,6 +34,22 @@ export function PerformanceMetricsWidget({
     return `${sign}${change.toFixed(1)}${unit || "%"}`;
   };
 
+  // Show loading state if no data
+  if (!weeklyComparison || weeklyComparison.length === 0) {
+    return (
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+        <Card className="lg:col-span-3">
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="text-center text-muted-foreground">
+              <Activity className="h-8 w-8 mx-auto mb-2 animate-pulse" />
+              <p>Performans verileri yükleniyor...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
       {/* Weekly Performance Comparison */}
