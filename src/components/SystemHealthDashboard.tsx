@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Activity, Database, Zap, HardDrive, TrendingUp, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
+import { ConsistencyMonitor } from './admin/ConsistencyMonitor';
 
 export const SystemHealthDashboard = () => {
   const { toast } = useToast();
@@ -116,6 +117,9 @@ export const SystemHealthDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Data Consistency Monitor */}
+      <ConsistencyMonitor />
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">Sistem Sağlığı</h2>
