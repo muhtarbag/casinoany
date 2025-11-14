@@ -31,8 +31,8 @@ export default function SiteStats() {
 
       return data || [];
     },
-    staleTime: 0,
-    refetchInterval: 30000,
+    staleTime: 5 * 60 * 1000, // 5 dakika cache
+    refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
   });
 
   if (isLoading) {

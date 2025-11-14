@@ -34,6 +34,8 @@ export default function BlogStats() {
         comments_count: commentsByPost?.[post.id] || 0,
       }));
     },
+    staleTime: 5 * 60 * 1000, // 5 dakika cache
+    refetchInterval: 3 * 60 * 1000, // 3 dakikada bir yenile
   });
 
   if (isLoading) {
