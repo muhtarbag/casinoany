@@ -1226,6 +1226,7 @@ export type Database = {
           trigger_conditions: Json | null
           trigger_type: string | null
           updated_at: string
+          user_segments: string[] | null
         }
         Insert: {
           background_color?: string | null
@@ -1250,6 +1251,7 @@ export type Database = {
           trigger_conditions?: Json | null
           trigger_type?: string | null
           updated_at?: string
+          user_segments?: string[] | null
         }
         Update: {
           background_color?: string | null
@@ -1274,6 +1276,7 @@ export type Database = {
           trigger_conditions?: Json | null
           trigger_type?: string | null
           updated_at?: string
+          user_segments?: string[] | null
         }
         Relationships: []
       }

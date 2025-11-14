@@ -19,6 +19,7 @@ interface Notification {
   button_url: string | null;
   display_frequency: string;
   display_pages: string[];
+  user_segments: string[];
   background_color: string | null;
   text_color: string | null;
   trigger_type: string;
@@ -42,6 +43,37 @@ const getSessionId = () => {
   return sessionId;
 };
 
+// Kullanıcı segmentini belirle
+const getUserSegment = (user: any): string => {
+  // Kayıtlı kullanıcı mı?
+  if (user) return 'registered';
+  
+  // Anonim kullanıcı için ziyaret geçmişi kontrol et
+  const visitHistory = localStorage.getItem('visit_history');
+  
+  if (!visitHistory) {
+    // İlk kez ziyaret - yeni ziyaretçi
+    const history = {
+      firstVisit: new Date().toISOString(),
+      visitCount: 1,
+      lastVisit: new Date().toISOString()
+    };
+    localStorage.setItem('visit_history', JSON.stringify(history));
+    return 'new_visitor';
+  }
+  
+  // Tekrar gelen ziyaretçi
+  try {
+    const history = JSON.parse(visitHistory);
+    history.visitCount = (history.visitCount || 1) + 1;
+    history.lastVisit = new Date().toISOString();
+    localStorage.setItem('visit_history', JSON.stringify(history));
+    return 'returning_visitor';
+  } catch {
+    return 'anonymous';
+  }
+};
+
 export const NotificationPopup = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,10 +88,13 @@ export const NotificationPopup = () => {
 
   // Admin paneldeyse bildirimleri gösterme
   const isAdminPanel = location.pathname.startsWith('/admin');
+  
+  // Kullanıcı segmentini belirle
+  const userSegment = getUserSegment(user);
 
   // Aktif bildirimleri getir
   const { data: notifications } = useQuery({
-    queryKey: ['active-notifications', location.pathname],
+    queryKey: ['active-notifications', location.pathname, userSegment],
     queryFn: async () => {
       // Admin paneldeyse boş dön
       if (isAdminPanel) return [];
@@ -78,10 +113,13 @@ export const NotificationPopup = () => {
       if (error) throw error;
       
       const currentPage = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
-      return (data as Notification[]).filter(n => 
-        n.display_pages?.includes('all') || 
-        n.display_pages?.includes(currentPage)
-      );
+      
+      // Sayfa ve kullanıcı segmentine göre filtrele
+      return (data as Notification[]).filter(n => {
+        const pageMatch = n.display_pages?.includes('all') || n.display_pages?.includes(currentPage);
+        const segmentMatch = n.user_segments?.includes('all') || n.user_segments?.includes(userSegment);
+        return pageMatch && segmentMatch;
+      });
     },
   });
 
