@@ -209,14 +209,13 @@ export function SiteFormWrapper({
             </FormItem>
           )} />
 
-          {/* ============ AFFILIATE ANLAŞMA BİLGİLERİ ============ */}
-          <div className="md:col-span-2 mt-6 p-6 bg-secondary/50 rounded-lg border border-border">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              🤝 Affiliate Anlaşma Bilgileri
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4 bg-muted p-3 rounded border border-border">
-              💡 <strong>ÖNEMLİ:</strong> Anlaşma tarihi doldurduğunuz siteler <strong>"Affiliate Yönetimi"</strong> sekmesinde otomatik görünür.
-            </p>
+          <div className="md:col-span-2 mt-6 space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-1">Affiliate Anlaşma Bilgileri</h3>
+              <p className="text-sm text-muted-foreground">
+                Anlaşma tarihi doldurduğunuz siteler "Affiliate Yönetimi" sekmesinde otomatik görünür.
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField control={form.control} name="affiliate_contract_date" render={({ field }) => (
