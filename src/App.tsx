@@ -88,7 +88,7 @@ const AppContent = () => {
           <Route path="/canli-casino" element={<LiveCasino />} />
           
           {/* SEO-optimized content pages */}
-          <Route path="/deneme-bonusu" element={<DenemeBonusu />} />
+          <Route path="/denemebonusu" element={<DenemeBonusu />} />
           <Route path="/betist-inceleme" element={<BetistInceleme />} />
           <Route path="/bets10-inceleme" element={<Bets10Inceleme />} />
           <Route path="/mobilbahis-inceleme" element={<MobilbahisInceleme />} />

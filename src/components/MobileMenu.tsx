@@ -45,7 +45,7 @@ export const MobileMenu = () => {
           </NavLink>
 
           <NavLink
-            to="/deneme-bonusu"
+            to="/denemebonusu"
             onClick={handleNavClick}
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
             activeClassName="text-primary bg-muted font-semibold"

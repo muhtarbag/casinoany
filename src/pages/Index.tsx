@@ -123,7 +123,7 @@ const Index = () => {
           {/* Bonus CTA */}
           <div className="text-center">
             <a 
-              href="/deneme-bonusu"
+              href="/denemebonusu"
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <span>🎁</span>
