@@ -95,8 +95,21 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
+      // Prepare affiliate data - convert empty strings to null
+      const affiliateData = {
+        affiliate_contract_date: formData.affiliate_contract_date || null,
+        affiliate_contract_terms: formData.affiliate_contract_terms || null,
+        affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+        affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
+        affiliate_panel_url: formData.affiliate_panel_url || null,
+        affiliate_panel_username: formData.affiliate_panel_username || null,
+        affiliate_panel_password: formData.affiliate_panel_password || null,
+        affiliate_notes: formData.affiliate_notes || null,
+      };
+
       const { error } = await (supabase as any).from('betting_sites').insert([{
         ...formData,
+        ...affiliateData,
         features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
         logo_url: logoUrl,
         is_active: true,
@@ -123,8 +136,21 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
+      // Prepare affiliate data - convert empty strings to null
+      const affiliateData = {
+        affiliate_contract_date: formData.affiliate_contract_date || null,
+        affiliate_contract_terms: formData.affiliate_contract_terms || null,
+        affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+        affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
+        affiliate_panel_url: formData.affiliate_panel_url || null,
+        affiliate_panel_username: formData.affiliate_panel_username || null,
+        affiliate_panel_password: formData.affiliate_panel_password || null,
+        affiliate_notes: formData.affiliate_notes || null,
+      };
+
       const updateData: any = {
         ...formData,
+        ...affiliateData,
         features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
       };
 

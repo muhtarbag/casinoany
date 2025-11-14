@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Loader2, X } from 'lucide-react';
 import { AdminLogoInput } from '@/pages/AdminLogoInput';
 
@@ -51,7 +54,15 @@ export function SiteManagementForm({
       twitter: '',
       instagram: '',
       facebook: '',
-      youtube: ''
+      youtube: '',
+      affiliate_contract_date: '',
+      affiliate_contract_terms: '',
+      affiliate_has_monthly_payment: false,
+      affiliate_monthly_payment: undefined,
+      affiliate_panel_url: '',
+      affiliate_panel_username: '',
+      affiliate_panel_password: '',
+      affiliate_notes: ''
     }
   });
 
@@ -237,6 +248,110 @@ export function SiteManagementForm({
               />
             </div>
           </div>
+
+          {/* Affiliate Management Section */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="affiliate">
+              <AccordionTrigger className="text-lg font-semibold">
+                🤝 Affiliate Anlaşma Bilgileri
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_contract_date">Anlaşma Tarihi</Label>
+                    <Input
+                      id="affiliate_contract_date"
+                      type="date"
+                      {...register('affiliate_contract_date')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_monthly_payment">Aylık Ödeme Tutarı (TL)</Label>
+                    <Input
+                      id="affiliate_monthly_payment"
+                      type="number"
+                      step="0.01"
+                      {...register('affiliate_monthly_payment', { valueAsNumber: true })}
+                      placeholder="Örn: 5000"
+                      disabled={!watch('affiliate_has_monthly_payment')}
+                    />
+                  </div>
+
+                  <div className="space-y-2 flex items-center gap-2 md:col-span-2">
+                    <Switch
+                      id="affiliate_has_monthly_payment"
+                      checked={watch('affiliate_has_monthly_payment')}
+                      onCheckedChange={(checked) => setValue('affiliate_has_monthly_payment', checked)}
+                    />
+                    <Label htmlFor="affiliate_has_monthly_payment" className="cursor-pointer">
+                      Aylık sabit ödeme alınıyor
+                    </Label>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="affiliate_panel_url">Affiliate Panel URL</Label>
+                    <Input
+                      id="affiliate_panel_url"
+                      {...register('affiliate_panel_url')}
+                      placeholder="https://panel.example.com"
+                      className={errors.affiliate_panel_url ? 'border-destructive' : ''}
+                    />
+                    {errors.affiliate_panel_url && (
+                      <p className="text-sm text-destructive">{errors.affiliate_panel_url.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_panel_username">Panel Kullanıcı Adı</Label>
+                    <Input
+                      id="affiliate_panel_username"
+                      {...register('affiliate_panel_username')}
+                      placeholder="kullanici_adi"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_panel_password">Panel Şifresi</Label>
+                    <Input
+                      id="affiliate_panel_password"
+                      type="password"
+                      {...register('affiliate_panel_password')}
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="affiliate_contract_terms">Anlaşma Şartları</Label>
+                    <Textarea
+                      id="affiliate_contract_terms"
+                      {...register('affiliate_contract_terms')}
+                      placeholder="Anlaşma detayları, komisyon oranları, özel şartlar vb..."
+                      rows={4}
+                      className={errors.affiliate_contract_terms ? 'border-destructive' : ''}
+                    />
+                    {errors.affiliate_contract_terms && (
+                      <p className="text-sm text-destructive">{errors.affiliate_contract_terms.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="affiliate_notes">Ek Notlar</Label>
+                    <Textarea
+                      id="affiliate_notes"
+                      {...register('affiliate_notes')}
+                      placeholder="Önemli notlar, hatırlatmalar, iletişim bilgileri vb..."
+                      rows={3}
+                      className={errors.affiliate_notes ? 'border-destructive' : ''}
+                    />
+                    {errors.affiliate_notes && (
+                      <p className="text-sm text-destructive">{errors.affiliate_notes.message}</p>
+                    )}
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           <div className="space-y-2">
             <Label>Logo</Label>
