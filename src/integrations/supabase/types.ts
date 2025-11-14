@@ -663,6 +663,44 @@ export type Database = {
           },
         ]
       }
+      bonus_requests: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: string | null
+          notification_id: string
+          phone: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address?: string | null
+          notification_id: string
+          phone: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string | null
+          notification_id?: string
+          phone?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_notification"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "site_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       casino_content_analytics: {
         Row: {
           affiliate_clicks: number | null

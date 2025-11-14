@@ -33,6 +33,13 @@ interface Notification {
   background_color: string | null;
   text_color: string | null;
   created_at: string;
+  form_fields?: {
+    email_label: string;
+    phone_label: string;
+    submit_text: string;
+    success_message: string;
+    privacy_text: string;
+  } | null;
 }
 
 export const NotificationManagement = () => {
@@ -59,6 +66,13 @@ export const NotificationManagement = () => {
     text_color: '#ffffff',
     trigger_type: 'instant',
     trigger_conditions: {},
+    form_fields: {
+      email_label: 'E-posta Adresiniz',
+      phone_label: 'Telefon Numaranız',
+      submit_text: 'Bonus Kodumu Gönder',
+      success_message: '✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi.',
+      privacy_text: '🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır ve hiçbir şekilde üçüncü kişilerle paylaşılmaz.',
+    },
   });
 
   const { data: notifications, isLoading } = useQuery({
@@ -184,6 +198,13 @@ export const NotificationManagement = () => {
       text_color: notification.text_color || '#ffffff',
       trigger_type: (notification as any).trigger_type || 'instant',
       trigger_conditions: (notification as any).trigger_conditions || {},
+      form_fields: notification.form_fields || {
+        email_label: 'E-posta Adresiniz',
+        phone_label: 'Telefon Numaranız',
+        submit_text: 'Bonus Kodumu Gönder',
+        success_message: '✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi.',
+        privacy_text: '🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır ve hiçbir şekilde üçüncü kişilerle paylaşılmaz.',
+      },
     });
     setIsDialogOpen(true);
   }, []);
@@ -207,6 +228,13 @@ export const NotificationManagement = () => {
       text_color: '#ffffff',
       trigger_type: 'instant',
       trigger_conditions: {},
+      form_fields: {
+        email_label: 'E-posta Adresiniz',
+        phone_label: 'Telefon Numaranız',
+        submit_text: 'Bonus Kodumu Gönder',
+        success_message: '✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi.',
+        privacy_text: '🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır ve hiçbir şekilde üçüncü kişilerle paylaşılmaz.',
+      },
     });
     setEditingNotification(null);
   }, []);
@@ -459,6 +487,83 @@ export const NotificationManagement = () => {
                     type="color"
                     value={formData.text_color}
                     onChange={(e) => setFormData(prev => ({ ...prev, text_color: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Form Alanları (Bonus Kampanyaları için) */}
+              <div className="space-y-4 border-t pt-4">
+                <h3 className="font-semibold">📧 Form Alanları (Lead Capture / Bonus Kampanyaları)</h3>
+                <p className="text-sm text-muted-foreground">
+                  Kullanıcıdan e-posta ve telefon toplamak için form alanlarını özelleştirin
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email_label">E-posta Label</Label>
+                    <Input
+                      id="email_label"
+                      value={formData.form_fields.email_label}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        form_fields: { ...prev.form_fields, email_label: e.target.value }
+                      }))}
+                      placeholder="E-posta Adresiniz"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone_label">Telefon Label</Label>
+                    <Input
+                      id="phone_label"
+                      value={formData.form_fields.phone_label}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        form_fields: { ...prev.form_fields, phone_label: e.target.value }
+                      }))}
+                      placeholder="Telefon Numaranız"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="submit_text">Submit Butonu Metni</Label>
+                  <Input
+                    id="submit_text"
+                    value={formData.form_fields.submit_text}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      form_fields: { ...prev.form_fields, submit_text: e.target.value }
+                    }))}
+                    placeholder="Bonus Kodumu Gönder"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="success_message">Başarı Mesajı</Label>
+                  <Textarea
+                    id="success_message"
+                    value={formData.form_fields.success_message}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      form_fields: { ...prev.form_fields, success_message: e.target.value }
+                    }))}
+                    placeholder="✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi."
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="privacy_text">Gizlilik/KVKK Metni</Label>
+                  <Textarea
+                    id="privacy_text"
+                    value={formData.form_fields.privacy_text}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      form_fields: { ...prev.form_fields, privacy_text: e.target.value }
+                    }))}
+                    placeholder="🔒 Bilgileriniz tamamen güvendedir..."
+                    rows={2}
                   />
                 </div>
               </div>
