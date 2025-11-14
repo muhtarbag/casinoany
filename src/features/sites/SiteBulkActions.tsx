@@ -29,7 +29,7 @@ export function SiteBulkActions({
         <AlertDialogTrigger asChild>
           <Button
             size="sm"
-            variant="destructive"
+            variant="danger"
             disabled={isLoading}
             aria-label={`${selectedCount} siteyi sil`}
           >
@@ -46,7 +46,7 @@ export function SiteBulkActions({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>İptal</AlertDialogCancel>
-            <AlertDialogAction onClick={onBulkDelete}>
+            <AlertDialogAction onClick={onBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Sil
             </AlertDialogAction>
           </AlertDialogFooter>

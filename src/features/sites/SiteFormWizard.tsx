@@ -167,6 +167,8 @@ export function SiteFormWizard({
               onClick={handleSubmit} 
               disabled={isLoading}
               className="flex-1 sm:flex-none gap-2"
+              variant="primary-action"
+              size="lg"
             >
               <Save className="w-4 h-4" />
               {editingId ? 'Güncelle' : 'Kaydet'}
