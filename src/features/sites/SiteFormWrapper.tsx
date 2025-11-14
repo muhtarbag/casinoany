@@ -85,6 +85,7 @@ export function SiteFormWrapper({
         affiliate_panel_username: editingSite.affiliate_panel_username || '',
         affiliate_panel_password: editingSite.affiliate_panel_password || '',
         affiliate_notes: editingSite.affiliate_notes || '',
+        affiliate_commission_percentage: editingSite.affiliate_commission_percentage || undefined,
       });
       if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
     } else {

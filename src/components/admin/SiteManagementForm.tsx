@@ -62,7 +62,8 @@ export function SiteManagementForm({
       affiliate_panel_url: '',
       affiliate_panel_username: '',
       affiliate_panel_password: '',
-      affiliate_notes: ''
+      affiliate_notes: '',
+      affiliate_commission_percentage: undefined
     }
   });
 
@@ -263,6 +264,17 @@ export function SiteManagementForm({
                       id="affiliate_contract_date"
                       type="date"
                       {...register('affiliate_contract_date')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_commission_percentage">Komisyon Yüzdesi (%)</Label>
+                    <Input
+                      id="affiliate_commission_percentage"
+                      type="number"
+                      step="0.01"
+                      {...register('affiliate_commission_percentage', { valueAsNumber: true })}
+                      placeholder="Örn: 25.5"
                     />
                   </div>
 
