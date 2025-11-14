@@ -2,6 +2,11 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 async function generateContentForSite(siteName: string, siteUrl: string, bonus: string, features: string[], apiKey: string) {
   const prompt = `Sen profesyonel bir online casino ve bahis uzmanısın. "${siteName}" adlı bahis sitesi için detaylı, bilgilendirici ve çekici casino içeriği oluştur.
 
@@ -114,34 +119,74 @@ async function saveSiteContent(supabase: any, siteId: string, content: any) {
   }
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // 🔐 JWT + Admin verification
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: No authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase configuration missing');
+    }
+
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+    
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: roleData, error: roleError } = await supabaseAuth
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError || !roleData) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: Admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('✅ Admin verified:', user.email);
+
     const { siteId, siteName, siteUrl, isBulk = false, siteIds = [] } = await req.json();
-    console.log('Generating casino content for:', siteName, 'Bulk:', isBulk);
+    console.log('Generating casino content for:', siteName, 'Bulk:', isBulk, 'by', user.email);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    // Create admin client for database operations
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
     // Handle bulk generation
     if (isBulk && siteIds.length > 0) {
       const results = [];
       for (const id of siteIds) {
-        const { data: site } = await supabase
+        const { data: site } = await supabaseAdmin
           .from('betting_sites')
           .select('name, affiliate_link, bonus, features')
           .eq('id', id)
@@ -150,7 +195,7 @@ serve(async (req) => {
         if (site) {
           try {
             const content = await generateContentForSite(site.name, site.affiliate_link, site.bonus, site.features, LOVABLE_API_KEY);
-            await saveSiteContent(supabase, id, content);
+            await saveSiteContent(supabaseAdmin, id, content);
             results.push({ siteId: id, success: true, siteName: site.name });
           } catch (error) {
             console.error(`Error generating content for ${site.name}:`, error);
@@ -167,7 +212,7 @@ serve(async (req) => {
     }
 
     // Get site details for better prompt
-    const { data: siteDetails } = await supabase
+    const { data: siteDetails } = await supabaseAdmin
       .from('betting_sites')
       .select('bonus, features')
       .eq('id', siteId)
@@ -248,7 +293,7 @@ Lütfen aşağıdaki içerikleri JSON formatında oluştur:
     const generatedContent = JSON.parse(jsonContent);
 
     // Save content and create version
-    await saveSiteContent(supabase, siteId, generatedContent);
+    await saveSiteContent(supabaseAdmin, siteId, generatedContent);
 
     console.log('Casino content generated and saved successfully');
 
