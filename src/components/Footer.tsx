@@ -72,12 +72,12 @@ export const Footer = () => {
               </div>
               
               {/* Trust Badges */}
-              <div className="pt-2 space-y-2">
+              <div className="pt-2 space-y-3">
                 <a 
                   href="https://gamecheck.com/tr" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity"
+                  className="block hover:opacity-80 transition-opacity"
                   aria-label="GameCheck Verified"
                 >
                   <img 
@@ -90,7 +90,7 @@ export const Footer = () => {
                   href="https://www.trustpilot.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity"
+                  className="block hover:opacity-80 transition-opacity"
                   aria-label="Trustpilot"
                 >
                   <img 
