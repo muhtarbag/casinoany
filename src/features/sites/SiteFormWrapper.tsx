@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { siteFormSchema, SiteFormData, generateSlug } from '@/schemas/siteValidation';
+import { siteFormSchema, SiteFormData, generateSlug, validateLogoFile } from '@/schemas/siteValidation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { X } from 'lucide-react';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { X, Loader2 } from 'lucide-react';
 import { UseMutationResult } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 interface SiteFormWrapperProps {
   editingId: string | null;
@@ -33,70 +34,41 @@ export function SiteFormWrapper({
 }: SiteFormWrapperProps) {
   const editingSite = sites.find((s) => s.id === editingId);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-    setValue,
-  } = useForm<SiteFormData>({
+  const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
-    defaultValues: editingSite
-      ? {
-          name: editingSite.name,
-          slug: editingSite.slug,
-          rating: editingSite.rating,
-          bonus: editingSite.bonus || '',
-          features: Array.isArray(editingSite.features)
-            ? editingSite.features.join(', ')
-            : '',
-          affiliate_link: editingSite.affiliate_link,
-          email: editingSite.email || '',
-          whatsapp: editingSite.whatsapp || '',
-          telegram: editingSite.telegram || '',
-          twitter: editingSite.twitter || '',
-          instagram: editingSite.instagram || '',
-          facebook: editingSite.facebook || '',
-          youtube: editingSite.youtube || '',
-        }
-      : {
-          name: '',
-          slug: '',
-          rating: 0,
-          bonus: '',
-          features: '',
-          affiliate_link: '',
-          email: '',
-          whatsapp: '',
-          telegram: '',
-          twitter: '',
-          instagram: '',
-          facebook: '',
-          youtube: '',
-        },
+    defaultValues: {
+      name: '',
+      slug: '',
+      rating: 4.5,
+      bonus: '',
+      features: '',
+      affiliate_link: '',
+      email: '',
+      whatsapp: '',
+      telegram: '',
+      twitter: '',
+      instagram: '',
+      facebook: '',
+      youtube: '',
+    },
   });
 
-  const nameValue = watch('name');
+  const nameValue = form.watch('name');
 
-  // Auto-generate slug from name
   useEffect(() => {
     if (nameValue && !editingId) {
-      setValue('slug', generateSlug(nameValue));
+      form.setValue('slug', generateSlug(nameValue), { shouldValidate: false });
     }
-  }, [nameValue, editingId, setValue]);
+  }, [nameValue, editingId, form]);
 
-  // Update form when editing site changes
   useEffect(() => {
     if (editingSite) {
-      reset({
+      form.reset({
         name: editingSite.name,
         slug: editingSite.slug,
         rating: editingSite.rating,
         bonus: editingSite.bonus || '',
-        features: Array.isArray(editingSite.features)
-          ? editingSite.features.join(', ')
-          : '',
+        features: Array.isArray(editingSite.features) ? editingSite.features.join(', ') : '',
         affiliate_link: editingSite.affiliate_link,
         email: editingSite.email || '',
         whatsapp: editingSite.whatsapp || '',
@@ -106,144 +78,139 @@ export function SiteFormWrapper({
         facebook: editingSite.facebook || '',
         youtube: editingSite.youtube || '',
       });
-      if (editingSite.logo_url) {
-        onLogoPreviewChange(editingSite.logo_url);
-      }
+      if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
     } else {
-      reset();
+      form.reset();
       onLogoFileChange(null);
       onLogoPreviewChange(null);
     }
-  }, [editingSite, reset, onLogoFileChange, onLogoPreviewChange]);
+  }, [editingSite, form, onLogoFileChange, onLogoPreviewChange]);
 
-  const onSubmit = (data: SiteFormData) => {
+  useEffect(() => {
+    if (createSiteMutation.isSuccess || updateSiteMutation.isSuccess) {
+      form.reset();
+      onLogoFileChange(null);
+      onLogoPreviewChange(null);
+      onEditingIdChange(null);
+    }
+  }, [createSiteMutation.isSuccess, updateSiteMutation.isSuccess, form, onLogoFileChange, onLogoPreviewChange, onEditingIdChange]);
+
+  const onSubmit = useCallback((data: SiteFormData) => {
     if (editingId) {
       updateSiteMutation.mutate({ id: editingId, formData: data, logoFile });
     } else {
       createSiteMutation.mutate({ formData: data, logoFile });
     }
-  };
+  }, [editingId, logoFile, createSiteMutation, updateSiteMutation]);
 
-  const handleCancel = () => {
-    reset();
+  const handleCancel = useCallback(() => {
+    form.reset();
     onEditingIdChange(null);
     onLogoFileChange(null);
     onLogoPreviewChange(null);
-  };
+  }, [form, onEditingIdChange, onLogoFileChange, onLogoPreviewChange]);
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validationError = validateLogoFile(file);
+      if (validationError) {
+        toast.error(validationError);
+        e.target.value = '';
+        return;
+      }
       onLogoFileChange(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        onLogoPreviewChange(reader.result as string);
-      };
+      reader.onloadend = () => onLogoPreviewChange(reader.result as string);
       reader.readAsDataURL(file);
     }
-  };
+  }, [onLogoFileChange, onLogoPreviewChange]);
 
-  const handleClearLogo = () => {
+  const handleClearLogo = useCallback(() => {
     onLogoFileChange(null);
     onLogoPreviewChange(null);
-  };
+  }, [onLogoFileChange, onLogoPreviewChange]);
+
+  const isLoading = createSiteMutation.isPending || updateSiteMutation.isPending;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="name">Site Adı*</Label>
-          <Input id="name" {...register('name')} />
-          {errors.name && (
-            <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
-          )}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField control={form.control} name="name" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Site Adı *</FormLabel>
+              <FormControl><Input placeholder="Örn: Betist" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <FormField control={form.control} name="slug" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Slug *</FormLabel>
+              <FormControl><Input placeholder="betist" {...field} /></FormControl>
+              <FormDescription>URL için kullanılır</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <FormField control={form.control} name="rating" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Rating (1-5) *</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.1" min="1" max="5" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <FormField control={form.control} name="affiliate_link" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Affiliate Link *</FormLabel>
+              <FormControl><Input type="url" placeholder="https://example.com" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <FormField control={form.control} name="bonus" render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Bonus</FormLabel>
+              <FormControl><Input placeholder="%100 Hoşgeldin Bonusu" {...field} /></FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <FormField control={form.control} name="features" render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Özellikler</FormLabel>
+              <FormControl><Input placeholder="Canlı bahis, Casino" {...field} /></FormControl>
+              <FormDescription>Virgülle ayırın</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          <div className="md:col-span-2">
+            <FormLabel>Logo</FormLabel>
+            <Input type="file" accept="image/*" onChange={handleLogoChange} disabled={isLoading} className="mt-2" />
+            {logoPreview && (
+              <div className="mt-3 relative inline-block">
+                <img src={logoPreview} alt="Preview" className="w-24 h-24 object-contain rounded border p-2" />
+                <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 w-6 h-6" onClick={handleClearLogo}>
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
-        
-        <div>
-          <Label htmlFor="slug">Slug*</Label>
-          <Input id="slug" {...register('slug')} />
-          {errors.slug && (
-            <p className="text-sm text-destructive mt-1">{errors.slug.message}</p>
-          )}
-        </div>
-        
-        <div>
-          <Label htmlFor="rating">Rating (1-5)*</Label>
-          <Input
-            id="rating"
-            type="number"
-            step="0.1"
-            min="1"
-            max="5"
-            {...register('rating', { valueAsNumber: true })}
-          />
-          {errors.rating && (
-            <p className="text-sm text-destructive mt-1">{errors.rating.message}</p>
-          )}
-        </div>
-        
-        <div>
-          <Label htmlFor="affiliate_link">Affiliate Link*</Label>
-          <Input id="affiliate_link" type="url" {...register('affiliate_link')} />
-          {errors.affiliate_link && (
-            <p className="text-sm text-destructive mt-1">
-              {errors.affiliate_link.message}
-            </p>
-          )}
-        </div>
-        
-        <div className="md:col-span-2">
-          <Label htmlFor="bonus">Bonus</Label>
-          <Input id="bonus" {...register('bonus')} />
-        </div>
-        
-        <div className="md:col-span-2">
-          <Label htmlFor="features">Özellikler (virgülle ayırın)</Label>
-          <Input id="features" {...register('features')} />
-        </div>
-        
-        <div>
-          <Label htmlFor="logo">Logo</Label>
-          <Input
-            id="logo"
-            type="file"
-            accept="image/*"
-            onChange={handleLogoChange}
-          />
-          {logoPreview && (
-            <div className="mt-2 relative inline-block">
-              <img
-                src={logoPreview}
-                alt="Preview"
-                className="w-20 h-20 object-contain"
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute -top-2 -right-2 w-6 h-6"
-                onClick={handleClearLogo}
-              >
-                <X className="w-3 h-3" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          disabled={createSiteMutation.isPending || updateSiteMutation.isPending}
-        >
-          {editingId ? 'Güncelle' : 'Ekle'}
-        </Button>
-        {editingId && (
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            İptal
+
+        <div className="flex gap-3 pt-4 border-t">
+          <Button type="submit" disabled={isLoading}>
+            {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {editingId ? 'Güncelle' : 'Ekle'}
           </Button>
-        )}
-      </div>
-    </form>
+          {editingId && <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>İptal</Button>}
+        </div>
+      </form>
+    </Form>
   );
 }
