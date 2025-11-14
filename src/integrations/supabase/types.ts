@@ -1629,6 +1629,7 @@ export type Database = {
         }
         Returns: string
       }
+      sync_daily_affiliate_metrics: { Args: never; Returns: undefined }
       track_conversion: {
         Args: {
           p_conversion_type: string
