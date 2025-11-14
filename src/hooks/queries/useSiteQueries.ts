@@ -38,13 +38,13 @@ export const useSites = (filters?: {
   });
 };
 
-// Tek site detay
+// Tek site detay - normalized tables ile
 export const useSite = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.sites.detail(slug),
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('betting_sites')
+        .from('sites_full_view')
         .select('*')
         .eq('slug', slug)
         .eq('is_active', true)

@@ -89,7 +89,7 @@ export const useAdminSiteManagement = () => {
     return publicUrlData.publicUrl;
   };
 
-  // Create site mutation
+  // Create site mutation - NORMALIZED SCHEMA
   const createSiteMutation = useMutation({
     mutationFn: async ({ formData, logoFile }: { formData: SiteFormData; logoFile: File | null }) => {
       let logoUrl = null;
@@ -97,28 +97,70 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
-      // Prepare affiliate data - convert empty strings to null
-      const affiliateData = {
-        affiliate_contract_date: formData.affiliate_contract_date || null,
-        affiliate_contract_terms: formData.affiliate_contract_terms || null,
-        affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
-        affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
-        affiliate_commission_percentage: formData.affiliate_commission_percentage || null,
-        affiliate_panel_url: formData.affiliate_panel_url || null,
-        affiliate_panel_username: formData.affiliate_panel_username || null,
-        affiliate_panel_password: formData.affiliate_panel_password || null,
-        affiliate_notes: formData.affiliate_notes || null,
-      };
+      // 1. Insert core site data
+      const { data: siteData, error: siteError } = await (supabase as any)
+        .from('betting_sites')
+        .insert([{
+          name: formData.name,
+          slug: formData.slug,
+          affiliate_link: formData.affiliate_link,
+          bonus: formData.bonus,
+          rating: formData.rating,
+          is_featured: false,
+          is_active: true,
+          logo_url: logoUrl,
+          features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
+        }])
+        .select()
+        .single();
 
-      const { error } = await (supabase as any).from('betting_sites').insert([{
-        ...formData,
-        ...affiliateData,
-        features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
-        logo_url: logoUrl,
-        is_active: true,
-      }]);
+      if (siteError) throw siteError;
 
-      if (error) throw error;
+      const siteId = siteData.id;
+
+      // 2. Insert social media data
+      if (formData.email || formData.whatsapp || formData.telegram || 
+          formData.twitter || formData.instagram || formData.facebook || formData.youtube) {
+        const { error: socialError } = await (supabase as any)
+          .from('site_social_media')
+          .insert([{
+            site_id: siteId,
+            email: formData.email || null,
+            whatsapp: formData.whatsapp || null,
+            telegram: formData.telegram || null,
+            twitter: formData.twitter || null,
+            instagram: formData.instagram || null,
+            facebook: formData.facebook || null,
+            youtube: formData.youtube || null,
+          }]);
+        
+        if (socialError) throw socialError;
+      }
+
+      // 3. Insert affiliate data (if any)
+      if (formData.affiliate_contract_date || formData.affiliate_panel_url) {
+        const { error: affiliateError } = await (supabase as any)
+          .from('site_affiliate_data')
+          .insert([{
+            site_id: siteId,
+            contract_date: formData.affiliate_contract_date || null,
+            contract_terms: formData.affiliate_contract_terms || null,
+            has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+            monthly_payment: formData.affiliate_monthly_payment || null,
+            commission_percentage: formData.affiliate_commission_percentage || null,
+            panel_url: formData.affiliate_panel_url || null,
+            panel_username: formData.affiliate_panel_username || null,
+            panel_password: formData.affiliate_panel_password || null,
+            notes: formData.affiliate_notes || null,
+          }]);
+        
+        if (affiliateError) throw affiliateError;
+      }
+
+      // 4. Insert content data (pros, cons, etc.) - automatically created by trigger
+      // The site_content table will be populated with default values via ON INSERT trigger
+
+      return siteData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
@@ -131,7 +173,7 @@ export const useAdminSiteManagement = () => {
     },
   });
 
-  // Update site mutation
+  // Update site mutation - NORMALIZED SCHEMA
   const updateSiteMutation = useMutation({
     mutationFn: async ({ id, formData, logoFile }: { id: string; formData: SiteFormData; logoFile: File | null }) => {
       let logoUrl;
@@ -139,22 +181,13 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
-      // Prepare affiliate data - convert empty strings to null
-      const affiliateData = {
-        affiliate_contract_date: formData.affiliate_contract_date || null,
-        affiliate_contract_terms: formData.affiliate_contract_terms || null,
-        affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
-        affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
-        affiliate_commission_percentage: formData.affiliate_commission_percentage || null,
-        affiliate_panel_url: formData.affiliate_panel_url || null,
-        affiliate_panel_username: formData.affiliate_panel_username || null,
-        affiliate_panel_password: formData.affiliate_panel_password || null,
-        affiliate_notes: formData.affiliate_notes || null,
-      };
-
+      // 1. Update core site data
       const updateData: any = {
-        ...formData,
-        ...affiliateData,
+        name: formData.name,
+        slug: formData.slug,
+        affiliate_link: formData.affiliate_link,
+        bonus: formData.bonus,
+        rating: formData.rating,
         features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
       };
 
@@ -162,8 +195,46 @@ export const useAdminSiteManagement = () => {
         updateData.logo_url = logoUrl;
       }
 
-      const { error } = await supabase.from('betting_sites').update(updateData).eq('id', id);
-      if (error) throw error;
+      const { error: siteError } = await (supabase as any)
+        .from('betting_sites')
+        .update(updateData)
+        .eq('id', id);
+      
+      if (siteError) throw siteError;
+
+      // 2. Upsert social media data
+      const { error: socialError } = await (supabase as any)
+        .from('site_social_media')
+        .upsert({
+          site_id: id,
+          email: formData.email || null,
+          whatsapp: formData.whatsapp || null,
+          telegram: formData.telegram || null,
+          twitter: formData.twitter || null,
+          instagram: formData.instagram || null,
+          facebook: formData.facebook || null,
+          youtube: formData.youtube || null,
+        }, { onConflict: 'site_id' });
+      
+      if (socialError) throw socialError;
+
+      // 3. Upsert affiliate data
+      const { error: affiliateError } = await (supabase as any)
+        .from('site_affiliate_data')
+        .upsert({
+          site_id: id,
+          contract_date: formData.affiliate_contract_date || null,
+          contract_terms: formData.affiliate_contract_terms || null,
+          has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+          monthly_payment: formData.affiliate_monthly_payment || null,
+          commission_percentage: formData.affiliate_commission_percentage || null,
+          panel_url: formData.affiliate_panel_url || null,
+          panel_username: formData.affiliate_panel_username || null,
+          panel_password: formData.affiliate_panel_password || null,
+          notes: formData.affiliate_notes || null,
+        }, { onConflict: 'site_id' });
+      
+      if (affiliateError) throw affiliateError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
