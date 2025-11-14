@@ -15,8 +15,27 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Try to fetch sitemap from database first
+    const { data: settingData } = await supabase
+      .from('site_settings')
+      .select('setting_value, updated_at')
+      .eq('setting_key', 'sitemap_xml')
+      .maybeSingle();
+
+    if (settingData?.setting_value) {
+      console.log('✅ Serving cached sitemap from database');
+      return new Response(settingData.setting_value, {
+        headers: {
+          ...corsHeaders,
+          'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        }
+      });
+    }
+
+    console.log('⚠️ No cached sitemap found, generating fresh one...');
 
     // Fetch all active sites
     const { data: sites, error: sitesError } = await supabase
