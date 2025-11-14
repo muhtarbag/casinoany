@@ -275,7 +275,7 @@ export default function SiteStats() {
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
-                    <span className="font-medium">{stat.betting_sites?.name}</span>
+                    <span className="font-medium">{stat.site_name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MousePointer className="w-4 h-4 text-muted-foreground" />
@@ -301,7 +301,7 @@ export default function SiteStats() {
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
-                    <span className="font-medium">{stat.betting_sites?.name}</span>
+                    <span className="font-medium">{stat.site_name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-muted-foreground" />
