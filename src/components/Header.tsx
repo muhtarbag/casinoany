@@ -26,7 +26,7 @@ export const Header = () => {
               Ana Sayfa
             </NavLink>
             <NavLink 
-              to="/deneme-bonusu" 
+              to="/denemebonusu" 
               className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
               activeClassName="text-primary font-semibold"
             >

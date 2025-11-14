@@ -180,7 +180,7 @@ const DenemeBonusu = () => {
           'free spin bonus',
           '2025 deneme bonusu'
         ]}
-        canonical={`${window.location.origin}/deneme-bonusu`}
+        canonical={`${window.location.origin}/denemebonusu`}
         ogType="website"
       />
       
