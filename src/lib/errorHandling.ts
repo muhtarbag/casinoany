@@ -4,6 +4,21 @@ interface ErrorHandlerOptions {
   title?: string;
   description?: string;
   showToast?: boolean;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+interface SuccessOptions {
+  title?: string;
+  description: string;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 export const handleError = (error: unknown, options: ErrorHandlerOptions = {}) => {
@@ -11,6 +26,8 @@ export const handleError = (error: unknown, options: ErrorHandlerOptions = {}) =
     title = "Bir Hata Oluştu",
     description,
     showToast = true,
+    duration = 5000,
+    action,
   } = options;
 
   console.error('Error:', error);
@@ -37,30 +54,66 @@ export const handleError = (error: unknown, options: ErrorHandlerOptions = {}) =
       variant: "destructive",
       title,
       description: errorMessage,
+      duration,
+      action: action ? {
+        altText: action.label,
+        onClick: action.onClick,
+      } as any : undefined,
     });
   }
 
   return errorMessage;
 };
 
-export const handleSuccess = (message: string, title = "Başarılı") => {
+export const handleSuccess = (options: SuccessOptions | string, legacyTitle?: string) => {
+  // Support both old and new API
+  if (typeof options === 'string') {
+    toast({
+      title: legacyTitle || "Başarılı",
+      description: options,
+      duration: 3000,
+      className: "border-success bg-success/10",
+    });
+    return;
+  }
+
+  const { title = "Başarılı", description, duration = 3000, action } = options;
+  
   toast({
     title,
-    description: message,
+    description,
+    duration,
+    className: "border-success bg-success/10",
+    action: action ? {
+      altText: action.label,
+      onClick: action.onClick,
+    } as any : undefined,
   });
 };
 
-export const handleInfo = (message: string, title = "Bilgi") => {
+export const handleInfo = (message: string, title = "Bilgi", duration = 4000) => {
   toast({
     title,
     description: message,
+    duration,
+    className: "border-info bg-info/10",
   });
 };
 
-export const handleWarning = (message: string, title = "Uyarı") => {
+export const handleWarning = (message: string, title = "Uyarı", duration = 4000) => {
   toast({
     title,
     description: message,
-    variant: "default",
+    duration,
+    className: "border-warning bg-warning/10",
+  });
+};
+
+export const handleLoading = (message: string, title = "Yükleniyor...") => {
+  return toast({
+    title,
+    description: message,
+    duration: Infinity, // Won't auto-dismiss
+    className: "border-muted",
   });
 };

@@ -7,6 +7,7 @@ import { useSiteStats } from '@/hooks/queries/useSiteQueries';
 import { SiteFormWrapper } from './SiteFormWrapper';
 import { EnhancedSiteList } from './EnhancedSiteList';
 import { SiteBulkActions } from './SiteBulkActions';
+import { SiteListSkeleton } from './SiteListSkeleton';
 
 export function SiteManagementContainer() {
   const queryClient = useQueryClient();
@@ -143,19 +144,23 @@ export function SiteManagementContainer() {
         />
 
         {/* Site List */}
-        <EnhancedSiteList
-          sites={orderedSites}
-          stats={siteStats || {}}
-          selectedSites={selectedSites}
-          editingId={editingId}
-          onToggleSelect={handleToggleSelect}
-          onToggleSelectAll={handleToggleSelectAll}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onReorder={handleReorder}
-          isDeleting={deletingId}
-          isLoading={sitesLoading}
-        />
+        {sitesLoading ? (
+          <SiteListSkeleton />
+        ) : (
+          <EnhancedSiteList
+            sites={orderedSites}
+            stats={siteStats || {}}
+            selectedSites={selectedSites}
+            editingId={editingId}
+            onToggleSelect={handleToggleSelect}
+            onToggleSelectAll={handleToggleSelectAll}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onReorder={handleReorder}
+            isDeleting={deletingId}
+            isLoading={sitesLoading}
+          />
+        )}
       </CardContent>
     </Card>
   );
