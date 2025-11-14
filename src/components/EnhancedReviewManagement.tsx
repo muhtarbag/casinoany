@@ -56,6 +56,10 @@ export default function EnhancedReviewManagement() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiSelectedSite, setAiSelectedSite] = useState<string>("");
   const [aiReviewCount, setAiReviewCount] = useState<string>("3");
+  const [aiReviewTone, setAiReviewTone] = useState<"positive" | "negative" | "neutral">("neutral");
+  const [aiRatingMin, setAiRatingMin] = useState<string>("3");
+  const [aiRatingMax, setAiRatingMax] = useState<string>("5");
+  const [aiLanguage, setAiLanguage] = useState<"tr" | "en">("tr");
 
   // Fetch betting sites for AI generation
   const { data: bettingSites = [] } = useQuery({
@@ -262,7 +266,11 @@ export default function EnhancedReviewManagement() {
           type: 'generate-reviews',
           data: {
             siteName: selectedSite?.name,
-            count: parseInt(aiReviewCount)
+            count: parseInt(aiReviewCount),
+            tone: aiReviewTone,
+            ratingMin: parseInt(aiRatingMin),
+            ratingMax: parseInt(aiRatingMax),
+            language: aiLanguage
           }
         }
       });
@@ -294,6 +302,10 @@ export default function EnhancedReviewManagement() {
       
       setAiSelectedSite("");
       setAiReviewCount("3");
+      setAiReviewTone("neutral");
+      setAiRatingMin("3");
+      setAiRatingMax("5");
+      setAiLanguage("tr");
     } catch (error) {
       console.error('AI yorum oluşturma hatası:', error);
       toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
@@ -331,8 +343,8 @@ export default function EnhancedReviewManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
               <label className="text-sm font-medium mb-2 block">Site Seçin</label>
               <Select value={aiSelectedSite} onValueChange={setAiSelectedSite}>
                 <SelectTrigger>
@@ -348,7 +360,58 @@ export default function EnhancedReviewManagement() {
               </Select>
             </div>
             
-            <div className="w-32">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Yorum Tonu</label>
+              <Select value={aiReviewTone} onValueChange={(value: "positive" | "negative" | "neutral") => setAiReviewTone(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="positive">👍 Pozitif</SelectItem>
+                  <SelectItem value="neutral">😐 Nötr</SelectItem>
+                  <SelectItem value="negative">👎 Negatif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Puan Aralığı</label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={aiRatingMin}
+                  onChange={(e) => setAiRatingMin(e.target.value)}
+                  className="w-20"
+                />
+                <span className="text-muted-foreground">-</span>
+                <Input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={aiRatingMax}
+                  onChange={(e) => setAiRatingMax(e.target.value)}
+                  className="w-20"
+                />
+                <span className="text-sm text-muted-foreground">⭐</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Dil</label>
+              <Select value={aiLanguage} onValueChange={(value: "tr" | "en") => setAiLanguage(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tr">🇹🇷 Türkçe</SelectItem>
+                  <SelectItem value="en">🇬🇧 İngilizce</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <label className="text-sm font-medium mb-2 block">Yorum Sayısı</label>
               <Input
                 type="number"
@@ -358,25 +421,25 @@ export default function EnhancedReviewManagement() {
                 onChange={(e) => setAiReviewCount(e.target.value)}
               />
             </div>
-
-            <Button 
-              onClick={handleAiGenerateReviews} 
-              disabled={isAiLoading || !aiSelectedSite}
-              className="gap-2"
-            >
-              {isAiLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Oluşturuluyor...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4" />
-                  Oluştur
-                </>
-              )}
-            </Button>
           </div>
+
+          <Button 
+            onClick={handleAiGenerateReviews} 
+            disabled={isAiLoading || !aiSelectedSite}
+            className="w-full gap-2"
+          >
+            {isAiLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Oluşturuluyor...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Yorumları Oluştur
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
 
