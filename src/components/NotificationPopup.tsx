@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -46,6 +46,7 @@ export const NotificationPopup = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [openNotificationId, setOpenNotificationId] = useState<string | null>(null);
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
@@ -114,6 +115,10 @@ export const NotificationPopup = () => {
       
       if (error) throw error;
     },
+    onSuccess: () => {
+      // Query'i invalidate et ki yeni data yüklensin
+      queryClient.invalidateQueries({ queryKey: ['viewed-notifications', sessionId] });
+    },
   });
 
   const trackClickMutation = useMutation({
@@ -138,6 +143,10 @@ export const NotificationPopup = () => {
       
       if (error) throw error;
     },
+    onSuccess: () => {
+      // Query'i invalidate et ki kapatılan bildirim bir daha gelmesin
+      queryClient.invalidateQueries({ queryKey: ['viewed-notifications', sessionId] });
+    },
   });
 
   // Timer for time_on_page trigger
@@ -151,6 +160,8 @@ export const NotificationPopup = () => {
 
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
+    // Zaten bir bildirim açıksa tekrar kontrol etme
+    if (openNotificationId) return;
 
     const notificationToShow = notifications.find(notification => {
       const viewed = viewedNotifications.find(v => v.notification_id === notification.id);
@@ -195,7 +206,7 @@ export const NotificationPopup = () => {
       setOpenNotificationId(notificationToShow.id);
       trackViewMutation.mutate(notificationToShow.id);
     }
-  }, [notifications, viewedNotifications, timeOnPage, shouldShow]);
+  }, [notifications, viewedNotifications, shouldShow, openNotificationId]);
 
   const checkTrigger = (notification: Notification) => {
     const { trigger_type, trigger_conditions } = notification;
