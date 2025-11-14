@@ -99,6 +99,7 @@ export default function Admin() {
             dailyPageViews={dailyPageViews || []}
             deviceStats={deviceStats || []}
             topPages={topPages || []}
+            onNavigate={setActiveTab}
           />
         )}
 
