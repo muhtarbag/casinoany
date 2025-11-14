@@ -56,7 +56,7 @@ export const Footer = () => {
               2020'den beri sektörde, binlerce kullanıcıya en iyi bahis deneyimini yaşatıyoruz.
             </p>
             
-            <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="space-y-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" />
                 <span>Güvenilir İncelemeler</span>
@@ -69,6 +69,19 @@ export const Footer = () => {
                 <CreditCard className="w-4 h-4 text-primary" />
                 <span>Hızlı Ödemeler</span>
               </div>
+              <a 
+                href="https://gamecheck.com/tr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity mt-2"
+                aria-label="GameCheck Verified"
+              >
+                <img 
+                  src={gameCheckLogo} 
+                  alt="GameCheck Verified" 
+                  className="h-12 w-auto"
+                />
+              </a>
             </div>
           </div>
 
@@ -239,24 +252,6 @@ export const Footer = () => {
           <p className="text-xs text-muted-foreground/70">
             Powered by <a href="https://visiontech.co" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">visiontech.co</a> • Built with ❤️
           </p>
-          
-          {/* GameCheck Verified Badge */}
-          <div className="flex justify-center py-4">
-            <a 
-              href="https://gamecheck.com/tr" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block hover:opacity-80 transition-opacity"
-              aria-label="GameCheck Verified"
-            >
-              <img 
-                src={gameCheckLogo} 
-                alt="GameCheck Verified" 
-                className="h-16 w-auto"
-              />
-            </a>
-          </div>
-
           <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
             <Link to="/privacy" className="hover:text-primary transition-colors">Gizlilik Politikası</Link>
             <span>•</span>
