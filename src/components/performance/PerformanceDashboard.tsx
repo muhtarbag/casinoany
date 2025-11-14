@@ -12,6 +12,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Activity, Zap, TrendingUp, AlertTriangle, AlertCircle, Calculator } from 'lucide-react';
 import { subHours } from 'date-fns';
 import { usePerformanceAlerts } from '@/hooks/usePerformanceAlerts';
+import { PerformanceInstructions } from './PerformanceInstructions';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function PerformanceDashboard() {
   // Fetch recent metrics
@@ -101,13 +103,20 @@ export function PerformanceDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold">Performance Dashboard</h2>
-        <p className="text-muted-foreground mt-2">
-          Son 24 saatin performans metrikleri ve Core Web Vitals
-        </p>
-      </div>
+      <Tabs defaultValue="metrics" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="metrics">Metrikler</TabsTrigger>
+          <TabsTrigger value="guide">Kullanım Kılavuzu</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="metrics" className="space-y-6">
+          {/* Header */}
+          <div>
+            <h2 className="text-3xl font-bold">Performance Dashboard</h2>
+            <p className="text-muted-foreground mt-2">
+              Son 24 saatin performans metrikleri ve Core Web Vitals
+            </p>
+          </div>
 
       {/* Real-time Alerts */}
       {(criticalCount > 0 || warningCount > 0) && (
