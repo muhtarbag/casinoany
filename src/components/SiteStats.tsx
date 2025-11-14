@@ -1,12 +1,38 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, MousePointer, TrendingUp, BarChart3, PieChart } from "lucide-react";
 import { Bar, BarChart, Pie, PieChart as RechartsPie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useEffect } from "react";
 
 export default function SiteStats() {
+  const queryClient = useQueryClient();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('site-stats-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_stats'
+        },
+        () => {
+          // Refetch stats when any change occurs
+          queryClient.invalidateQueries({ queryKey: ["all-site-stats"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
