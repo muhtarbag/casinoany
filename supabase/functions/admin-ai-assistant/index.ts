@@ -433,6 +433,35 @@ SEO skorunu 0-100 arasında değerlendir ve iyileştirme önerileri sun.`
 async function generateReviews(data: any, apiKey: string) {
   const { siteName, count } = data;
 
+  // Generate unique seed for this request
+  const timestamp = Date.now();
+  const randomSeed = Math.random().toString(36).substring(2, 15);
+  const uniqueSeed = `${timestamp}_${randomSeed}`;
+
+  // Genişletilmiş Türk isim havuzu
+  const turkishNames = {
+    male: [
+      'Ahmet', 'Mehmet', 'Ali', 'Mustafa', 'Hasan', 'Hüseyin', 'İbrahim', 'Yusuf', 'Emre', 'Burak',
+      'Cem', 'Deniz', 'Murat', 'Can', 'Eren', 'Arda', 'Kaan', 'Barış', 'Oğuz', 'Kerem',
+      'Onur', 'Serkan', 'Tolga', 'Volkan', 'Berkay', 'Tuncay', 'Erdem', 'Alper', 'Sinan', 'Umut',
+      'Furkan', 'Berk', 'Çağlar', 'Selim', 'Tarık', 'Engin', 'Özgür', 'Koray', 'Mert', 'Okan'
+    ],
+    female: [
+      'Fatma', 'Ayşe', 'Elif', 'Zeynep', 'Merve', 'Selin', 'Ebru', 'Gülşen', 'Derya', 'Esra',
+      'Burcu', 'Tuğba', 'Özlem', 'Pınar', 'Canan', 'Sibel', 'Hülya', 'Serap', 'Gamze', 'Gözde',
+      'Aslı', 'Ece', 'Duygu', 'Nihan', 'İrem', 'Dilara', 'Seda', 'Yasemin', 'Cansu', 'Begüm',
+      'Emine', 'Hatice', 'Melek', 'Nesrin', 'Sevgi', 'Arzu', 'Aysun', 'Nurten', 'Filiz', 'Işıl'
+    ],
+    surnames: [
+      'Yılmaz', 'Demir', 'Çelik', 'Aydın', 'Özdemir', 'Arslan', 'Doğan', 'Kaya', 'Şahin', 'Kılıç',
+      'Polat', 'Karaca', 'Koç', 'Öztürk', 'Yıldız', 'Yıldırım', 'Aksoy', 'Özkan', 'Erdoğan', 'Keskin',
+      'Türk', 'Acar', 'Korkmaz', 'Güneş', 'Kara', 'Aslan', 'Özer', 'Güler', 'Kurt', 'Özgür',
+      'Tekin', 'Durmaz', 'Şimşek', 'Bulut', 'Ünal', 'Akın', 'Erdem', 'Toprak', 'Taş', 'Duman'
+    ]
+  };
+
+  const nameList = JSON.stringify(turkishNames);
+
   const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -441,52 +470,78 @@ async function generateReviews(data: any, apiKey: string) {
     },
     body: JSON.stringify({
       model: 'google/gemini-2.5-flash',
-      temperature: 0.9, // Yüksek yaratıcılık için
       messages: [
         {
           role: 'system',
-          content: 'Sen gerçek kullanıcı yorumları yazan bir uzman yazarsın. Her yorumun benzersiz, organik ve gerçekçi olması gerekir. Asla aynı ismi veya benzer ifadeleri tekrar etme. Her yorumcu farklı bir kişilik ve deneyime sahip olmalı.'
+          content: `Sen gerçek kullanıcı yorumları yazan bir uzman yazarsın. Her çağrıda tamamen farklı isimler ve yorumlar üretmelisin. 
+
+🚨 KRİTİK BENZERSIZLIK KURALLARI:
+- Bu çağrının benzersiz ID'si: ${uniqueSeed}
+- Her yorumda FARKLI bir isim-soyisim kombinasyonu kullan
+- Hiçbir zaman daha önce kullandığın isimleri tekrar etme
+- Her yorum farklı bir kişilik, üslup ve deneyimi yansıtmalı
+- Aynı ifadeleri, cümle kalıplarını veya kelimeleri tekrar kullanma`
         },
         {
           role: 'user',
-          content: `${siteName} bahis sitesi için ${count || 5} adet BENZERSIZ ve ORGANIK kullanıcı yorumu oluştur.
+          content: `${siteName} bahis sitesi için ${count || 5} adet TAMAMEN BENZERSIZ kullanıcı yorumu oluştur.
 
-        🎯 UNIQUE İSİM KURALLARI (ÇOK ÖNEMLİ):
-        - Her yorumcu için FARKLI bir Türkçe isim-soyisim kombinasyonu kullan
-        - Popüler Türkçe isimleri kullan: Ahmet, Mehmet, Ali, Mustafa, Hasan, Hüseyin, İbrahim, Yusuf, Emre, Burak, Cem, Deniz, Fatma, Ayşe, Elif, Zeynep, Merve, Selin, Ebru, Gülşen vb.
-        - Çeşitli soyisimler: Yılmaz, Demir, Çelik, Aydın, Özdemir, Arslan, Doğan, Kaya, Şahin, Kılıç, Polat, Karaca, Koç, Öztürk vb.
-        - Asla aynı ismi tekrar etme!
-        - Erkek ve kadın isimleri karıştır
-        
-        👤 KULLANICI ÇEŞİTLİLİĞİ:
-        - Farklı yaş grupları (20'li yaşlar: genç dil, 30'lu yaşlar: deneyimli, 40+: muhafazakâr üslup)
-        - Farklı deneyim seviyeleri (yeni başlayan, orta seviye, profesyonel)
-        - Farklı bahis tarzları (spor bahisleri, canlı bahis, casino oyunları)
-        - Bazıları teknik detaylara girerken, bazıları genel izlenimlerini paylaşsın
-        
-        📝 ORGANİK YORUM İÇERİĞİ:
-        - Her yorum FARKLI konulara odaklansın
-        - Bazıları bonuslardan bahsetsin
-        - Bazıları çekim süreçlerinden
-        - Bazıları müşteri hizmetlerinden
-        - Bazıları mobil uygulamadan
-        - Bazıları bahis oranlarından
-        - GERÇEK kullanıcı tecrübesi gibi yaz (gramer hataları, günlük dil, emoji kullanımı dahil)
-        
-        ⭐ PUAN DAĞILIMI:
-        - ${Math.ceil((count || 5) * 0.6)} adet 4-5 yıldız (pozitif deneyim)
-        - ${Math.floor((count || 5) * 0.4)} adet 1-3 yıldız (negatif/orta deneyim)
-        - Her puan için farklı gerekçeler
-        
-        📅 TARİH ÇEŞİTLİLİĞİ:
-        - Son 3 ay içinde farklı tarihler
-        - Aynı günde birden fazla yorum olmasın
-        
-        ✍️ YORUM DETAYLARI:
-        - Başlık: 50-80 karakter, dikkat çekici ve özgün
-        - Yorum: 150-250 kelime, detaylı ve kişisel
-        - Pros: 2-4 madde, spesifik avantajlar
-        - Cons: 1-3 madde (pozitif yorumlarda az, negatif yorumlarda çok)`
+🎯 BENZERSIZ İSİM OLUŞTURMA (MUTLAKA UYGULA):
+
+Seed: ${uniqueSeed}
+Timestamp: ${timestamp}
+
+Kullanılabilir isim havuzu:
+${nameList}
+
+⚠️ ÇOK ÖNEMLİ KURALLAR:
+1. Bu listeden her yorumcu için FARKLI bir isim-soyisim kombinasyonu seç
+2. İsimleri karıştır - her seferinde farklı kombinasyonlar kullan
+3. Erkek ve kadın isimlerini dengeli dağıt
+4. Aynı ismi veya soyismi iki kez kullanma
+5. Her yorumcu için rastgele bir isim + rastgele bir soyisim seç
+
+👤 KULLANICI ÇEŞİTLİLİĞİ:
+- Farklı yaş grupları: 18-25 (genç, rahat üslup), 26-35 (deneyimli, teknik), 36-50 (olgun, detaycı)
+- Farklı deneyim seviyeleri: Yeni başlayan (basit yorumlar), Orta (dengeli), Uzman (teknik detay)
+- Farklı bahis tarzları: Spor, Canlı bahis, Casino, Slot oyunları
+- Bazıları kısa ve özlü, bazıları detaylı ve analitik yorumlar yazsın
+
+📝 ORGANİK YORUM İÇERİĞİ:
+Her yorum TAMAMEN FARKLI bir konuya odaklansın:
+- Bonus kampanyaları ve çevrim şartları
+- Para çekme süreci ve limitler  
+- Müşteri hizmetleri deneyimi
+- Mobil uygulama performansı
+- Bahis oranları ve çeşitliliği
+- Canlı destek kalitesi
+- Site hızı ve kullanıcı deneyimi
+- Güvenilirlik ve lisans durumu
+
+GERÇEK kullanıcı gibi yaz:
+- Günlük konuşma dili kullan
+- Ara sıra emojiler ekle 😊 👍 ⚡
+- Küçük gramer hataları yapabilirsin
+- Kısaltmalar kullan (vs., vb., bence, keşke)
+
+⭐ PUAN DAĞILIMI:
+- ${Math.ceil((count || 5) * 0.6)} adet 4-5 yıldız (pozitif deneyim)
+- ${Math.floor((count || 5) * 0.4)} adet 1-3 yıldız (olumsuz/orta deneyim)
+
+📅 TARİH ÇEŞİTLİLİĞİ:
+- Son 90 gün içinden rastgele tarihler
+- Her yorum farklı bir günde olmalı
+
+✍️ YORUM DETAYLARI:
+- Başlık: 40-70 karakter, dikkat çekici ve her biri benzersiz
+- Yorum: 120-200 kelime, her biri farklı üslup ve ton
+- Pros: 2-4 madde (her yorum farklı avantajlar vurgulasın)
+- Cons: 1-3 madde (pozitif yorumlarda az, negatif yorumlarda fazla)
+
+🎲 RASTGELELIK VE BENZERSİZLİK:
+Bu seed'i kullan: ${uniqueSeed}
+Her yorum için listeden farklı kombinasyonlar seç
+Her çağrıda tamamen yeni isimler üret`
         }
       ],
       tools: [{
