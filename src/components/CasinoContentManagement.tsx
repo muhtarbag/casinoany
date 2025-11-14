@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -96,46 +96,51 @@ export const CasinoContentManagement = () => {
   }, [siteContent]);
 
   // Bulk generate for all sites
-  const generateBulkAI = async () => {
-    if (!sites || sites.length === 0) return;
-    
+  const generateBulkAI = useCallback(async () => {
+    if (!sites || sites.length === 0) {
+      toast({
+        title: "Hata",
+        description: "Henüz aktif site bulunmuyor",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsBulkGenerating(true);
+
     try {
-      const siteIds = sites.map(s => s.id);
-      const { data, error } = await supabase.functions.invoke('generate-casino-content', {
-        body: {
-          isBulk: true,
-          siteIds,
-        },
+      const { data, error } = await (supabase.functions as any).invoke('generate-casino-content', {
+        body: { 
+          mode: 'bulk',
+          siteIds: sites.map((s: any) => s.id)
+        }
       });
 
       if (error) throw error;
 
-      if (data.success) {
-        const successCount = data.results.filter((r: any) => r.success).length;
-        const failCount = data.results.filter((r: any) => !r.success).length;
-        
-        toast({
-          title: "Toplu İçerik Oluşturma Tamamlandı!",
-          description: `${successCount} site başarılı, ${failCount} site başarısız.`,
-        });
+      toast({
+        title: "Toplu İçerik Oluşturuldu",
+        description: `${data.successCount || 0} site için içerik başarıyla oluşturuldu!`,
+      });
 
-        queryClient.invalidateQueries({ queryKey: ['betting-sites-casino-content'] });
-        queryClient.invalidateQueries({ queryKey: ['site-casino-content'] });
+      // Refresh queries
+      queryClient.invalidateQueries({ queryKey: ['betting-sites-casino-content'] });
+      if (selectedSiteId) {
+        queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
       }
-    } catch (error) {
-      console.error('Bulk generation error:', error);
+    } catch (error: any) {
+      console.error('Bulk AI generation error:', error);
       toast({
         title: "Hata",
-        description: "Toplu içerik oluşturulurken bir hata oluştu.",
+        description: error.message || "İçerik oluşturulurken bir hata oluştu",
         variant: "destructive",
       });
     } finally {
       setIsBulkGenerating(false);
     }
-  };
+  }, [sites, toast, queryClient, selectedSiteId]);
 
-  const handleVersionRestore = (version: any) => {
+  const handleVersionRestore = useCallback((version: any) => {
     setPros(version.pros || []);
     setCons(version.cons || []);
     setVerdict(version.verdict || '');
@@ -149,10 +154,10 @@ export const CasinoContentManagement = () => {
     }
     
     queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
-  };
+  }, [selectedSiteId, queryClient]);
 
   // Generate content with AI
-  const generateWithAI = async () => {
+  const generateWithAI = useCallback(async () => {
     if (!selectedSiteId) return;
     
     const selectedSite = sites?.find(s => s.id === selectedSiteId);
@@ -197,7 +202,7 @@ export const CasinoContentManagement = () => {
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [selectedSiteId, sites, toast, queryClient]);
 
   // Update mutation
   const updateMutation = useMutation({
@@ -233,9 +238,8 @@ export const CasinoContentManagement = () => {
     },
   });
 
-  const handleSiteChange = (siteId: string) => {
+  const handleSiteChange = useCallback((siteId: string) => {
     setSelectedSiteId(siteId);
-    // Reset content when changing site
     setPros([]);
     setCons([]);
     setVerdict('');
@@ -244,11 +248,11 @@ export const CasinoContentManagement = () => {
     setLoginGuide('');
     setWithdrawalGuide('');
     setFaq([]);
-  };
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     updateMutation.mutate();
-  };
+  }, [updateMutation]);
 
   if (sitesLoading) {
     return (
