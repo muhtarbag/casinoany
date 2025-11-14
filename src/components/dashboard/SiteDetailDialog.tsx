@@ -87,7 +87,7 @@ export function SiteDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className="pr-10">
           <div className="flex flex-wrap items-start gap-3 justify-between">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <Avatar className="h-12 w-12 border-2 border-background shadow-sm shrink-0">
@@ -102,7 +102,7 @@ export function SiteDetailDialog({
               </div>
             </div>
             {rating && (
-              <Badge variant="outline" className="shrink-0">
+              <Badge variant="outline" className="shrink-0 mt-1">
                 ⭐ {rating.toFixed(1)}
               </Badge>
             )}
