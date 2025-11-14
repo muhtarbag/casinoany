@@ -40,9 +40,6 @@ const AMPSiteDetail = lazy(() => import("./pages/amp/AMPSiteDetail"));
 
 // SEO-optimized pages
 const DenemeBonusu = lazy(() => import("./pages/DenemeBonusu"));
-const BetistInceleme = lazy(() => import("./pages/BetistInceleme"));
-const Bets10Inceleme = lazy(() => import("./pages/Bets10Inceleme"));
-const MobilbahisInceleme = lazy(() => import("./pages/MobilbahisInceleme"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -89,9 +86,6 @@ const AppContent = () => {
           
           {/* SEO-optimized content pages */}
           <Route path="/deneme-bonusu" element={<DenemeBonusu />} />
-          <Route path="/betist-inceleme" element={<BetistInceleme />} />
-          <Route path="/bets10-inceleme" element={<Bets10Inceleme />} />
-          <Route path="/mobilbahis-inceleme" element={<MobilbahisInceleme />} />
           
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
