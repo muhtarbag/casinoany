@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { optimizeImage, formatFileSize } from '@/utils/imageOptimizer';
+import { showSuccessToast, showErrorToast, showLoadingToast, updateToast } from '@/lib/toastHelpers';
 
 interface Banner {
   id: string;
@@ -161,14 +163,30 @@ export const BannerManagement = () => {
   };
 
   const uploadImage = async (file: File) => {
+    const loadingToastId = showLoadingToast('Görsel optimize ediliyor...');
+    
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      // Optimize image
+      const optimized = await optimizeImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1080,
+        quality: 0.85,
+        format: 'webp'
+      });
+
+      updateToast(
+        loadingToastId,
+        'info',
+        `Optimizasyon tamamlandı: ${formatFileSize(optimized.originalSize)} → ${formatFileSize(optimized.optimizedSize)} (%${optimized.savings} tasarruf)`
+      );
+
+      // Upload optimized image
+      const fileName = `banner-${Date.now()}.${optimized.format}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('notification-images')
-        .upload(filePath, file);
+        .upload(filePath, optimized.file);
 
       if (uploadError) throw uploadError;
 
@@ -177,9 +195,9 @@ export const BannerManagement = () => {
         .getPublicUrl(filePath);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Görsel yüklendi');
+      showSuccessToast('Görsel başarıyla yüklendi!');
     } catch (error: any) {
-      toast.error('Görsel yüklenirken hata: ' + error.message);
+      showErrorToast(error, 'Görsel yüklenirken bir hata oluştu');
     }
   };
 
