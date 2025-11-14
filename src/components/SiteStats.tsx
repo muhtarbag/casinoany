@@ -10,8 +10,8 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("site_stats_with_details")
+      const { data, error } = await supabase
+        .from("site_stats_with_details" as any)
         .select("*")
         .order("clicks", { ascending: false });
 
@@ -20,8 +20,8 @@ export default function SiteStats() {
       return (data || []).map((row: any) => ({
         id: row.id,
         site_id: row.site_id,
-        views: row.views,
-        clicks: row.clicks,
+        views: row.views || 0,
+        clicks: row.clicks || 0,
         created_at: row.created_at,
         updated_at: row.updated_at,
         betting_sites: {
@@ -31,7 +31,8 @@ export default function SiteStats() {
         },
       }));
     },
-    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    staleTime: 0,
+    refetchInterval: 30000,
   });
 
   if (isLoading) {
@@ -52,19 +53,19 @@ export default function SiteStats() {
 
   // Chart data
   const clicksChartData = topClicked.map((stat: any) => ({
-    name: stat.betting_sites?.name || "Bilinmeyen",
+    name: stat.betting_sites?.name,
     clicks: stat.clicks,
   }));
 
   const viewsChartData = topViewed.map((stat: any) => ({
-    name: stat.betting_sites?.name || "Bilinmeyen",
+    name: stat.betting_sites?.name,
     views: stat.views,
   }));
 
   const ctrChartData = [...((statsData as any[]) || [])]
     .filter((stat: any) => stat.views > 0)
     .map((stat: any) => ({
-      name: stat.betting_sites?.name || "Bilinmeyen",
+      name: stat.betting_sites?.name,
       ctr: ((stat.clicks / stat.views) * 100).toFixed(2),
       clicks: stat.clicks,
       views: stat.views,
@@ -73,7 +74,7 @@ export default function SiteStats() {
     .slice(0, 10);
 
   const pieChartData = topClicked.slice(0, 5).map((stat: any) => ({
-    name: stat.betting_sites?.name || "Bilinmeyen",
+    name: stat.betting_sites?.name,
     value: stat.clicks,
   }));
 
@@ -270,7 +271,7 @@ export default function SiteStats() {
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
-                    <span className="font-medium">{stat.betting_sites?.name || "Bilinmeyen"}</span>
+                    <span className="font-medium">{stat.betting_sites?.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MousePointer className="w-4 h-4 text-muted-foreground" />
@@ -296,7 +297,7 @@ export default function SiteStats() {
                 <div key={stat.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
-                    <span className="font-medium">{stat.betting_sites?.name || "Bilinmeyen"}</span>
+                    <span className="font-medium">{stat.betting_sites?.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-muted-foreground" />
