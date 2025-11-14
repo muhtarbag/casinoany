@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, X } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Upload, X, ChevronDown } from 'lucide-react';
 import type { NotificationFormData } from './types';
 
 interface NotificationFormProps {
@@ -177,6 +178,69 @@ export function NotificationForm({
           </Select>
         </div>
       </div>
+
+      {/* Form Fields - Only shown when notification type is "form" */}
+      {formData.notification_type === 'form' && (
+        <Collapsible open={true} className="border rounded-lg p-4 space-y-4 bg-muted/20">
+          <CollapsibleTrigger className="flex items-center justify-between w-full">
+            <h3 className="font-semibold text-sm">Form Alanları Ayarları</h3>
+            <ChevronDown className="h-4 w-4" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="email_label">E-posta Alanı Etiketi</Label>
+              <Input
+                id="email_label"
+                value={formData.form_fields?.email_label || ''}
+                onChange={(e) => handleFormFieldChange('email_label', e.target.value)}
+                placeholder="E-posta Adresiniz"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone_label">Telefon Alanı Etiketi</Label>
+              <Input
+                id="phone_label"
+                value={formData.form_fields?.phone_label || ''}
+                onChange={(e) => handleFormFieldChange('phone_label', e.target.value)}
+                placeholder="Telefon Numaranız"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="submit_text">Gönder Butonu Metni</Label>
+              <Input
+                id="submit_text"
+                value={formData.form_fields?.submit_text || ''}
+                onChange={(e) => handleFormFieldChange('submit_text', e.target.value)}
+                placeholder="Bonus Kodumu Gönder"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="success_message">Başarı Mesajı</Label>
+              <Textarea
+                id="success_message"
+                value={formData.form_fields?.success_message || ''}
+                onChange={(e) => handleFormFieldChange('success_message', e.target.value)}
+                placeholder="✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi."
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="privacy_text">Gizlilik Metni</Label>
+              <Textarea
+                id="privacy_text"
+                value={formData.form_fields?.privacy_text || ''}
+                onChange={(e) => handleFormFieldChange('privacy_text', e.target.value)}
+                placeholder="🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır."
+                rows={2}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Buttons */}
       <div className="grid grid-cols-2 gap-4">
