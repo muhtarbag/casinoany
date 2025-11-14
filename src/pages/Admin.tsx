@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -465,7 +463,6 @@ export default function Admin() {
 
   return (
     <>
-      <Header />
       <AdminLayout
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -797,7 +794,6 @@ export default function Admin() {
           {activeTab === 'gsc' && <GSCSetupGuide />}
         </div>
       </AdminLayout>
-      <Footer />
     </>
   );
 }
