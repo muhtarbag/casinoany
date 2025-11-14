@@ -9,15 +9,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://cpaukwimbfoembwwtqhj.supabase.co" />
     
-    <!-- Preload critical CSS (Google Fonts) -->
+    <!-- Critical font preload -->
     <link 
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     />
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Google Fonts - Only Inter (main font) loaded synchronously -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+      rel="stylesheet" 
+    />
+    
+    <!-- Other fonts loaded asynchronously -->
+    <link 
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
     
     <!-- Mobile Optimization -->
     <meta name="mobile-web-app-capable" content="yes" />
@@ -26,6 +37,9 @@
     <meta name="apple-mobile-web-app-title" content="CasinoAny" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="theme-color" content="#c026d3" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
     
     <title>CasinoAny.com - En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu 2025</title>
     <meta name="description" content="CasinoAny.com ile Türkiye'nin en güvenilir casino ve bahis sitelerini keşfedin. Güncel bonuslar, kampanyalar ve detaylı site incelemeleri.">
@@ -66,5 +80,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Silent fail
+          });
+        });
+      }
+    </script>
   </body>
 </html>

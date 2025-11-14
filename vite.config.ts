@@ -19,26 +19,73 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Optimize chunk splitting
+    // Aggressive chunk splitting for optimal loading
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-charts': ['recharts'],
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            // React core
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            // UI libraries
+            if (id.includes('@radix-ui')) {
+              return 'vendor-ui';
+            }
+            // Query library
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-query';
+            }
+            // Chart library
+            if (id.includes('recharts')) {
+              return 'vendor-charts';
+            }
+            // Date utilities
+            if (id.includes('date-fns')) {
+              return 'vendor-dates';
+            }
+            // Form libraries
+            if (id.includes('react-hook-form') || id.includes('zod')) {
+              return 'vendor-forms';
+            }
+            // Rich text editor
+            if (id.includes('react-quill')) {
+              return 'vendor-editor';
+            }
+            // All other node_modules
+            return 'vendor-other';
+          }
+          
+          // Split large route components
+          if (id.includes('/pages/admin/')) {
+            return 'admin-routes';
+          }
+          if (id.includes('/pages/')) {
+            return 'app-routes';
+          }
         },
       },
     },
     // Increase chunk size warning limit
-    chunkSizeWarningLimit: 1000,
-    // Enable source maps for production debugging (optional)
+    chunkSizeWarningLimit: 600,
+    // Disable source maps in production
     sourcemap: false,
-    // Use esbuild for minification (faster than terser, already included)
+    // Use esbuild for minification (faster)
     minify: 'esbuild',
+    // Target modern browsers for smaller bundle
+    target: 'es2020',
+    // CSS code splitting
+    cssCodeSplit: true,
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      '@tanstack/react-query'
+    ],
+    exclude: ['@tanstack/react-virtual'], // Exclude if not used in initial load
   },
 }));
