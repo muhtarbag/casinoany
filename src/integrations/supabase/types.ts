@@ -14,6 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_metrics: {
+        Row: {
+          created_at: string
+          estimated_revenue: number | null
+          id: string
+          metric_date: string
+          notes: string | null
+          site_id: string
+          total_clicks: number
+          total_conversions: number
+          total_views: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_revenue?: number | null
+          id?: string
+          metric_date?: string
+          notes?: string | null
+          site_id: string
+          total_clicks?: number
+          total_conversions?: number
+          total_views?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estimated_revenue?: number | null
+          id?: string
+          metric_date?: string
+          notes?: string | null
+          site_id?: string
+          total_clicks?: number
+          total_conversions?: number
+          total_views?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_payments: {
+        Row: {
+          commission_percentage: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          payment_amount: number
+          payment_date: string
+          payment_status: string
+          payment_type: string
+          site_id: string
+          updated_at: string
+        }
+        Insert: {
+          commission_percentage?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_amount: number
+          payment_date: string
+          payment_status?: string
+          payment_type?: string
+          site_id: string
+          updated_at?: string
+        }
+        Update: {
+          commission_percentage?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_amount?: number
+          payment_date?: string
+          payment_status?: string
+          payment_type?: string
+          site_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_payments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_analysis_history: {
         Row: {
           actions: Json | null
@@ -208,6 +302,7 @@ export type Database = {
       }
       betting_sites: {
         Row: {
+          affiliate_commission_percentage: number | null
           affiliate_contract_date: string | null
           affiliate_contract_terms: string | null
           affiliate_has_monthly_payment: boolean | null
@@ -247,6 +342,7 @@ export type Database = {
           youtube: string | null
         }
         Insert: {
+          affiliate_commission_percentage?: number | null
           affiliate_contract_date?: string | null
           affiliate_contract_terms?: string | null
           affiliate_has_monthly_payment?: boolean | null
@@ -286,6 +382,7 @@ export type Database = {
           youtube?: string | null
         }
         Update: {
+          affiliate_commission_percentage?: number | null
           affiliate_contract_date?: string | null
           affiliate_contract_terms?: string | null
           affiliate_has_monthly_payment?: boolean | null

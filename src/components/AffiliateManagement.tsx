@@ -1,0 +1,363 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { 
+  DollarSign, 
+  TrendingUp, 
+  Users, 
+  Eye, 
+  MousePointer, 
+  Calendar,
+  Link as LinkIcon,
+  Plus,
+  ExternalLink
+} from 'lucide-react';
+
+export function AffiliateManagement() {
+  const queryClient = useQueryClient();
+  const [selectedSiteId, setSelectedSiteId] = useState<string>('');
+
+  // Fetch sites with affiliate contracts
+  const { data: sites, isLoading: sitesLoading } = useQuery({
+    queryKey: ['affiliate-sites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .not('affiliate_contract_date', 'is', null)
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch selected site details
+  const { data: selectedSite } = useQuery({
+    queryKey: ['site-details', selectedSiteId],
+    queryFn: async () => {
+      if (!selectedSiteId) return null;
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .eq('id', selectedSiteId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedSiteId,
+  });
+
+  // Fetch payments for selected site
+  const { data: payments } = useQuery({
+    queryKey: ['affiliate-payments', selectedSiteId],
+    queryFn: async () => {
+      if (!selectedSiteId) return [];
+      const { data, error } = await supabase
+        .from('affiliate_payments')
+        .select('*')
+        .eq('site_id', selectedSiteId)
+        .order('payment_date', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedSiteId,
+  });
+
+  // Fetch metrics for selected site
+  const { data: metrics } = useQuery({
+    queryKey: ['affiliate-metrics', selectedSiteId],
+    queryFn: async () => {
+      if (!selectedSiteId) return [];
+      const { data, error } = await supabase
+        .from('affiliate_metrics')
+        .select('*')
+        .eq('site_id', selectedSiteId)
+        .order('metric_date', { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedSiteId,
+  });
+
+  // Add payment mutation
+  const addPaymentMutation = useMutation({
+    mutationFn: async (payment: any) => {
+      const { error } = await supabase
+        .from('affiliate_payments')
+        .insert([payment]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['affiliate-payments'] });
+      toast.success('Ödeme kaydı eklendi!');
+    },
+    onError: (error: any) => {
+      toast.error('Hata: ' + error.message);
+    },
+  });
+
+  // Calculate totals
+  const totalRevenue = payments?.reduce((sum, p) => sum + Number(p.payment_amount), 0) || 0;
+  const totalClicks = metrics?.reduce((sum, m) => sum + m.total_clicks, 0) || 0;
+  const totalViews = metrics?.reduce((sum, m) => sum + m.total_views, 0) || 0;
+  const totalConversions = metrics?.reduce((sum, m) => sum + m.total_conversions, 0) || 0;
+
+  if (sitesLoading) {
+    return <div className="flex justify-center p-8">Yükleniyor...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>🤝 Affiliate Yönetim Paneli</CardTitle>
+          <CardDescription>
+            Affiliate anlaşmalarınızı, ödemelerinizi ve performansınızı takip edin
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Site Seçin</Label>
+              <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Affiliate anlaşması olan bir site seçin..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {sites?.map((site) => (
+                    <SelectItem key={site.id} value={site.id}>
+                      {site.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedSiteId && selectedSite && (
+              <div className="space-y-6 mt-6">
+                {/* Site Info Card */}
+                <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-2xl">{selectedSite.name}</CardTitle>
+                        <CardDescription className="mt-2">
+                          Anlaşma Tarihi: {selectedSite.affiliate_contract_date ? new Date(selectedSite.affiliate_contract_date).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                        </CardDescription>
+                      </div>
+                      {selectedSite.affiliate_panel_url && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={selectedSite.affiliate_panel_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Panel'i Aç
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Komisyon %</p>
+                        <p className="text-xl font-bold">
+                          {selectedSite.affiliate_commission_percentage || '-'}%
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Aylık Ödeme</p>
+                        <p className="text-xl font-bold">
+                          {selectedSite.affiliate_has_monthly_payment ? (
+                            `${selectedSite.affiliate_monthly_payment || 0} TL`
+                          ) : (
+                            <Badge variant="secondary">Yok</Badge>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Panel Kullanıcı</p>
+                        <p className="text-sm font-mono">{selectedSite.affiliate_panel_username || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Panel Şifre</p>
+                        <p className="text-sm font-mono">
+                          {selectedSite.affiliate_panel_password ? '••••••••' : '-'}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedSite.affiliate_contract_terms && (
+                      <div className="pt-3 border-t">
+                        <p className="text-sm text-muted-foreground mb-1">Anlaşma Şartları:</p>
+                        <p className="text-sm">{selectedSite.affiliate_contract_terms}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Performance Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Toplam Gelir</p>
+                          <p className="text-2xl font-bold">{totalRevenue.toFixed(2)} TL</p>
+                        </div>
+                        <DollarSign className="w-8 h-8 text-green-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Toplam Tıklama</p>
+                          <p className="text-2xl font-bold">{totalClicks.toLocaleString()}</p>
+                        </div>
+                        <MousePointer className="w-8 h-8 text-blue-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Toplam Görüntüleme</p>
+                          <p className="text-2xl font-bold">{totalViews.toLocaleString()}</p>
+                        </div>
+                        <Eye className="w-8 h-8 text-purple-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Conversion</p>
+                          <p className="text-2xl font-bold">{totalConversions}</p>
+                        </div>
+                        <TrendingUp className="w-8 h-8 text-orange-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Tabs for Payments and Metrics */}
+                <Tabs defaultValue="payments" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="payments">Ödeme Geçmişi</TabsTrigger>
+                    <TabsTrigger value="metrics">Metrikler</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="payments" className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Ödeme Geçmişi</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {payments && payments.length > 0 ? (
+                            payments.map((payment) => (
+                              <div
+                                key={payment.id}
+                                className="flex items-center justify-between p-4 border rounded-lg"
+                              >
+                                <div>
+                                  <p className="font-semibold">
+                                    {new Date(payment.payment_date).toLocaleDateString('tr-TR')}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {payment.payment_type === 'monthly' ? 'Aylık Ödeme' : 
+                                     payment.payment_type === 'commission' ? 'Komisyon' : 'Bonus'}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-lg text-green-600">
+                                    {payment.payment_amount} TL
+                                  </p>
+                                  <Badge variant={
+                                    payment.payment_status === 'completed' ? 'default' :
+                                    payment.payment_status === 'pending' ? 'secondary' : 'destructive'
+                                  }>
+                                    {payment.payment_status === 'completed' ? 'Tamamlandı' :
+                                     payment.payment_status === 'pending' ? 'Bekliyor' : 'İptal'}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-center text-muted-foreground py-8">
+                              Henüz ödeme kaydı yok
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="metrics" className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Son 30 Gün Metrikleri</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {metrics && metrics.length > 0 ? (
+                            <div className="overflow-x-auto">
+                              <table className="w-full">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left py-2">Tarih</th>
+                                    <th className="text-right py-2">Görüntüleme</th>
+                                    <th className="text-right py-2">Tıklama</th>
+                                    <th className="text-right py-2">Conversion</th>
+                                    <th className="text-right py-2">Gelir (Tahmini)</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {metrics.map((metric) => (
+                                    <tr key={metric.id} className="border-b">
+                                      <td className="py-2">
+                                        {new Date(metric.metric_date).toLocaleDateString('tr-TR')}
+                                      </td>
+                                      <td className="text-right">{metric.total_views}</td>
+                                      <td className="text-right">{metric.total_clicks}</td>
+                                      <td className="text-right">{metric.total_conversions}</td>
+                                      <td className="text-right font-semibold">
+                                        {metric.estimated_revenue || 0} TL
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <p className="text-center text-muted-foreground py-8">
+                              Henüz metrik verisi yok
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

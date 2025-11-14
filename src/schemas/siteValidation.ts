@@ -107,6 +107,12 @@ export const siteFormSchema = z.object({
     .max(2000, 'Notlar en fazla 2000 karakter olabilir')
     .optional()
     .default(''),
+  
+  affiliate_commission_percentage: z.number()
+    .min(0, 'Komisyon yüzdesi negatif olamaz')
+    .max(100, 'Komisyon yüzdesi 100\'den büyük olamaz')
+    .optional()
+    .nullable(),
 });
 
 export type SiteFormData = z.infer<typeof siteFormSchema>;
