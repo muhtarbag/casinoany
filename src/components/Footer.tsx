@@ -1,6 +1,7 @@
 import { Mail, Twitter, Facebook, Instagram, Youtube, Linkedin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
 import gameCheckLogo from '@/assets/gamecheck-verified.svg';
+import trustpilotLogo from '@/assets/trustpilot-logo.svg';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
@@ -69,19 +70,36 @@ export const Footer = () => {
                 <CreditCard className="w-4 h-4 text-primary" />
                 <span>Hızlı Ödemeler</span>
               </div>
-              <a 
-                href="https://gamecheck.com/tr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-block hover:opacity-80 transition-opacity mt-2"
-                aria-label="GameCheck Verified"
-              >
-                <img 
-                  src={gameCheckLogo} 
-                  alt="GameCheck Verified" 
-                  className="h-12 w-auto"
-                />
-              </a>
+              
+              {/* Trust Badges */}
+              <div className="pt-2 space-y-2">
+                <a 
+                  href="https://gamecheck.com/tr" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity"
+                  aria-label="GameCheck Verified"
+                >
+                  <img 
+                    src={gameCheckLogo} 
+                    alt="GameCheck Verified" 
+                    className="h-12 w-auto"
+                  />
+                </a>
+                <a 
+                  href="https://www.trustpilot.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity"
+                  aria-label="Trustpilot"
+                >
+                  <img 
+                    src={trustpilotLogo} 
+                    alt="Trustpilot" 
+                    className="h-8 w-auto"
+                  />
+                </a>
+              </div>
             </div>
           </div>
 
