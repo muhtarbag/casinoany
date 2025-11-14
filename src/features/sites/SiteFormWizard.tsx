@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { SiteFormData } from '@/schemas/siteValidation';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { SiteFormStepSocial } from './wizard-steps/SiteFormStepSocial';
 import { SiteFormStepAffiliate } from './wizard-steps/SiteFormStepAffiliate';
 import { ChevronLeft, ChevronRight, Save, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ShortcutHint } from '@/components/shortcuts/ShortcutHint';
 
 interface SiteFormWizardProps {
   form: UseFormReturn<SiteFormData>;
@@ -37,6 +39,43 @@ export function SiteFormWizard({
 }: SiteFormWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const isMobile = useIsMobile();
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 's',
+      ctrl: true,
+      handler: (e) => {
+        e.preventDefault();
+        if (currentStep === STEPS.length - 1) {
+          handleSubmit();
+        }
+      },
+      description: 'Formu kaydet',
+    },
+    {
+      key: 'Escape',
+      handler: () => {
+        if (!isLoading) {
+          onCancel();
+        }
+      },
+      description: 'Formu iptal et',
+    },
+    {
+      key: 'Enter',
+      ctrl: true,
+      handler: (e) => {
+        e.preventDefault();
+        if (currentStep < STEPS.length - 1) {
+          handleNext();
+        } else {
+          handleSubmit();
+        }
+      },
+      description: 'Sonraki adım / Kaydet',
+    },
+  ]);
 
   const validateCurrentStep = async (): Promise<boolean> => {
     const fieldsToValidate = getFieldsForStep(currentStep);
@@ -116,20 +155,22 @@ export function SiteFormWizard({
               type="button" 
               onClick={handleNext} 
               disabled={isLoading}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none gap-2"
             >
               {!isMobile && 'İleri'}
-              <ChevronRight className="w-4 h-4 ml-1 sm:ml-2" />
+              <ChevronRight className="w-4 h-4" />
+              {!isMobile && <ShortcutHint shortcut={{ key: 'Enter', ctrl: true }} />}
             </Button>
           ) : (
             <Button 
               type="button" 
               onClick={handleSubmit} 
               disabled={isLoading}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none gap-2"
             >
-              <Save className="w-4 h-4 mr-1 sm:mr-2" />
+              <Save className="w-4 h-4" />
               {editingId ? 'Güncelle' : 'Kaydet'}
+              {!isMobile && <ShortcutHint shortcut={{ key: 'S', ctrl: true }} />}
             </Button>
           )}
         </div>
