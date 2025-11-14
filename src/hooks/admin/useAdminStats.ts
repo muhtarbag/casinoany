@@ -20,6 +20,7 @@ export const useAdminStats = () => {
         { count: pendingCommentsCount },
         { data: statsData },
         { data: blogData },
+        { data: paymentsData },
       ] = await Promise.all([
         supabase.from('betting_sites').select('*', { count: 'exact', head: true }),
         supabase.from('betting_sites').select('*', { count: 'exact', head: true }).eq('is_active', true),
@@ -33,12 +34,21 @@ export const useAdminStats = () => {
         (supabase as any).from('blog_comments').select('*', { count: 'exact', head: true }).eq('is_approved', false),
         (supabase as any).from('site_stats').select('views, clicks'),
         (supabase as any).from('blog_posts').select('view_count'),
+        supabase.from('affiliate_payments').select('payment_amount, payment_status'),
       ]);
 
       const totalViews = statsData?.reduce((sum, stat) => sum + (stat.views || 0), 0) || 0;
       const totalClicks = statsData?.reduce((sum, stat) => sum + (stat.clicks || 0), 0) || 0;
       const totalBlogViews = blogData?.reduce((sum, post) => sum + (post.view_count || 0), 0) || 0;
       const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0';
+      
+      // Calculate total revenue from paid affiliate payments
+      const totalRevenue = paymentsData?.reduce((sum, payment) => {
+        if (payment.payment_status === 'paid' && payment.payment_amount) {
+          return sum + parseFloat(String(payment.payment_amount));
+        }
+        return sum;
+      }, 0) || 0;
 
       return {
         totalSites: sitesCount || 0,
@@ -55,6 +65,7 @@ export const useAdminStats = () => {
         totalClicks,
         totalBlogViews,
         ctr,
+        totalRevenue,
       };
     },
     refetchInterval: 60000, // Refetch every minute

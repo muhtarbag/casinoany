@@ -47,6 +47,7 @@ interface DashboardStats {
   totalReviews: number;
   publishedBlogs: number;
   totalBlogPosts: number;
+  totalRevenue: number;
 }
 
 interface DashboardTabProps {
@@ -76,9 +77,6 @@ export function DashboardTab({
   const totalTrend = monthlyTrend.length > 1 
     ? ((monthlyTrend[monthlyTrend.length - 1]?.value - monthlyTrend[0]?.value) / monthlyTrend[0]?.value * 100).toFixed(1)
     : '0';
-
-  // Toplam gelir hesaplama (örnek - gerçek veri ile değiştirilmeli)
-  const totalRevenue = dashboardStats.totalClicks * 2.5; // Örnek: tıklama başına 2.5 TL
 
   return (
     <div className="space-y-6">
@@ -175,9 +173,9 @@ export function DashboardTab({
             <DollarSign className="h-5 w-5 text-warning" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-warning">₺{totalRevenue.toFixed(2)}</div>
+            <div className="text-3xl font-bold text-warning">₺{dashboardStats.totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Toplam tahsil
+              Ödenen komisyonlar
             </p>
           </CardContent>
         </Card>
