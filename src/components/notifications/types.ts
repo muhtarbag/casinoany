@@ -34,6 +34,15 @@ export interface Notification {
   created_at: string;
   updated_at?: string;
   form_fields?: NotificationFormFields | null;
+  // Advanced styling options
+  font_family?: string | null;
+  font_size?: string | null;
+  border_radius?: string | null;
+  max_width?: string | null;
+  padding?: string | null;
+  border_color?: string | null;
+  border_width?: string | null;
+  shadow_size?: string | null;
 }
 
 export interface NotificationFormData {
@@ -56,6 +65,15 @@ export interface NotificationFormData {
   trigger_type: string;
   trigger_conditions: Record<string, any>;
   form_fields: NotificationFormFields;
+  // Advanced styling options
+  font_family: string;
+  font_size: string;
+  border_radius: string;
+  max_width: string;
+  padding: string;
+  border_color: string;
+  border_width: string;
+  shadow_size: string;
 }
 
 export interface NotificationStats {

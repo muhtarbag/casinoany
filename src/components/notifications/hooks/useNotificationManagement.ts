@@ -36,6 +36,15 @@ const DEFAULT_FORM_DATA: NotificationFormData = {
     success_message: '✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi.',
     privacy_text: '🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır ve hiçbir şekilde üçüncü kişilerle paylaşılmaz.',
   },
+  // Advanced styling options
+  font_family: 'Inter',
+  font_size: 'base',
+  border_radius: 'lg',
+  max_width: 'md',
+  padding: 'normal',
+  border_color: '',
+  border_width: '0',
+  shadow_size: 'lg',
 };
 
 export function useNotificationManagement() {
@@ -184,6 +193,15 @@ export function useNotificationManagement() {
       trigger_type: notification.trigger_type || 'instant',
       trigger_conditions: notification.trigger_conditions || {},
       form_fields: notification.form_fields || DEFAULT_FORM_DATA.form_fields,
+      // Advanced styling options
+      font_family: notification.font_family || 'Inter',
+      font_size: notification.font_size || 'base',
+      border_radius: notification.border_radius || 'lg',
+      max_width: notification.max_width || 'md',
+      padding: notification.padding || 'normal',
+      border_color: notification.border_color || '',
+      border_width: notification.border_width || '0',
+      shadow_size: notification.shadow_size || 'lg',
     });
   }, []);
 

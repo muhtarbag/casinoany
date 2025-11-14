@@ -1306,6 +1306,9 @@ export type Database = {
       site_notifications: {
         Row: {
           background_color: string | null
+          border_color: string | null
+          border_radius: string | null
+          border_width: string | null
           button_text: string | null
           button_url: string | null
           content: string | null
@@ -1314,12 +1317,17 @@ export type Database = {
           display_frequency: string | null
           display_pages: string[] | null
           end_date: string | null
+          font_family: string | null
+          font_size: string | null
           form_fields: Json | null
           id: string
           image_url: string | null
           is_active: boolean | null
+          max_width: string | null
           notification_type: string
+          padding: string | null
           priority: number | null
+          shadow_size: string | null
           start_date: string | null
           target_url: string | null
           text_color: string | null
@@ -1331,6 +1339,9 @@ export type Database = {
         }
         Insert: {
           background_color?: string | null
+          border_color?: string | null
+          border_radius?: string | null
+          border_width?: string | null
           button_text?: string | null
           button_url?: string | null
           content?: string | null
@@ -1339,12 +1350,17 @@ export type Database = {
           display_frequency?: string | null
           display_pages?: string[] | null
           end_date?: string | null
+          font_family?: string | null
+          font_size?: string | null
           form_fields?: Json | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          max_width?: string | null
           notification_type?: string
+          padding?: string | null
           priority?: number | null
+          shadow_size?: string | null
           start_date?: string | null
           target_url?: string | null
           text_color?: string | null
@@ -1356,6 +1372,9 @@ export type Database = {
         }
         Update: {
           background_color?: string | null
+          border_color?: string | null
+          border_radius?: string | null
+          border_width?: string | null
           button_text?: string | null
           button_url?: string | null
           content?: string | null
@@ -1364,12 +1383,17 @@ export type Database = {
           display_frequency?: string | null
           display_pages?: string[] | null
           end_date?: string | null
+          font_family?: string | null
+          font_size?: string | null
           form_fields?: Json | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          max_width?: string | null
           notification_type?: string
+          padding?: string | null
           priority?: number | null
+          shadow_size?: string | null
           start_date?: string | null
           target_url?: string | null
           text_color?: string | null
