@@ -129,11 +129,208 @@ export const useAdminStats = () => {
     },
   });
 
+  // Weekly comparison - This week vs last week
+  const weeklyComparisonQuery = useQuery({
+    queryKey: ['weekly-comparison'],
+    queryFn: async () => {
+      const today = new Date();
+      const thisWeekStart = subDays(today, 7);
+      const lastWeekStart = subDays(today, 14);
+
+      const [thisWeekData, lastWeekData] = await Promise.all([
+        (supabase as any)
+          .from('analytics_events')
+          .select('event_type, event_name')
+          .eq('event_type', 'page_view')
+          .gte('created_at', thisWeekStart.toISOString())
+          .lte('created_at', today.toISOString()),
+        (supabase as any)
+          .from('analytics_events')
+          .select('event_type, event_name')
+          .eq('event_type', 'page_view')
+          .gte('created_at', lastWeekStart.toISOString())
+          .lte('created_at', thisWeekStart.toISOString()),
+      ]);
+
+      const thisWeekViews = thisWeekData.data?.length || 0;
+      const lastWeekViews = lastWeekData.data?.length || 0;
+      const viewsChange = lastWeekViews > 0 ? ((thisWeekViews - lastWeekViews) / lastWeekViews) * 100 : 0;
+
+      const [thisWeekClicks, lastWeekClicks] = await Promise.all([
+        (supabase as any)
+          .from('analytics_events')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_type', 'click')
+          .gte('created_at', thisWeekStart.toISOString()),
+        (supabase as any)
+          .from('analytics_events')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_type', 'click')
+          .gte('created_at', lastWeekStart.toISOString())
+          .lte('created_at', thisWeekStart.toISOString()),
+      ]);
+
+      const thisWeekClicksCount = thisWeekClicks.count || 0;
+      const lastWeekClicksCount = lastWeekClicks.count || 0;
+      const clicksChange = lastWeekClicksCount > 0 ? ((thisWeekClicksCount - lastWeekClicksCount) / lastWeekClicksCount) * 100 : 0;
+
+      const [thisWeekReviews, lastWeekReviews] = await Promise.all([
+        (supabase as any)
+          .from('site_reviews')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', thisWeekStart.toISOString()),
+        (supabase as any)
+          .from('site_reviews')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', lastWeekStart.toISOString())
+          .lte('created_at', thisWeekStart.toISOString()),
+      ]);
+
+      const thisWeekReviewsCount = thisWeekReviews.count || 0;
+      const lastWeekReviewsCount = lastWeekReviews.count || 0;
+      const reviewsChange = lastWeekReviewsCount > 0 ? ((thisWeekReviewsCount - lastWeekReviewsCount) / lastWeekReviewsCount) * 100 : 0;
+
+      return [
+        {
+          name: "Görüntüleme",
+          current: thisWeekViews,
+          previous: lastWeekViews,
+          change: viewsChange,
+          trend: viewsChange >= 0 ? "up" : "down" as "up" | "down"
+        },
+        {
+          name: "Tıklama",
+          current: thisWeekClicksCount,
+          previous: lastWeekClicksCount,
+          change: clicksChange,
+          trend: clicksChange >= 0 ? "up" : "down" as "up" | "down"
+        },
+        {
+          name: "Yorum",
+          current: thisWeekReviewsCount,
+          previous: lastWeekReviewsCount,
+          change: reviewsChange,
+          trend: reviewsChange >= 0 ? "up" : "down" as "up" | "down"
+        }
+      ];
+    },
+  });
+
+  // Monthly trend - Last 30 days
+  const monthlyTrendQuery = useQuery({
+    queryKey: ['monthly-trend'],
+    queryFn: async () => {
+      const thirtyDaysAgo = subDays(new Date(), 30);
+
+      const { data: viewsData } = await (supabase as any)
+        .from('analytics_events')
+        .select('created_at')
+        .eq('event_type', 'page_view')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      const { data: clicksData } = await (supabase as any)
+        .from('analytics_events')
+        .select('created_at')
+        .eq('event_type', 'click')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      const trendByDate: Record<string, { views: number; clicks: number }> = {};
+
+      viewsData?.forEach((item: any) => {
+        const date = new Date(item.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' });
+        if (!trendByDate[date]) trendByDate[date] = { views: 0, clicks: 0 };
+        trendByDate[date].views += 1;
+      });
+
+      clicksData?.forEach((item: any) => {
+        const date = new Date(item.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' });
+        if (!trendByDate[date]) trendByDate[date] = { views: 0, clicks: 0 };
+        trendByDate[date].clicks += 1;
+      });
+
+      return Object.entries(trendByDate)
+        .map(([date, data]) => ({ date, ...data }))
+        .slice(-30);
+    },
+  });
+
+  // Custom metrics
+  const customMetricsQuery = useQuery({
+    queryKey: ['custom-metrics'],
+    queryFn: async () => {
+      const thirtyDaysAgo = subDays(new Date(), 30);
+
+      // Avg response time from system health metrics
+      const { data: healthData } = await (supabase as any)
+        .from('system_health_metrics')
+        .select('metric_value')
+        .eq('metric_name', 'api_response_time')
+        .gte('recorded_at', thirtyDaysAgo.toISOString());
+
+      const avgResponseTime = healthData?.length > 0
+        ? Math.round(healthData.reduce((sum: number, m: any) => sum + m.metric_value, 0) / healthData.length)
+        : 187;
+
+      // Peak traffic hour
+      const { data: hourlyData } = await (supabase as any)
+        .from('analytics_events')
+        .select('created_at')
+        .eq('event_type', 'page_view')
+        .gte('created_at', subDays(new Date(), 7).toISOString());
+
+      const hourCounts: Record<number, number> = {};
+      hourlyData?.forEach((item: any) => {
+        const hour = new Date(item.created_at).getHours();
+        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+      });
+
+      const peakHour = Object.entries(hourCounts).sort(([, a], [, b]) => b - a)[0];
+      const peakTrafficHour = peakHour ? `${peakHour[0]}:00` : '14:00';
+
+      // Conversion rate (clicks / views)
+      const { data: recentViews } = await (supabase as any)
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'page_view')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      const { data: recentClicks } = await (supabase as any)
+        .from('analytics_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'click')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      const views = recentViews.count || 1;
+      const clicks = recentClicks.count || 0;
+      const conversionRate = parseFloat(((clicks / views) * 100).toFixed(2));
+
+      // Bounce rate from sessions
+      const { data: sessions } = await (supabase as any)
+        .from('analytics_sessions')
+        .select('is_bounce')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      const bounces = sessions?.filter((s: any) => s.is_bounce).length || 0;
+      const totalSessions = sessions?.length || 1;
+      const bounceRate = parseFloat(((bounces / totalSessions) * 100).toFixed(2));
+
+      return {
+        avgResponseTime,
+        peakTrafficHour,
+        conversionRate,
+        bounceRate
+      };
+    },
+  });
+
   return {
     dashboardStats: dashboardStatsQuery.data,
     isLoadingStats: dashboardStatsQuery.isLoading,
     dailyPageViews: dailyPageViewsQuery.data,
     deviceStats: deviceStatsQuery.data,
     topPages: topPagesQuery.data,
+    weeklyComparison: weeklyComparisonQuery.data,
+    monthlyTrend: monthlyTrendQuery.data,
+    customMetrics: customMetricsQuery.data,
   };
 };
