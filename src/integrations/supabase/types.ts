@@ -208,7 +208,15 @@ export type Database = {
       }
       betting_sites: {
         Row: {
+          affiliate_contract_date: string | null
+          affiliate_contract_terms: string | null
+          affiliate_has_monthly_payment: boolean | null
           affiliate_link: string
+          affiliate_monthly_payment: number | null
+          affiliate_notes: string | null
+          affiliate_panel_password: string | null
+          affiliate_panel_url: string | null
+          affiliate_panel_username: string | null
           block_styles: Json | null
           bonus: string | null
           cons: string[] | null
@@ -239,7 +247,15 @@ export type Database = {
           youtube: string | null
         }
         Insert: {
+          affiliate_contract_date?: string | null
+          affiliate_contract_terms?: string | null
+          affiliate_has_monthly_payment?: boolean | null
           affiliate_link: string
+          affiliate_monthly_payment?: number | null
+          affiliate_notes?: string | null
+          affiliate_panel_password?: string | null
+          affiliate_panel_url?: string | null
+          affiliate_panel_username?: string | null
           block_styles?: Json | null
           bonus?: string | null
           cons?: string[] | null
@@ -270,7 +286,15 @@ export type Database = {
           youtube?: string | null
         }
         Update: {
+          affiliate_contract_date?: string | null
+          affiliate_contract_terms?: string | null
+          affiliate_has_monthly_payment?: boolean | null
           affiliate_link?: string
+          affiliate_monthly_payment?: number | null
+          affiliate_notes?: string | null
+          affiliate_panel_password?: string | null
+          affiliate_panel_url?: string | null
+          affiliate_panel_username?: string | null
           block_styles?: Json | null
           bonus?: string | null
           cons?: string[] | null

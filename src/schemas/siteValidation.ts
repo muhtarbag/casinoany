@@ -67,6 +67,46 @@ export const siteFormSchema = z.object({
     .max(100, 'YouTube adresi en fazla 100 karakter olabilir')
     .optional()
     .default(''),
+  
+  // Affiliate Management Fields
+  affiliate_contract_date: z.string()
+    .optional()
+    .default(''),
+  
+  affiliate_contract_terms: z.string()
+    .max(2000, 'Anlaşma şartları en fazla 2000 karakter olabilir')
+    .optional()
+    .default(''),
+  
+  affiliate_has_monthly_payment: z.boolean()
+    .optional()
+    .default(false),
+  
+  affiliate_monthly_payment: z.number()
+    .min(0, 'Ödeme tutarı negatif olamaz')
+    .optional()
+    .nullable(),
+  
+  affiliate_panel_url: z.string()
+    .url('Geçerli bir URL giriniz')
+    .or(z.literal(''))
+    .optional()
+    .default(''),
+  
+  affiliate_panel_username: z.string()
+    .max(100, 'Kullanıcı adı en fazla 100 karakter olabilir')
+    .optional()
+    .default(''),
+  
+  affiliate_panel_password: z.string()
+    .max(200, 'Şifre en fazla 200 karakter olabilir')
+    .optional()
+    .default(''),
+  
+  affiliate_notes: z.string()
+    .max(2000, 'Notlar en fazla 2000 karakter olabilir')
+    .optional()
+    .default(''),
 });
 
 export type SiteFormData = z.infer<typeof siteFormSchema>;

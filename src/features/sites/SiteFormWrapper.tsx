@@ -77,6 +77,14 @@ export function SiteFormWrapper({
         instagram: editingSite.instagram || '',
         facebook: editingSite.facebook || '',
         youtube: editingSite.youtube || '',
+        affiliate_contract_date: editingSite.affiliate_contract_date || '',
+        affiliate_contract_terms: editingSite.affiliate_contract_terms || '',
+        affiliate_has_monthly_payment: editingSite.affiliate_has_monthly_payment || false,
+        affiliate_monthly_payment: editingSite.affiliate_monthly_payment || undefined,
+        affiliate_panel_url: editingSite.affiliate_panel_url || '',
+        affiliate_panel_username: editingSite.affiliate_panel_username || '',
+        affiliate_panel_password: editingSite.affiliate_panel_password || '',
+        affiliate_notes: editingSite.affiliate_notes || '',
       });
       if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
     } else {
