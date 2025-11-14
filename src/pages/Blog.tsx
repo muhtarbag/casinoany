@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { Breadcrumb } from '@/components/Breadcrumb';
-import { ItemListSchema } from '@/components/StructuredData';
+import { ItemListSchema, BreadcrumbSchema } from '@/components/StructuredData';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { EmptyState } from '@/components/EmptyState';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -59,6 +59,12 @@ const Blog = () => {
         description="Bahis siteleri hakkında en güncel haberler, bonus kampanyaları, strateji ipuçları ve sektör analizleri. Kazancınızı artırın!"
         keywords={['bahis blog', 'casino haberleri', 'bahis ipuçları', 'bonus kampanyaları', 'bahis stratejileri']}
       />
+      
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: 'Blog', url: `${window.location.origin}/blog` }
+      ]} />
       
       {filteredPosts && filteredPosts.length > 0 && (
         <ItemListSchema

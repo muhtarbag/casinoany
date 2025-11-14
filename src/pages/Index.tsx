@@ -3,32 +3,27 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
-import { OrganizationSchema } from '@/components/StructuredData';
+import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
 
 const Index = () => {
   const handleSearch = (term: string) => {
     document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const breadcrumbItems = [
+    { name: 'Ana Sayfa', url: window.location.origin }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-dark">
       <SEO
-        title="CasinoAny.com - En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu 2025"
+        title="BahisSiteleri - En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu 2025"
         description="Türkiye'nin en güvenilir casino ve bahis siteleri listesi. Yüksek bonuslar, hızlı ödemeler ve 7/24 destek. 50+ lisanslı casino sitesi karşılaştırması ve detaylı incelemeleri."
         keywords={['casino siteleri', 'bahis siteleri', 'güvenilir casino', 'casino bonusları', 'canlı bahis', 'online casino']}
-        structuredData={{
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          name: 'CasinoAny.com',
-          url: window.location.origin,
-          potentialAction: {
-            '@type': 'SearchAction',
-            target: `${window.location.origin}/?q={search_term_string}`,
-            'query-input': 'required name=search_term_string',
-          },
-        }}
       />
       <OrganizationSchema />
+      <WebSiteSchema />
+      <BreadcrumbSchema items={breadcrumbItems} />
       <Header />
       
       <main>

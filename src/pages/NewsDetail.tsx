@@ -9,6 +9,7 @@ import { Calendar, Eye, ArrowLeft, ExternalLink } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQueries";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -56,10 +57,48 @@ export default function NewsDetail() {
         title={article.meta_title || article.title}
         description={article.meta_description || article.excerpt || ""}
         keywords={article.tags || []}
+        ogType="article"
+        ogImageAlt={article.title}
+        article={{
+          publishedTime: article.published_at,
+          modifiedTime: article.updated_at,
+          tags: article.tags,
+        }}
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          headline: article.title,
+          description: article.excerpt || article.meta_description,
+          datePublished: article.published_at,
+          dateModified: article.updated_at,
+          author: {
+            '@type': 'Organization',
+            name: 'BahisSiteleri',
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'BahisSiteleri',
+            logo: {
+              '@type': 'ImageObject',
+              url: `${window.location.origin}/logo.png`,
+            },
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `${window.location.origin}/news/${article.slug}`,
+          },
+        }}
       />
       <Helmet>
-        <link rel="canonical" href={`https://casinoany.com/haber/${article.slug}`} />
+        <link rel="canonical" href={`${window.location.origin}/news/${article.slug}`} />
       </Helmet>
+      
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: 'Haberler', url: `${window.location.origin}/news` },
+        { name: article.title, url: `${window.location.origin}/news/${article.slug}` }
+      ]} />
 
       <article className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <div className="container mx-auto px-4 py-12 max-w-4xl">

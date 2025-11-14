@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Users, TrendingUp, Target, Award, CheckCircle, Clock, BarChart3, Search, FileCheck, Zap } from 'lucide-react';
+import { BreadcrumbSchema } from '@/components/StructuredData';
 
 const About = () => {
   const organizationStructuredData = {
@@ -84,6 +85,10 @@ const About = () => {
         canonical={`${window.location.origin}/about`}
         structuredData={[organizationStructuredData, faqStructuredData]}
       />
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: 'Hakkımızda', url: `${window.location.origin}/about` }
+      ]} />
       <Header />
       
       <main className="container mx-auto px-4 py-12">

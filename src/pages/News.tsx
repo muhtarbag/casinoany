@@ -14,6 +14,7 @@ import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNewsArticles } from "@/hooks/queries/useNewsQueries";
+import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
 
 const categories = [
   "Tümü",
@@ -82,6 +83,24 @@ export default function News() {
       <Helmet>
         <link rel="canonical" href="https://casinoany.com/haberler" />
       </Helmet>
+      
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: 'Haberler', url: `${window.location.origin}/news` }
+      ]} />
+      
+      {/* News ItemList Schema */}
+      {paginatedArticles && paginatedArticles.length > 0 && (
+        <ItemListSchema
+          title="iGaming ve Casino Haberleri"
+          items={paginatedArticles.map((article: any) => ({
+            name: article.title,
+            url: `${window.location.origin}/news/${article.slug}`,
+            image: undefined
+          }))}
+        />
+      )}
 
       <Header />
 
