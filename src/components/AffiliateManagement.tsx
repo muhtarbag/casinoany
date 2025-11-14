@@ -146,16 +146,18 @@ export function AffiliateManagement() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Affiliate anlaşması olan bir site seçin..." />
                 </SelectTrigger>
-                <SelectContent 
-                  className="bg-background border border-border shadow-lg z-[100] max-h-[300px]"
-                  position="popper"
-                  sideOffset={5}
-                >
-                  {sites?.map((site) => (
-                    <SelectItem key={site.id} value={site.id}>
-                      {site.name}
-                    </SelectItem>
-                  ))}
+                <SelectContent>
+                  {sites && sites.length > 0 ? (
+                    sites.map((site) => (
+                      <SelectItem key={site.id} value={site.id}>
+                        {site.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Affiliate anlaşması olan site bulunamadı
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
