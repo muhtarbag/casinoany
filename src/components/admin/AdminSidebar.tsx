@@ -96,7 +96,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   ];
 
   return (
-    <Sidebar collapsible="icon" className="border-r">
+    <Sidebar collapsible="icon" className="border-r z-50">
       <SidebarContent>
         {navigationGroups.map((group) => (
           <SidebarGroup key={group.label}>
