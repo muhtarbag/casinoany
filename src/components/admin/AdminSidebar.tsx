@@ -114,11 +114,15 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
                     <SidebarMenuButton
                       onClick={() => onTabChange(item.id)}
                       isActive={activeTab === item.id}
-                      className="w-full justify-between"
+                      className={`w-full justify-between transition-all ${
+                        activeTab === item.id
+                          ? 'bg-primary/10 text-primary font-semibold border-l-4 border-primary shadow-sm'
+                          : 'hover:bg-muted/50'
+                      }`}
                       tooltip={collapsed ? item.label : undefined}
                     >
-                      <div className="flex items-center gap-2">
-                        <item.icon className="w-4 h-4" />
+                      <div className="flex items-center gap-3">
+                        <item.icon className={`w-4 h-4 ${activeTab === item.id ? 'text-primary' : ''}`} />
                         {!collapsed && <span>{item.label}</span>}
                       </div>
                       {!collapsed && item.badge && (
