@@ -5,7 +5,7 @@ import { AdminErrorBoundary } from './AdminErrorBoundary';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Keyboard } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { showSuccessToast } from '@/lib/toastHelpers';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
@@ -25,7 +25,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
 
   const clearCache = () => {
     queryClient.clear();
-    toast.success('Cache temizlendi');
+    showSuccessToast('Cache temizlendi');
   };
 
   // Global keyboard shortcuts

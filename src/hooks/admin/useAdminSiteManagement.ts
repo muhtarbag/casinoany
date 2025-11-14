@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { SiteFormData, validateLogoFile } from '@/schemas/siteValidation';
 import { useLogChange } from '@/hooks/useChangeHistory';
 
@@ -164,12 +164,12 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      toast.success('Site başarıyla eklendi!');
+      showSuccessToast('Site başarıyla eklendi!');
       setLogoFile(null);
       setLogoPreview(null);
     },
     onError: (error: any) => {
-      toast.error('Hata: ' + error.message);
+      showErrorToast(error, 'Site eklenirken bir hata oluştu');
     },
   });
 
@@ -238,13 +238,13 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      toast.success('Site başarıyla güncellendi!');
+      showSuccessToast('Site başarıyla güncellendi!');
       setEditingId(null);
       setLogoFile(null);
       setLogoPreview(null);
     },
     onError: (error: any) => {
-      toast.error('Hata: ' + error.message);
+      showErrorToast(error, 'Site güncellenirken bir hata oluştu');
     },
   });
 
@@ -276,13 +276,24 @@ export const useAdminSiteManagement = () => {
         });
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      toast.success('Site silindi');
+      
+      // Show success with undo option
+      showSuccessToast('Site silindi', {
+        duration: 10000, // 10 seconds to give time for undo
+        onUndo: () => {
+          // Note: Undo functionality requires change history system
+          // User can undo via History tab
+          window.open('#history', '_blank');
+        },
+        undoLabel: 'Geçmişi Gör',
+      });
+      
       setDeletingId(null);
     },
     onError: (error: any) => {
-      toast.error('Hata: ' + error.message);
+      showErrorToast(error, 'Site silinirken bir hata oluştu');
       setDeletingId(null);
     },
   });
@@ -312,14 +323,22 @@ export const useAdminSiteManagement = () => {
         });
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, siteIds) => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
       queryClient.invalidateQueries({ queryKey: ['change-history'] });
-      toast.success(`${selectedSites.length} site silindi`);
+      
+      showSuccessToast(`${selectedSites.length} site silindi`, {
+        duration: 10000,
+        onUndo: () => {
+          window.open('#history', '_blank');
+        },
+        undoLabel: 'Geçmişi Gör',
+      });
+      
       setSelectedSites([]);
     },
     onError: (error: any) => {
-      toast.error('Hata: ' + error.message);
+      showErrorToast(error, 'Siteler silinirken bir hata oluştu');
     },
   });
 
@@ -330,11 +349,11 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      toast.success(`${selectedSites.length} site ${variables.isActive ? 'aktif' : 'pasif'} yapıldı`);
+      showSuccessToast(`${selectedSites.length} site ${variables.isActive ? 'aktif' : 'pasif'} yapıldı`);
       setSelectedSites([]);
     },
     onError: (error: any) => {
-      toast.error('Hata: ' + error.message);
+      showErrorToast(error, 'İşlem sırasında bir hata oluştu');
     },
   });
 
@@ -348,7 +367,7 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      toast.success('Sıra güncellendi');
+      showSuccessToast('Sıra güncellendi');
     },
   });
 
