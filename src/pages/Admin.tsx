@@ -39,6 +39,7 @@ import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { SystemHealthDashboard } from '@/components/SystemHealthDashboard';
 import { SystemLogsViewer } from '@/components/SystemLogsViewer';
 import { NewsManagement } from '@/components/NewsManagement';
+import { RealtimeAnalyticsDashboard } from '@/components/RealtimeAnalyticsDashboard';
 import { RefreshCw, Star } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSiteStats } from '@/hooks/queries/useSiteQueries';
@@ -845,6 +846,9 @@ export default function Admin() {
                   <DropdownMenuItem onClick={() => setActiveTab('analytics')}>
                     İçerik Analitiği
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('realtime-analytics')}>
+                    🔴 Canlı Analytics
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('traffic')}>
                     Analytics
                   </DropdownMenuItem>
@@ -1163,6 +1167,9 @@ export default function Admin() {
           <TabsContent value="reviews"><ReviewManagement /></TabsContent>
           <TabsContent value="notifications">
             <NotificationManagement />
+          </TabsContent>
+          <TabsContent value="realtime-analytics">
+            <RealtimeAnalyticsDashboard />
           </TabsContent>
           <TabsContent value="stats">
             <Tabs defaultValue="site-stats" className="w-full">
