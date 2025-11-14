@@ -1,19 +1,25 @@
 interface DynamicBannerProps {
   imageUrl: string;
+  mobileImageUrl?: string | null;
   altText: string;
   targetUrl?: string | null;
   title: string;
 }
 
-export const DynamicBanner = ({ imageUrl, altText, targetUrl, title }: DynamicBannerProps) => {
+export const DynamicBanner = ({ imageUrl, mobileImageUrl, altText, targetUrl, title }: DynamicBannerProps) => {
   const bannerContent = (
-    <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[28/9] rounded-md sm:rounded-lg overflow-hidden shadow-md">
-      <img
-        src={imageUrl}
-        alt={altText || title}
-        className="w-full h-full object-cover object-center"
-        loading="lazy"
-      />
+    <div className="relative w-full rounded-md sm:rounded-lg overflow-hidden shadow-md">
+      <picture>
+        {mobileImageUrl && (
+          <source media="(max-width: 768px)" srcSet={mobileImageUrl} />
+        )}
+        <img
+          src={imageUrl}
+          alt={altText || title}
+          className="w-full h-auto object-cover object-center aspect-[16/9] sm:aspect-[20/9] md:aspect-[24/9]"
+          loading="lazy"
+        />
+      </picture>
     </div>
   );
 

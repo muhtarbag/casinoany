@@ -1267,6 +1267,7 @@ export type Database = {
           id: string
           image_url: string
           is_active: boolean | null
+          mobile_image_url: string | null
           position: number
           target_url: string | null
           title: string
@@ -1280,6 +1281,7 @@ export type Database = {
           id?: string
           image_url: string
           is_active?: boolean | null
+          mobile_image_url?: string | null
           position?: number
           target_url?: string | null
           title: string
@@ -1293,6 +1295,7 @@ export type Database = {
           id?: string
           image_url?: string
           is_active?: boolean | null
+          mobile_image_url?: string | null
           position?: number
           target_url?: string | null
           title?: string
