@@ -28,6 +28,7 @@ interface Notification {
   start_date: string | null;
   end_date: string | null;
   display_pages: string[];
+  user_segments: string[];
   display_frequency: string;
   priority: number;
   background_color: string | null;
@@ -60,6 +61,7 @@ export const NotificationManagement = () => {
     start_date: '',
     end_date: '',
     display_pages: ['all'],
+    user_segments: ['all'],
     display_frequency: 'once',
     priority: 0,
     background_color: '#3b82f6',
@@ -199,6 +201,7 @@ export const NotificationManagement = () => {
       start_date: notification.start_date || '',
       end_date: notification.end_date || '',
       display_pages: notification.display_pages,
+      user_segments: notification.user_segments || ['all'],
       display_frequency: notification.display_frequency,
       priority: notification.priority,
       background_color: notification.background_color || '#3b82f6',
@@ -229,6 +232,7 @@ export const NotificationManagement = () => {
       start_date: '',
       end_date: '',
       display_pages: ['all'],
+      user_segments: ['all'],
       display_frequency: 'once',
       priority: 0,
       background_color: '#3b82f6',
@@ -255,12 +259,23 @@ export const NotificationManagement = () => {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <CardTitle>{notification.title}</CardTitle>
               <Badge variant={notification.is_active ? 'default' : 'secondary'}>
                 {notification.is_active ? 'Aktif' : 'Pasif'}
               </Badge>
               <Badge variant="outline">{notification.notification_type}</Badge>
+              {notification.user_segments && notification.user_segments.length > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  🎯 {notification.user_segments.includes('all') ? 'Tüm Kullanıcılar' : 
+                     notification.user_segments.length === 1 ? 
+                     (notification.user_segments[0] === 'new_visitor' ? 'Yeni Ziyaretçiler' : 
+                      notification.user_segments[0] === 'returning_visitor' ? 'Tekrar Gelenler' :
+                      notification.user_segments[0] === 'registered' ? 'Kayıtlı Üyeler' : 
+                      'Anonim') :
+                     `${notification.user_segments.length} Segment`}
+                </Badge>
+              )}
             </div>
             <CardDescription>{notification.content}</CardDescription>
           </div>
@@ -473,6 +488,99 @@ export const NotificationManagement = () => {
                     value={formData.priority}
                     onChange={(e) => setFormData(prev => ({ ...prev, priority: parseInt(e.target.value) }))}
                   />
+                </div>
+              </div>
+
+              {/* Hedef Kitle Segmentleri */}
+              <div className="space-y-3 border-t pt-4">
+                <div>
+                  <Label className="text-base font-semibold">🎯 Hedef Kitle Segmentleri</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Bu bildirimi hangi kullanıcı gruplarına göstermek istiyorsunuz?
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'all', label: 'Tüm Kullanıcılar', desc: 'Herkese göster' },
+                    { value: 'new_visitor', label: 'Yeni Ziyaretçi', desc: 'İlk kez gelenlere' },
+                    { value: 'returning_visitor', label: 'Tekrar Gelen', desc: 'Daha önce ziyaret etmiş' },
+                    { value: 'registered', label: 'Kayıtlı Üye', desc: 'Giriş yapmış kullanıcılar' },
+                    { value: 'anonymous', label: 'Anonim', desc: 'Giriş yapmamış kullanıcılar' },
+                  ].map((segment) => (
+                    <div
+                      key={segment.value}
+                      className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        formData.user_segments.includes(segment.value)
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          user_segments: prev.user_segments.includes(segment.value)
+                            ? prev.user_segments.filter(s => s !== segment.value)
+                            : [...prev.user_segments.filter(s => s !== 'all'), segment.value]
+                        }));
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.user_segments.includes(segment.value)}
+                        onChange={() => {}}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{segment.label}</div>
+                        <div className="text-xs text-muted-foreground">{segment.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Görünürlük Sayfaları */}
+              <div className="space-y-3 border-t pt-4">
+                <div>
+                  <Label className="text-base font-semibold">📍 Görünürlük Sayfaları</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Bu bildirimi hangi sayfalarda göstermek istiyorsunuz?
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'all', label: 'Tüm Sayfalar', desc: 'Her yerde göster' },
+                    { value: 'home', label: 'Ana Sayfa', desc: 'Sadece ana sayfada' },
+                    { value: 'deneme-bonusu', label: 'Deneme Bonusu', desc: 'Bonus sayfaları' },
+                    { value: 'casino-siteleri', label: 'Casino Siteleri', desc: 'Site listesi' },
+                  ].map((page) => (
+                    <div
+                      key={page.value}
+                      className={`flex items-start space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        formData.display_pages.includes(page.value)
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          display_pages: prev.display_pages.includes(page.value)
+                            ? prev.display_pages.filter(p => p !== page.value)
+                            : [...prev.display_pages.filter(p => p !== 'all'), page.value]
+                        }));
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.display_pages.includes(page.value)}
+                        onChange={() => {}}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{page.label}</div>
+                        <div className="text-xs text-muted-foreground">{page.desc}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
