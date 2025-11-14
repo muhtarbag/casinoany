@@ -404,9 +404,21 @@ export default function SiteDetail() {
                 <Button
                   size="lg"
                   onClick={handleAffiliateClick}
-                  className="w-full md:w-auto"
+                  className="w-full md:w-auto relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0"
                 >
-                  Siteye Git <ExternalLink className="ml-2 w-4 h-4" />
+                  {/* Animated shimmer overlay */}
+                  <div className="absolute inset-0 w-full h-full">
+                    <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
+                  </div>
+                  
+                  {/* Subtle pulse glow background */}
+                  <div className="absolute inset-0 bg-white/5 animate-glow" />
+                  
+                  {/* Button content */}
+                  <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
+                    Siteye Git
+                    <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
+                  </span>
                 </Button>
               </div>
             </div>
