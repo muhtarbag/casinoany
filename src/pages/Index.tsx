@@ -5,6 +5,7 @@ import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
 import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const handleSearch = (term: string) => {
@@ -44,8 +45,8 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <a 
-              href="/betist-inceleme"
+            <Link 
+              to="/betist-inceleme"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -67,10 +68,10 @@ const Index = () => {
               <span className="text-primary text-sm font-semibold group-hover:underline">
                 Detaylı İncelemeyi Oku →
               </span>
-            </a>
+            </Link>
 
-            <a 
-              href="/bets10-inceleme"
+            <Link 
+              to="/bets10-inceleme"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -92,10 +93,10 @@ const Index = () => {
               <span className="text-primary text-sm font-semibold group-hover:underline">
                 Detaylı İncelemeyi Oku →
               </span>
-            </a>
+            </Link>
 
-            <a 
-              href="/mobilbahis-inceleme"
+            <Link 
+              to="/mobilbahis-inceleme"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -117,19 +118,19 @@ const Index = () => {
               <span className="text-primary text-sm font-semibold group-hover:underline">
                 Detaylı İncelemeyi Oku →
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Bonus CTA */}
           <div className="text-center">
-            <a 
-              href="/denemebonusu"
+            <Link 
+              to="/denemebonusu"
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <span>🎁</span>
               <span>Deneme Bonusu Veren Siteleri Keşfet</span>
               <span>→</span>
-            </a>
+            </Link>
           </div>
         </section>
         
