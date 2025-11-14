@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, memo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -6,8 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { GripVertical, Edit, Trash2, Eye, MousePointer, Loader2 } from 'lucide-react';
+import { GripVertical, Edit, Trash2, Eye, MousePointer, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SiteListSkeleton } from './SiteListSkeleton';
 
 interface Site {
   id: string;
@@ -37,7 +38,7 @@ interface SortableItemProps {
   stats?: SiteStats;
 }
 
-const SortableItem = ({ 
+const SortableItem = memo(({ 
   id, 
   site, 
   editingId, 
@@ -61,20 +62,30 @@ const SortableItem = ({
       ref={setNodeRef} 
       style={style} 
       className="bg-card border rounded-lg p-4 mb-2 hover:shadow-md transition-shadow"
+      role="article"
+      aria-label={`${site.name} site kartı`}
     >
       <div className="flex items-center gap-4">
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+        <div 
+          {...attributes} 
+          {...listeners} 
+          className="cursor-grab active:cursor-grabbing"
+          aria-label="Sıralamak için sürükleyin"
+          role="button"
+          tabIndex={0}
+        >
           <GripVertical className="w-5 h-5 text-muted-foreground" />
         </div>
         <Checkbox 
           checked={isSelected} 
           onCheckedChange={() => onToggleSelect(id)} 
-          className="w-4 h-4" 
+          className="w-4 h-4"
+          aria-label={`${site.name} seç`}
         />
         {site.logo_url && (
           <img 
             src={site.logo_url} 
-            alt={site.name} 
+            alt={`${site.name} logosu`}
             className="w-12 h-12 object-contain rounded" 
           />
         )}
@@ -84,12 +95,12 @@ const SortableItem = ({
             {!site.is_active && <Badge variant="secondary">Pasif</Badge>}
           </div>
           <div className="flex gap-4 text-sm text-muted-foreground mt-1">
-            <span className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
+            <span className="flex items-center gap-1" aria-label={`${stats?.views || 0} görüntülenme`}>
+              <Eye className="w-3 h-3" aria-hidden="true" />
               {stats?.views || 0} görüntülenme
             </span>
-            <span className="flex items-center gap-1">
-              <MousePointer className="w-3 h-3" />
+            <span className="flex items-center gap-1" aria-label={`${stats?.clicks || 0} tıklama`}>
+              <MousePointer className="w-3 h-3" aria-hidden="true" />
               {stats?.clicks || 0} tıklama
             </span>
           </div>
@@ -100,8 +111,9 @@ const SortableItem = ({
             size="icon"
             onClick={() => onEdit(site)}
             disabled={editingId === site.id}
+            aria-label={`${site.name} düzenle`}
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="w-4 h-4" aria-hidden="true" />
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -109,11 +121,12 @@ const SortableItem = ({
                 variant="ghost"
                 size="icon"
                 disabled={isDeleting === site.id}
+                aria-label={`${site.name} sil`}
               >
                 {isDeleting === site.id ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                 ) : (
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 )}
               </Button>
             </AlertDialogTrigger>
@@ -136,7 +149,7 @@ const SortableItem = ({
       </div>
     </div>
   );
-};
+});
 
 interface SiteListProps {
   sites: Site[];
@@ -151,7 +164,10 @@ interface SiteListProps {
   onDelete: (id: string) => void;
   onDragEnd: (event: DragEndEvent) => void;
   isDeleting: string | null;
+  isLoading?: boolean;
 }
+
+const ITEMS_PER_PAGE = 20;
 
 export function SiteList({
   sites,
@@ -166,7 +182,9 @@ export function SiteList({
   onDelete,
   onDragEnd,
   isDeleting,
+  isLoading = false,
 }: SiteListProps) {
+  const [currentPage, setCurrentPage] = useState(1);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
