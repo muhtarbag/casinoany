@@ -596,7 +596,7 @@ export default function SiteDetail() {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4 max-w-4xl mx-auto">
               {/* Site Info */}
-              <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex items-center gap-3 min-w-0">
                 {logoUrl && (
                   <img 
                     src={logoUrl} 
@@ -604,21 +604,11 @@ export default function SiteDetail() {
                     className="w-12 h-12 object-contain rounded-lg bg-card border border-border/50 p-1 flex-shrink-0"
                   />
                 )}
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0">
                   <h3 className="font-bold truncate">{site.name}</h3>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-gold text-gold" />
-                      <span className="text-sm font-semibold text-muted-foreground">{site.rating}/5</span>
-                    </div>
-                    {site.bonus && (
-                      <>
-                        <span className="text-muted-foreground">•</span>
-                        <Badge variant="secondary" className="text-xs font-semibold">
-                          {site.bonus}
-                        </Badge>
-                      </>
-                    )}
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-gold text-gold" />
+                    <span className="text-sm font-semibold text-muted-foreground">{site.rating}/5</span>
                   </div>
                 </div>
               </div>
