@@ -98,6 +98,7 @@ export default function BlogPost() {
         canonical={`${window.location.origin}/blog/${post.slug}`}
         ogType="article"
         ogImage={post.featured_image || undefined}
+        ogImageAlt={post.title}
         article={{
           publishedTime: post.published_at || undefined,
           modifiedTime: post.updated_at,

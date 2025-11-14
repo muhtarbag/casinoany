@@ -23,7 +23,7 @@ export const SEO = ({
   keywords = [],
   canonical,
   ogType = 'website',
-  ogImage = '/og-image.jpg',
+  ogImage,
   ogImageAlt,
   article,
   structuredData,
@@ -31,6 +31,8 @@ export const SEO = ({
   const siteUrl = window.location.origin;
   const currentUrl = canonical || window.location.href;
   const fullTitle = `${title} | BahisSiteleri`;
+  const defaultOgImage = `${siteUrl}/og-default.jpg`;
+  const finalOgImage = ogImage || defaultOgImage;
   
   // Default structured data - Organization
   const defaultStructuredData = {
@@ -50,7 +52,7 @@ export const SEO = ({
     '@type': 'Article',
     headline: title,
     description: description,
-    image: ogImage,
+    image: finalOgImage,
     datePublished: article.publishedTime,
     dateModified: article.modifiedTime,
     author: {
@@ -82,7 +84,7 @@ export const SEO = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={currentUrl} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={finalOgImage} />
       {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -111,7 +113,7 @@ export const SEO = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={finalOgImage} />
 
       {/* Additional SEO Meta Tags */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
