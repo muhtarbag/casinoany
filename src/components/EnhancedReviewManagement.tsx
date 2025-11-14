@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2 } from "lucide-react";
+import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 
@@ -60,6 +61,11 @@ export default function EnhancedReviewManagement() {
   const [aiRatingMin, setAiRatingMin] = useState<string>("3");
   const [aiRatingMax, setAiRatingMax] = useState<string>("5");
   const [aiLanguage, setAiLanguage] = useState<"tr" | "en">("tr");
+  const [aiAutoPublish, setAiAutoPublish] = useState(false);
+  
+  // Bulk actions
+  const [selectedReviews, setSelectedReviews] = useState<Set<string>>(new Set());
+  const [isBulkActionLoading, setIsBulkActionLoading] = useState(false);
 
   // Fetch betting sites for AI generation
   const { data: bettingSites = [] } = useQuery({
@@ -250,6 +256,104 @@ export default function EnhancedReviewManagement() {
     });
   };
 
+  // Bulk actions handlers
+  const toggleReviewSelection = (reviewId: string) => {
+    const newSelection = new Set(selectedReviews);
+    if (newSelection.has(reviewId)) {
+      newSelection.delete(reviewId);
+    } else {
+      newSelection.add(reviewId);
+    }
+    setSelectedReviews(newSelection);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedReviews.size === filteredReviews.length) {
+      setSelectedReviews(new Set());
+    } else {
+      setSelectedReviews(new Set(filteredReviews.map(r => r.id)));
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedReviews.size === 0) {
+      toast.error("Lütfen onaylanacak yorumları seçin");
+      return;
+    }
+
+    setIsBulkActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("site_reviews")
+        .update({ is_approved: true })
+        .in("id", Array.from(selectedReviews));
+
+      if (error) throw error;
+
+      toast.success(`${selectedReviews.size} yorum onaylandı`);
+      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
+      setSelectedReviews(new Set());
+    } catch (error) {
+      toast.error("Yorumlar onaylanırken hata oluştu");
+    } finally {
+      setIsBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedReviews.size === 0) {
+      toast.error("Lütfen reddedilecek yorumları seçin");
+      return;
+    }
+
+    setIsBulkActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("site_reviews")
+        .update({ is_approved: false })
+        .in("id", Array.from(selectedReviews));
+
+      if (error) throw error;
+
+      toast.success(`${selectedReviews.size} yorum reddedildi`);
+      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
+      setSelectedReviews(new Set());
+    } catch (error) {
+      toast.error("Yorumlar reddedilirken hata oluştu");
+    } finally {
+      setIsBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedReviews.size === 0) {
+      toast.error("Lütfen silinecek yorumları seçin");
+      return;
+    }
+
+    if (!confirm(`${selectedReviews.size} yorumu silmek istediğinizden emin misiniz?`)) {
+      return;
+    }
+
+    setIsBulkActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from("site_reviews")
+        .delete()
+        .in("id", Array.from(selectedReviews));
+
+      if (error) throw error;
+
+      toast.success(`${selectedReviews.size} yorum silindi`);
+      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
+      setSelectedReviews(new Set());
+    } catch (error) {
+      toast.error("Yorumlar silinirken hata oluştu");
+    } finally {
+      setIsBulkActionLoading(false);
+    }
+  };
+
   // AI Review Generation Handler
   const handleAiGenerateReviews = async () => {
     if (!aiSelectedSite) {
@@ -286,7 +390,7 @@ export default function EnhancedReviewManagement() {
         rating: Math.round(review.rating),
         title: review.title,
         comment: review.comment,
-        is_approved: false,
+        is_approved: aiAutoPublish,
         user_id: null,
         email: null
       }));
@@ -297,7 +401,10 @@ export default function EnhancedReviewManagement() {
 
       if (insertError) throw insertError;
 
-      toast.success(`${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`);
+      const message = aiAutoPublish 
+        ? `${reviews.length} yorum başarıyla oluşturuldu ve yayınlandı`
+        : `${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`;
+      toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
       
       setAiSelectedSite("");
@@ -306,6 +413,7 @@ export default function EnhancedReviewManagement() {
       setAiRatingMin("3");
       setAiRatingMax("5");
       setAiLanguage("tr");
+      setAiAutoPublish(false);
     } catch (error) {
       console.error('AI yorum oluşturma hatası:', error);
       toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
@@ -423,6 +531,20 @@ export default function EnhancedReviewManagement() {
             </div>
           </div>
 
+          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+            <Checkbox
+              id="auto-publish"
+              checked={aiAutoPublish}
+              onCheckedChange={(checked) => setAiAutoPublish(checked as boolean)}
+            />
+            <label
+              htmlFor="auto-publish"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              Yorumları otomatik yayınla (onay beklemeden)
+            </label>
+          </div>
+
           <Button 
             onClick={handleAiGenerateReviews} 
             disabled={isAiLoading || !aiSelectedSite}
@@ -524,8 +646,50 @@ export default function EnhancedReviewManagement() {
             </Select>
           </div>
 
-          <div className="text-sm text-muted-foreground">
-            Toplam {filteredReviews.length} yorum gösteriliyor
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Toplam {filteredReviews.length} yorum gösteriliyor
+              {selectedReviews.size > 0 && (
+                <span className="ml-2 text-primary font-medium">
+                  ({selectedReviews.size} seçili)
+                </span>
+              )}
+            </div>
+
+            {selectedReviews.size > 0 && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleBulkApprove}
+                  disabled={isBulkActionLoading}
+                  className="gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Onayla ({selectedReviews.size})
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleBulkReject}
+                  disabled={isBulkActionLoading}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Reddet ({selectedReviews.size})
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleBulkDelete}
+                  disabled={isBulkActionLoading}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Sil ({selectedReviews.size})
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Reviews Table */}
@@ -533,6 +697,12 @@ export default function EnhancedReviewManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedReviews.size === filteredReviews.length && filteredReviews.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Site</TableHead>
                   <TableHead>Kullanıcı</TableHead>
                   <TableHead>Puan</TableHead>
@@ -545,13 +715,19 @@ export default function EnhancedReviewManagement() {
               <TableBody>
                 {filteredReviews.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       Yorum bulunamadı
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredReviews.map(review => (
                     <TableRow key={review.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedReviews.has(review.id)}
+                          onCheckedChange={() => toggleReviewSelection(review.id)}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">
                         {review.betting_sites?.name || "Bilinmeyen"}
                       </TableCell>
