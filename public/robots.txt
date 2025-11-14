@@ -1,47 +1,104 @@
-# robots.txt - CasinoAny.com
-# Tüm arama motorları için geçerli kurallar
+# robots.txt for BahisSiteleri - Turkish Betting Sites Comparison Platform
+# Last Updated: 2025-01-14
 
+# =============================================================================
+# GENERAL CRAWLERS - Allow all content
+# =============================================================================
 User-agent: *
 Allow: /
-Allow: /blog
-Allow: /blog/*
-Allow: /site/*
-Allow: /about
-Allow: /casino-siteleri
-Allow: /spor-bahisleri
-Allow: /bonus-kampanyalari
-Allow: /mobil-bahis
-Allow: /canli-casino
 
-# Admin ve kullanıcı sayfalarını engelle
+# =============================================================================
+# SITEMAP LOCATIONS
+# =============================================================================
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/dynamic-sitemap
+# Add your custom domain sitemap when available:
+# Sitemap: https://yourdomain.com/sitemap.xml
+
+# =============================================================================
+# CRAWL RATE OPTIMIZATION
+# =============================================================================
+# Google crawler-specific settings
+User-agent: Googlebot
+Crawl-delay: 0
+# No restrictions for Google - they have smart crawling
+
+# Bing crawler settings
+User-agent: Bingbot
+Crawl-delay: 1
+# Slightly slower for Bing to avoid overload
+
+# Yandex crawler settings (popular in Turkey/Russia)
+User-agent: YandexBot
+Crawl-delay: 2
+
+# General crawlers - moderate rate
+User-agent: Slurp
+Crawl-delay: 2
+
+# =============================================================================
+# BLOCK BAD BOTS & SCRAPERS
+# =============================================================================
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+# =============================================================================
+# DISALLOW SPECIFIC PATHS
+# =============================================================================
+# Admin and authentication pages
 Disallow: /admin
-Disallow: /admin/*
 Disallow: /login
 Disallow: /signup
+Disallow: /auth
 
-# Yasal sayfalar - izin ver ama düşük öncelik
-Allow: /privacy
-Allow: /terms
-Allow: /cookies
-Allow: /kvkk
+# API endpoints (if exposed)
+Disallow: /api/
+Disallow: /_next/
 
-# Sitemap konumu
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-xml
+# Filter/sort parameter pages (avoid duplicate content)
+Disallow: /*?sort=*
+Disallow: /*?filter=*
+Disallow: /*?page=*
+Disallow: /*?ref=*
+Disallow: /*?utm_*
 
-# Google Bot için özel ayarlar
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
+# Redirect pages
+Disallow: /redirect
+Disallow: /r/
 
-# Bing Bot için özel ayarlar
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
+# =============================================================================
+# ALLOW IMPORTANT RESOURCES
+# =============================================================================
+# Allow CSS, JS, images for proper page rendering
+User-agent: *
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
+Allow: /assets/
+Allow: /public/
+Allow: /logos/
 
-# Yandex Bot için özel ayarlar
-User-agent: Yandex
-Allow: /
-Crawl-delay: 1
-
-# Genel crawl delay
-Crawl-delay: 1
+# =============================================================================
+# YANDEX SPECIFIC
+# =============================================================================
+# Clean tracking parameters
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&ref&gclid&fbclid
