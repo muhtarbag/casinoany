@@ -43,6 +43,20 @@ const DenemeBonusu = lazy(() => import("./pages/DenemeBonusu"));
 const BetistInceleme = lazy(() => import("./pages/BetistInceleme"));
 const Bets10Inceleme = lazy(() => import("./pages/Bets10Inceleme"));
 const MobilbahisInceleme = lazy(() => import("./pages/MobilbahisInceleme"));
+const FenomenbetInceleme = lazy(() => import("./pages/FenomenbetInceleme"));
+const BahisFanatikInceleme = lazy(() => import("./pages/BahisFanatikInceleme"));
+const CepBahisInceleme = lazy(() => import("./pages/CepBahisInceleme"));
+const HavanaBetInceleme = lazy(() => import("./pages/HavanaBetInceleme"));
+const BetJollyInceleme = lazy(() => import("./pages/BetJollyInceleme"));
+const YouwinInceleme = lazy(() => import("./pages/YouwinInceleme"));
+const SekabetInceleme = lazy(() => import("./pages/SekabetInceleme"));
+const BetebetInceleme = lazy(() => import("./pages/BetebetInceleme"));
+const BetpasInceleme = lazy(() => import("./pages/BetpasInceleme"));
+const KingbettingInceleme = lazy(() => import("./pages/KingbettingInceleme"));
+const BetbooInceleme = lazy(() => import("./pages/BetbooInceleme"));
+const LigobetInceleme = lazy(() => import("./pages/LigobetInceleme"));
+const HovardaInceleme = lazy(() => import("./pages/HovardaInceleme"));
+const BetparkInceleme = lazy(() => import("./pages/BetparkInceleme"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -92,6 +106,20 @@ const AppContent = () => {
           <Route path="/betist-inceleme" element={<BetistInceleme />} />
           <Route path="/bets10-inceleme" element={<Bets10Inceleme />} />
           <Route path="/mobilbahis-inceleme" element={<MobilbahisInceleme />} />
+          <Route path="/fenomenbet-inceleme" element={<FenomenbetInceleme />} />
+          <Route path="/bahisfanatik-inceleme" element={<BahisFanatikInceleme />} />
+          <Route path="/cepbahis-inceleme" element={<CepBahisInceleme />} />
+          <Route path="/havanabet-inceleme" element={<HavanaBetInceleme />} />
+          <Route path="/betjolly-inceleme" element={<BetJollyInceleme />} />
+          <Route path="/youwin-inceleme" element={<YouwinInceleme />} />
+          <Route path="/sekabet-inceleme" element={<SekabetInceleme />} />
+          <Route path="/betebet-inceleme" element={<BetebetInceleme />} />
+          <Route path="/betpas-inceleme" element={<BetpasInceleme />} />
+          <Route path="/kingbetting-inceleme" element={<KingbettingInceleme />} />
+          <Route path="/betboo-inceleme" element={<BetbooInceleme />} />
+          <Route path="/ligobet-inceleme" element={<LigobetInceleme />} />
+          <Route path="/hovarda-inceleme" element={<HovardaInceleme />} />
+          <Route path="/betpark-inceleme" element={<BetparkInceleme />} />
           
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />

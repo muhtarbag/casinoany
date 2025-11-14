@@ -35,7 +35,7 @@ const FenomenbetInceleme = () => {
   const cons = [
     'Minimum yatırım limiti 100 TL (rakiplerden yüksek)',
     'Kripto para çekim komisyonu %2',
-    'Bonus çevrim şartı bazı slotlarda 45x'e kadar çıkabiliyor'
+    'Bonus çevrim şartı bazı slotlarda 45x\'e kadar çıkabiliyor'
   ];
 
   const features = [
