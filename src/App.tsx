@@ -31,6 +31,17 @@ const AdminKeywords = lazy(() => import("./pages/admin/analytics/KeywordPerforma
 const AdminCasinoContent = lazy(() => import("./pages/admin/content/CasinoContent"));
 const AdminSystemHealth = lazy(() => import("./pages/admin/system/SystemHealth"));
 const AdminAI = lazy(() => import("./pages/admin/AIAssistant"));
+const AdminBonusRequests = lazy(() => import("./pages/admin/finance/BonusRequests"));
+const AdminContentPlanner = lazy(() => import("./pages/admin/content/ContentPlanner"));
+const AdminChangeHistory = lazy(() => import("./pages/admin/system/ChangeHistory"));
+const AdminPerformance = lazy(() => import("./pages/admin/system/Performance"));
+const AdminFeaturedSites = lazy(() => import("./pages/admin/sites/FeaturedSites"));
+const AdminSiteStats = lazy(() => import("./pages/admin/sites/SiteStats"));
+const AdminBlogStats = lazy(() => import("./pages/admin/blog/BlogStats"));
+const AdminBlogComments = lazy(() => import("./pages/admin/blog/BlogComments"));
+const AdminCasinoAnalytics = lazy(() => import("./pages/admin/content/CasinoAnalytics"));
+const AdminAIHistory = lazy(() => import("./pages/admin/ai/AIHistory"));
+const AdminSystemLogs = lazy(() => import("./pages/admin/system/SystemLogs"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const News = lazy(() => import("./pages/News"));
@@ -86,7 +97,11 @@ const AppContent = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="sites" element={<AdminSiteManagement />} />
+            <Route path="sites/featured" element={<AdminFeaturedSites />} />
+            <Route path="sites/stats" element={<AdminSiteStats />} />
             <Route path="blog" element={<AdminBlogManagement />} />
+            <Route path="blog/stats" element={<AdminBlogStats />} />
+            <Route path="blog/comments" element={<AdminBlogComments />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
@@ -94,10 +109,17 @@ const AppContent = () => {
             <Route path="analytics/realtime" element={<AdminRealtimeAnalytics />} />
             <Route path="analytics/keywords" element={<AdminKeywords />} />
             <Route path="content/casino" element={<AdminCasinoContent />} />
+            <Route path="content/casino-analytics" element={<AdminCasinoAnalytics />} />
+            <Route path="content/planner" element={<AdminContentPlanner />} />
             <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
             <Route path="finance/bonus" element={<AdminBonusManagement />} />
+            <Route path="finance/bonus-requests" element={<AdminBonusRequests />} />
             <Route path="system/health" element={<AdminSystemHealth />} />
+            <Route path="system/history" element={<AdminChangeHistory />} />
+            <Route path="system/performance" element={<AdminPerformance />} />
+            <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="ai" element={<AdminAI />} />
+            <Route path="ai/history" element={<AdminAIHistory />} />
           </Route>
           
           <Route path="/about" element={<About />} />
