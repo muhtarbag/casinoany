@@ -13,6 +13,8 @@ import { Calendar, Eye, ExternalLink, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const categories = [
   "Tümü",
@@ -94,6 +96,8 @@ export default function News() {
       <Helmet>
         <link rel="canonical" href="https://casinoany.com/haberler" />
       </Helmet>
+
+      <Header />
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         <div className="container mx-auto px-4 py-12">
@@ -215,6 +219,8 @@ export default function News() {
           </div>
         )}
       </div>
+
+      <Footer />
     </>
   );
 }
