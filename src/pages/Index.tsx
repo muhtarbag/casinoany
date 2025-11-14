@@ -5,6 +5,7 @@ import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
 import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
+import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -36,7 +37,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-8 md:py-12">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Detaylı Casino İncelemeleri
+              Öne Çıkan Casino İncelemeleri
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
@@ -44,7 +45,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <FeaturedSitesSection />
             <Link 
               to="/site/betist"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"

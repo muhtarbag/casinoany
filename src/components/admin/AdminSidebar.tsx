@@ -15,7 +15,9 @@ import {
   Search,
   Calendar,
   Gamepad2,
-  PieChart
+  PieChart,
+  Gift,
+  FileEdit
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
@@ -54,6 +56,8 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       items: [
         { id: 'manage', icon: Globe, label: 'Siteler' },
         { id: 'featured', icon: Star, label: 'Öne Çıkan Siteler' },
+        { id: 'bonus', icon: Gift, label: 'Bonus Yönetimi' },
+        { id: 'cms', icon: FileEdit, label: 'İçerik Yönetimi (CMS)' },
         { id: 'blog', icon: FileText, label: 'Blog Yönetimi' },
         { id: 'news', icon: Newspaper, label: 'Haber Yönetimi' },
         { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik' },
