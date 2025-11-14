@@ -4,6 +4,7 @@ import { Eye, TrendingUp, MessageSquare, FileText, AlertTriangle, Globe, Setting
 import { Button } from '@/components/ui/button';
 import { DashboardWidgetGrid } from '@/components/dashboard/DashboardWidgetGrid';
 import { WidgetCustomizer } from '@/components/dashboard/WidgetCustomizer';
+import { SitePerformanceCards } from '@/components/dashboard/SitePerformanceCards';
 import { 
   LineChart, 
   Line, 
@@ -65,6 +66,9 @@ export function DashboardTab({
 
       {/* Widget Grid */}
       <DashboardWidgetGrid onNavigate={onNavigate} />
+
+      {/* Site Performance Analytics */}
+      <SitePerformanceCards />
 
       {/* Priority Alert Banner */}
       {dashboardStats.pendingReviews > 5 && (
