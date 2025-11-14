@@ -46,6 +46,7 @@ export default function SiteDetail() {
   const queryClient = useQueryClient();
   const [viewTracked, setViewTracked] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading } = useQuery({
@@ -201,6 +202,17 @@ export default function SiteDetail() {
 
     trackView();
   }, [site?.id, viewTracked, queryClient]);
+
+  // Scroll tracking for sticky CTA
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setShowStickyCTA(scrollPosition > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Track click mutation
   const trackClickMutation = useMutation({
@@ -575,6 +587,57 @@ export default function SiteDetail() {
         {/* Recommended Sites */}
         <RecommendedSites currentSiteId={site.id} currentSiteFeatures={site.features || []} />
       </main>
+      
+      {/* Sticky Floating CTA */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ${
+        showStickyCTA ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+      }`}>
+        <div className="bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-sm border-t border-border/50 shadow-2xl">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between gap-4 max-w-4xl mx-auto">
+              {/* Site Info */}
+              <div className="flex items-center gap-3 min-w-0">
+                {logoUrl && (
+                  <img 
+                    src={logoUrl} 
+                    alt={site.name}
+                    className="w-12 h-12 object-contain rounded-lg bg-card border border-border/50 p-1 flex-shrink-0"
+                  />
+                )}
+                <div className="min-w-0">
+                  <h3 className="font-bold truncate">{site.name}</h3>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-gold text-gold" />
+                    <span className="text-sm font-semibold text-muted-foreground">{site.rating}/5</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* CTA Button */}
+              <Button
+                size="lg"
+                onClick={handleAffiliateClick}
+                className="relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0 flex-shrink-0"
+              >
+                {/* Animated shimmer overlay */}
+                <div className="absolute inset-0 w-full h-full">
+                  <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
+                </div>
+                
+                {/* Subtle pulse glow background */}
+                <div className="absolute inset-0 bg-white/5 animate-glow" />
+                
+                {/* Button content */}
+                <span className="relative z-10 flex items-center gap-2 drop-shadow-lg whitespace-nowrap">
+                  Siteye Git
+                  <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
+                </span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <Footer />
     </div>
   );
