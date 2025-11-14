@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -10,30 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Eye, ArrowLeft, ExternalLink } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
+import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQueries";
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data: article, isLoading } = useQuery({
-    queryKey: ["news-article", slug],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("news_articles")
-        .select("*")
-        .eq("slug", slug)
-        .eq("is_published", true)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: article, isLoading } = useNewsArticle(slug || "");
+  const incrementView = useIncrementNewsView();
 
   useEffect(() => {
     if (article?.id) {
-      supabase.rpc("increment_news_view_count", {
-        article_id: article.id,
-      });
+      incrementView.mutate(article.id);
     }
   }, [article?.id]);
 

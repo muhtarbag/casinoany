@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +13,7 @@ import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useNewsArticles } from "@/hooks/queries/useNewsQueries";
 
 const categories = [
   "Tümü",
@@ -32,22 +31,9 @@ export default function News() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: articles, isLoading } = useQuery({
-    queryKey: ["news-articles"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("news_articles")
-        .select("*")
-        .eq("is_published", true)
-        .order("published_at", { ascending: false })
-        .limit(50);
+  const { data: articles, isLoading } = useNewsArticles({ isPublished: true, limit: 50 });
 
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const filteredArticles = articles?.filter((article) => {
+  const filteredArticles = articles?.filter((article: any) => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "Tümü" || article.category === selectedCategory;
