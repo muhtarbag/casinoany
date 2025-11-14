@@ -6,6 +6,7 @@ import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
 import { SlotBanner } from './SlotBanner';
+import { CardsBanner } from './CardsBanner';
 
 export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
@@ -117,6 +118,11 @@ export const PixelGrid = () => {
             {index === 8 && (
               <div className="col-span-1 md:col-span-2 lg:col-span-3">
                 <SlotBanner />
+              </div>
+            )}
+            {index === 32 && (
+              <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardsBanner />
               </div>
             )}
           </>
