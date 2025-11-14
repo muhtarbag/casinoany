@@ -60,13 +60,14 @@ export const useAdminStats = () => {
     refetchInterval: 60000, // Refetch every minute
   });
 
-  // Daily page views (last 30 days)
+  // Daily page views (last 30 days) - MIGRATED to analytics_events
   const dailyPageViewsQuery = useQuery({
     queryKey: ['daily-page-views'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('page_views')
+        .from('analytics_events')
         .select('created_at')
+        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
@@ -81,13 +82,14 @@ export const useAdminStats = () => {
     },
   });
 
-  // Device stats
+  // Device stats - MIGRATED to analytics_events
   const deviceStatsQuery = useQuery({
     queryKey: ['device-stats'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('page_views')
+        .from('analytics_events')
         .select('device_type')
+        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
@@ -102,13 +104,14 @@ export const useAdminStats = () => {
     },
   });
 
-  // Top pages
+  // Top pages - MIGRATED to analytics_events
   const topPagesQuery = useQuery({
     queryKey: ['top-pages'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from('page_views')
+        .from('analytics_events')
         .select('page_path')
+        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
