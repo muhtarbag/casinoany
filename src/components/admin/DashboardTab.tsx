@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Eye, TrendingUp, MessageSquare, FileText, AlertTriangle, Globe } from 'lucide-react';
+import { Eye, TrendingUp, MessageSquare, FileText, AlertTriangle, Globe, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DashboardWidgetGrid } from '@/components/dashboard/DashboardWidgetGrid';
+import { WidgetCustomizer } from '@/components/dashboard/WidgetCustomizer';
 import { 
   LineChart, 
   Line, 
@@ -33,16 +37,35 @@ interface DashboardTabProps {
   dailyPageViews: any[];
   deviceStats: any[];
   topPages: any[];
+  onNavigate?: (tab: string) => void;
 }
 
 export function DashboardTab({ 
   dashboardStats, 
   dailyPageViews, 
   deviceStats, 
-  topPages 
+  topPages,
+  onNavigate 
 }: DashboardTabProps) {
+  const [showCustomizer, setShowCustomizer] = useState(false);
+
   return (
     <div className="space-y-6">
+      {/* Widget Customizer Button */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Dashboard</h2>
+          <p className="text-muted-foreground">Widget'ları sürükleyerek özelleştirin</p>
+        </div>
+        <Button variant="outline" onClick={() => setShowCustomizer(true)}>
+          <Settings className="w-4 h-4 mr-2" />
+          Widget'ları Düzenle
+        </Button>
+      </div>
+
+      {/* Widget Grid */}
+      <DashboardWidgetGrid onNavigate={onNavigate} />
+
       {/* Priority Alert Banner */}
       {dashboardStats.pendingReviews > 5 && (
         <div className="p-4 rounded-lg border border-warning bg-warning/10 flex items-start gap-3">
@@ -225,6 +248,9 @@ export function DashboardTab({
           </CardContent>
         </Card>
       </div>
+
+      {/* Widget Customizer Dialog */}
+      <WidgetCustomizer open={showCustomizer} onOpenChange={setShowCustomizer} />
     </div>
   );
 }
