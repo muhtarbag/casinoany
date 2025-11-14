@@ -1,0 +1,17 @@
+{
+  "name": "CasinoAny - Casino ve Bahis Siteleri",
+  "short_name": "CasinoAny",
+  "description": "Türkiye'nin en güvenilir casino ve bahis siteleri karşılaştırma platformu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#c026d3",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
