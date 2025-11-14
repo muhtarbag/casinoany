@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { subDays } from 'date-fns';
+import { QUERY_DEFAULTS, queryKeys } from '@/lib/queryClient';
 
 export interface SiteAnalytics {
   siteId: string;
@@ -22,7 +23,7 @@ export interface SiteAnalytics {
 
 export function useSiteAnalytics() {
   return useQuery({
-    queryKey: ['site-analytics'],
+    queryKey: [...queryKeys.analytics.all, 'site-analytics'],
     queryFn: async () => {
       // Fetch all active sites
       const { data: sites, error: sitesError } = await supabase
@@ -117,6 +118,7 @@ export function useSiteAnalytics() {
       // Sort by total views descending
       return siteAnalytics.sort((a, b) => b.totalViews - a.totalViews);
     },
-    refetchInterval: 60000, // Refetch every minute
+    // STANDARDIZED: Analytics pattern (2 dakika refetch)
+    ...QUERY_DEFAULTS.analytics,
   });
 }

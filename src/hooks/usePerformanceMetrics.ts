@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_DEFAULTS, queryKeys } from '@/lib/queryClient';
 
 export interface PerformanceMetric {
   id: string;
@@ -13,7 +14,7 @@ export interface PerformanceMetric {
 
 export function usePerformanceMetrics(timeRange: '1h' | '24h' | '7d' = '24h') {
   return useQuery({
-    queryKey: ['performance-metrics', timeRange],
+    queryKey: [...queryKeys.admin.all, 'performance-metrics', timeRange],
     queryFn: async () => {
       const hoursAgo = timeRange === '1h' ? 1 : timeRange === '24h' ? 24 : 168;
       const startTime = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
@@ -27,13 +28,14 @@ export function usePerformanceMetrics(timeRange: '1h' | '24h' | '7d' = '24h') {
       if (error) throw error;
       return data as PerformanceMetric[];
     },
-    refetchInterval: 60000, // Refresh every minute
+    // STANDARDIZED: Analytics pattern (2 dakika refetch)
+    ...QUERY_DEFAULTS.analytics,
   });
 }
 
 export function useRecentErrors(limit: number = 10) {
   return useQuery({
-    queryKey: ['recent-errors', limit],
+    queryKey: [...queryKeys.admin.logs({ severity: 'error' }), 'recent', limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('system_logs')
@@ -45,12 +47,14 @@ export function useRecentErrors(limit: number = 10) {
       if (error) throw error;
       return data;
     },
+    // STANDARDIZED: Admin data pattern
+    ...QUERY_DEFAULTS.admin,
   });
 }
 
 export function useApiPerformance() {
   return useQuery({
-    queryKey: ['api-performance'],
+    queryKey: [...queryKeys.admin.all, 'api-performance'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('api_call_logs')
@@ -70,5 +74,7 @@ export function useApiPerformance() {
         successRate: Math.round(successRate),
       };
     },
+    // STANDARDIZED: Analytics pattern
+    ...QUERY_DEFAULTS.analytics,
   });
 }
