@@ -1660,6 +1660,21 @@ export type Database = {
     }
     Functions: {
       can_view_site_stats: { Args: never; Returns: boolean }
+      get_daily_site_metrics: {
+        Args: { days_back?: number }
+        Returns: {
+          affiliate_clicks: number
+          avg_duration_seconds: number
+          logged_in_users: number
+          metric_date: string
+          site_id: string
+          site_name: string
+          site_slug: string
+          total_conversions: number
+          total_views: number
+          unique_sessions: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
