@@ -1,6 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
@@ -16,6 +14,7 @@ import { Calendar, Clock, Eye, Search, Tag, ArrowRight, FileText } from 'lucide-
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState, useMemo } from 'react';
+import { useBlogPosts } from '@/hooks/queries/useBlogQueries';
 
 interface BlogPost {
   id: string;
@@ -35,23 +34,11 @@ const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['blog-posts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts' as any)
-        .select('*')
-        .eq('is_published', true)
-        .order('published_at', { ascending: false });
-      
-      if (error) throw error;
-      return (data as unknown) as BlogPost[];
-    },
-  });
+  const { data: posts, isLoading } = useBlogPosts({ isPublished: true });
 
   const categories = useMemo(() => {
     if (!posts) return [];
-    const cats = new Set(posts.map(p => p.category).filter(Boolean));
+    const cats = new Set(posts.map(p => p.category).filter(Boolean) as string[]);
     return Array.from(cats);
   }, [posts]);
 
@@ -124,7 +111,7 @@ const Blog = () => {
                   key={cat}
                   variant={selectedCategory === cat ? 'default' : 'outline'}
                   className="cursor-pointer"
-                  onClick={() => setSelectedCategory(cat as string)}
+                  onClick={() => setSelectedCategory(cat)}
                 >
                   {cat}
                 </Badge>

@@ -1,10 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageSquare, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useBlogComments } from '@/hooks/queries/useBlogQueries';
 
 interface BlogCommentListProps {
   postId: string;
@@ -24,46 +23,7 @@ interface Comment {
 }
 
 export const BlogCommentList = ({ postId }: BlogCommentListProps) => {
-  const { data: comments, isLoading } = useQuery({
-    queryKey: ['blog-comments', postId],
-    queryFn: async () => {
-      const { data: commentsData, error: commentsError } = await supabase
-        .from('blog_comments' as any)
-        .select('*')
-        .eq('post_id', postId)
-        .eq('is_approved', true)
-        .order('created_at', { ascending: false });
-
-      if (commentsError) throw commentsError;
-
-      // Fetch profiles for authenticated users
-      const userIds = commentsData
-        .map((c: any) => c.user_id)
-        .filter((id: string | null) => id !== null);
-
-      let profilesData = [];
-      if (userIds.length > 0) {
-        const { data, error: profilesError } = await (supabase as any)
-          .from('profiles')
-          .select('id, username')
-          .in('id', userIds);
-
-        if (profilesError) throw profilesError;
-        profilesData = data || [];
-      }
-
-      // Combine comments with profiles
-      const commentsWithProfiles = commentsData.map((comment: any) => {
-        const profile = profilesData?.find((p: any) => p.id === comment.user_id);
-        return {
-          ...comment,
-          profiles: profile ? { username: profile.username || 'Anonim' } : undefined,
-        };
-      });
-
-      return commentsWithProfiles as Comment[];
-    },
-  });
+  const { data: comments, isLoading } = useBlogComments(postId);
 
   if (isLoading) {
     return (
