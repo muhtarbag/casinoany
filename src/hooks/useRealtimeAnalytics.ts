@@ -14,6 +14,11 @@ interface RealtimeMetrics {
   }>;
 }
 
+/**
+ * OPTIMIZED: Single WebSocket channel instead of 4 separate channels
+ * Subscribes to analytics_events table with event-sourcing pattern
+ * Performance: 75% reduction in WebSocket overhead
+ */
 export const useRealtimeAnalytics = () => {
   const [metrics, setMetrics] = useState<RealtimeMetrics>({
     totalViews: 0,
@@ -24,207 +29,126 @@ export const useRealtimeAnalytics = () => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    console.log('[Realtime Analytics] Başlatılıyor...');
+    console.log('[Realtime Analytics] Starting with unified channel...');
     
-    let pageViewsChannel: RealtimeChannel;
-    let userEventsChannel: RealtimeChannel;
-    let siteStatsChannel: RealtimeChannel;
-    let conversionsChannel: RealtimeChannel;
+    let analyticsChannel: RealtimeChannel;
 
-    // İlk verileri yükle
+    // Load initial data from analytics_events
     const loadInitialData = async () => {
       try {
-        // Total page views
-        const { count: viewsCount } = await (supabase as any)
-          .from('page_views')
-          .select('*', { count: 'exact', head: true });
-
-        // Total site stats clicks
-        const { data: statsData } = await (supabase as any)
-          .from('site_stats')
-          .select('clicks');
+        const now = new Date();
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
         
-        const totalClicks = statsData?.reduce((sum: number, stat: any) => sum + (stat.clicks || 0), 0) || 0;
+        // Get counts by event type (using any to handle type mismatch during migration)
+        const { data: events } = await (supabase as any)
+          .from('analytics_events')
+          .select('event_type')
+          .gte('created_at', oneDayAgo);
 
-        // Active users (son 5 dakika içinde aktivite gösteren)
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const viewsCount = events?.filter((e: any) => e.event_type === 'page_view').length || 0;
+        const clicksCount = events?.filter((e: any) => e.event_type === 'affiliate_click').length || 0;
+
+        // Active users (last 5 minutes)
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000).toISOString();
         const { data: activeSessions } = await (supabase as any)
-          .from('analytics_sessions')
+          .from('analytics_events')
           .select('session_id')
-          .gte('last_activity', fiveMinutesAgo);
+          .gte('created_at', fiveMinutesAgo)
+          .not('session_id', 'is', null);
 
-        // Recent activities
-        const { data: recentPageViews } = await (supabase as any)
-          .from('page_views')
-          .select('id, page_path, created_at')
+        const uniqueSessions = new Set(activeSessions?.map((s: any) => s.session_id)).size;
+
+        // Recent activities (last 10 events)
+        const { data: recentEvents } = await (supabase as any)
+          .from('analytics_events')
+          .select('id, event_type, event_name, page_path, created_at')
           .order('created_at', { ascending: false })
           .limit(10);
 
-        const activities = recentPageViews?.map((pv: any) => ({
-          id: pv.id,
-          type: 'view' as const,
-          timestamp: pv.created_at,
-          details: pv.page_path,
+        const activities = recentEvents?.map((event: any) => ({
+          id: event.id,
+          type: event.event_type === 'page_view' ? 'view' as const :
+                event.event_type === 'affiliate_click' ? 'click' as const :
+                event.event_type === 'conversion' ? 'conversion' as const :
+                'event' as const,
+          timestamp: event.created_at,
+          details: event.page_path || event.event_name || 'Unknown',
         })) || [];
 
         setMetrics({
-          totalViews: viewsCount || 0,
-          totalClicks,
-          activeUsers: activeSessions?.length || 0,
+          totalViews: viewsCount,
+          totalClicks: clicksCount,
+          activeUsers: uniqueSessions,
           recentActivities: activities,
         });
 
-        console.log('[Realtime Analytics] İlk veriler yüklendi:', {
+        console.log('[Realtime Analytics] Initial data loaded:', {
           views: viewsCount,
-          clicks: totalClicks,
-          activeUsers: activeSessions?.length,
+          clicks: clicksCount,
+          activeUsers: uniqueSessions,
         });
       } catch (error) {
-        console.error('[Realtime Analytics] İlk veri yükleme hatası:', error);
+        console.error('[Realtime Analytics] Initial data load error:', error);
       }
     };
 
     loadInitialData();
 
-    // Page Views Channel
-    pageViewsChannel = supabase
-      .channel('realtime-page-views')
+    // OPTIMIZED: Single unified analytics channel
+    analyticsChannel = supabase
+      .channel('unified-analytics-events')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'page_views',
+          table: 'analytics_events',
         },
         (payload: any) => {
-          console.log('[Realtime Analytics] Yeni page view:', payload);
-          setMetrics(prev => ({
-            ...prev,
-            totalViews: prev.totalViews + 1,
-            recentActivities: [
-              {
-                id: payload.new?.id || Math.random().toString(),
-                type: 'view',
-                timestamp: payload.new?.created_at || new Date().toISOString(),
-                details: payload.new?.page_path || 'Unknown',
-              },
-              ...prev.recentActivities.slice(0, 9),
-            ],
-          }));
-        }
-      )
-      .subscribe((status) => {
-        console.log('[Realtime Analytics] Page Views kanalı:', status);
-      });
+          const newEvent = payload.new;
+          console.log('[Realtime Analytics] New event:', newEvent.event_type);
 
-    // User Events Channel
-    userEventsChannel = supabase
-      .channel('realtime-user-events')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_events',
-        },
-        (payload: any) => {
-          console.log('[Realtime Analytics] Yeni user event:', payload);
-          setMetrics(prev => ({
-            ...prev,
-            recentActivities: [
-              {
-                id: payload.new?.id || Math.random().toString(),
-                type: 'event',
-                timestamp: payload.new?.created_at || new Date().toISOString(),
-                details: `${payload.new?.event_type || 'Event'}: ${payload.new?.event_name || 'Unknown'}`,
-              },
-              ...prev.recentActivities.slice(0, 9),
-            ],
-          }));
-        }
-      )
-      .subscribe((status) => {
-        console.log('[Realtime Analytics] User Events kanalı:', status);
-      });
-
-    // Site Stats Channel
-    siteStatsChannel = supabase
-      .channel('realtime-site-stats')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'site_stats',
-        },
-        (payload: any) => {
-          console.log('[Realtime Analytics] Site stats güncellendi:', payload);
-          const oldClicks = payload.old?.clicks || 0;
-          const newClicks = payload.new?.clicks || 0;
-          const clickDiff = newClicks - oldClicks;
-
-          if (clickDiff > 0) {
-            setMetrics(prev => ({
-              ...prev,
-              totalClicks: prev.totalClicks + clickDiff,
+          setMetrics(prev => {
+            const updates: Partial<RealtimeMetrics> = {
               recentActivities: [
                 {
-                  id: payload.new?.id || Math.random().toString(),
-                  type: 'click',
-                  timestamp: payload.new?.updated_at || new Date().toISOString(),
-                  details: 'Site affiliate link clicked',
+                  id: newEvent.id,
+                  type: newEvent.event_type === 'page_view' ? 'view' :
+                        newEvent.event_type === 'affiliate_click' ? 'click' :
+                        newEvent.event_type === 'conversion' ? 'conversion' :
+                        'event',
+                  timestamp: newEvent.created_at,
+                  details: newEvent.page_path || newEvent.event_name || 'Unknown',
                 },
                 ...prev.recentActivities.slice(0, 9),
               ],
-            }));
-          }
+            };
+
+            // Update counters based on event type
+            if (newEvent.event_type === 'page_view') {
+              updates.totalViews = prev.totalViews + 1;
+            } else if (newEvent.event_type === 'affiliate_click') {
+              updates.totalClicks = prev.totalClicks + 1;
+            }
+
+            // Update active users if new session
+            if (newEvent.session_id && newEvent.event_type === 'session_start') {
+              updates.activeUsers = prev.activeUsers + 1;
+            }
+
+            return { ...prev, ...updates };
+          });
         }
       )
       .subscribe((status) => {
-        console.log('[Realtime Analytics] Site Stats kanalı:', status);
-        if (status === 'SUBSCRIBED') {
-          setIsConnected(true);
-        }
+        console.log('[Realtime Analytics] Channel status:', status);
+        setIsConnected(status === 'SUBSCRIBED');
       });
 
-    // Conversions Channel
-    conversionsChannel = supabase
-      .channel('realtime-conversions')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'conversions',
-        },
-        (payload: any) => {
-          console.log('[Realtime Analytics] Yeni conversion:', payload);
-          setMetrics(prev => ({
-            ...prev,
-            recentActivities: [
-              {
-                id: payload.new?.id || Math.random().toString(),
-                type: 'conversion',
-                timestamp: payload.new?.created_at || new Date().toISOString(),
-                details: `${payload.new?.conversion_type || 'Conversion'} - ${payload.new?.conversion_value || 0}₺`,
-              },
-              ...prev.recentActivities.slice(0, 9),
-            ],
-          }));
-        }
-      )
-      .subscribe((status) => {
-        console.log('[Realtime Analytics] Conversions kanalı:', status);
-      });
-
-    // Cleanup
+    // Cleanup: Single channel unsubscribe
     return () => {
-      console.log('[Realtime Analytics] Kapatılıyor...');
-      supabase.removeChannel(pageViewsChannel);
-      supabase.removeChannel(userEventsChannel);
-      supabase.removeChannel(siteStatsChannel);
-      supabase.removeChannel(conversionsChannel);
-      setIsConnected(false);
+      console.log('[Realtime Analytics] Cleaning up unified channel...');
+      analyticsChannel?.unsubscribe();
     };
   }, []);
 
