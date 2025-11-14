@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { optimizeImage, getOptimizedFileName, formatFileSize } from '@/utils/imageOptimizer';
 
 interface Banner {
   id: string;
@@ -39,6 +40,7 @@ export const BannerManagement = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const [formData, setFormData] = useState<BannerFormData>({
     title: '',
     image_url: '',
@@ -162,13 +164,33 @@ export const BannerManagement = () => {
 
   const uploadImage = async (file: File) => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      setIsOptimizing(true);
+      const originalSize = file.size;
+      
+      toast.info('Görsel optimize ediliyor...', { duration: 2000 });
+      
+      // Optimize image
+      const optimizedBlob = await optimizeImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1080,
+        quality: 0.85,
+        format: 'webp'
+      });
+      
+      const optimizedSize = optimizedBlob.size;
+      const savings = ((originalSize - optimizedSize) / originalSize * 100).toFixed(1);
+      
+      // Generate optimized filename
+      const fileName = getOptimizedFileName(file.name, 'webp');
+      const filePath = `banners/${fileName}`;
 
+      // Upload optimized image
       const { error: uploadError } = await supabase.storage
         .from('notification-images')
-        .upload(filePath, file);
+        .upload(filePath, optimizedBlob, {
+          contentType: 'image/webp',
+          cacheControl: '31536000', // 1 year cache
+        });
 
       if (uploadError) throw uploadError;
 
@@ -177,9 +199,15 @@ export const BannerManagement = () => {
         .getPublicUrl(filePath);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Görsel yüklendi');
+      
+      toast.success(
+        `Görsel yüklendi! ${formatFileSize(originalSize)} → ${formatFileSize(optimizedSize)} (%${savings} daha küçük)`,
+        { duration: 4000 }
+      );
     } catch (error: any) {
       toast.error('Görsel yüklenirken hata: ' + error.message);
+    } finally {
+      setIsOptimizing(false);
     }
   };
 
