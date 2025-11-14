@@ -7,7 +7,8 @@ import { SiteFormProgress } from '@/components/forms/SiteFormProgress';
 import { SiteFormStepBasic } from './wizard-steps/SiteFormStepBasic';
 import { SiteFormStepSocial } from './wizard-steps/SiteFormStepSocial';
 import { SiteFormStepAffiliate } from './wizard-steps/SiteFormStepAffiliate';
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, X } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SiteFormWizardProps {
   form: UseFormReturn<SiteFormData>;
@@ -35,6 +36,7 @@ export function SiteFormWizard({
   isLoading,
 }: SiteFormWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const isMobile = useIsMobile();
 
   const validateCurrentStep = async (): Promise<boolean> => {
     const fieldsToValidate = getFieldsForStep(currentStep);
@@ -63,11 +65,11 @@ export function SiteFormWizard({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <SiteFormProgress currentStep={currentStep} steps={STEPS} />
 
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
           {currentStep === 0 && (
             <SiteFormStepBasic
               form={form}
@@ -83,13 +85,15 @@ export function SiteFormWizard({
       </Card>
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
           disabled={isLoading}
+          className="w-full sm:w-auto order-last sm:order-first"
         >
+          {isMobile && <X className="w-4 h-4 mr-2" />}
           İptal
         </Button>
 
@@ -100,20 +104,31 @@ export function SiteFormWizard({
               variant="outline"
               onClick={handlePrevious}
               disabled={isLoading}
+              className="flex-1 sm:flex-none"
             >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Geri
+              <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+              {!isMobile && 'Geri'}
             </Button>
           )}
 
           {currentStep < STEPS.length - 1 ? (
-            <Button type="button" onClick={handleNext} disabled={isLoading}>
-              İleri
-              <ChevronRight className="w-4 h-4 ml-2" />
+            <Button 
+              type="button" 
+              onClick={handleNext} 
+              disabled={isLoading}
+              className="flex-1 sm:flex-none"
+            >
+              {!isMobile && 'İleri'}
+              <ChevronRight className="w-4 h-4 ml-1 sm:ml-2" />
             </Button>
           ) : (
-            <Button type="button" onClick={handleSubmit} disabled={isLoading}>
-              <Save className="w-4 h-4 mr-2" />
+            <Button 
+              type="button" 
+              onClick={handleSubmit} 
+              disabled={isLoading}
+              className="flex-1 sm:flex-none"
+            >
+              <Save className="w-4 h-4 mr-1 sm:mr-2" />
               {editingId ? 'Güncelle' : 'Kaydet'}
             </Button>
           )}
