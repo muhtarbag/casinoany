@@ -198,6 +198,8 @@ export function EnhancedSiteList({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showFiltersDialog, setShowFiltersDialog] = useState(false);
   const isMobile = useIsMobile();
 
   const sensors = useSensors(
