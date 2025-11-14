@@ -18,6 +18,7 @@ interface Banner {
   id: string;
   title: string;
   image_url: string;
+  mobile_image_url?: string | null;
   target_url: string | null;
   position: number;
   display_pages: string[];
@@ -29,6 +30,7 @@ interface Banner {
 interface BannerFormData {
   title: string;
   image_url: string;
+  mobile_image_url: string;
   target_url: string;
   position: number;
   display_pages: string[];
@@ -44,6 +46,7 @@ export const BannerManagement = () => {
   const [formData, setFormData] = useState<BannerFormData>({
     title: '',
     image_url: '',
+    mobile_image_url: '',
     target_url: '',
     position: 9,
     display_pages: ['home'],
@@ -127,6 +130,7 @@ export const BannerManagement = () => {
     setFormData({
       title: '',
       image_url: '',
+      mobile_image_url: '',
       target_url: '',
       position: 9,
       display_pages: ['home'],
@@ -142,6 +146,7 @@ export const BannerManagement = () => {
     setFormData({
       title: banner.title,
       image_url: banner.image_url,
+      mobile_image_url: banner.mobile_image_url || '',
       target_url: banner.target_url || '',
       position: banner.position,
       display_pages: banner.display_pages,
@@ -162,14 +167,14 @@ export const BannerManagement = () => {
     }
   };
 
-  const uploadImage = async (file: File) => {
-    const loadingToastId = showLoadingToast('Görsel optimize ediliyor...');
+  const uploadImage = async (file: File, isMobile: boolean = false) => {
+    const loadingToastId = showLoadingToast(`${isMobile ? 'Mobil' : 'Desktop'} görsel optimize ediliyor...`);
     
     try {
-      // Optimize image
+      // Optimize image with different dimensions for mobile/desktop
       const optimized = await optimizeImage(file, {
-        maxWidth: 1920,
-        maxHeight: 1080,
+        maxWidth: isMobile ? 768 : 1920,
+        maxHeight: isMobile ? 432 : 1080,
         quality: 0.85,
         format: 'webp'
       });
@@ -181,7 +186,7 @@ export const BannerManagement = () => {
       );
 
       // Upload optimized image
-      const fileName = `banner-${Date.now()}.${optimized.format}`;
+      const fileName = `banner-${isMobile ? 'mobile-' : ''}${Date.now()}.${optimized.format}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -194,17 +199,22 @@ export const BannerManagement = () => {
         .from('notification-images')
         .getPublicUrl(filePath);
 
-      setFormData({ ...formData, image_url: publicUrl });
-      showSuccessToast('Görsel başarıyla yüklendi!');
+      if (isMobile) {
+        setFormData({ ...formData, mobile_image_url: publicUrl });
+      } else {
+        setFormData({ ...formData, image_url: publicUrl });
+      }
+      
+      showSuccessToast(`${isMobile ? 'Mobil' : 'Desktop'} görsel başarıyla yüklendi!`);
     } catch (error: any) {
       showErrorToast(error, 'Görsel yüklenirken bir hata oluştu');
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isMobile: boolean = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    await uploadImage(file);
+    await uploadImage(file, isMobile);
   };
 
   const [isDragging, setIsDragging] = useState(false);
@@ -273,53 +283,100 @@ export const BannerManagement = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="image">Banner Görseli</Label>
-                <div
-                  className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                    isDragging
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {isDragging
-                      ? 'Görseli buraya bırakın'
-                      : 'Görseli sürükleyin veya tıklayın'}
+              <div className="space-y-6">
+                {/* Desktop Banner */}
+                <div>
+                  <Label htmlFor="image" className="text-base font-semibold">
+                    Desktop Banner Görseli
+                  </Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Önerilen Boyut: 1920x540px (Aspect Ratio: 24:9)
                   </p>
-                  <input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    PNG, JPG, WEBP (Maks. 5MB)
-                  </p>
-                </div>
-                {formData.image_url && (
-                  <div className="mt-4 relative">
-                    <img
-                      src={formData.image_url}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg"
+                  <div
+                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                      isDragging
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <ImageIcon className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Desktop görseli sürükleyin veya tıklayın
+                    </p>
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, false)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => setFormData({ ...formData, image_url: '' })}
-                    >
-                      Kaldır
-                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      PNG, JPG, WEBP (Maks. 5MB)
+                    </p>
                   </div>
-                )}
+                  {formData.image_url && (
+                    <div className="mt-3 relative">
+                      <img
+                        src={formData.image_url}
+                        alt="Desktop Preview"
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                      >
+                        Kaldır
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Banner */}
+                <div>
+                  <Label htmlFor="mobile-image" className="text-base font-semibold">
+                    Mobil Banner Görseli
+                  </Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Önerilen Boyut: 768x432px (Aspect Ratio: 16:9)
+                  </p>
+                  <div className="relative border-2 border-dashed rounded-lg p-6 text-center transition-colors border-border hover:border-primary/50">
+                    <ImageIcon className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Mobil görseli sürükleyin veya tıklayın
+                    </p>
+                    <input
+                      id="mobile-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, true)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      PNG, JPG, WEBP (Maks. 5MB)
+                    </p>
+                  </div>
+                  {formData.mobile_image_url && (
+                    <div className="mt-3 relative">
+                      <img
+                        src={formData.mobile_image_url}
+                        alt="Mobile Preview"
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => setFormData({ ...formData, mobile_image_url: '' })}
+                      >
+                        Kaldır
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>

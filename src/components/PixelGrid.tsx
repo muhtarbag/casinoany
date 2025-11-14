@@ -140,6 +140,7 @@ export const PixelGrid = () => {
                     <DynamicBanner
                       key={banner.id}
                       imageUrl={banner.image_url}
+                      mobileImageUrl={banner.mobile_image_url}
                       altText={banner.alt_text}
                       targetUrl={banner.target_url}
                       title={banner.title}
