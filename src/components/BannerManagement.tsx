@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, Eye, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { DynamicBanner } from './DynamicBanner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { optimizeImage, formatFileSize } from '@/utils/imageOptimizer';
 import { showSuccessToast, showErrorToast, showLoadingToast, updateToast } from '@/lib/toastHelpers';
 
@@ -208,6 +210,8 @@ export const BannerManagement = () => {
   };
 
   const [isDragging, setIsDragging] = useState(false);
+  const [previewBanner, setPreviewBanner] = useState<Banner | null>(null);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -239,6 +243,17 @@ export const BannerManagement = () => {
     }
 
     await uploadImage(file);
+  };
+
+  const getDeviceWidth = () => {
+    switch (previewDevice) {
+      case 'mobile':
+        return '375px';
+      case 'tablet':
+        return '768px';
+      case 'desktop':
+        return '100%';
+    }
   };
 
   if (isLoading) {
@@ -423,6 +438,9 @@ export const BannerManagement = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setPreviewBanner(banner)}>
+                    <Eye className="w-4 h-4" />
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => handleEdit(banner)}>
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -475,6 +493,180 @@ export const BannerManagement = () => {
           </Card>
         )}
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewBanner} onOpenChange={(open) => !open && setPreviewBanner(null)}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Banner Önizleme: {previewBanner?.title}</span>
+              <div className="flex gap-2">
+                <Button
+                  variant={previewDevice === 'desktop' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPreviewDevice('desktop')}
+                >
+                  <Monitor className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={previewDevice === 'tablet' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPreviewDevice('tablet')}
+                >
+                  <Tablet className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={previewDevice === 'mobile' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPreviewDevice('mobile')}
+                >
+                  <Smartphone className="w-4 h-4" />
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          {previewBanner && (
+            <Tabs defaultValue="homepage" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="homepage">Ana Sayfa</TabsTrigger>
+                <TabsTrigger value="blog">Blog Sayfası</TabsTrigger>
+                <TabsTrigger value="site-detail">Site Detay</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="homepage" className="mt-4">
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Banner ana sayfada böyle görünecek
+                  </div>
+                  <div 
+                    className="mx-auto transition-all duration-300 bg-background border rounded-lg p-4"
+                    style={{ width: getDeviceWidth() }}
+                  >
+                    {/* Simulated homepage header */}
+                    <div className="h-16 bg-muted rounded mb-4 flex items-center px-4">
+                      <div className="h-8 w-32 bg-muted-foreground/20 rounded" />
+                    </div>
+                    
+                    {/* Simulated content cards before banner */}
+                    <div className="grid gap-4 mb-4">
+                      {Array.from({ length: previewBanner.position }).map((_, i) => (
+                        <div key={i} className="h-32 bg-muted rounded p-4">
+                          <div className="h-4 bg-muted-foreground/20 rounded w-3/4 mb-2" />
+                          <div className="h-3 bg-muted-foreground/10 rounded w-full mb-1" />
+                          <div className="h-3 bg-muted-foreground/10 rounded w-5/6" />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Actual Banner Preview */}
+                    <DynamicBanner
+                      imageUrl={previewBanner.image_url}
+                      altText={previewBanner.alt_text || previewBanner.title}
+                      targetUrl={previewBanner.target_url}
+                      title={previewBanner.title}
+                    />
+
+                    {/* Simulated content after banner */}
+                    <div className="grid gap-4 mt-4">
+                      {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="h-32 bg-muted rounded p-4">
+                          <div className="h-4 bg-muted-foreground/20 rounded w-3/4 mb-2" />
+                          <div className="h-3 bg-muted-foreground/10 rounded w-full mb-1" />
+                          <div className="h-3 bg-muted-foreground/10 rounded w-5/6" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="blog" className="mt-4">
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Banner blog sayfasında böyle görünecek
+                  </div>
+                  <div 
+                    className="mx-auto transition-all duration-300 bg-background border rounded-lg p-4"
+                    style={{ width: getDeviceWidth() }}
+                  >
+                    {/* Blog header */}
+                    <div className="mb-6">
+                      <div className="h-8 bg-muted-foreground/20 rounded w-2/3 mb-2" />
+                      <div className="h-4 bg-muted-foreground/10 rounded w-1/3" />
+                    </div>
+
+                    {/* Blog content before banner */}
+                    <div className="space-y-3 mb-4">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="h-3 bg-muted-foreground/10 rounded" />
+                      ))}
+                    </div>
+
+                    {/* Banner */}
+                    <DynamicBanner
+                      imageUrl={previewBanner.image_url}
+                      altText={previewBanner.alt_text || previewBanner.title}
+                      targetUrl={previewBanner.target_url}
+                      title={previewBanner.title}
+                    />
+
+                    {/* Blog content after banner */}
+                    <div className="space-y-3 mt-4">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="h-3 bg-muted-foreground/10 rounded" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="site-detail" className="mt-4">
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Banner site detay sayfasında böyle görünecek
+                  </div>
+                  <div 
+                    className="mx-auto transition-all duration-300 bg-background border rounded-lg p-4"
+                    style={{ width: getDeviceWidth() }}
+                  >
+                    {/* Site header with logo */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-20 w-20 bg-muted rounded" />
+                      <div className="flex-1">
+                        <div className="h-6 bg-muted-foreground/20 rounded w-1/2 mb-2" />
+                        <div className="h-4 bg-muted-foreground/10 rounded w-1/3" />
+                      </div>
+                    </div>
+
+                    {/* Rating and info */}
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="h-16 bg-muted rounded" />
+                      ))}
+                    </div>
+
+                    {/* Banner */}
+                    <DynamicBanner
+                      imageUrl={previewBanner.image_url}
+                      altText={previewBanner.alt_text || previewBanner.title}
+                      targetUrl={previewBanner.target_url}
+                      title={previewBanner.title}
+                    />
+
+                    {/* Review content */}
+                    <div className="space-y-3 mt-4">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="h-3 bg-muted-foreground/10 rounded" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
