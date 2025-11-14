@@ -7,7 +7,7 @@ interface DynamicBannerProps {
 
 export const DynamicBanner = ({ imageUrl, altText, targetUrl, title }: DynamicBannerProps) => {
   const bannerContent = (
-    <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[24/9] rounded-lg md:rounded-xl overflow-hidden shadow-lg md:shadow-2xl">
+    <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[28/9] rounded-md sm:rounded-lg overflow-hidden shadow-md">
       <img
         src={imageUrl}
         alt={altText || title}
@@ -19,12 +19,12 @@ export const DynamicBanner = ({ imageUrl, altText, targetUrl, title }: DynamicBa
 
   if (targetUrl) {
     return (
-      <section className="w-full my-6 md:my-12 lg:my-16 px-2 sm:px-0">
+      <section className="w-full my-3 md:my-6 lg:my-8 px-4 sm:px-0">
         <a
           href={targetUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block transition-transform active:scale-[0.98] md:hover:scale-[1.02]"
+          className="block transition-transform active:scale-[0.98] md:hover:scale-[1.01]"
         >
           {bannerContent}
         </a>
@@ -33,7 +33,7 @@ export const DynamicBanner = ({ imageUrl, altText, targetUrl, title }: DynamicBa
   }
 
   return (
-    <section className="w-full my-6 md:my-12 lg:my-16 px-2 sm:px-0">
+    <section className="w-full my-3 md:my-6 lg:my-8 px-4 sm:px-0">
       {bannerContent}
     </section>
   );
