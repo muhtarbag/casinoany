@@ -40,6 +40,7 @@ import { SystemHealthDashboard } from '@/components/SystemHealthDashboard';
 import { SystemLogsViewer } from '@/components/SystemLogsViewer';
 import { NewsManagement } from '@/components/NewsManagement';
 import { RealtimeAnalyticsDashboard } from '@/components/RealtimeAnalyticsDashboard';
+import GSCSetupGuide from '@/components/GSCSetupGuide';
 import { RefreshCw, Star } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSiteStats } from '@/hooks/queries/useSiteQueries';
@@ -833,7 +834,7 @@ export default function Admin() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant={['analytics', 'traffic', 'keywords', 'stats', 'ai', 'history', 'health', 'logs'].includes(activeTab) ? 'default' : 'ghost'}
+                    variant={['analytics', 'traffic', 'keywords', 'stats', 'ai', 'history', 'health', 'logs', 'gsc'].includes(activeTab) ? 'default' : 'ghost'}
                     size="sm"
                     className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
                   >
@@ -857,6 +858,9 @@ export default function Admin() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('stats')}>
                     İstatistikler
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('gsc')}>
+                    Google Search Console
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('health')}>
                     Sistem Sağlığı
@@ -1184,6 +1188,9 @@ export default function Admin() {
                 <BlogStats />
               </TabsContent>
             </Tabs>
+          </TabsContent>
+          <TabsContent value="gsc">
+            <GSCSetupGuide />
           </TabsContent>
           <TabsContent value="ai">
             <AIAssistant />
