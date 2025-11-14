@@ -81,6 +81,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/haberler" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  📰 Haberler
+                </Link>
+              </li>
+              <li>
                 <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   ℹ️ Hakkımızda
                 </Link>

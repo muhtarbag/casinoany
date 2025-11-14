@@ -19,6 +19,8 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const News = lazy(() => import("./pages/News"));
+const NewsDetail = lazy(() => import("./pages/NewsDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const SiteDetail = lazy(() => import("./pages/SiteDetail"));
 const CasinoSites = lazy(() => import("./pages/CasinoSites"));
@@ -74,6 +76,8 @@ const AppContent = () => {
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/haberler" element={<News />} />
+          <Route path="/haber/:slug" element={<NewsDetail />} />
           <Route path="/sitemap.xml" element={<Sitemap />} />
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/privacy" element={<Privacy />} />
