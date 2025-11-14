@@ -235,22 +235,29 @@ const BettingSiteCardComponent = ({
         </Button>
         <Button 
           size="sm" 
-          className="flex-1 relative font-semibold overflow-hidden group/cta transition-all duration-300 bg-gradient-to-r from-secondary via-secondary to-secondary hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
+          className="flex-1 relative font-bold overflow-hidden group/cta transition-all duration-300 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.03] text-white border-0"
           onClick={handleAffiliateClick}
         >
           {/* Animated shimmer overlay */}
           <div className="absolute inset-0 w-full h-full">
-            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12" />
           </div>
           
+          {/* Pulse glow background */}
+          <div className="absolute inset-0 animate-glow opacity-50" />
+          
           {/* Button content */}
-          <span className="relative z-10 flex items-center gap-2">
+          <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
             Siteye Git
-            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 group-hover/cta:scale-110 transition-all duration-300" />
+            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 group-hover/cta:scale-110 transition-all duration-300 drop-shadow-md" />
           </span>
           
-          {/* Hover glow effect */}
-          <div className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-sm" />
+          {/* Hover sparkle effect */}
+          <div className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300">
+            <div className="absolute top-1/2 left-1/4 w-2 h-2 bg-white rounded-full blur-sm animate-ping" />
+            <div className="absolute top-1/4 right-1/3 w-1.5 h-1.5 bg-white rounded-full blur-sm animate-ping delay-75" />
+            <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-white rounded-full blur-sm animate-ping delay-150" />
+          </div>
         </Button>
       </CardFooter>
     </Card>
