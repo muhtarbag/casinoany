@@ -1,87 +1,37 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, MousePointer, TrendingUp, BarChart3, PieChart } from "lucide-react";
 import { Bar, BarChart, Pie, PieChart as RechartsPie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { useEffect } from "react";
 
 export default function SiteStats() {
-  const queryClient = useQueryClient();
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('site-stats-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'site_stats'
-        },
-        () => {
-          // Refetch stats when any change occurs
-          queryClient.invalidateQueries({ queryKey: ["all-site-stats"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
-      console.log("🔍 Fetching stats from view...");
-      
-      // Use the optimized database view
       const { data, error } = await (supabase as any)
         .from("site_stats_with_details")
         .select("*")
         .order("clicks", { ascending: false });
 
-      if (error) {
-        console.error("❌ View error:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("✅ Raw data from view:", data);
-      console.log("📊 First row sample:", data?.[0]);
-
-      // Map view data to match expected format
-      const formattedData = (data || []).map((row: any) => {
-        console.log("🔄 Processing row:", {
-          id: row.id,
-          site_name: row.site_name,
-          site_slug: row.site_slug,
-          clicks: row.clicks,
-          views: row.views
-        });
-        
-        return {
-          id: row.id,
-          site_id: row.site_id,
-          views: row.views,
-          clicks: row.clicks,
-          created_at: row.created_at,
-          updated_at: row.updated_at,
-          betting_sites: {
-            id: row.site_id,
-            name: row.site_name,
-            slug: row.site_slug,
-          },
-        };
-      });
-
-      console.log("✨ Final formatted data:", formattedData);
-      return formattedData;
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        site_id: row.site_id,
+        views: row.views,
+        clicks: row.clicks,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        betting_sites: {
+          id: row.site_id,
+          name: row.site_name,
+          slug: row.site_slug,
+        },
+      }));
     },
-    staleTime: 0, // No cache for debugging
-    refetchOnWindowFocus: false,
+    refetchInterval: 30000, // Auto-refresh every 30 seconds
   });
 
   if (isLoading) {
