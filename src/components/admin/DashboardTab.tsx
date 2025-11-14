@@ -16,9 +16,7 @@ import {
   Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DashboardWidgetGrid } from '@/components/dashboard/DashboardWidgetGrid';
 import { WidgetCustomizer } from '@/components/dashboard/WidgetCustomizer';
-import { SitePerformanceCards } from '@/components/dashboard/SitePerformanceCards';
 import { 
   LineChart, 
   Line, 
@@ -543,12 +541,6 @@ export function DashboardTab({
           </CardContent>
         </Card>
       </div>
-
-      {/* Site Performance Analytics */}
-      <SitePerformanceCards />
-
-      {/* Hızlı İşlemler Widget Grid */}
-      <DashboardWidgetGrid onNavigate={onNavigate} />
 
       {/* Widget Customizer Dialog */}
       <WidgetCustomizer open={showCustomizer} onOpenChange={setShowCustomizer} />
