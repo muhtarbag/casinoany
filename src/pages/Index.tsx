@@ -46,84 +46,9 @@ const Index = () => {
           </div>
           
           <FeaturedSitesSection />
-            <Link 
-              to="/site/betist"
-              className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-2xl font-bold">B</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                    Betist İnceleme
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    ⭐ 4.8/5.0 • 1,547 değerlendirme
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                10.000 TL hoşgeldin bonusu, hızlı ödemeler ve 5000+ oyun ile Türkiye'nin en popüler casino sitelerinden biri.
-              </p>
-              <span className="text-primary text-sm font-semibold group-hover:underline">
-                Detaylı İncelemeyi Oku →
-              </span>
-            </Link>
-
-            <Link 
-              to="/site/bets10"
-              className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-2xl font-bold">B10</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                    Bets10 İnceleme
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    ⭐ 4.7/5.0 • 2,134 değerlendirme
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                15.000 TL hoşgeldin bonusu ve 200 free spin. Hem casino hem spor bahisleri için ideal platform.
-              </p>
-              <span className="text-primary text-sm font-semibold group-hover:underline">
-                Detaylı İncelemeyi Oku →
-              </span>
-            </Link>
-
-            <Link 
-              to="/site/mobilbahis"
-              className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-2xl font-bold">M</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                    Mobilbahis İnceleme
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    ⭐ 4.6/5.0 • 1,823 değerlendirme
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">
-                Mobil-first tasarım, hızlı işlemler ve Telegram desteği ile genç oyunculara hitap eden platform.
-              </p>
-              <span className="text-primary text-sm font-semibold group-hover:underline">
-                Detaylı İncelemeyi Oku →
-              </span>
-            </Link>
-          </div>
 
           {/* Bonus CTA */}
-          <div className="text-center">
+          <div className="text-center mt-8">
             <Link 
               to="/deneme-bonusu"
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
