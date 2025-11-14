@@ -130,10 +130,6 @@ export function SiteManagementContainer() {
     );
   }, [bulkToggleActiveMutation, selectedSites, setSelectedSites]);
 
-  if (sitesLoading) {
-    return <div>Yükleniyor...</div>;
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -179,6 +175,7 @@ export function SiteManagementContainer() {
           onDelete={handleDelete}
           onDragEnd={handleDragEnd}
           isDeleting={deletingId}
+          isLoading={sitesLoading}
         />
       </CardContent>
     </Card>

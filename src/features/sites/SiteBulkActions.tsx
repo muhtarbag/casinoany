@@ -20,8 +20,8 @@ export function SiteBulkActions({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="flex gap-2 p-3 bg-muted/50 rounded-lg border">
-      <div className="flex-1 flex items-center text-sm font-medium">
+    <div className="flex gap-2 p-3 bg-muted/50 rounded-lg border" role="toolbar" aria-label="Toplu işlemler">
+      <div className="flex-1 flex items-center text-sm font-medium" aria-live="polite">
         {selectedCount} site seçildi
       </div>
       
@@ -31,8 +31,9 @@ export function SiteBulkActions({
             size="sm"
             variant="destructive"
             disabled={isLoading}
+            aria-label={`${selectedCount} siteyi sil`}
           >
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
             Toplu Sil
           </Button>
         </AlertDialogTrigger>
@@ -57,6 +58,7 @@ export function SiteBulkActions({
         variant="outline"
         onClick={onBulkActivate}
         disabled={isLoading}
+        aria-label={`${selectedCount} siteyi aktif yap`}
       >
         Aktif Yap
       </Button>
@@ -66,6 +68,7 @@ export function SiteBulkActions({
         variant="outline"
         onClick={onBulkDeactivate}
         disabled={isLoading}
+        aria-label={`${selectedCount} siteyi pasif yap`}
       >
         Pasif Yap
       </Button>
