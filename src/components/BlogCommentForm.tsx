@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +7,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { useAddBlogComment } from '@/hooks/queries/useBlogQueries';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+const commentSchema = z.object({
+  name: z.string()
+    .min(2, 'Ad en az 2 karakter olmalıdır')
+    .max(100, 'Ad en fazla 100 karakter olabilir')
+    .regex(/^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$/, 'Ad sadece harf içermelidir'),
+  email: z.string()
+    .email('Geçerli bir email adresi giriniz')
+    .max(255, 'Email en fazla 255 karakter olabilir'),
+  comment: z.string()
+    .min(10, 'Yorum en az 10 karakter olmalıdır')
+    .max(1000, 'Yorum en fazla 1000 karakter olabilir')
+    .regex(/^[^<>{}]*$/, 'Yorum geçersiz karakterler içeriyor'),
+});
 
 interface BlogCommentFormProps {
   postId: string;
@@ -16,51 +33,39 @@ interface BlogCommentFormProps {
 export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [comment, setComment] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-
   const submitCommentMutation = useAddBlogComment();
 
-  const onSuccess = () => {
-    setComment('');
-    setName('');
-    setEmail('');
-  };
+  const form = useForm<z.infer<typeof commentSchema>>({
+    resolver: zodResolver(commentSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      comment: '',
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (comment.trim().length < 3) {
-      toast({
-        title: 'Hata',
-        description: 'Yorum en az 3 karakter olmalıdır',
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  const handleSubmit = (values: z.infer<typeof commentSchema>) => {
     const commentData: any = {
       post_id: postId,
-      comment: comment.trim(),
+      comment: values.comment.trim(),
     };
 
     if (user) {
       commentData.user_id = user.id;
     } else {
-      if (!name.trim() || !email.trim()) {
-        toast({
-          title: 'Hata',
-          description: 'Lütfen ad ve email alanlarını doldurun',
-          variant: 'destructive',
-        });
-        return;
-      }
-      commentData.name = name.trim();
-      commentData.email = email.trim();
+      commentData.name = values.name.trim();
+      commentData.email = values.email.trim();
     }
 
-    submitCommentMutation.mutate(commentData, { onSuccess });
+    submitCommentMutation.mutate(commentData, {
+      onSuccess: () => {
+        form.reset();
+        toast({
+          title: 'Başarılı',
+          description: 'Yorumunuz onay için gönderildi',
+        });
+      },
+    });
   };
 
   return (
@@ -77,61 +82,73 @@ export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!user && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Adınız *</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Adınız"
-                  required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            {!user && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Adınız *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Adınız" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email *</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="email@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email@example.com"
-                  required
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="comment">Yorumunuz *</Label>
-            <Textarea
-              id="comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Yorumunuzu buraya yazın..."
-              rows={4}
-              required
-              minLength={3}
-            />
-          </div>
-
-          <Button
-            type="submit"
-            disabled={submitCommentMutation.isPending}
-            className="w-full md:w-auto"
-          >
-            {submitCommentMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Gönderiliyor...
-              </>
-            ) : (
-              'Yorum Gönder'
             )}
-          </Button>
-        </form>
+
+            <FormField
+              control={form.control}
+              name="comment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yorumunuz *</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Yorumunuzu buraya yazın..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              disabled={submitCommentMutation.isPending}
+              className="w-full md:w-auto"
+            >
+              {submitCommentMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Gönderiliyor...
+                </>
+              ) : (
+                'Yorum Gönder'
+              )}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );
