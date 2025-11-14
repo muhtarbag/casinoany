@@ -142,7 +142,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     trackSearch(siteName);
     setShowSuggestions(false);
     setShowPopular(false);
-    navigate(`/site/${siteSlug}`);
+    navigate(`/${siteSlug}`);
   };
 
   const handlePopularClick = (term: string) => {
