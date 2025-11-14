@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
+import { SlotBanner } from './SlotBanner';
 
 export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
@@ -93,25 +94,32 @@ export const PixelGrid = () => {
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site: any) => (
-          <BettingSiteCard
-            key={site.id}
-            id={site.id}
-            slug={site.slug}
-            name={site.name}
-            logo={site.logo_url || ''}
-            rating={site.rating || 0}
-            bonus={site.bonus || ''}
-            features={site.features || []}
-            affiliateUrl={site.affiliate_link || ''}
-            email={site.email || ''}
-            whatsapp={site.whatsapp || ''}
-            telegram={site.telegram || ''}
-            twitter={site.twitter || ''}
-            instagram={site.instagram || ''}
-            facebook={site.facebook || ''}
-            youtube={site.youtube || ''}
-          />
+        {sites.map((site: any, index: number) => (
+          <>
+            <BettingSiteCard
+              key={site.id}
+              id={site.id}
+              slug={site.slug}
+              name={site.name}
+              logo={site.logo_url || ''}
+              rating={site.rating || 0}
+              bonus={site.bonus || ''}
+              features={site.features || []}
+              affiliateUrl={site.affiliate_link || ''}
+              email={site.email || ''}
+              whatsapp={site.whatsapp || ''}
+              telegram={site.telegram || ''}
+              twitter={site.twitter || ''}
+              instagram={site.instagram || ''}
+              facebook={site.facebook || ''}
+              youtube={site.youtube || ''}
+            />
+            {index === 8 && (
+              <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                <SlotBanner />
+              </div>
+            )}
+          </>
         ))}
       </div>
     </div>

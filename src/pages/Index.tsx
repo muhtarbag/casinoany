@@ -6,7 +6,6 @@ import { Hero } from '@/components/Hero';
 import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
-import { SlotBanner } from '@/components/SlotBanner';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -47,9 +46,6 @@ const Index = () => {
           </div>
           
           <FeaturedSitesSection />
-
-          {/* Slot Banner Separator */}
-          <SlotBanner />
 
           {/* Bonus CTA */}
           <div className="text-center mt-8">
