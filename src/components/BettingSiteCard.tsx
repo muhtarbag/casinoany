@@ -233,12 +233,24 @@ const BettingSiteCardComponent = ({
           Detaylar
           <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
         </Button>
-        <Button size="sm" className="flex-1 bg-gradient-to-r from-secondary via-secondary/80 to-secondary bg-[length:200%_100%] animate-shimmer text-secondary-foreground hover:bg-secondary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden group/shimmer"
+        <Button 
+          size="sm" 
+          className="flex-1 relative font-semibold overflow-hidden group/cta transition-all duration-300 bg-gradient-to-r from-secondary via-secondary to-secondary hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] hover:scale-[1.02]"
           onClick={handleAffiliateClick}
         >
-          <span className="relative z-10">Siteye Git</span>
-          <ExternalLink className="w-4 h-4 ml-1 relative z-10 group-hover/shimmer:translate-x-1 transition-transform" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/shimmer:translate-x-full transition-transform duration-1000" />
+          {/* Animated shimmer overlay */}
+          <div className="absolute inset-0 w-full h-full">
+            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          </div>
+          
+          {/* Button content */}
+          <span className="relative z-10 flex items-center gap-2">
+            Siteye Git
+            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 group-hover/cta:scale-110 transition-all duration-300" />
+          </span>
+          
+          {/* Hover glow effect */}
+          <div className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-sm" />
         </Button>
       </CardFooter>
     </Card>

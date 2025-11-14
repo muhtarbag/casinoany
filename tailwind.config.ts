@@ -96,17 +96,26 @@ export default {
         },
         "shimmer": {
           "0%": {
-            backgroundPosition: "-200% 0",
+            transform: "translateX(-100%)",
           },
           "100%": {
-            backgroundPosition: "200% 0",
+            transform: "translateX(100%)",
+          },
+        },
+        "glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px rgba(var(--secondary-rgb), 0.5)",
+          },
+          "50%": {
+            boxShadow: "0 0 30px rgba(var(--secondary-rgb), 0.8), 0 0 40px rgba(var(--secondary-rgb), 0.4)",
           },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "shimmer": "shimmer 3s ease-in-out infinite",
+        "shimmer": "shimmer 2.5s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite",
       },
     },
   },
