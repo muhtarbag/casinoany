@@ -1213,6 +1213,7 @@ export type Database = {
           display_frequency: string | null
           display_pages: string[] | null
           end_date: string | null
+          form_fields: Json | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -1236,6 +1237,7 @@ export type Database = {
           display_frequency?: string | null
           display_pages?: string[] | null
           end_date?: string | null
+          form_fields?: Json | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -1259,6 +1261,7 @@ export type Database = {
           display_frequency?: string | null
           display_pages?: string[] | null
           end_date?: string | null
+          form_fields?: Json | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
