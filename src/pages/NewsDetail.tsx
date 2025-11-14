@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -16,12 +16,14 @@ export default function NewsDetail() {
 
   const { data: article, isLoading } = useNewsArticle(slug || "");
   const incrementView = useIncrementNewsView();
+  const viewTrackedRef = useRef(false);
 
   useEffect(() => {
-    if (article?.id) {
+    if (article?.id && !viewTrackedRef.current) {
       incrementView.mutate(article.id);
+      viewTrackedRef.current = true;
     }
-  }, [article?.id]);
+  }, [article?.id, incrementView]);
 
   if (isLoading) {
     return (
