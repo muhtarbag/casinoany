@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { LoadingFallback } from '@/components/admin/LoadingFallback';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
+import { ConsistencyMonitor } from '@/components/admin/ConsistencyMonitor';
 import { Loader2 } from 'lucide-react';
 
 const DashboardTab = lazy(() => import('@/components/admin/DashboardTab').then(m => ({ default: m.DashboardTab })));
@@ -26,28 +27,33 @@ export default function Dashboard() {
   }
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      {dashboardStats && (
-        <DashboardTab 
-          dashboardStats={dashboardStats}
-          dailyPageViews={dailyPageViews || []}
-          deviceStats={deviceStats || []}
-          topPages={topPages || []}
-          weeklyComparison={weeklyComparison}
-          monthlyTrend={monthlyTrend}
-          customMetrics={customMetrics}
-          onNavigate={(tab) => {
-            // Route-based navigation
-            const routeMap: Record<string, string> = {
-              'manage': '/admin/sites',
-              'blog': '/admin/blog',
-              'analytics': '/admin/analytics',
-            };
-            const route = routeMap[tab] || `/admin/${tab}`;
-            window.location.href = route;
-          }}
-        />
-      )}
-    </Suspense>
+    <div className="space-y-6">
+      {/* Consistency Monitor at the top */}
+      <ConsistencyMonitor />
+      
+      <Suspense fallback={<LoadingFallback />}>
+        {dashboardStats && (
+          <DashboardTab 
+            dashboardStats={dashboardStats}
+            dailyPageViews={dailyPageViews || []}
+            deviceStats={deviceStats || []}
+            topPages={topPages || []}
+            weeklyComparison={weeklyComparison}
+            monthlyTrend={monthlyTrend}
+            customMetrics={customMetrics}
+            onNavigate={(tab) => {
+              // Route-based navigation
+              const routeMap: Record<string, string> = {
+                'manage': '/admin/sites',
+                'blog': '/admin/blog',
+                'analytics': '/admin/analytics',
+              };
+              const route = routeMap[tab] || `/admin/${tab}`;
+              window.location.href = route;
+            }}
+          />
+        )}
+      </Suspense>
+    </div>
   );
 }
