@@ -171,10 +171,17 @@ export const NotificationManagement = () => {
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     
+    // Convert empty strings to null for date fields
+    const sanitizedData = {
+      ...formData,
+      start_date: formData.start_date || null,
+      end_date: formData.end_date || null,
+    };
+    
     if (editingNotification) {
-      updateMutation.mutate({ id: editingNotification.id, data: formData });
+      updateMutation.mutate({ id: editingNotification.id, data: sanitizedData });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(sanitizedData);
     }
   }, [editingNotification, formData, updateMutation, createMutation]);
 
