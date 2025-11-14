@@ -37,7 +37,7 @@ export function EnhancedEmptyState({ type, onAction, onClearFilters }: EnhancedE
         Başlamak için ilk sitenizi ekleyin. Site ekledikten sonra buradan yönetebilirsiniz.
       </p>
       {onAction && (
-        <Button onClick={onAction}>
+        <Button onClick={onAction} variant="primary-action" size="lg">
           <Plus className="h-4 w-4 mr-2" />
           İlk Siteyi Ekle
         </Button>
