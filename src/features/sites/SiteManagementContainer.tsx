@@ -5,15 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useAdminSiteManagement } from '@/hooks/admin/useAdminSiteManagement';
 import { useSiteStats } from '@/hooks/queries/useSiteQueries';
 import { SiteFormWrapper } from './SiteFormWrapper';
-import { SiteList } from './SiteList';
+import { EnhancedSiteList } from './EnhancedSiteList';
 import { SiteBulkActions } from './SiteBulkActions';
-import { DragEndEvent } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
-import { toast } from 'sonner';
 
 export function SiteManagementContainer() {
   const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState('');
   const [orderedSites, setOrderedSites] = useState<any[]>([]);
 
   // Use the centralized hook
@@ -69,32 +65,12 @@ export function SiteManagementContainer() {
   }, [setSelectedSites]);
 
   const handleToggleSelectAll = useCallback(() => {
-    const filteredSites = orderedSites.filter(s => 
-      s.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    if (selectedSites.length === filteredSites.length && filteredSites.length > 0) {
+    if (selectedSites.length === orderedSites.length && orderedSites.length > 0) {
       setSelectedSites([]);
     } else {
-      setSelectedSites(filteredSites.map(s => s.id));
+      setSelectedSites(orderedSites.map(s => s.id));
     }
-  }, [orderedSites, searchQuery, selectedSites, setSelectedSites]);
-
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    setOrderedSites((items) => {
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
-      const newOrder = arrayMove(items, oldIndex, newIndex);
-
-      // Update display order in database
-      updateOrderMutation.mutate(newOrder);
-
-      return newOrder;
-    });
-  }, [updateOrderMutation]);
+  }, [orderedSites, selectedSites, setSelectedSites]);
 
   const handleDelete = useCallback((id: string) => {
     deleteSiteMutation.mutate(id);
@@ -130,6 +106,11 @@ export function SiteManagementContainer() {
     );
   }, [bulkToggleActiveMutation, selectedSites, setSelectedSites]);
 
+  const handleReorder = useCallback((newOrder: any[]) => {
+    setOrderedSites(newOrder);
+    updateOrderMutation.mutate(newOrder);
+  }, [updateOrderMutation]);
+
   return (
     <Card>
       <CardHeader>
@@ -162,18 +143,16 @@ export function SiteManagementContainer() {
         />
 
         {/* Site List */}
-        <SiteList
+        <EnhancedSiteList
           sites={orderedSites}
-          siteStats={siteStats}
+          stats={siteStats || {}}
           selectedSites={selectedSites}
           editingId={editingId}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
           onToggleSelect={handleToggleSelect}
           onToggleSelectAll={handleToggleSelectAll}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          onDragEnd={handleDragEnd}
+          onReorder={handleReorder}
           isDeleting={deletingId}
           isLoading={sitesLoading}
         />
