@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Eye, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { VirtualList } from '@/components/VirtualList';
 
 interface Notification {
   id: string;
@@ -213,6 +214,61 @@ export const NotificationManagement = () => {
   const toggleActive = useCallback((id: string, currentStatus: boolean) => {
     updateMutation.mutate({ id, data: { is_active: !currentStatus } });
   }, [updateMutation]);
+
+  const renderNotificationItem = useCallback((notification: Notification) => (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <CardTitle>{notification.title}</CardTitle>
+              <Badge variant={notification.is_active ? 'default' : 'secondary'}>
+                {notification.is_active ? 'Aktif' : 'Pasif'}
+              </Badge>
+              <Badge variant="outline">{notification.notification_type}</Badge>
+            </div>
+            <CardDescription>{notification.content}</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => toggleActive(notification.id, notification.is_active)}
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(notification)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) {
+                  deleteMutation.mutate(notification.id);
+                }
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      {notification.image_url && (
+        <CardContent>
+          <img
+            src={notification.image_url}
+            alt={notification.title}
+            className="w-full h-48 object-cover rounded-lg"
+          />
+        </CardContent>
+      )}
+    </Card>
+  ), [toggleActive, handleEdit, deleteMutation]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center p-8">Yükleniyor...</div>;
@@ -487,62 +543,19 @@ export const NotificationManagement = () => {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {notifications?.map((notification) => (
-          <Card key={notification.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <CardTitle>{notification.title}</CardTitle>
-                    <Badge variant={notification.is_active ? 'default' : 'secondary'}>
-                      {notification.is_active ? 'Aktif' : 'Pasif'}
-                    </Badge>
-                    <Badge variant="outline">{notification.notification_type}</Badge>
-                  </div>
-                  <CardDescription>{notification.content}</CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleActive(notification.id, notification.is_active)}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEdit(notification)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      if (confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) {
-                        deleteMutation.mutate(notification.id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            {notification.image_url && (
-              <CardContent>
-                <img
-                  src={notification.image_url}
-                  alt={notification.title}
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-              </CardContent>
-            )}
-          </Card>
-        ))}
-      </div>
+      {notifications && notifications.length > 0 ? (
+        <VirtualList
+          items={notifications}
+          height={800}
+          estimateSize={200}
+          renderItem={renderNotificationItem}
+          className="rounded-lg"
+        />
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Henüz bildirim bulunmamaktadır.</p>
+        </div>
+      )}
     </div>
   );
 };

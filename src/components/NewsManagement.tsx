@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { useNewsArticles, useDeleteNews, useToggleNewsPublish } from '@/hooks/queries/useNewsQueries';
+import { VirtualList } from '@/components/VirtualList';
 
 export function NewsManagement() {
   const { toast } = useToast();
@@ -65,6 +66,86 @@ export function NewsManagement() {
     );
   }, [articles, searchTerm]);
 
+  const renderArticleItem = useCallback((article: any) => (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg mb-2">{article.title}</CardTitle>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Badge variant={article.is_published ? 'default' : 'secondary'}>
+                {article.is_published ? 'Yayında' : 'Taslak'}
+              </Badge>
+              <Badge variant="outline">{article.category}</Badge>
+              <span>•</span>
+              <Eye className="w-4 h-4" />
+              {article.view_count}
+              <span>•</span>
+              <span>{format(new Date(article.created_at), 'd MMM yyyy', { locale: tr })}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`/haber/${article.slug}`, '_blank')}
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => togglePublishMutation.mutate({
+                id: article.id,
+                isPublished: article.is_published
+              })}
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Haberi Sil</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bu haberi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>İptal</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => deleteMutation.mutate(article.id)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Sil
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          {article.excerpt}
+        </p>
+        {article.tags && article.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {article.tags.slice(0, 5).map((tag: string, idx: number) => (
+              <Badge key={idx} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  ), [togglePublishMutation, deleteMutation]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -98,89 +179,15 @@ export function NewsManagement() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
-        {filteredArticles?.map((article) => (
-          <Card key={article.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg mb-2">{article.title}</CardTitle>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Badge variant={article.is_published ? 'default' : 'secondary'}>
-                      {article.is_published ? 'Yayında' : 'Taslak'}
-                    </Badge>
-                    <Badge variant="outline">{article.category}</Badge>
-                    <span>•</span>
-                    <Eye className="w-4 h-4" />
-                    {article.view_count}
-                    <span>•</span>
-                    <span>{format(new Date(article.created_at), 'd MMM yyyy', { locale: tr })}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(`/haber/${article.slug}`, '_blank')}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => togglePublishMutation.mutate({
-                      id: article.id,
-                      isPublished: article.is_published
-                    })}
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Haberi Sil</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Bu haberi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>İptal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => deleteMutation.mutate(article.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Sil
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                {article.excerpt}
-              </p>
-              {article.tags && article.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {article.tags.slice(0, 5).map((tag: string, idx: number) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {(!filteredArticles || filteredArticles.length === 0) && (
+      {filteredArticles && filteredArticles.length > 0 ? (
+        <VirtualList
+          items={filteredArticles}
+          height={800}
+          estimateSize={280}
+          renderItem={renderArticleItem}
+          className="rounded-lg"
+        />
+      ) : (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Henüz haber bulunmamaktadır.</p>
         </div>
