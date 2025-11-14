@@ -37,6 +37,7 @@ interface Review {
 import { SEO } from '@/components/SEO';
 import { SiteBlogSection } from '@/components/SiteBlogSection';
 import { CasinoReviewCoreContent } from '@/components/casino/CasinoReviewCoreContent';
+import { BreadcrumbSchema, FAQSchema, ReviewSchema } from '@/components/StructuredData';
 
 export default function SiteDetail() {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -321,6 +322,31 @@ export default function SiteDetail() {
           },
         }}
       />
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: site.name, url: `${window.location.origin}/site/${site.slug}` }
+      ]} />
+      {/* FAQ Schema */}
+      {site.faq && site.faq.length > 0 && (
+        <FAQSchema faqs={site.faq.map((f: any) => ({
+          question: f.question,
+          answer: f.answer
+        }))} />
+      )}
+      {/* Review Schema */}
+      {reviews && reviews.length > 0 && (
+        <ReviewSchema 
+          reviews={reviews.map((r: any) => ({
+            author: r.profiles?.username || r.name || 'Anonim',
+            rating: r.rating,
+            text: r.comment,
+            date: r.created_at
+          }))}
+          itemName={site.name}
+          itemType="Product"
+        />
+      )}
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Breadcrumb */}
