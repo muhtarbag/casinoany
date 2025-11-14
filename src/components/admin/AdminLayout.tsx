@@ -23,7 +23,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background to-muted relative">
         <div className="z-40 relative">
           <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
