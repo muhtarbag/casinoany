@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -124,7 +124,7 @@ export const NotificationManagement = () => {
     },
   });
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -151,9 +151,9 @@ export const NotificationManagement = () => {
     } finally {
       setUploadingImage(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     
     if (editingNotification) {
@@ -161,9 +161,9 @@ export const NotificationManagement = () => {
     } else {
       createMutation.mutate(formData);
     }
-  };
+  }, [editingNotification, formData, updateMutation, createMutation]);
 
-  const handleEdit = (notification: Notification) => {
+  const handleEdit = useCallback((notification: Notification) => {
     setEditingNotification(notification);
     setFormData({
       title: notification.title,
@@ -185,9 +185,9 @@ export const NotificationManagement = () => {
       trigger_conditions: (notification as any).trigger_conditions || {},
     });
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       title: '',
       content: '',
@@ -208,11 +208,11 @@ export const NotificationManagement = () => {
       trigger_conditions: {},
     });
     setEditingNotification(null);
-  };
+  }, []);
 
-  const toggleActive = async (id: string, currentStatus: boolean) => {
+  const toggleActive = useCallback((id: string, currentStatus: boolean) => {
     updateMutation.mutate({ id, data: { is_active: !currentStatus } });
-  };
+  }, [updateMutation]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center p-8">Yükleniyor...</div>;
