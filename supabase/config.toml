@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.system-health-monitor]
 verify_jwt = false
+
+[functions.sync-affiliate-metrics]
+verify_jwt = false
