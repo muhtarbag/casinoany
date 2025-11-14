@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, TrendingUp, Flame } from 'lucide-react';
@@ -12,6 +13,7 @@ interface SmartSearchProps {
 }
 
 export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
+  const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showPopular, setShowPopular] = useState(false);
@@ -136,13 +138,11 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const handleSuggestionClick = (siteName: string) => {
-    setLocalSearch(siteName);
+  const handleSuggestionClick = (siteSlug: string, siteName: string) => {
     trackSearch(siteName);
-    onSearch(siteName);
     setShowSuggestions(false);
     setShowPopular(false);
-    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    navigate(`/site/${siteSlug}`);
   };
 
   const handlePopularClick = (term: string) => {
@@ -217,7 +217,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
                 <button
                   key={site.id}
                   type="button"
-                  onClick={() => handleSuggestionClick(site.name)}
+                  onClick={() => handleSuggestionClick(site.slug, site.name)}
                   className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors border-b border-border last:border-b-0 flex items-center gap-3"
                 >
                   <div className="flex-shrink-0">
