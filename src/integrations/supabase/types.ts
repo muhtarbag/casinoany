@@ -59,6 +59,13 @@ export type Database = {
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "affiliate_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       affiliate_payments: {
@@ -105,6 +112,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_payments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -528,6 +542,13 @@ export type Database = {
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "blog_post_related_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       blog_posts: {
@@ -605,6 +626,13 @@ export type Database = {
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "blog_posts_primary_site_id_fkey"
+            columns: ["primary_site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       bonus_offers: {
@@ -660,6 +688,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonus_offers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -746,6 +781,13 @@ export type Database = {
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "casino_content_analytics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       casino_content_versions: {
@@ -807,6 +849,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "casino_content_versions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -952,6 +1001,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -1328,6 +1384,13 @@ export type Database = {
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "site_reviews_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       site_settings: {
@@ -1386,6 +1449,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -1541,6 +1611,21 @@ export type Database = {
       }
     }
     Views: {
+      daily_site_metrics: {
+        Row: {
+          affiliate_clicks: number | null
+          avg_duration_seconds: number | null
+          logged_in_users: number | null
+          metric_date: string | null
+          site_id: string | null
+          site_name: string | null
+          site_slug: string | null
+          total_conversions: number | null
+          total_views: number | null
+          unique_sessions: number | null
+        }
+        Relationships: []
+      }
       site_stats_with_details: {
         Row: {
           clicks: number | null
@@ -1562,6 +1647,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "betting_sites"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
           },
         ]
       }
@@ -1629,6 +1721,7 @@ export type Database = {
         }
         Returns: string
       }
+      refresh_daily_site_metrics: { Args: never; Returns: undefined }
       sync_daily_affiliate_metrics: { Args: never; Returns: undefined }
       track_conversion: {
         Args: {

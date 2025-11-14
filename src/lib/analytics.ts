@@ -1,5 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
 
+// Page start time for duration tracking
+let pageStartTime = Date.now();
+let visibilityChangeTime = Date.now();
+let totalInactiveTime = 0;
+
 // Generate or get session ID
 export const getSessionId = (): string => {
   let sessionId = sessionStorage.getItem('analytics_session_id');
@@ -9,6 +14,43 @@ export const getSessionId = (): string => {
   }
   return sessionId;
 };
+
+// Calculate accurate page duration (excluding inactive time)
+const getPageDuration = (): number => {
+  const now = Date.now();
+  const totalTime = now - pageStartTime;
+  const activeTime = totalTime - totalInactiveTime;
+  return Math.floor(activeTime / 1000); // Convert to seconds
+};
+
+// Track visibility changes to exclude inactive time
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      visibilityChangeTime = Date.now();
+    } else {
+      totalInactiveTime += Date.now() - visibilityChangeTime;
+    }
+  });
+
+  // Track page view on beforeunload with accurate duration
+  window.addEventListener('beforeunload', () => {
+    const duration = getPageDuration();
+    if (duration > 0) {
+      // Use sendBeacon for reliable delivery
+      const data = JSON.stringify({
+        page_path: window.location.pathname,
+        page_title: document.title,
+        duration,
+        session_id: getSessionId(),
+      });
+      navigator.sendBeacon(
+        `${(supabase as any).supabaseUrl}/rest/v1/rpc/track_page_view`,
+        data
+      );
+    }
+  });
+}
 
 // Get user agent info
 const getUserAgent = (): string => {
@@ -21,11 +63,13 @@ const getReferrer = (): string => {
 };
 
 // Track page view
-export const trackPageView = async (pagePath?: string, pageTitle?: string, duration: number = 0) => {
+export const trackPageView = async (pagePath?: string, pageTitle?: string, duration?: number) => {
   try {
     const path = pagePath || window.location.pathname;
     const title = pageTitle || document.title;
     const sessionId = getSessionId();
+    // ✅ FIX: Use calculated duration if not provided
+    const actualDuration = duration !== undefined ? duration : getPageDuration();
     
     await (supabase as any).rpc('track_page_view', {
       p_page_path: path,
@@ -33,8 +77,12 @@ export const trackPageView = async (pagePath?: string, pageTitle?: string, durat
       p_referrer: getReferrer(),
       p_user_agent: getUserAgent(),
       p_session_id: sessionId,
-      p_duration: duration,
+      p_duration: actualDuration,
     });
+    
+    // Reset page start time after tracking
+    pageStartTime = Date.now();
+    totalInactiveTime = 0;
   } catch (error) {
     console.error('Error tracking page view:', error);
   }
