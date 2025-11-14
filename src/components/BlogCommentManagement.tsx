@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -102,8 +103,15 @@ export const BlogCommentManagement = () => {
     },
   });
 
-  const pendingComments = comments?.filter((c: any) => !c.is_approved) || [];
-  const approvedComments = comments?.filter((c: any) => c.is_approved) || [];
+  const pendingComments = useMemo(() => 
+    comments?.filter((c: any) => !c.is_approved) || [], 
+    [comments]
+  );
+  
+  const approvedComments = useMemo(() => 
+    comments?.filter((c: any) => c.is_approved) || [], 
+    [comments]
+  );
 
   if (isLoading) {
     return <div className="text-center py-8">Yükleniyor...</div>;

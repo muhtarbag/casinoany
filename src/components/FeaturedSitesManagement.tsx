@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,18 +57,28 @@ export const FeaturedSitesManagement = () => {
     },
   });
 
-  const handleToggleFeatured = (id: string, currentStatus: boolean) => {
+  const handleToggleFeatured = useCallback((id: string, currentStatus: boolean) => {
     toggleFeaturedMutation.mutate({ id, isFeatured: !currentStatus });
-  };
+  }, [toggleFeaturedMutation]);
 
   // Filter sites by search query
-  const filteredSites = sites?.filter((site: any) => 
-    site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    site.bonus?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredSites = useMemo(() => 
+    sites?.filter((site: any) => 
+      site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      site.bonus?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [],
+    [sites, searchQuery]
+  );
 
-  const featuredSites = filteredSites.filter((site: any) => site.is_featured) || [];
-  const nonFeaturedSites = filteredSites.filter((site: any) => !site.is_featured) || [];
+  const featuredSites = useMemo(() => 
+    filteredSites.filter((site: any) => site.is_featured) || [],
+    [filteredSites]
+  );
+  
+  const nonFeaturedSites = useMemo(() => 
+    filteredSites.filter((site: any) => !site.is_featured) || [],
+    [filteredSites]
+  );
 
   if (isLoading) {
     return (

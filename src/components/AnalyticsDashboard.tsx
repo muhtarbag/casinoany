@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,68 +41,72 @@ export const AnalyticsDashboard = () => {
     refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
   });
 
-  // Process data for charts
-  const processedData = summary ? {
-    totalPageViews: summary.pageViews.length,
-    totalEvents: summary.events.length,
-    totalConversions: summary.conversions.length,
-    totalSessions: summary.sessions.length,
-    avgSessionDuration: summary.sessions.length > 0
-      ? Math.round(summary.sessions.reduce((sum: number, s: any) => sum + (s.total_duration || 0), 0) / summary.sessions.length)
-      : 0,
-    bounceRate: summary.sessions.length > 0
-      ? Math.round((summary.sessions.filter((s: any) => s.is_bounce).length / summary.sessions.length) * 100)
-      : 0,
+  // Process data for charts - Memoize expensive computations
+  const processedData = useMemo(() => {
+    if (!summary) return null;
     
-    // Page views by day
-    pageViewsByDay: Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000);
-      const dateStr = date.toISOString().split('T')[0];
-      const count = summary.pageViews.filter((pv: any) => 
-        pv.created_at.startsWith(dateStr)
-      ).length;
-      return {
-        date: date.toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }),
-        views: count,
-      };
-    }),
+    return {
+      totalPageViews: summary.pageViews.length,
+      totalEvents: summary.events.length,
+      totalConversions: summary.conversions.length,
+      totalSessions: summary.sessions.length,
+      avgSessionDuration: summary.sessions.length > 0
+        ? Math.round(summary.sessions.reduce((sum: number, s: any) => sum + (s.total_duration || 0), 0) / summary.sessions.length)
+        : 0,
+      bounceRate: summary.sessions.length > 0
+        ? Math.round((summary.sessions.filter((s: any) => s.is_bounce).length / summary.sessions.length) * 100)
+        : 0,
+      
+      // Page views by day
+      pageViewsByDay: Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000);
+        const dateStr = date.toISOString().split('T')[0];
+        const count = summary.pageViews.filter((pv: any) => 
+          pv.created_at.startsWith(dateStr)
+        ).length;
+        return {
+          date: date.toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }),
+          views: count,
+        };
+      }),
 
-    // Top pages
-    topPages: Object.entries(
-      summary.pageViews.reduce((acc: any, pv: any) => {
-        acc[pv.page_path] = (acc[pv.page_path] || 0) + 1;
-        return acc;
-      }, {})
-    )
-      .sort(([, a]: any, [, b]: any) => b - a)
-      .slice(0, 10)
-      .map(([path, count]) => ({ path, count })),
+      // Top pages
+      topPages: Object.entries(
+        summary.pageViews.reduce((acc: any, pv: any) => {
+          acc[pv.page_path] = (acc[pv.page_path] || 0) + 1;
+          return acc;
+        }, {})
+      )
+        .sort(([, a]: any, [, b]: any) => b - a)
+        .slice(0, 10)
+        .map(([path, count]) => ({ path, count })),
 
-    // Device breakdown
-    deviceBreakdown: Object.entries(
-      summary.pageViews.reduce((acc: any, pv: any) => {
-        const device = pv.device_type || 'unknown';
-        acc[device] = (acc[device] || 0) + 1;
-        return acc;
-      }, {})
-    ).map(([name, value]) => ({ name, value })),
+      // Device breakdown
+      deviceBreakdown: Object.entries(
+        summary.pageViews.reduce((acc: any, pv: any) => {
+          const device = pv.device_type || 'unknown';
+          acc[device] = (acc[device] || 0) + 1;
+          return acc;
+        }, {})
+      ).map(([name, value]) => ({ name, value })),
 
-    // Event types
-    eventTypes: Object.entries(
-      summary.events.reduce((acc: any, e: any) => {
-        acc[e.event_type] = (acc[e.event_type] || 0) + 1;
-        return acc;
-      }, {})
-    ).map(([name, value]) => ({ name, value })),
+      // Event types
+      eventTypes: Object.entries(
+        summary.events.reduce((acc: any, e: any) => {
+          acc[e.event_type] = (acc[e.event_type] || 0) + 1;
+          return acc;
+        }, {})
+      ).map(([name, value]) => ({ name, value })),
 
-    // Conversion funnel
-    conversionFunnel: Object.entries(
-      summary.conversions.reduce((acc: any, c: any) => {
-        acc[c.conversion_type] = (acc[c.conversion_type] || 0) + 1;
-        return acc;
-      }, {})
-    ).map(([type, count]) => ({ type, count })),
-  } : null;
+      // Conversion funnel
+      conversionFunnel: Object.entries(
+        summary.conversions.reduce((acc: any, c: any) => {
+          acc[c.conversion_type] = (acc[c.conversion_type] || 0) + 1;
+          return acc;
+        }, {})
+      ).map(([type, count]) => ({ type, count })),
+    };
+  }, [summary]);
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 

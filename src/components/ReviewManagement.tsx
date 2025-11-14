@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -229,21 +229,21 @@ export default function ReviewManagement() {
     },
   });
 
-  const toggleReviewSelection = (reviewId: string) => {
+  const toggleReviewSelection = useCallback((reviewId: string) => {
     setSelectedReviews((prev) =>
       prev.includes(reviewId) ? prev.filter((id) => id !== reviewId) : [...prev, reviewId]
     );
-  };
+  }, []);
 
-  const toggleSelectAll = (reviews: any[]) => {
+  const toggleSelectAll = useCallback((reviews: any[]) => {
     if (selectedReviews.length === reviews.length) {
       setSelectedReviews([]);
     } else {
       setSelectedReviews(reviews.map((r) => r.id));
     }
-  };
+  }, [selectedReviews.length]);
 
-  const handleAiGenerateReviews = async () => {
+  const handleAiGenerateReviews = useCallback(async () => {
     if (!aiSelectedSite) {
       toast({
         title: "Hata",
@@ -307,7 +307,7 @@ export default function ReviewManagement() {
     } finally {
       setIsAiLoading(false);
     }
-  };
+  }, [aiSelectedSite, aiReviewCount, bettingSites, toast, queryClient]);
 
   const ReviewCard = ({ review, showActions = true }: { review: any; showActions?: boolean }) => {
     const username = review.name || review.profiles?.username || "Anonim";
