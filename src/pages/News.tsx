@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -5,12 +6,26 @@ import { tr } from "date-fns/locale";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Eye, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Eye, ExternalLink, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 
+const categories = [
+  "Tümü",
+  "Slot Haberleri",
+  "Regülasyon",
+  "Kripto Casino",
+  "Bonus Haberleri",
+  "iGaming Genel"
+];
+
 export default function News() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Tümü");
+
   const { data: articles, isLoading } = useQuery({
     queryKey: ["news-articles"],
     queryFn: async () => {
@@ -24,6 +39,13 @@ export default function News() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const filteredArticles = articles?.filter((article) => {
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "Tümü" || article.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   if (isLoading) {
@@ -63,8 +85,33 @@ export default function News() {
             </p>
           </div>
 
+          <div className="mb-8 flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <Input
+                placeholder="Haber ara..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full md:w-[200px]">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles?.map((article) => (
+            {filteredArticles?.map((article) => (
               <Link key={article.id} to={`/haber/${article.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                   <CardHeader>
@@ -102,11 +149,13 @@ export default function News() {
             ))}
           </div>
 
-          {(!articles || articles.length === 0) && (
-            <div className="text-center py-12">
+          {(!filteredArticles || filteredArticles.length === 0) && !isLoading && (
+            <div className="text-center py-12 col-span-full">
               <ExternalLink className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
               <p className="text-xl text-muted-foreground">
-                Henüz haber bulunmamaktadır.
+                {searchTerm || selectedCategory !== "Tümü" 
+                  ? "Arama kriterlerine uygun haber bulunamadı."
+                  : "Henüz haber bulunmamaktadır."}
               </p>
             </div>
           )}

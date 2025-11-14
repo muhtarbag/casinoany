@@ -38,6 +38,7 @@ import { CarouselSettings } from '@/components/CarouselSettings';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { SystemHealthDashboard } from '@/components/SystemHealthDashboard';
 import { SystemLogsViewer } from '@/components/SystemLogsViewer';
+import { NewsManagement } from '@/components/NewsManagement';
 import { RefreshCw, Star } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -802,7 +803,7 @@ export default function Admin() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
-                    variant={['casino', 'blog', 'planner', 'reviews', 'notifications'].includes(activeTab) ? 'default' : 'ghost'}
+                    variant={['casino', 'blog', 'planner', 'reviews', 'notifications', 'news'].includes(activeTab) ? 'default' : 'ghost'}
                     size="sm"
                     className="whitespace-nowrap gap-2 h-9 px-3 data-[state=open]:bg-accent"
                   >
@@ -817,6 +818,9 @@ export default function Admin() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('blog')}>
                     Blog
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveTab('news')}>
+                    Haberler (RSS)
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setActiveTab('planner')}>
                     İçerik Planlama
@@ -1191,6 +1195,9 @@ export default function Admin() {
           </TabsContent>
           <TabsContent value="logs">
             <SystemLogsViewer />
+          </TabsContent>
+          <TabsContent value="news">
+            <NewsManagement />
           </TabsContent>
         </Tabs>
       </main>
