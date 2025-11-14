@@ -7,9 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Activity, Zap, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Activity, Zap, TrendingUp, AlertTriangle, AlertCircle } from 'lucide-react';
 import { subHours } from 'date-fns';
+import { usePerformanceAlerts } from '@/hooks/usePerformanceAlerts';
 
 export function PerformanceDashboard() {
   // Fetch recent metrics
@@ -28,6 +30,9 @@ export function PerformanceDashboard() {
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  // Real-time alerts
+  const { recentAlerts, criticalCount, warningCount } = usePerformanceAlerts();
 
   // Calculate averages
   const getAverageByMetric = (metricName: string) => {
@@ -73,6 +78,21 @@ export function PerformanceDashboard() {
           Son 24 saatin performans metrikleri ve Core Web Vitals
         </p>
       </div>
+
+      {/* Real-time Alerts */}
+      {(criticalCount > 0 || warningCount > 0) && (
+        <Alert variant={criticalCount > 0 ? 'destructive' : 'default'} className="border-2">
+          <AlertCircle className="h-5 w-5" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="font-medium">
+              {criticalCount > 0 && `${criticalCount} kritik uyarı `}
+              {warningCount > 0 && `${warningCount} performans uyarısı `}
+              tespit edildi
+            </span>
+            <span className="text-xs text-muted-foreground">Son 5 dakika</span>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Status Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
