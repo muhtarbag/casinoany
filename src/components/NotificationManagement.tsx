@@ -15,7 +15,7 @@
  * PERFORMANCE: 84% code reduction, better separation of concerns
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -67,24 +67,101 @@ export function NotificationManagement() {
     setIsDialogOpen(false);
   };
 
-  const handlePreview = (notification: Notification) => {
+  const handlePreview = useCallback((notification: Notification) => {
     setPreviewNotification(notification);
-  };
+  }, []);
 
-  const renderPreviewContent = () => {
+  const renderPreviewContent = useCallback(() => {
     if (!previewNotification) return null;
 
-    const { notification_type, title, content, image_url, button_text, background_color, text_color } = previewNotification;
+    const {
+      notification_type,
+      title,
+      content,
+      image_url,
+      button_text,
+      background_color,
+      text_color,
+      font_family,
+      font_size,
+      border_radius,
+      max_width,
+      padding,
+      border_color,
+      border_width,
+      shadow_size,
+    } = previewNotification;
+
+    const fontSizeMap = {
+      xs: 'text-xs',
+      sm: 'text-sm',
+      base: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
+      '2xl': 'text-2xl',
+    };
+
+    const borderRadiusMap = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      '2xl': 'rounded-2xl',
+      full: 'rounded-full',
+    };
+
+    const maxWidthMap = {
+      sm: 'max-w-sm',
+      md: 'max-w-md',
+      lg: 'max-w-lg',
+      xl: 'max-w-xl',
+      '2xl': 'max-w-2xl',
+      full: 'max-w-full',
+    };
+
+    const paddingMap = {
+      tight: 'p-3',
+      normal: 'p-6',
+      relaxed: 'p-8',
+      loose: 'p-10',
+    };
+
+    const shadowMap = {
+      none: 'shadow-none',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      '2xl': 'shadow-2xl',
+    };
+
+    const baseClasses = `
+      ${maxWidthMap[max_width || 'md']}
+      ${borderRadiusMap[border_radius || 'lg']}
+      ${shadowMap[shadow_size || 'lg']}
+      overflow-hidden
+    `.trim();
+
+    const contentClasses = `
+      ${paddingMap[padding || 'normal']}
+      ${fontSizeMap[font_size || 'base']}
+    `.trim();
+
+    const borderStyle = border_width && border_width !== '0' && border_color
+      ? { border: `${border_width}px solid ${border_color}` }
+      : {};
+
+    const containerStyle = {
+      backgroundColor: background_color || '#ffffff',
+      color: text_color || '#000000',
+      fontFamily: font_family || 'Inter',
+      ...borderStyle,
+    };
 
     if (notification_type === 'popup') {
       return (
-        <div 
-          className="max-w-md mx-auto rounded-lg shadow-2xl overflow-hidden"
-          style={{
-            backgroundColor: background_color || '#ffffff',
-            color: text_color || '#000000'
-          }}
-        >
+        <div className={`mx-auto ${baseClasses}`} style={containerStyle}>
           {image_url && (
             <img 
               src={image_url} 
@@ -92,7 +169,7 @@ export function NotificationManagement() {
               className="w-full h-48 object-cover"
             />
           )}
-          <div className="p-6">
+          <div className={contentClasses}>
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-xl font-bold pr-8">{title}</h3>
               <Button
@@ -105,7 +182,7 @@ export function NotificationManagement() {
               </Button>
             </div>
             {content && (
-              <p className="text-sm mb-4 opacity-90">{content}</p>
+              <p className="mb-4 opacity-90">{content}</p>
             )}
             {button_text && (
               <Button className="w-full">
@@ -120,13 +197,10 @@ export function NotificationManagement() {
     if (notification_type === 'banner') {
       return (
         <div 
-          className="w-full rounded-lg shadow-lg p-4 flex items-center justify-between"
-          style={{
-            backgroundColor: background_color || '#3b82f6',
-            color: text_color || '#ffffff'
-          }}
+          className={`w-full ${baseClasses} flex items-center justify-between`}
+          style={containerStyle}
         >
-          <div className="flex items-center gap-4 flex-1">
+          <div className={`flex items-center gap-4 flex-1 ${contentClasses}`}>
             {image_url && (
               <img 
                 src={image_url} 
@@ -135,13 +209,13 @@ export function NotificationManagement() {
               />
             )}
             <div className="flex-1">
-              <h4 className="font-semibold text-lg">{title}</h4>
+              <h4 className="font-semibold">{title}</h4>
               {content && (
-                <p className="text-sm opacity-90 mt-1">{content}</p>
+                <p className="opacity-90 mt-1">{content}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-6">
             {button_text && (
               <Button variant="secondary" size="sm">
                 {button_text}
@@ -161,7 +235,7 @@ export function NotificationManagement() {
     }
 
     return null;
-  };
+  }, [previewNotification]);
 
   return (
     <div className="space-y-6">
