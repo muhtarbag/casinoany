@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { siteFormSchema, SiteFormData, generateSlug, validateLogoFile } from '@/schemas/siteValidation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { X, Loader2 } from 'lucide-react';
 import { UseMutationResult } from '@tanstack/react-query';
@@ -50,6 +52,15 @@ export function SiteFormWrapper({
       instagram: '',
       facebook: '',
       youtube: '',
+      affiliate_contract_date: '',
+      affiliate_contract_terms: '',
+      affiliate_has_monthly_payment: false,
+      affiliate_monthly_payment: undefined,
+      affiliate_panel_url: '',
+      affiliate_panel_username: '',
+      affiliate_panel_password: '',
+      affiliate_notes: '',
+      affiliate_commission_percentage: undefined,
     },
   });
 
@@ -197,6 +208,124 @@ export function SiteFormWrapper({
               <FormMessage />
             </FormItem>
           )} />
+
+          {/* ============ AFFILIATE ANLAŞMA BİLGİLERİ ============ */}
+          <div className="md:col-span-2 mt-6 p-6 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-lg border-2 border-orange-500/50">
+            <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+              🤝 Affiliate Anlaşma Bilgileri
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4 bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded border border-yellow-300 dark:border-yellow-700">
+              💡 <strong>ÖNEMLİ:</strong> Anlaşma tarihi doldurduğunuz siteler <strong>"Affiliate Yönetimi"</strong> sekmesinde otomatik görünür.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField control={form.control} name="affiliate_contract_date" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Anlaşma Tarihi</FormLabel>
+                  <FormControl><Input type="date" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_commission_percentage" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Komisyon Yüzdesi (%)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      step="0.01" 
+                      placeholder="Örn: 25.5" 
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_monthly_payment" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Aylık Ödeme Tutarı (TL)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      step="0.01" 
+                      placeholder="Örn: 5000" 
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      disabled={!form.watch('affiliate_has_monthly_payment')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_has_monthly_payment" render={({ field }) => (
+                <FormItem className="flex items-center gap-2 md:col-span-2">
+                  <FormControl>
+                    <Switch 
+                      checked={field.value} 
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="!mt-0 cursor-pointer">Aylık sabit ödeme alınıyor</FormLabel>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_panel_url" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Affiliate Panel URL</FormLabel>
+                  <FormControl><Input type="url" placeholder="https://panel.example.com" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_panel_username" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Panel Kullanıcı Adı</FormLabel>
+                  <FormControl><Input placeholder="kullanici_adi" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_panel_password" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Panel Şifresi</FormLabel>
+                  <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_contract_terms" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Anlaşma Şartları</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Anlaşma detayları, komisyon oranları, özel şartlar vb..."
+                      rows={4}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="affiliate_notes" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Ek Notlar</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Önemli notlar, hatırlatmalar, iletişim bilgileri vb..."
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
+          </div>
 
           <div className="md:col-span-2">
             <FormLabel>Logo</FormLabel>
