@@ -68,7 +68,7 @@ const SortableItem = ({ id, site, editingId, selectedSites, onToggleSelect, onEd
         <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
           <GripVertical className="w-5 h-5 text-muted-foreground" />
         </div>
-        <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect(id)} />
+        <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect(id)} className="w-4 h-4" />
         {site.logo_url && (
           <img src={site.logo_url} alt={site.name} className="w-12 h-12 object-contain rounded" />
         )}
@@ -714,6 +714,16 @@ export default function Admin() {
                   </div>
                 </form>
 
+                {/* Search and Filter */}
+                <div className="mb-4">
+                  <Input
+                    placeholder="Site ara..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="max-w-md"
+                  />
+                </div>
+
                 {/* Site List */}
                 <div className="space-y-4">
                   {selectedSites.length > 0 && (
@@ -744,13 +754,25 @@ export default function Admin() {
                   )}
 
                   <div className="flex items-center gap-2 mb-4">
-                    <Checkbox checked={selectedSites.length === orderedSites.length} onCheckedChange={toggleSelectAll} />
+                    <Checkbox 
+                      checked={selectedSites.length === orderedSites.filter(s => 
+                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
+                      ).length && orderedSites.filter(s => 
+                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
+                      ).length > 0} 
+                      onCheckedChange={toggleSelectAll} 
+                      className="w-4 h-4"
+                    />
                     <span className="text-sm text-muted-foreground">Tümünü Seç</span>
                   </div>
 
                   <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={orderedSites.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                      {orderedSites.map((site) => (
+                    <SortableContext items={orderedSites.filter(s => 
+                      s.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map(s => s.id)} strategy={verticalListSortingStrategy}>
+                      {orderedSites.filter(s => 
+                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
+                      ).map((site) => (
                         <SortableItem
                           key={site.id}
                           id={site.id}
