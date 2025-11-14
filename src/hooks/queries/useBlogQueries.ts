@@ -58,20 +58,46 @@ export const useBlogPost = (slug: string) => {
   });
 };
 
-// Blog yorumları
+// Blog yorumları (profiller dahil)
 export const useBlogComments = (postId: string) => {
   return useQuery({
     queryKey: queryKeys.blog.comments(postId),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('blog_comments')
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('blog_comments' as any)
         .select('*')
         .eq('post_id', postId)
         .eq('is_approved', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+      if (commentsError) throw commentsError;
+
+      // Fetch profiles for authenticated users
+      const userIds = commentsData
+        .map((c: any) => c.user_id)
+        .filter((id: string | null) => id !== null);
+
+      let profilesData = [];
+      if (userIds.length > 0) {
+        const { data, error: profilesError } = await (supabase as any)
+          .from('profiles')
+          .select('id, username')
+          .in('id', userIds);
+
+        if (profilesError) throw profilesError;
+        profilesData = data || [];
+      }
+
+      // Combine comments with profiles
+      const commentsWithProfiles = commentsData.map((comment: any) => {
+        const profile = profilesData?.find((p: any) => p.id === comment.user_id);
+        return {
+          ...comment,
+          profiles: profile ? { username: profile.username || 'Anonim' } : undefined,
+        };
+      });
+
+      return commentsWithProfiles;
     },
     staleTime: CACHE_TIMES.SHORT,
     enabled: !!postId,

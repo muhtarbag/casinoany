@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, MessageSquare } from 'lucide-react';
+import { useAddBlogComment } from '@/hooks/queries/useBlogQueries';
 
 interface BlogCommentFormProps {
   postId: string;
@@ -17,53 +16,17 @@ interface BlogCommentFormProps {
 export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [comment, setComment] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
-  const submitCommentMutation = useMutation({
-    mutationFn: async () => {
-      const commentData: any = {
-        post_id: postId,
-        comment: comment.trim(),
-      };
+  const submitCommentMutation = useAddBlogComment();
 
-      if (user) {
-        commentData.user_id = user.id;
-      } else {
-        // Anonymous comment
-        if (!name.trim() || !email.trim()) {
-          throw new Error('Lütfen ad ve email alanlarını doldurun');
-        }
-        commentData.name = name.trim();
-        commentData.email = email.trim();
-      }
-
-      const { error } = await supabase
-        .from('blog_comments' as any)
-        .insert([commentData]);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Yorum gönderildi',
-        description: 'Yorumunuz onay bekliyor. Onaylandıktan sonra görüntülenecektir.',
-      });
-      setComment('');
-      setName('');
-      setEmail('');
-      queryClient.invalidateQueries({ queryKey: ['blog-comments', postId] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Hata',
-        description: error.message || 'Yorum gönderilemedi',
-        variant: 'destructive',
-      });
-    },
-  });
+  const onSuccess = () => {
+    setComment('');
+    setName('');
+    setEmail('');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +40,27 @@ export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
       return;
     }
 
-    submitCommentMutation.mutate();
+    const commentData: any = {
+      post_id: postId,
+      comment: comment.trim(),
+    };
+
+    if (user) {
+      commentData.user_id = user.id;
+    } else {
+      if (!name.trim() || !email.trim()) {
+        toast({
+          title: 'Hata',
+          description: 'Lütfen ad ve email alanlarını doldurun',
+          variant: 'destructive',
+        });
+        return;
+      }
+      commentData.name = name.trim();
+      commentData.email = email.trim();
+    }
+
+    submitCommentMutation.mutate(commentData, { onSuccess });
   };
 
   return (

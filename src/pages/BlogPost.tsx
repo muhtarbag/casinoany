@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -15,26 +15,14 @@ import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useEffect } from 'react';
+import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
 
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { data: post, isLoading } = useQuery({
-    queryKey: ['blog-post', slug],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts' as any)
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data as any;
-    },
-    enabled: !!slug,
-  });
+  const { data: post, isLoading } = useBlogPost(slug || '');
+  const incrementView = useIncrementBlogView();
 
   // Fetch related posts based on tags
   const { data: relatedPosts } = useQuery({
@@ -66,16 +54,9 @@ export default function BlogPost() {
     enabled: !!post?.id && !!post?.tags,
   });
 
-  const incrementViewMutation = useMutation({
-    mutationFn: async (postId: string) => {
-      const { error } = await supabase.rpc('increment_blog_view_count' as any, { post_id: postId });
-      if (error) throw error;
-    },
-  });
-
   useEffect(() => {
     if (post?.id) {
-      incrementViewMutation.mutate(post.id);
+      incrementView.mutate(post.id);
     }
   }, [post?.id]);
 
