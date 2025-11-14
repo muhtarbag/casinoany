@@ -19,8 +19,10 @@ import {
   Calendar,
   Link as LinkIcon,
   Plus,
-  ExternalLink
+  ExternalLink,
+  LineChart as LineChartIcon
 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export function AffiliateManagement() {
   const queryClient = useQueryClient();
@@ -112,6 +114,17 @@ export function AffiliateManagement() {
   const totalViews = metrics?.reduce((sum, m) => sum + m.total_views, 0) || 0;
   const totalConversions = metrics?.reduce((sum, m) => sum + m.total_conversions, 0) || 0;
 
+  // Prepare chart data (reverse to show oldest to newest)
+  const chartData = metrics
+    ?.slice()
+    .reverse()
+    .map((m) => ({
+      date: new Date(m.metric_date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' }),
+      Tıklama: m.total_clicks,
+      Görüntüleme: m.total_views,
+      Gelir: Number(m.estimated_revenue || 0),
+    })) || [];
+
   if (sitesLoading) {
     return <div className="flex justify-center p-8">Yükleniyor...</div>;
   }
@@ -130,10 +143,10 @@ export function AffiliateManagement() {
             <div className="space-y-2">
               <Label>Site Seçin</Label>
               <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Affiliate anlaşması olan bir site seçin..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-[100]">
                   {sites?.map((site) => (
                     <SelectItem key={site.id} value={site.id}>
                       {site.name}
@@ -254,12 +267,92 @@ export function AffiliateManagement() {
                   </Card>
                 </div>
 
-                {/* Tabs for Payments and Metrics */}
-                <Tabs defaultValue="payments" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
+                {/* Tabs for Performance Chart, Payments and Metrics */}
+                <Tabs defaultValue="chart" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="chart">Performans Grafiği</TabsTrigger>
                     <TabsTrigger value="payments">Ödeme Geçmişi</TabsTrigger>
                     <TabsTrigger value="metrics">Metrikler</TabsTrigger>
                   </TabsList>
+
+                  {/* Performance Chart Tab */}
+                  <TabsContent value="chart" className="space-y-4">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <LineChartIcon className="w-5 h-5" />
+                          Performans Trendleri
+                        </CardTitle>
+                        <CardDescription>
+                          Son 30 günün tıklama, görüntüleme ve gelir trendleri
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {chartData.length > 0 ? (
+                          <div className="h-[400px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                <XAxis 
+                                  dataKey="date" 
+                                  className="text-xs"
+                                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                />
+                                <YAxis 
+                                  yAxisId="left"
+                                  className="text-xs"
+                                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                />
+                                <YAxis 
+                                  yAxisId="right" 
+                                  orientation="right"
+                                  className="text-xs"
+                                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: 'hsl(var(--background))',
+                                    border: '1px solid hsl(var(--border))',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Legend />
+                                <Line 
+                                  yAxisId="left"
+                                  type="monotone" 
+                                  dataKey="Görüntüleme" 
+                                  stroke="hsl(var(--primary))" 
+                                  strokeWidth={2}
+                                  dot={{ fill: 'hsl(var(--primary))' }}
+                                />
+                                <Line 
+                                  yAxisId="left"
+                                  type="monotone" 
+                                  dataKey="Tıklama" 
+                                  stroke="hsl(var(--chart-2))" 
+                                  strokeWidth={2}
+                                  dot={{ fill: 'hsl(var(--chart-2))' }}
+                                />
+                                <Line 
+                                  yAxisId="right"
+                                  type="monotone" 
+                                  dataKey="Gelir" 
+                                  stroke="hsl(var(--chart-3))" 
+                                  strokeWidth={2}
+                                  dot={{ fill: 'hsl(var(--chart-3))' }}
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground">
+                            <LineChartIcon className="w-16 h-16 mb-4 opacity-50" />
+                            <p>Henüz metrik verisi bulunmuyor</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
 
                   <TabsContent value="payments" className="space-y-4">
                     <Card>
