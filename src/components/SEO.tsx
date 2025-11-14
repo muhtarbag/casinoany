@@ -30,7 +30,12 @@ export const SEO = ({
 }: SEOProps) => {
   const siteUrl = window.location.origin;
   const currentUrl = canonical || window.location.href;
-  const fullTitle = `${title} | BahisSiteleri`;
+  
+  // Title optimization: Keep under 60 chars for SERP display
+  const fullTitle = title.length > 50 
+    ? `${title} | CasinoAny` 
+    : `${title} | CasinoAny - İGaming Rehberi`;
+  
   const defaultOgImage = `${siteUrl}/og-default.jpg`;
   const finalOgImage = ogImage || defaultOgImage;
   
@@ -117,8 +122,20 @@ export const SEO = ({
 
       {/* Additional SEO Meta Tags */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+      <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+      <meta name="bingbot" content="index, follow" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+      
+      {/* Geo-Targeting for Turkey */}
+      <meta name="geo.region" content="TR" />
+      <meta name="geo.placename" content="Turkey" />
+      
+      {/* Content Classification */}
+      <meta name="rating" content="general" />
+      <meta name="audience" content="all" />
+      
+      {/* Language */}
+      <meta httpEquiv="content-language" content="tr" />
       <meta httpEquiv="content-language" content="tr" />
       
       {/* Structured Data */}

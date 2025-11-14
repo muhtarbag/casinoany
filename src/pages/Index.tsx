@@ -4,6 +4,7 @@ import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
 import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
+import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 
 const Index = () => {
   const handleSearch = (term: string) => {
@@ -24,6 +25,7 @@ const Index = () => {
       <OrganizationSchema />
       <WebSiteSchema />
       <BreadcrumbSchema items={breadcrumbItems} />
+      <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
       
       <main>

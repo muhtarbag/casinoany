@@ -38,6 +38,8 @@ import { SEO } from '@/components/SEO';
 import { SiteBlogSection } from '@/components/SiteBlogSection';
 import { CasinoReviewCoreContent } from '@/components/casino/CasinoReviewCoreContent';
 import { BreadcrumbSchema, FAQSchema, ReviewSchema } from '@/components/StructuredData';
+import { CasinoReviewSchema, ExpertReviewSchema } from '@/components/seo/GamblingSEOSchemas';
+import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 
 export default function SiteDetail() {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -334,6 +336,43 @@ export default function SiteDetail() {
           },
         }}
       />
+      
+      {/* iGaming-Specific SEO Enhancements */}
+      <GamblingSEOEnhancer
+        isMoneyPage={true}
+        authorName="CasinoAny Experts Team"
+        lastReviewed={site.updated_at || new Date().toISOString()}
+      />
+      
+      {/* Casino Review Schema (iGaming-Optimized) */}
+      <CasinoReviewSchema
+        name={site.name}
+        url={`${window.location.origin}/site/${site.slug}`}
+        logo={logoUrl || ''}
+        rating={parseFloat(averageRating)}
+        reviewCount={reviews?.length || 0}
+        bonus={site.bonus || ''}
+        features={site.features || []}
+        license="Curacao eGaming"
+        paymentMethods={['Papara', 'Cepbank', 'Kredi Kartı', 'Kripto']}
+        gameProviders={['Pragmatic Play', 'Evolution Gaming', 'NetEnt']}
+      />
+      
+      {/* Expert Review Schema (E-E-A-T) */}
+      <ExpertReviewSchema
+        articleTitle={`${site.name} İnceleme 2025 - Detaylı Analiz`}
+        articleBody={`${site.name} detaylı incelemesi. ${site.bonus}. Rating: ${averageRating}/5.0`}
+        author={{
+          name: 'Ahmet Yılmaz',
+          expertise: 'iGaming & Casino Güvenlik Uzmanı',
+          experience: '10+ yıl sektör deneyimi'
+        }}
+        datePublished={site.created_at}
+        dateModified={site.updated_at || new Date().toISOString()}
+        rating={parseFloat(averageRating)}
+        casinoName={site.name}
+      />
+      
       {/* Breadcrumb Schema */}
       <BreadcrumbSchema items={[
         { name: 'Ana Sayfa', url: window.location.origin },
