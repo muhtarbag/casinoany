@@ -1,5 +1,6 @@
 import { Mail, Twitter, Facebook, Instagram, Youtube, Linkedin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
+import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
@@ -238,6 +239,24 @@ export const Footer = () => {
           <p className="text-xs text-muted-foreground/70">
             Powered by <a href="https://visiontech.co" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">visiontech.co</a> • Built with ❤️
           </p>
+          
+          {/* GameCheck Verified Badge */}
+          <div className="flex justify-center py-4">
+            <a 
+              href="https://gamecheck.com/tr" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block hover:opacity-80 transition-opacity"
+              aria-label="GameCheck Verified"
+            >
+              <img 
+                src={gameCheckLogo} 
+                alt="GameCheck Verified" 
+                className="h-16 w-auto"
+              />
+            </a>
+          </div>
+
           <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
             <Link to="/privacy" className="hover:text-primary transition-colors">Gizlilik Politikası</Link>
             <span>•</span>
