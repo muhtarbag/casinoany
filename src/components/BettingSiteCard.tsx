@@ -233,11 +233,12 @@ const BettingSiteCardComponent = ({
           Detaylar
           <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
         </Button>
-        <Button size="sm" className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold"
+        <Button size="sm" className="flex-1 bg-gradient-to-r from-secondary via-secondary/80 to-secondary bg-[length:200%_100%] animate-shimmer text-secondary-foreground hover:bg-secondary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden group/shimmer"
           onClick={handleAffiliateClick}
         >
-          Siteye Git
-          <ExternalLink className="w-4 h-4 ml-1" />
+          <span className="relative z-10">Siteye Git</span>
+          <ExternalLink className="w-4 h-4 ml-1 relative z-10 group-hover/shimmer:translate-x-1 transition-transform" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/shimmer:translate-x-full transition-transform duration-1000" />
         </Button>
       </CardFooter>
     </Card>
