@@ -1,0 +1,164 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
+import { toast } from 'sonner';
+
+// Blog posts listesi
+export const useBlogPosts = (filters?: {
+  isPublished?: boolean;
+  category?: string;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: queryKeys.blog.list(filters),
+    queryFn: async () => {
+      let query = (supabase as any)
+        .from('blog_posts')
+        .select('*')
+        .order('published_at', { ascending: false });
+
+      if (filters?.isPublished !== undefined) {
+        query = query.eq('is_published', filters.isPublished);
+      }
+
+      if (filters?.category) {
+        query = query.eq('category', filters.category);
+      }
+
+      if (filters?.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: CACHE_TIMES.MEDIUM,
+    refetchInterval: REFETCH_INTERVALS.NORMAL,
+  });
+};
+
+// Tek blog post
+export const useBlogPost = (slug: string) => {
+  return useQuery({
+    queryKey: queryKeys.blog.detail(slug),
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('is_published', true)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    staleTime: CACHE_TIMES.LONG,
+    enabled: !!slug,
+  });
+};
+
+// Blog yorumları
+export const useBlogComments = (postId: string) => {
+  return useQuery({
+    queryKey: queryKeys.blog.comments(postId),
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('blog_comments')
+        .select('*')
+        .eq('post_id', postId)
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: CACHE_TIMES.SHORT,
+    enabled: !!postId,
+  });
+};
+
+// Blog stats
+export const useBlogStats = () => {
+  return useQuery({
+    queryKey: queryKeys.blog.stats(),
+    queryFn: async () => {
+      const [postsRes, commentsRes] = await Promise.all([
+        (supabase as any)
+          .from('blog_posts')
+          .select('id, title, slug, view_count, created_at')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false }),
+        (supabase as any)
+          .from('blog_comments')
+          .select('post_id')
+          .eq('is_approved', true),
+      ]);
+
+      if (postsRes.error) throw postsRes.error;
+      if (commentsRes.error) throw commentsRes.error;
+
+      // Yorum sayılarını grupla
+      const commentsByPost = (commentsRes.data || []).reduce((acc: any, comment: any) => {
+        acc[comment.post_id] = (acc[comment.post_id] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Posts'a yorum sayılarını ekle
+      return (postsRes.data || []).map((post: any) => ({
+        ...post,
+        comments_count: commentsByPost[post.id] || 0,
+      }));
+    },
+    staleTime: CACHE_TIMES.MEDIUM,
+    refetchInterval: REFETCH_INTERVALS.SLOW,
+  });
+};
+
+// View count artırma
+export const useIncrementBlogView = () => {
+  return useMutation({
+    mutationFn: async (postId: string) => {
+      const { error } = await (supabase as any)
+        .rpc('increment_blog_view_count', { post_id: postId });
+      
+      if (error) throw error;
+    },
+    onError: () => {
+      console.error('View count artırılamadı');
+    },
+  });
+};
+
+// Yorum ekleme
+export const useAddBlogComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (comment: {
+      post_id: string;
+      name?: string;
+      email?: string;
+      comment: string;
+      user_id?: string;
+    }) => {
+      const { data, error } = await (supabase as any)
+        .from('blog_comments')
+        .insert(comment)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.blog.comments(variables.post_id) 
+      });
+      toast.success('Yorumunuz onay bekliyor');
+    },
+    onError: (error: any) => {
+      toast.error('Yorum eklenirken hata oluştu: ' + error.message);
+    },
+  });
+};
