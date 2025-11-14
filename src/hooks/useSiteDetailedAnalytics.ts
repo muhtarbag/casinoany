@@ -34,12 +34,12 @@ export function useSiteDetailedAnalytics(siteId: string | null) {
         .gte('metric_date', thirtyDaysAgo)
         .order('metric_date', { ascending: true });
 
-      // Create a map of dates for the last 30 days
+      // Create a map of dates for the last 30 days with full date for filtering
       const dailyMetrics: Record<string, DailyMetric> = {};
       for (let i = 29; i >= 0; i--) {
-        const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-        dailyMetrics[date] = {
-          date: format(subDays(new Date(), i), 'dd MMM'),
+        const dateKey = format(subDays(new Date(), i), 'yyyy-MM-dd');
+        dailyMetrics[dateKey] = {
+          date: dateKey, // Store full date for filtering
           views: 0,
           clicks: 0,
           affiliateClicks: 0,

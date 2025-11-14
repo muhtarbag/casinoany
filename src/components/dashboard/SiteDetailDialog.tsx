@@ -1,10 +1,17 @@
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useSiteDetailedAnalytics } from '@/hooks/useSiteDetailedAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, MousePointerClick, Target, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Eye, MousePointerClick, Target, DollarSign, CalendarIcon, RotateCcw } from 'lucide-react';
+import { format, parseISO, isWithinInterval } from 'date-fns';
+import { tr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import {
   LineChart,
   Line,
@@ -16,6 +23,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Brush,
 } from 'recharts';
 
 interface SiteDetailDialogProps {
@@ -36,16 +44,45 @@ export function SiteDetailDialog({
   rating,
 }: SiteDetailDialogProps) {
   const { data: metrics, isLoading } = useSiteDetailedAnalytics(siteId);
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined,
+  });
+
+  // Filter metrics based on date range
+  const filteredMetrics = useMemo(() => {
+    if (!metrics) return [];
+    if (!dateRange.from || !dateRange.to) return metrics;
+
+    return metrics.filter(metric => {
+      const metricDate = parseISO(metric.date);
+      return isWithinInterval(metricDate, { start: dateRange.from!, end: dateRange.to! });
+    });
+  }, [metrics, dateRange]);
+
+  // Format data for display
+  const displayMetrics = useMemo(() => {
+    return filteredMetrics.map(m => ({
+      ...m,
+      displayDate: format(parseISO(m.date), 'dd MMM', { locale: tr }),
+    }));
+  }, [filteredMetrics]);
 
   const calculateTotal = (key: 'views' | 'clicks' | 'affiliateClicks' | 'revenue') => {
-    if (!metrics) return 0;
-    return metrics.reduce((sum, m) => sum + m[key], 0);
+    if (!filteredMetrics) return 0;
+    return filteredMetrics.reduce((sum, m) => sum + m[key], 0);
   };
 
   const calculateAverage = (key: 'views' | 'clicks' | 'affiliateClicks' | 'revenue') => {
-    if (!metrics || metrics.length === 0) return 0;
-    return calculateTotal(key) / metrics.length;
+    if (!filteredMetrics || filteredMetrics.length === 0) return 0;
+    return calculateTotal(key) / filteredMetrics.length;
   };
+
+  const resetFilters = () => {
+    setDateRange({ from: undefined, to: undefined });
+  };
+
+  const hasActiveFilter = dateRange.from || dateRange.to;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,6 +118,80 @@ export function SiteDetailDialog({
           </div>
         ) : metrics ? (
           <div className="space-y-6">
+            {/* Date Range Filter */}
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex-1 min-w-[200px]">
+                    <p className="text-sm font-medium mb-2">Tarih Aralığı Filtresi</p>
+                    <div className="flex gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'justify-start text-left font-normal',
+                              !dateRange.from && 'text-muted-foreground'
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange.from ? format(dateRange.from, 'dd MMM yyyy', { locale: tr }) : 'Başlangıç'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange.from}
+                            onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+                            disabled={(date) => date > new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+
+                      <span className="flex items-center text-muted-foreground">-</span>
+
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'justify-start text-left font-normal',
+                              !dateRange.to && 'text-muted-foreground'
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange.to ? format(dateRange.to, 'dd MMM yyyy', { locale: tr }) : 'Bitiş'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange.to}
+                            onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+                            disabled={(date) => date > new Date() || (dateRange.from ? date < dateRange.from : false)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  {hasActiveFilter && (
+                    <Button variant="ghost" size="sm" onClick={resetFilters}>
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Filtreyi Temizle
+                    </Button>
+                  )}
+
+                  <div className="ml-auto">
+                    <Badge variant="secondary">
+                      {filteredMetrics.length} gün gösteriliyor
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
@@ -154,8 +265,8 @@ export function SiteDetailDialog({
                 <CardTitle>Görüntülenme ve Tıklama Trendi</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={metrics}>
+                <ResponsiveContainer width="100%" height={350}>
+                  <AreaChart data={displayMetrics}>
                     <defs>
                       <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -168,7 +279,7 @@ export function SiteDetailDialog({
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis 
-                      dataKey="date" 
+                      dataKey="displayDate" 
                       className="text-xs"
                       tick={{ fill: 'hsl(var(--muted-foreground))' }}
                     />
@@ -200,6 +311,12 @@ export function SiteDetailDialog({
                       fillOpacity={1}
                       fill="url(#colorClicks)"
                     />
+                    <Brush 
+                      dataKey="displayDate" 
+                      height={30} 
+                      stroke="hsl(var(--primary))"
+                      fill="hsl(var(--muted))"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -211,11 +328,11 @@ export function SiteDetailDialog({
                 <CardTitle>Affiliate Performans ve Gelir</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={metrics}>
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={displayMetrics}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis 
-                      dataKey="date" 
+                      dataKey="displayDate" 
                       className="text-xs"
                       tick={{ fill: 'hsl(var(--muted-foreground))' }}
                     />
@@ -255,6 +372,12 @@ export function SiteDetailDialog({
                       stroke="hsl(var(--chart-2))"
                       strokeWidth={2}
                       dot={{ fill: 'hsl(var(--chart-2))' }}
+                    />
+                    <Brush 
+                      dataKey="displayDate" 
+                      height={30} 
+                      stroke="hsl(var(--primary))"
+                      fill="hsl(var(--muted))"
                     />
                   </LineChart>
                 </ResponsiveContainer>
