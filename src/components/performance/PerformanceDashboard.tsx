@@ -322,6 +322,12 @@ export function PerformanceDashboard() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="guide">
+          <PerformanceInstructions />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
