@@ -56,32 +56,13 @@ export function DashboardTab({
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Dashboard</h2>
-          <p className="text-muted-foreground">Widget'ları sürükleyerek özelleştirin</p>
+          <p className="text-muted-foreground">Genel sistem özeti ve istatistikler</p>
         </div>
         <Button variant="outline" onClick={() => setShowCustomizer(true)}>
           <Settings className="w-4 h-4 mr-2" />
           Widget'ları Düzenle
         </Button>
       </div>
-
-      {/* Widget Grid */}
-      <DashboardWidgetGrid onNavigate={onNavigate} />
-
-      {/* Site Performance Analytics */}
-      <SitePerformanceCards />
-
-      {/* Priority Alert Banner */}
-      {dashboardStats.pendingReviews > 5 && (
-        <div className="p-4 rounded-lg border border-warning bg-warning/10 flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-warning">Dikkat: Bekleyen Yorumlar</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              {dashboardStats.pendingReviews} yorum onay bekliyor. Kullanıcı deneyimi için hızlı aksiyon önerilir.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Stats Cards with Priority Indicators */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -135,6 +116,19 @@ export function DashboardTab({
           </CardContent>
         </Card>
       </div>
+
+      {/* Priority Alert Banner */}
+      {dashboardStats.pendingReviews > 5 && (
+        <div className="p-4 rounded-lg border border-warning bg-warning/10 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-warning">Dikkat: Bekleyen Yorumlar</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {dashboardStats.pendingReviews} yorum onay bekliyor. Kullanıcı deneyimi için hızlı aksiyon önerilir.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Charts Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -252,6 +246,12 @@ export function DashboardTab({
           </CardContent>
         </Card>
       </div>
+
+      {/* Site Performance Analytics */}
+      <SitePerformanceCards />
+
+      {/* Widget Grid */}
+      <DashboardWidgetGrid onNavigate={onNavigate} />
 
       {/* Widget Customizer Dialog */}
       <WidgetCustomizer open={showCustomizer} onOpenChange={setShowCustomizer} />
