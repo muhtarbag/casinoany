@@ -11,6 +11,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
+import { createAppQueryClient } from "@/lib/queryClient";
+
+const queryClient = createAppQueryClient();
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -77,10 +80,6 @@ const PageLoader = () => (
     </div>
   </div>
 );
-
-import { createAppQueryClient } from "@/lib/queryClient";
-
-const queryClient = createAppQueryClient();
 
 const AppContent = () => {
   usePageTracking();
