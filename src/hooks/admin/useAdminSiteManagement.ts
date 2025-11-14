@@ -3,9 +3,11 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { SiteFormData, validateLogoFile } from '@/schemas/siteValidation';
+import { useLogChange } from '@/hooks/useChangeHistory';
 
 export const useAdminSiteManagement = () => {
   const queryClient = useQueryClient();
+  const logChange = useLogChange();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedSites, setSelectedSites] = useState<string[]>([]);
@@ -179,8 +181,29 @@ export const useAdminSiteManagement = () => {
   const deleteSiteMutation = useMutation({
     mutationFn: async (id: string) => {
       setDeletingId(id);
+      
+      // Get site data before deleting for undo
+      const { data: siteData } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
       const { error } = await supabase.from('betting_sites').delete().eq('id', id);
       if (error) throw error;
+      
+      // Log the change for undo
+      if (siteData) {
+        await logChange.mutateAsync({
+          actionType: 'delete',
+          tableName: 'betting_sites',
+          recordId: id,
+          previousData: siteData,
+          metadata: {
+            description: `${siteData.name} silindi`,
+          },
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
@@ -196,11 +219,31 @@ export const useAdminSiteManagement = () => {
   // Bulk operations
   const bulkDeleteMutation = useMutation({
     mutationFn: async (siteIds: string[]) => {
+      // Get sites data before deleting for undo
+      const { data: sitesData } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .in('id', siteIds);
+      
       const { error } = await supabase.from('betting_sites').delete().in('id', siteIds);
       if (error) throw error;
+      
+      // Log the bulk change for undo
+      if (sitesData && sitesData.length > 0) {
+        await logChange.mutateAsync({
+          actionType: 'bulk_delete',
+          tableName: 'betting_sites',
+          recordIds: siteIds,
+          previousData: sitesData,
+          metadata: {
+            description: `${sitesData.length} site toplu silme`,
+          },
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['change-history'] });
       toast.success(`${selectedSites.length} site silindi`);
       setSelectedSites([]);
     },

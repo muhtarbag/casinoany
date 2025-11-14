@@ -18,7 +18,8 @@ import {
   PieChart,
   Gift,
   FileEdit,
-  DollarSign
+  DollarSign,
+  History
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
@@ -86,6 +87,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       label: 'Sistem',
       items: [
         { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null },
+        { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null },
         { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA' },
       ],
     },

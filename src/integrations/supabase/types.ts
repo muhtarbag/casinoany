@@ -772,6 +772,57 @@ export type Database = {
           },
         ]
       }
+      change_history: {
+        Row: {
+          action_type: string
+          batch_id: string | null
+          created_at: string
+          id: string
+          is_undone: boolean | null
+          metadata: Json | null
+          new_data: Json | null
+          previous_data: Json | null
+          record_id: string | null
+          record_ids: string[] | null
+          table_name: string
+          undone_at: string | null
+          undone_by: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          is_undone?: boolean | null
+          metadata?: Json | null
+          new_data?: Json | null
+          previous_data?: Json | null
+          record_id?: string | null
+          record_ids?: string[] | null
+          table_name: string
+          undone_at?: string | null
+          undone_by?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          batch_id?: string | null
+          created_at?: string
+          id?: string
+          is_undone?: boolean | null
+          metadata?: Json | null
+          new_data?: Json | null
+          previous_data?: Json | null
+          record_id?: string | null
+          record_ids?: string[] | null
+          table_name?: string
+          undone_at?: string | null
+          undone_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       content_optimization_suggestions: {
         Row: {
           applied_at: string | null
@@ -1496,6 +1547,19 @@ export type Database = {
         Args: { article_id: string }
         Returns: undefined
       }
+      log_change: {
+        Args: {
+          p_action_type: string
+          p_batch_id?: string
+          p_metadata?: Json
+          p_new_data?: Json
+          p_previous_data?: Json
+          p_record_id?: string
+          p_record_ids?: string[]
+          p_table_name: string
+        }
+        Returns: string
+      }
       log_system_event: {
         Args: {
           p_action: string
@@ -1555,6 +1619,7 @@ export type Database = {
         }
         Returns: string
       }
+      undo_change: { Args: { p_change_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
