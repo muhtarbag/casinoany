@@ -431,7 +431,11 @@ SEO skorunu 0-100 arasında değerlendir ve iyileştirme önerileri sun.`
 }
 
 async function generateReviews(data: any, apiKey: string) {
-  const { siteName, count } = data;
+  const { siteName, count, tone = 'neutral', ratingMin = 3, ratingMax = 5, language = 'tr' } = data;
+  
+  // Type safety for tone
+  const reviewTone: 'positive' | 'negative' | 'neutral' = 
+    (tone === 'positive' || tone === 'negative' || tone === 'neutral') ? tone : 'neutral';
 
   // Generate unique seed for this request
   const timestamp = Date.now();
@@ -462,6 +466,23 @@ async function generateReviews(data: any, apiKey: string) {
 
   const nameList = JSON.stringify(turkishNames);
 
+  // Ton ve dil ayarlarına göre system prompt'u hazırla
+  const toneInstructions: Record<'positive' | 'negative' | 'neutral', string> = {
+    positive: language === 'tr' 
+      ? 'Yorumlar ağırlıklı olarak POZİTİF olmalı. Kullanıcılar siteden memnun, bonus ve hizmetlerden hoşnut, genel deneyim olumlu. Ancak her yorumda küçük bir eleştiri de eklenebilir.'
+      : 'Reviews should be predominantly POSITIVE. Users are satisfied with the site, happy with bonuses and services, overall experience is good. However, minor criticism can be included in each review.',
+    negative: language === 'tr'
+      ? 'Yorumlar ağırlıklı olarak NEGATİF olmalı. Kullanıcılar siteden memnun değil, sorunlar yaşıyor, eleştiriler var. Ancak her yorumda küçük bir olumlu nokta da belirtebilirsin.'
+      : 'Reviews should be predominantly NEGATIVE. Users are dissatisfied with the site, experiencing issues, with criticism. However, a small positive point can be mentioned in each review.',
+    neutral: language === 'tr'
+      ? 'Yorumlar NÖTR/DENGELI olmalı. Bazı yorumlar olumlu, bazıları olumsuz, bazıları karışık. Gerçek kullanıcı deneyimlerini yansıt.'
+      : 'Reviews should be NEUTRAL/BALANCED. Some reviews positive, some negative, some mixed. Reflect real user experiences.'
+  };
+
+  const languageInstructions = language === 'tr'
+    ? 'Tüm yorumları Türkçe yaz. Günlük konuşma dilini kullan.'
+    : 'Write all reviews in English. Use casual conversational language.';
+
   const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -480,11 +501,19 @@ async function generateReviews(data: any, apiKey: string) {
 - Her yorumda FARKLI bir isim-soyisim kombinasyonu kullan
 - Hiçbir zaman daha önce kullandığın isimleri tekrar etme
 - Her yorum farklı bir kişilik, üslup ve deneyimi yansıtmalı
-- Aynı ifadeleri, cümle kalıplarını veya kelimeleri tekrar kullanma`
+- Aynı ifadeleri, cümle kalıplarını veya kelimeleri tekrar kullanma
+
+🎭 TON VE DİL:
+${toneInstructions[reviewTone]}
+${languageInstructions}
+
+⭐ PUAN ARALIĞI:
+- Yorumların puanları ${ratingMin} ile ${ratingMax} arasında olmalı
+- Yorumun tonuyla puan uyumlu olmalı (pozitif yorum = yüksek puan, negatif yorum = düşük puan)`
         },
         {
           role: 'user',
-          content: `${siteName} bahis sitesi için ${count || 5} adet TAMAMEN BENZERSIZ kullanıcı yorumu oluştur.
+          content: `${siteName} ${language === 'tr' ? 'bahis sitesi için' : 'betting site için'} ${count || 5} ${language === 'tr' ? 'adet TAMAMEN BENZERSIZ kullanıcı yorumu oluştur' : 'COMPLETELY UNIQUE user reviews'}.
 
 🎯 BENZERSIZ İSİM OLUŞTURMA (MUTLAKA UYGULA):
 
