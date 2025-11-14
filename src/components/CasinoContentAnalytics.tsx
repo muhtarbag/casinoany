@@ -49,6 +49,7 @@ export const CasinoContentAnalytics = () => {
         .sort((a, b) => b.views - a.views)
         .slice(0, 10);
     },
+    staleTime: 5 * 60 * 1000, // 5 dakika cache
   });
 
   // Fetch block interactions
@@ -78,6 +79,7 @@ export const CasinoContentAnalytics = () => {
         value,
       }));
     },
+    staleTime: 5 * 60 * 1000, // 5 dakika cache
   });
 
   // Fetch daily trends (last 7 days)
@@ -111,6 +113,7 @@ export const CasinoContentAnalytics = () => {
         date: format(new Date(entry.date), 'dd MMM', { locale: tr }),
       }));
     },
+    staleTime: 3 * 60 * 1000, // 3 dakika cache
   });
 
   // Calculate summary stats

@@ -16,41 +16,28 @@ export const AnalyticsDashboard = () => {
       const today = new Date();
       const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      // Page views
-      const { data: pageViews, error: pvError } = await (supabase as any)
-        .from('page_views')
-        .select('*')
-        .gte('created_at', sevenDaysAgo.toISOString());
-      if (pvError) throw pvError;
+      // Paralel sorgular ile hızlandırma
+      const [pageViewsRes, eventsRes, conversionsRes, sessionsRes] = await Promise.all([
+        (supabase as any).from('page_views').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        (supabase as any).from('user_events').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        (supabase as any).from('conversions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        (supabase as any).from('analytics_sessions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+      ]);
 
-      // User events
-      const { data: events, error: evError } = await (supabase as any)
-        .from('user_events')
-        .select('*')
-        .gte('created_at', sevenDaysAgo.toISOString());
-      if (evError) throw evError;
-
-      // Conversions
-      const { data: conversions, error: convError } = await (supabase as any)
-        .from('conversions')
-        .select('*')
-        .gte('created_at', sevenDaysAgo.toISOString());
-      if (convError) throw convError;
-
-      // Sessions
-      const { data: sessions, error: sessError } = await (supabase as any)
-        .from('analytics_sessions')
-        .select('*')
-        .gte('created_at', sevenDaysAgo.toISOString());
-      if (sessError) throw sessError;
+      if (pageViewsRes.error) throw pageViewsRes.error;
+      if (eventsRes.error) throw eventsRes.error;
+      if (conversionsRes.error) throw conversionsRes.error;
+      if (sessionsRes.error) throw sessionsRes.error;
 
       return {
-        pageViews: pageViews || [],
-        events: events || [],
-        conversions: conversions || [],
-        sessions: sessions || [],
+        pageViews: pageViewsRes.data || [],
+        events: eventsRes.data || [],
+        conversions: conversionsRes.data || [],
+        sessions: sessionsRes.data || [],
       };
     },
+    staleTime: 3 * 60 * 1000, // 3 dakika cache
+    refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
   });
 
   // Process data for charts
