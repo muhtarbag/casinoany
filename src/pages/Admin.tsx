@@ -15,7 +15,7 @@ const SiteManagementContainer = lazy(() => import('@/features/sites/SiteManageme
 const FeaturedSitesManagement = lazy(() => import('@/components/FeaturedSitesManagement').then(m => ({ default: m.FeaturedSitesManagement })));
 const SiteStats = lazy(() => import('@/components/SiteStats'));
 const BlogStats = lazy(() => import('@/components/BlogStats'));
-const ReviewManagement = lazy(() => import('@/components/ReviewManagement'));
+const EnhancedReviewManagement = lazy(() => import('@/components/EnhancedReviewManagement'));
 const BlogManagement = lazy(() => import('@/components/BlogManagement').then(m => ({ default: m.BlogManagement })));
 const BlogCommentManagement = lazy(() => import('@/components/BlogCommentManagement').then(m => ({ default: m.BlogCommentManagement })));
 const AIAssistant = lazy(() => import('@/components/AIAssistant').then(m => ({ default: m.AIAssistant })));
@@ -109,7 +109,7 @@ export default function Admin() {
         {activeTab === 'featured' && <FeaturedSitesManagement />}
         {activeTab === 'site-stats' && <SiteStats />}
         {activeTab === 'blog-stats' && <BlogStats />}
-        {activeTab === 'reviews' && <ReviewManagement />}
+        {activeTab === 'reviews' && <EnhancedReviewManagement />}
         {activeTab === 'blog' && <BlogManagement />}
         {activeTab === 'comments' && <BlogCommentManagement />}
         {activeTab === 'ai' && <AIAssistant />}
