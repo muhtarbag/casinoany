@@ -224,10 +224,6 @@ export function DashboardTab({
             </ResponsiveContainer>
           </CardContent>
         </Card>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
