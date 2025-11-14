@@ -24,12 +24,14 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-background to-muted">
-        <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background to-muted relative">
+        <div className="z-40 relative">
+          <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
+        </div>
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-14 items-center gap-4 px-4">
               <SidebarTrigger />
               
