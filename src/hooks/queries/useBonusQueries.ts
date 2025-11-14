@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_DEFAULTS, queryKeys } from '@/lib/queryClient';
 
 export const useBonusOffers = () => {
   return useQuery({
-    queryKey: ['bonus-offers'],
+    queryKey: [...queryKeys.sites.all, 'bonus-offers'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bonus_offers')
@@ -14,12 +15,14 @@ export const useBonusOffers = () => {
       if (error) throw error;
       return data;
     },
+    // STANDARDIZED: Static content (bonus offers nadiren değişir)
+    ...QUERY_DEFAULTS.static,
   });
 };
 
 export const useCMSContent = () => {
   return useQuery({
-    queryKey: ['cms-content'],
+    queryKey: [...queryKeys.admin.all, 'cms-content'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
@@ -44,5 +47,7 @@ export const useCMSContent = () => {
       });
       return contentMap;
     },
+    // STANDARDIZED: Content (CMS settings nadiren değişir)
+    ...QUERY_DEFAULTS.content,
   });
 };

@@ -16,6 +16,65 @@ export const REFETCH_INTERVALS = {
   NEVER: false,           // Otomatik refetch yok
 } as const;
 
+// ============================================================
+// QUERY DEFAULTS: Centralized Query Configuration
+// Use case bazlı standart query ayarları
+// ============================================================
+
+export const QUERY_DEFAULTS = {
+  // STATIC DATA: Nadiren değişen veriler (site list, featured items)
+  static: {
+    staleTime: CACHE_TIMES.LONG,      // 15 dakika
+    gcTime: CACHE_TIMES.VERY_LONG,    // 1 saat
+    refetchOnWindowFocus: false,       // Window focus'ta refetch etme
+    refetchOnMount: false,             // Mount'ta refetch etme
+    refetchOnReconnect: false,         // Reconnect'te refetch etme
+  },
+  
+  // DYNAMIC DATA: Sık değişebilen veriler (user stats, notifications)
+  dynamic: {
+    staleTime: CACHE_TIMES.SHORT,     // 1 dakika
+    gcTime: CACHE_TIMES.MEDIUM,       // 5 dakika
+    refetchOnWindowFocus: true,        // Window focus'ta refetch et
+    refetchOnMount: 'always' as const, // Her mount'ta refetch et
+    refetchOnReconnect: true,          // Reconnect'te refetch et
+  },
+  
+  // ANALYTICS: Analytics ve metrics data
+  analytics: {
+    staleTime: CACHE_TIMES.MEDIUM,    // 5 dakika
+    gcTime: CACHE_TIMES.LONG,         // 15 dakika
+    refetchOnWindowFocus: false,       // Window focus'ta refetch etme
+    refetchOnMount: false,             // Mount'ta refetch etme
+    refetchInterval: REFETCH_INTERVALS.NORMAL, // 2 dakikada bir otomatik refetch
+  },
+  
+  // REALTIME: Real-time subscriptions için (manual refetch, realtime updates)
+  realtime: {
+    staleTime: 0,                      // Her zaman stale (realtime updates'e güven)
+    gcTime: CACHE_TIMES.SHORT,         // 1 dakika
+    refetchOnWindowFocus: false,       // Realtime'da manual refetch gereksiz
+    refetchOnMount: false,             // Realtime'da manual refetch gereksiz
+    refetchInterval: false,            // Otomatik refetch yok (realtime var)
+  },
+  
+  // ADMIN: Admin panel data (change history, logs, etc.)
+  admin: {
+    staleTime: CACHE_TIMES.SHORT,     // 1 dakika
+    gcTime: CACHE_TIMES.MEDIUM,       // 5 dakika
+    refetchOnWindowFocus: true,        // Window focus'ta refetch et
+    refetchInterval: REFETCH_INTERVALS.NORMAL, // 2 dakikada bir refetch
+  },
+  
+  // CONTENT: Blog, news, static content
+  content: {
+    staleTime: CACHE_TIMES.LONG,      // 15 dakika
+    gcTime: CACHE_TIMES.VERY_LONG,    // 1 saat
+    refetchOnWindowFocus: false,       // Window focus'ta refetch etme
+    refetchOnMount: false,             // Mount'ta refetch etme
+  },
+} as const;
+
 // Query key factory - Merkezi query key yönetimi
 export const queryKeys = {
   // News

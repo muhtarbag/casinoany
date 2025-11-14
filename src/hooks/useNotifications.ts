@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_DEFAULTS, queryKeys } from '@/lib/queryClient';
 
 export interface SystemNotification {
   id: string;
@@ -16,7 +17,7 @@ export interface SystemNotification {
 
 export function useNotifications() {
   const { data: changeHistory } = useQuery({
-    queryKey: ['system-notifications'],
+    queryKey: [...queryKeys.admin.all, 'notifications'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('change_history')
@@ -39,7 +40,8 @@ export function useNotifications() {
         };
       }) as SystemNotification[];
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    // STANDARDIZED: Admin data pattern (2 dakika refetch interval)
+    ...QUERY_DEFAULTS.admin,
   });
 
   const unreadCount = changeHistory?.filter(n => !n.read).length || 0;
