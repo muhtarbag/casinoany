@@ -88,19 +88,21 @@ export function SiteDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
-              <AvatarImage src={logoUrl || ''} alt={siteName} />
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                {siteName.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <DialogTitle className="text-2xl">{siteName}</DialogTitle>
-              <DialogDescription>Son 30 günlük detaylı performans analizi</DialogDescription>
+          <div className="flex flex-wrap items-start gap-3 justify-between">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <Avatar className="h-12 w-12 border-2 border-background shadow-sm shrink-0">
+                <AvatarImage src={logoUrl || ''} alt={siteName} />
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {siteName.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-2xl truncate">{siteName}</DialogTitle>
+                <DialogDescription className="mt-1">Son 30 günlük detaylı performans analizi</DialogDescription>
+              </div>
             </div>
             {rating && (
-              <Badge variant="outline" className="ml-auto">
+              <Badge variant="outline" className="shrink-0">
                 ⭐ {rating.toFixed(1)}
               </Badge>
             )}
