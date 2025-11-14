@@ -251,12 +251,18 @@ export function SiteManagementForm({
           </div>
 
           {/* Affiliate Management Section */}
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full" defaultValue="affiliate">
             <AccordionItem value="affiliate">
-              <AccordionTrigger className="text-lg font-semibold">
-                🤝 Affiliate Anlaşma Bilgileri
+              <AccordionTrigger className="text-lg font-semibold bg-primary/5 px-4 py-3 rounded-lg hover:bg-primary/10">
+                🤝 Affiliate Anlaşma Bilgileri (Opsiyonel)
               </AccordionTrigger>
               <AccordionContent>
+                <div className="mb-4 p-3 bg-muted/50 rounded-lg border">
+                  <p className="text-sm text-muted-foreground">
+                    💡 <strong>Not:</strong> Anlaşma tarihi doldurduğunuz siteler <strong>Affiliate Yönetimi</strong> sayfasında otomatik olarak görünür. 
+                    Buraya komisyon oranı, panel bilgileri ve ödeme detaylarını girebilirsiniz.
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="affiliate_contract_date">Anlaşma Tarihi</Label>
