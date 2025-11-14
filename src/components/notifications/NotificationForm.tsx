@@ -224,6 +224,183 @@ export function NotificationForm({
         </div>
       </div>
 
+      {/* Colors */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="background_color">Arkaplan Rengi</Label>
+          <Input
+            id="background_color"
+            type="color"
+            value={formData.background_color}
+            onChange={(e) => handleChange('background_color', e.target.value)}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="text_color">Metin Rengi</Label>
+          <Input
+            id="text_color"
+            type="color"
+            value={formData.text_color}
+            onChange={(e) => handleChange('text_color', e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Advanced Styling */}
+      <div className="border-t pt-4 space-y-4">
+        <h3 className="font-semibold">Gelişmiş Stil Seçenekleri</h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="font_family">Font</Label>
+            <Select
+              value={formData.font_family}
+              onValueChange={(value) => handleChange('font_family', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Inter">Inter</SelectItem>
+                <SelectItem value="Roboto">Roboto</SelectItem>
+                <SelectItem value="Poppins">Poppins</SelectItem>
+                <SelectItem value="Playfair Display">Playfair Display</SelectItem>
+                <SelectItem value="Montserrat">Montserrat</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="font_size">Yazı Boyutu</Label>
+            <Select
+              value={formData.font_size}
+              onValueChange={(value) => handleChange('font_size', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="xs">Çok Küçük</SelectItem>
+                <SelectItem value="sm">Küçük</SelectItem>
+                <SelectItem value="base">Normal</SelectItem>
+                <SelectItem value="lg">Büyük</SelectItem>
+                <SelectItem value="xl">Çok Büyük</SelectItem>
+                <SelectItem value="2xl">Ekstra Büyük</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="border_radius">Köşe Yuvarlaklığı</Label>
+            <Select
+              value={formData.border_radius}
+              onValueChange={(value) => handleChange('border_radius', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Yok</SelectItem>
+                <SelectItem value="sm">Az</SelectItem>
+                <SelectItem value="md">Orta</SelectItem>
+                <SelectItem value="lg">Çok</SelectItem>
+                <SelectItem value="xl">Ekstra</SelectItem>
+                <SelectItem value="2xl">Maksimum</SelectItem>
+                <SelectItem value="full">Tam Yuvarlak</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="max_width">Maksimum Genişlik</Label>
+            <Select
+              value={formData.max_width}
+              onValueChange={(value) => handleChange('max_width', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sm">Küçük (384px)</SelectItem>
+                <SelectItem value="md">Orta (448px)</SelectItem>
+                <SelectItem value="lg">Büyük (512px)</SelectItem>
+                <SelectItem value="xl">Çok Büyük (576px)</SelectItem>
+                <SelectItem value="2xl">Ekstra Büyük (672px)</SelectItem>
+                <SelectItem value="full">Tam Genişlik</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="padding">İç Boşluk</Label>
+            <Select
+              value={formData.padding}
+              onValueChange={(value) => handleChange('padding', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tight">Sıkı</SelectItem>
+                <SelectItem value="normal">Normal</SelectItem>
+                <SelectItem value="relaxed">Rahat</SelectItem>
+                <SelectItem value="loose">Geniş</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="shadow_size">Gölge</Label>
+            <Select
+              value={formData.shadow_size}
+              onValueChange={(value) => handleChange('shadow_size', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Yok</SelectItem>
+                <SelectItem value="sm">Küçük</SelectItem>
+                <SelectItem value="md">Orta</SelectItem>
+                <SelectItem value="lg">Büyük</SelectItem>
+                <SelectItem value="xl">Çok Büyük</SelectItem>
+                <SelectItem value="2xl">Ekstra Büyük</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="border_color">Kenarlık Rengi</Label>
+            <Input
+              id="border_color"
+              type="color"
+              value={formData.border_color}
+              onChange={(e) => handleChange('border_color', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="border_width">Kenarlık Kalınlığı</Label>
+            <Select
+              value={formData.border_width}
+              onValueChange={(value) => handleChange('border_width', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">Yok</SelectItem>
+                <SelectItem value="1">İnce (1px)</SelectItem>
+                <SelectItem value="2">Orta (2px)</SelectItem>
+                <SelectItem value="4">Kalın (4px)</SelectItem>
+                <SelectItem value="8">Çok Kalın (8px)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       {/* Status & Priority */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
