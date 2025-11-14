@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,52 +36,73 @@ export default function SiteStats() {
     refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
   });
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Skeleton className="h-64" />
-        <Skeleton className="h-64" />
-      </div>
-    );
-  }
+  const topClicked = useMemo(() => 
+    [...((statsData as any[]) || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5),
+    [statsData]
+  );
+  
+  const topViewed = useMemo(() => 
+    [...((statsData as any[]) || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5),
+    [statsData]
+  );
 
-  const topClicked = [...((statsData as any[]) || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5);
-  const topViewed = [...((statsData as any[]) || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5);
-
-  const totalClicks = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.clicks, 0);
-  const totalViews = (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.views, 0);
-  const averageCTR = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : "0";
+  const totalClicks = useMemo(() => 
+    (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.clicks, 0),
+    [statsData]
+  );
+  
+  const totalViews = useMemo(() => 
+    (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.views, 0),
+    [statsData]
+  );
+  
+  const averageCTR = useMemo(() => 
+    totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : "0",
+    [totalClicks, totalViews]
+  );
 
   // Chart data
-  const clicksChartData = topClicked.map((stat: any) => ({
-    name: stat.betting_sites?.name,
-    clicks: stat.clicks,
-  }));
-
-  const viewsChartData = topViewed.map((stat: any) => ({
-    name: stat.betting_sites?.name,
-    views: stat.views,
-  }));
-
-  const ctrChartData = [...((statsData as any[]) || [])]
-    .filter((stat: any) => stat.views > 0)
-    .map((stat: any) => ({
+  const clicksChartData = useMemo(() => 
+    topClicked.map((stat: any) => ({
       name: stat.betting_sites?.name,
-      ctr: ((stat.clicks / stat.views) * 100).toFixed(2),
       clicks: stat.clicks,
-      views: stat.views,
-    }))
-    .sort((a: any, b: any) => parseFloat(b.ctr) - parseFloat(a.ctr))
-    .slice(0, 10);
+    })),
+    [topClicked]
+  );
 
-  const pieChartData = topClicked.slice(0, 5).map((stat: any) => ({
-    name: stat.betting_sites?.name,
-    value: stat.clicks,
-  }));
+  const viewsChartData = useMemo(() => 
+    topViewed.map((stat: any) => ({
+      name: stat.betting_sites?.name,
+      views: stat.views,
+    })),
+    [topViewed]
+  );
+
+  const ctrChartData = useMemo(() => 
+    [...((statsData as any[]) || [])]
+      .filter((stat: any) => stat.views > 0)
+      .map((stat: any) => ({
+        name: stat.betting_sites?.name,
+        ctr: ((stat.clicks / stat.views) * 100).toFixed(2),
+        clicks: stat.clicks,
+        views: stat.views,
+      }))
+      .sort((a: any, b: any) => parseFloat(b.ctr) - parseFloat(a.ctr))
+      .slice(0, 10),
+    [statsData]
+  );
+
+  const pieChartData = useMemo(() => 
+    topClicked.slice(0, 5).map((stat: any) => ({
+      name: stat.betting_sites?.name,
+      value: stat.clicks,
+    })),
+    [topClicked]
+  );
 
   const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--chart-1))', 'hsl(var(--chart-2))'];
 
-  const chartConfig = {
+  const chartConfig = useMemo(() => ({
     clicks: {
       label: "Tıklamalar",
       color: "hsl(var(--primary))",
@@ -93,7 +115,16 @@ export default function SiteStats() {
       label: "Tıklama Oranı (%)",
       color: "hsl(var(--accent))",
     },
-  };
+  }), []);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-64" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

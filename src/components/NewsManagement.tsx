@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
@@ -32,7 +32,7 @@ export function NewsManagement() {
   const deleteMutation = useDeleteNews();
   const togglePublishMutation = useToggleNewsPublish();
 
-  const handleManualRSSProcess = async () => {
+  const handleManualRSSProcess = useCallback(async () => {
     setIsProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke('rss-news-processor');
@@ -55,12 +55,15 @@ export function NewsManagement() {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [toast, queryClient]);
 
-  const filteredArticles = articles?.filter((article: any) =>
-    article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    article.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredArticles = useMemo(() => {
+    if (!articles) return [];
+    return articles.filter((article: any) =>
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [articles, searchTerm]);
 
   if (isLoading) {
     return (
