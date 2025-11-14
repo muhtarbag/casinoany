@@ -3,20 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Trash2, Upload, Edit, X, GripVertical, Eye, MousePointer, CheckSquare, TrendingUp, Users, MessageSquare, Clock } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, Eye, MousePointer, CheckSquare, TrendingUp, MessageSquare } from 'lucide-react';
 import SiteStats from '@/components/SiteStats';
 import BlogStats from '@/components/BlogStats';
 import ReviewManagement from '@/components/ReviewManagement';
@@ -27,7 +15,7 @@ import { AIAssistant } from '@/components/AIAssistant';
 import { AnalysisHistory } from '@/components/AnalysisHistory';
 import { ContentPlanner } from '@/components/ContentPlanner';
 import { KeywordPerformance } from '@/components/KeywordPerformance';
-import { AdminLogoInput } from './AdminLogoInput';
+import { SiteManagementContainer } from '@/features/sites/SiteManagementContainer';
 import { CasinoContentManagement } from '@/components/CasinoContentManagement';
 import { CasinoContentAnalytics } from '@/components/CasinoContentAnalytics';
 import { NotificationManagement } from '@/components/NotificationManagement';
@@ -39,95 +27,9 @@ import { NewsManagement } from '@/components/NewsManagement';
 import { RealtimeAnalyticsDashboard } from '@/components/RealtimeAnalyticsDashboard';
 import GSCSetupGuide from '@/components/GSCSetupGuide';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { useSiteStats } from '@/hooks/queries/useSiteQueries';
-
-interface SiteFormData {
-  name: string;
-  slug: string;
-  rating: number;
-  bonus: string;
-  features: string;
-  affiliate_link: string;
-  email: string;
-  whatsapp: string;
-  telegram: string;
-  twitter: string;
-  instagram: string;
-  facebook: string;
-  youtube: string;
-}
-
-const SortableItem = ({ id, site, editingId, selectedSites, onToggleSelect, onEdit, onDelete, isDeleting, stats }: any) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
-  const isSelected = selectedSites.includes(id);
-
-  return (
-    <div ref={setNodeRef} style={style} className="bg-card border rounded-lg p-4 mb-2 hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-4">
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-          <GripVertical className="w-5 h-5 text-muted-foreground" />
-        </div>
-        <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect(id)} className="w-4 h-4" />
-        {site.logo_url && (
-          <img src={site.logo_url} alt={site.name} className="w-12 h-12 object-contain rounded" />
-        )}
-        <div className="flex-1">
-          <h3 className="font-semibold">{site.name}</h3>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Eye className="w-4 h-4" />
-              {stats?.views || 0}
-            </span>
-            <span className="flex items-center gap-1">
-              <MousePointer className="w-4 h-4" />
-              {stats?.clicks || 0}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(site)}
-            disabled={editingId === site.id}
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                disabled={isDeleting === site.id}
-              >
-                {isDeleting === site.id ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Trash2 className="w-4 h-4" />
-                )}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {site.name} sitesini silmek üzeresiniz. Bu işlem geri alınamaz.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>İptal</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(site.id)}>
-                  Sil
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -612,186 +514,7 @@ export default function Admin() {
           )}
 
           {/* Site Management Tab */}
-          {activeTab === 'manage' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Site Yönetimi</CardTitle>
-                <CardDescription>Bahis sitelerini ekleyin, düzenleyin ve yönetin</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Site Adı*</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleNameChange(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="slug">Slug*</Label>
-                      <Input
-                        id="slug"
-                        value={formData.slug}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="rating">Rating (1-5)*</Label>
-                      <Input
-                        id="rating"
-                        type="number"
-                        min="1"
-                        max="5"
-                        step="0.1"
-                        value={formData.rating}
-                        onChange={(e) => setFormData({ ...formData, rating: parseFloat(e.target.value) })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="affiliate_link">Affiliate Link*</Label>
-                      <Input
-                        id="affiliate_link"
-                        type="url"
-                        value={formData.affiliate_link}
-                        onChange={(e) => setFormData({ ...formData, affiliate_link: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="bonus">Bonus</Label>
-                      <Input
-                        id="bonus"
-                        value={formData.bonus}
-                        onChange={(e) => setFormData({ ...formData, bonus: e.target.value })}
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="features">Özellikler (virgülle ayırın)</Label>
-                      <Input
-                        id="features"
-                        value={formData.features}
-                        onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="logo">Logo</Label>
-                      <Input
-                        id="logo"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoChange}
-                      />
-                      {logoPreview && (
-                        <div className="mt-2 relative inline-block">
-                          <img src={logoPreview} alt="Preview" className="w-20 h-20 object-contain" />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2"
-                            onClick={clearLogo}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button type="submit" disabled={createSiteMutation.isPending || updateSiteMutation.isPending}>
-                      {editingId ? 'Güncelle' : 'Ekle'}
-                    </Button>
-                    {editingId && (
-                      <Button type="button" variant="outline" onClick={resetForm}>
-                        İptal
-                      </Button>
-                    )}
-                  </div>
-                </form>
-
-                {/* Search and Filter */}
-                <div className="mb-4">
-                  <Input
-                    placeholder="Site ara..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="max-w-md"
-                  />
-                </div>
-
-                {/* Site List */}
-                <div className="space-y-4">
-                  {selectedSites.length > 0 && (
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => bulkDeleteMutation.mutate(selectedSites)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        {selectedSites.length} Seçili Siteyi Sil
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: true })}
-                      >
-                        Aktif Yap
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => bulkToggleActiveMutation.mutate({ siteIds: selectedSites, isActive: false })}
-                      >
-                        Pasif Yap
-                      </Button>
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2 mb-4">
-                    <Checkbox 
-                      checked={selectedSites.length === orderedSites.filter(s => 
-                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
-                      ).length && orderedSites.filter(s => 
-                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
-                      ).length > 0} 
-                      onCheckedChange={toggleSelectAll} 
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm text-muted-foreground">Tümünü Seç</span>
-                  </div>
-
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={orderedSites.filter(s => 
-                      s.name.toLowerCase().includes(searchQuery.toLowerCase())
-                    ).map(s => s.id)} strategy={verticalListSortingStrategy}>
-                      {orderedSites.filter(s => 
-                        s.name.toLowerCase().includes(searchQuery.toLowerCase())
-                      ).map((site) => (
-                        <SortableItem
-                          key={site.id}
-                          id={site.id}
-                          site={site}
-                          editingId={editingId}
-                          selectedSites={selectedSites}
-                          onToggleSelect={toggleSiteSelection}
-                          onEdit={handleEdit}
-                          onDelete={(id: string) => deleteSiteMutation.mutate(id)}
-                          isDeleting={deletingId}
-                          stats={siteStats?.find((s: any) => s.site_id === site.id)}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {activeTab === 'manage' && <SiteManagementContainer />}
 
           {/* Other tabs */}
           {activeTab === 'featured' && <FeaturedSitesManagement />}
