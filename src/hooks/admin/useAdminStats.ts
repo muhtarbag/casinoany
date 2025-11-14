@@ -95,19 +95,18 @@ export const useAdminStats = () => {
     },
   });
 
-  // Device stats - MIGRATED to analytics_events
+  // Device stats - Using page_views table
   const deviceStatsQuery = useQuery({
     queryKey: ['device-stats'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('analytics_events')
+      const { data, error } = await supabase
+        .from('page_views')
         .select('device_type')
-        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
 
-      const deviceCounts = data.reduce((acc, view) => {
+      const deviceCounts = (data || []).reduce((acc, view) => {
         const device = view.device_type || 'Unknown';
         acc[device] = (acc[device] || 0) + 1;
         return acc;
@@ -117,19 +116,18 @@ export const useAdminStats = () => {
     },
   });
 
-  // Top pages - MIGRATED to analytics_events
+  // Top pages - Using page_views table
   const topPagesQuery = useQuery({
     queryKey: ['top-pages'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('analytics_events')
+      const { data, error } = await supabase
+        .from('page_views')
         .select('page_path')
-        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
 
-      const pageCounts = data.reduce((acc, view) => {
+      const pageCounts = (data || []).reduce((acc, view) => {
         const path = view.page_path || '/';
         acc[path] = (acc[path] || 0) + 1;
         return acc;
@@ -151,16 +149,14 @@ export const useAdminStats = () => {
       const lastWeekStart = subDays(today, 14);
 
       const [thisWeekData, lastWeekData] = await Promise.all([
-        (supabase as any)
-          .from('analytics_events')
-          .select('event_type, event_name')
-          .eq('event_type', 'page_view')
+        supabase
+          .from('page_views')
+          .select('id')
           .gte('created_at', thisWeekStart.toISOString())
           .lte('created_at', today.toISOString()),
-        (supabase as any)
-          .from('analytics_events')
-          .select('event_type, event_name')
-          .eq('event_type', 'page_view')
+        supabase
+          .from('page_views')
+          .select('id')
           .gte('created_at', lastWeekStart.toISOString())
           .lte('created_at', thisWeekStart.toISOString()),
       ]);
@@ -170,15 +166,15 @@ export const useAdminStats = () => {
       const viewsChange = lastWeekViews > 0 ? ((thisWeekViews - lastWeekViews) / lastWeekViews) * 100 : 0;
 
       const [thisWeekClicks, lastWeekClicks] = await Promise.all([
-        (supabase as any)
-          .from('analytics_events')
+        supabase
+          .from('conversions')
           .select('*', { count: 'exact', head: true })
-          .eq('event_type', 'click')
+          .eq('conversion_type', 'affiliate_click')
           .gte('created_at', thisWeekStart.toISOString()),
-        (supabase as any)
-          .from('analytics_events')
+        supabase
+          .from('conversions')
           .select('*', { count: 'exact', head: true })
-          .eq('event_type', 'click')
+          .eq('conversion_type', 'affiliate_click')
           .gte('created_at', lastWeekStart.toISOString())
           .lte('created_at', thisWeekStart.toISOString()),
       ]);
@@ -235,27 +231,26 @@ export const useAdminStats = () => {
     queryFn: async () => {
       const thirtyDaysAgo = subDays(new Date(), 30);
 
-      const { data: viewsData } = await (supabase as any)
-        .from('analytics_events')
+      const { data: viewsData } = await supabase
+        .from('page_views')
         .select('created_at')
-        .eq('event_type', 'page_view')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
-      const { data: clicksData } = await (supabase as any)
-        .from('analytics_events')
+      const { data: clicksData } = await supabase
+        .from('conversions')
         .select('created_at')
-        .eq('event_type', 'click')
+        .eq('conversion_type', 'affiliate_click')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
       const trendByDate: Record<string, { views: number; clicks: number }> = {};
 
-      viewsData?.forEach((item: any) => {
+      (viewsData || []).forEach((item: any) => {
         const date = new Date(item.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' });
         if (!trendByDate[date]) trendByDate[date] = { views: 0, clicks: 0 };
         trendByDate[date].views += 1;
       });
 
-      clicksData?.forEach((item: any) => {
+      (clicksData || []).forEach((item: any) => {
         const date = new Date(item.created_at).toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' });
         if (!trendByDate[date]) trendByDate[date] = { views: 0, clicks: 0 };
         trendByDate[date].clicks += 1;
@@ -285,14 +280,13 @@ export const useAdminStats = () => {
         : 187;
 
       // Peak traffic hour
-      const { data: hourlyData } = await (supabase as any)
-        .from('analytics_events')
+      const { data: hourlyData } = await supabase
+        .from('page_views')
         .select('created_at')
-        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 7).toISOString());
 
       const hourCounts: Record<number, number> = {};
-      hourlyData?.forEach((item: any) => {
+      (hourlyData || []).forEach((item: any) => {
         const hour = new Date(item.created_at).getHours();
         hourCounts[hour] = (hourCounts[hour] || 0) + 1;
       });
@@ -301,16 +295,15 @@ export const useAdminStats = () => {
       const peakTrafficHour = peakHour ? `${peakHour[0]}:00` : '14:00';
 
       // Conversion rate (clicks / views)
-      const { data: recentViews } = await (supabase as any)
-        .from('analytics_events')
+      const recentViews = await supabase
+        .from('page_views')
         .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'page_view')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
-      const { data: recentClicks } = await (supabase as any)
-        .from('analytics_events')
+      const recentClicks = await supabase
+        .from('conversions')
         .select('*', { count: 'exact', head: true })
-        .eq('event_type', 'click')
+        .eq('conversion_type', 'affiliate_click')
         .gte('created_at', thirtyDaysAgo.toISOString());
 
       const views = recentViews.count || 1;
