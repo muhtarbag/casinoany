@@ -21,7 +21,8 @@ import {
   DollarSign,
   History,
   Gauge,
-  Mail
+  Mail,
+  Shield
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -36,6 +37,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -45,57 +47,68 @@ interface AdminSidebarProps {
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
+  const { userRoles } = useAuth();
+
+  // Rol bazlı erişim kontrolü
+  const hasRole = (requiredRoles: string[]) => {
+    if (userRoles.includes('admin')) return true; // Admin her şeye erişir
+    return requiredRoles.some(role => userRoles.includes(role));
+  };
 
   const navigationGroups = [
     {
       label: 'Gösterge Paneli',
       items: [
-        { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', badge: null, route: '/admin/dashboard' },
-        { id: 'realtime', icon: Activity, label: 'Canlı Takip', badge: null, route: '/admin/analytics/realtime' },
+        { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', badge: null, route: '/admin/dashboard', roles: [] },
+        { id: 'realtime', icon: Activity, label: 'Canlı Takip', badge: null, route: '/admin/analytics/realtime', roles: ['seo_manager'] },
       ],
     },
     {
       label: 'İçerik',
       items: [
-        { id: 'manage', icon: Globe, label: 'Site Yönetimi', badge: null, route: '/admin/sites' },
-        { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino' },
-        { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog' },
-        { id: 'news', icon: Newspaper, label: 'Haberler', badge: null, route: '/admin/news' },
+        { id: 'manage', icon: Globe, label: 'Site Yönetimi', badge: null, route: '/admin/sites', roles: ['content_editor'] },
+        { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino', roles: ['content_editor'] },
+        { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
+        { id: 'news', icon: Newspaper, label: 'Haberler', badge: null, route: '/admin/news', roles: ['content_editor'] },
       ],
     },
     {
       label: 'Finans',
       items: [
-        { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null, route: '/admin/finance/affiliate' },
-        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null, route: '/admin/finance/bonus' },
-        { id: 'bonus-requests', icon: Mail, label: 'Bonus Talepleri', badge: null, route: '/admin/finance/bonus-requests' },
+        { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null, route: '/admin/finance/affiliate', roles: ['finance'] },
+        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null, route: '/admin/finance/bonus', roles: ['finance'] },
+        { id: 'bonus-requests', icon: Mail, label: 'Bonus Talepleri', badge: null, route: '/admin/finance/bonus-requests', roles: ['finance'] },
       ],
     },
     {
       label: 'Etkileşim',
       items: [
-        { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', badge: null, route: '/admin/reviews' },
-        { id: 'notifications', icon: Bell, label: 'Bildirimler', badge: null, route: '/admin/notifications' },
+        { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', badge: null, route: '/admin/reviews', roles: ['content_editor'] },
+        { id: 'notifications', icon: Bell, label: 'Bildirimler', badge: null, route: '/admin/notifications', roles: ['content_editor'] },
       ],
     },
     {
       label: 'Analiz & SEO',
       items: [
-        { id: 'analytics', icon: BarChart3, label: 'Analytics', badge: null, route: '/admin/analytics' },
-        { id: 'keywords', icon: Search, label: 'SEO Takip', badge: null, route: '/admin/analytics/keywords' },
-        { id: 'content-planner', icon: Calendar, label: 'İçerik Planlama', badge: null, route: '/admin/content/planner' },
+        { id: 'analytics', icon: BarChart3, label: 'Analytics', badge: null, route: '/admin/analytics', roles: ['seo_manager'] },
+        { id: 'keywords', icon: Search, label: 'SEO Takip', badge: null, route: '/admin/analytics/keywords', roles: ['seo_manager'] },
+        { id: 'content-planner', icon: Calendar, label: 'İçerik Planlama', badge: null, route: '/admin/content/planner', roles: ['seo_manager', 'content_editor'] },
       ],
     },
     {
       label: 'Sistem',
       items: [
-        { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null, route: '/admin/system/health' },
-        { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null, route: '/admin/system/history' },
-        { id: 'performance', icon: Gauge, label: 'Performance İzleme', badge: null, route: '/admin/system/performance' },
-        { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA', route: '/admin/ai' },
+        { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null, route: '/admin/system/health', roles: [] },
+        { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null, route: '/admin/system/history', roles: [] },
+        { id: 'performance', icon: Gauge, label: 'Performance İzleme', badge: null, route: '/admin/system/performance', roles: [] },
+        { id: 'roles', icon: Shield, label: 'Rol Yönetimi', badge: null, route: '/admin/system/roles', roles: [] },
+        { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA', route: '/admin/ai', roles: ['content_editor', 'seo_manager'] },
       ],
     },
-  ];
+  ].map(group => ({
+    ...group,
+    items: group.items.filter(item => item.roles.length === 0 || hasRole(item.roles))
+  })).filter(group => group.items.length > 0);
 
   return (
     <Sidebar collapsible="icon" className="border-r">
