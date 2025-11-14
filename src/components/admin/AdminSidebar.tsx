@@ -20,7 +20,8 @@ import {
   FileEdit,
   DollarSign,
   History,
-  Gauge
+  Gauge,
+  Mail
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useLocation } from 'react-router-dom';
@@ -67,6 +68,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       items: [
         { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null },
         { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null },
+        { id: 'bonus-requests', icon: Mail, label: 'Bonus Talepleri', badge: null },
       ],
     },
     {
