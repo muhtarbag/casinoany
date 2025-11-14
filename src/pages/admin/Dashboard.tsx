@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { LoadingFallback } from '@/components/admin/LoadingFallback';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { ConsistencyMonitor } from '@/components/admin/ConsistencyMonitor';
 import { Loader2 } from 'lucide-react';
 
 const DashboardTab = lazy(() => import('@/components/admin/DashboardTab').then(m => ({ default: m.DashboardTab })));
@@ -28,9 +27,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Consistency Monitor at the top */}
-      <ConsistencyMonitor />
-      
       <Suspense fallback={<LoadingFallback />}>
         {dashboardStats && (
           <DashboardTab 
