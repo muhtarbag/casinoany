@@ -113,9 +113,23 @@ export const queryKeys = {
     featured: () => [...queryKeys.sites.all, 'featured'] as const,
   },
   
-  // Analytics
+  // Analytics (OPTIMIZED: Event-sourcing pattern)
   analytics: {
     all: ['analytics'] as const,
+    // New unified events pattern
+    events: (filters?: { 
+      eventType?: string; 
+      dateRange?: { start: Date; end: Date };
+      siteId?: string;
+    }) => [...queryKeys.analytics.all, 'events', filters] as const,
+    
+    // Hourly aggregations (materialized view)
+    hourly: (filters?: {
+      dateRange?: { start: Date; end: Date };
+      eventType?: string;
+    }) => [...queryKeys.analytics.all, 'hourly', filters] as const,
+    
+    // Legacy compatibility (keep for backward compatibility during migration)
     pageViews: (dateRange?: { start: Date; end: Date }) => 
       [...queryKeys.analytics.all, 'pageViews', dateRange] as const,
     userEvents: (dateRange?: { start: Date; end: Date }) => 
@@ -124,7 +138,9 @@ export const queryKeys = {
       [...queryKeys.analytics.all, 'sessions', dateRange] as const,
     conversions: (dateRange?: { start: Date; end: Date }) => 
       [...queryKeys.analytics.all, 'conversions', dateRange] as const,
+    
     dashboard: () => [...queryKeys.analytics.all, 'dashboard'] as const,
+    realtime: () => [...queryKeys.analytics.all, 'realtime'] as const,
   },
   
   // Casino
