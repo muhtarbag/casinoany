@@ -255,15 +255,29 @@ export const NotificationManagement = () => {
   }, [updateMutation]);
 
   const renderNotificationItem = useCallback((notification: Notification) => (
-    <Card>
+    <Card className={`transition-all ${
+      notification.is_active 
+        ? 'border-green-500/50 bg-green-50/5 shadow-sm' 
+        : 'border-border/50 bg-muted/20 opacity-75'
+    }`}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle>{notification.title}</CardTitle>
-              <Badge variant={notification.is_active ? 'default' : 'secondary'}>
-                {notification.is_active ? 'Aktif' : 'Pasif'}
-              </Badge>
+              {notification.is_active ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-green-100 dark:bg-green-950 border border-green-500 rounded-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold text-green-700 dark:text-green-400">YAYINDA</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-gray-900 border border-gray-400 dark:border-gray-600 rounded-full">
+                  <div className="w-2 h-2 bg-gray-400 dark:bg-gray-600 rounded-full" />
+                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">DURDURULDU</span>
+                </div>
+              )}
+              <CardTitle className={notification.is_active ? '' : 'text-muted-foreground'}>
+                {notification.title}
+              </CardTitle>
               <Badge variant="outline">{notification.notification_type}</Badge>
               {notification.user_segments && notification.user_segments.length > 0 && (
                 <Badge variant="secondary" className="text-xs">
@@ -277,15 +291,18 @@ export const NotificationManagement = () => {
                 </Badge>
               )}
             </div>
-            <CardDescription>{notification.content}</CardDescription>
+            <CardDescription className={notification.is_active ? '' : 'text-muted-foreground/70'}>
+              {notification.content}
+            </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button
-              variant="ghost"
-              size="icon"
+              variant={notification.is_active ? "default" : "outline"}
+              size="sm"
               onClick={() => toggleActive(notification.id, notification.is_active)}
+              className="font-semibold"
             >
-              <Eye className="w-4 h-4" />
+              {notification.is_active ? '⏸ Durdur' : '▶ Yayınla'}
             </Button>
             <Button
               variant="ghost"
@@ -313,7 +330,7 @@ export const NotificationManagement = () => {
           <img
             src={notification.image_url}
             alt={notification.title}
-            className="w-full h-48 object-cover rounded-lg"
+            className={`w-full h-48 object-cover rounded-lg ${!notification.is_active && 'opacity-60'}`}
           />
         </CardContent>
       )}
