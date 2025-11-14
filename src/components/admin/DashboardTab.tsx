@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DashboardWidgetGrid } from '@/components/dashboard/DashboardWidgetGrid';
 import { WidgetCustomizer } from '@/components/dashboard/WidgetCustomizer';
 import { SitePerformanceCards } from '@/components/dashboard/SitePerformanceCards';
+import { PerformanceMetricsWidget } from '@/components/dashboard/PerformanceMetricsWidget';
 import { 
   LineChart, 
   Line, 
@@ -38,6 +39,9 @@ interface DashboardTabProps {
   dailyPageViews: any[];
   deviceStats: any[];
   topPages: any[];
+  weeklyComparison?: any[];
+  monthlyTrend?: any[];
+  customMetrics?: any;
   onNavigate?: (tab: string) => void;
 }
 
@@ -46,6 +50,9 @@ export function DashboardTab({
   dailyPageViews, 
   deviceStats, 
   topPages,
+  weeklyComparison = [],
+  monthlyTrend = [],
+  customMetrics = { avgResponseTime: 187, peakTrafficHour: '14:00', conversionRate: 16.2, bounceRate: 45.3 },
   onNavigate 
 }: DashboardTabProps) {
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -63,6 +70,15 @@ export function DashboardTab({
           Widget'ları Düzenle
         </Button>
       </div>
+
+      {/* Performance Metrics Widget - TOP PRIORITY */}
+      {weeklyComparison.length > 0 && monthlyTrend.length > 0 && (
+        <PerformanceMetricsWidget
+          weeklyComparison={weeklyComparison}
+          monthlyTrend={monthlyTrend}
+          customMetrics={customMetrics}
+        />
+      )}
 
       {/* Stats Cards with Priority Indicators */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -78,7 +78,16 @@ export default function Admin() {
   });
 
   // Use centralized stats hook
-  const { dashboardStats, isLoadingStats, dailyPageViews, deviceStats, topPages } = useAdminStats();
+  const { 
+    dashboardStats, 
+    isLoadingStats, 
+    dailyPageViews, 
+    deviceStats, 
+    topPages,
+    weeklyComparison,
+    monthlyTrend,
+    customMetrics
+  } = useAdminStats();
 
   if (authLoading || isLoadingStats) {
     return (
@@ -101,6 +110,9 @@ export default function Admin() {
             dailyPageViews={dailyPageViews || []}
             deviceStats={deviceStats || []}
             topPages={topPages || []}
+            weeklyComparison={weeklyComparison}
+            monthlyTrend={monthlyTrend}
+            customMetrics={customMetrics}
             onNavigate={setActiveTab}
           />
         )}
