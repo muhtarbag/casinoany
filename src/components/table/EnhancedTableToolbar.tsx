@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, SlidersHorizontal, X, Download } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Download, Bookmark } from 'lucide-react';
 
 interface EnhancedTableToolbarProps {
   searchQuery: string;
@@ -15,6 +15,7 @@ interface EnhancedTableToolbarProps {
   filteredItems: number;
   onClearFilters: () => void;
   onExport?: () => void;
+  onSavedFilters?: () => void;
 }
 
 export function EnhancedTableToolbar({
@@ -28,6 +29,7 @@ export function EnhancedTableToolbar({
   filteredItems,
   onClearFilters,
   onExport,
+  onSavedFilters,
 }: EnhancedTableToolbarProps) {
   const hasActiveFilters = searchQuery || statusFilter !== 'all' || ratingFilter !== 'all';
   const isFiltered = filteredItems < totalItems;
@@ -51,6 +53,12 @@ export function EnhancedTableToolbar({
             <Button variant="outline" size="default" onClick={onExport}>
               <Download className="h-4 w-4 mr-2" />
               Dışa Aktar
+            </Button>
+          )}
+          {onSavedFilters && (
+            <Button variant="outline" size="default" onClick={onSavedFilters}>
+              <Bookmark className="h-4 w-4 mr-2" />
+              Filtreler
             </Button>
           )}
         </div>

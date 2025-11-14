@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -67,6 +68,8 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
                   {isMobile ? 'Admin Panel' : `Hoş Geldin, ${username || 'Admin'}! 👋`}
                 </h1>
               </div>
+
+              <NotificationCenter />
 
               <Button
                 variant="outline"
