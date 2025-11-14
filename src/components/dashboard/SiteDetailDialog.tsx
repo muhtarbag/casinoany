@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useSiteDetailedAnalytics } from '@/hooks/useSiteDetailedAnalytics';
+import { useDataExport } from '@/hooks/useDataExport';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Eye, MousePointerClick, Target, DollarSign, CalendarIcon, RotateCcw } from 'lucide-react';
+import { Eye, MousePointerClick, Target, DollarSign, CalendarIcon, RotateCcw, Download, X } from 'lucide-react';
 import { format, parseISO, isWithinInterval } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,7 @@ export function SiteDetailDialog({
   rating,
 }: SiteDetailDialogProps) {
   const { data: metrics, isLoading } = useSiteDetailedAnalytics(siteId);
+  const { exportData, isExporting } = useDataExport();
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
     to: undefined,
@@ -80,6 +82,34 @@ export function SiteDetailDialog({
 
   const resetFilters = () => {
     setDateRange({ from: undefined, to: undefined });
+  };
+
+  const handleExport = async (type: 'views' | 'clicks' | 'all') => {
+    let data: any[] = [];
+    let filename = '';
+
+    if (type === 'all') {
+      data = displayMetrics.map(m => ({
+        tarih: m.displayDate,
+        goruntulenme: m.views,
+        tiklama: m.clicks,
+        affiliate_tiklama: m.affiliateClicks,
+        gelir: m.revenue,
+      }));
+      filename = `${siteName.replace(/\s+/g, '-')}-tum-veriler`;
+    } else if (type === 'views') {
+      data = displayMetrics.map(m => ({ tarih: m.displayDate, goruntulenme: m.views }));
+      filename = `${siteName.replace(/\s+/g, '-')}-goruntulenme`;
+    } else {
+      data = displayMetrics.map(m => ({ tarih: m.displayDate, tiklama: m.clicks }));
+      filename = `${siteName.replace(/\s+/g, '-')}-tiklama`;
+    }
+
+    await exportData({
+      format: 'csv',
+      filename: `${filename}-${format(new Date(), 'yyyy-MM-dd')}`,
+      data,
+    });
   };
 
   const hasActiveFilter = dateRange.from || dateRange.to;
@@ -186,10 +216,39 @@ export function SiteDetailDialog({
                     </Button>
                   )}
 
-                  <div className="ml-auto">
+                  <div className="ml-auto flex items-center gap-2">
                     <Badge variant="secondary">
                       {filteredMetrics.length} gün gösteriliyor
                     </Badge>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleExport('views')}
+                        disabled={isExporting || displayMetrics.length === 0}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Görüntülenme
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleExport('clicks')}
+                        disabled={isExporting || displayMetrics.length === 0}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Tıklama
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleExport('all')}
+                        disabled={isExporting || displayMetrics.length === 0}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Tümü
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>

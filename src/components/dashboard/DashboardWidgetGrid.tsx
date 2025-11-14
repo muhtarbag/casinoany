@@ -9,8 +9,8 @@ import { useDashboardWidgets, Widget } from '@/hooks/useDashboardWidgets';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { GripVertical, Plus, ExternalLink, History, TrendingUp, Activity } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { GripVertical, Plus, ExternalLink, History, TrendingUp, Activity, DollarSign, Percent, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { formatDistanceToNow, subDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
@@ -71,6 +71,73 @@ export function DashboardWidgetGrid({ onNavigate }: DashboardWidgetGridProps) {
     },
   });
 
+  const { data: revenueData } = useQuery({
+    queryKey: ['revenue-widget'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('affiliate_metrics')
+        .select('estimated_revenue');
+      const total = data?.reduce((sum, item) => sum + (item.estimated_revenue || 0), 0) || 0;
+      
+      // Calculate previous period revenue for trend
+      const thirtyDaysAgo = subDays(new Date(), 30);
+      const { data: previousData } = await supabase
+        .from('affiliate_metrics')
+        .select('estimated_revenue')
+        .lt('created_at', thirtyDaysAgo.toISOString());
+      const previousTotal = previousData?.reduce((sum, item) => sum + (item.estimated_revenue || 0), 0) || 0;
+      
+      return { total, previousTotal, trend: previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : 0 };
+    },
+  });
+
+  const { data: conversionData } = useQuery({
+    queryKey: ['conversion-widget'],
+    queryFn: async () => {
+      const [conversions, pageViews] = await Promise.all([
+        supabase.from('conversions').select('id', { count: 'exact', head: true }),
+        supabase.from('page_views').select('id', { count: 'exact', head: true }),
+      ]);
+      
+      const conversionCount = conversions.count || 0;
+      const viewCount = pageViews.count || 1;
+      const rate = (conversionCount / viewCount) * 100;
+      
+      // Calculate previous period for trend
+      const thirtyDaysAgo = subDays(new Date(), 30);
+      const [prevConversions, prevPageViews] = await Promise.all([
+        supabase.from('conversions').select('id', { count: 'exact', head: true }).lt('created_at', thirtyDaysAgo.toISOString()),
+        supabase.from('page_views').select('id', { count: 'exact', head: true }).lt('created_at', thirtyDaysAgo.toISOString()),
+      ]);
+      
+      const prevConversionCount = prevConversions.count || 0;
+      const prevViewCount = prevPageViews.count || 1;
+      const prevRate = (prevConversionCount / prevViewCount) * 100;
+      const trend = prevRate > 0 ? ((rate - prevRate) / prevRate) * 100 : 0;
+      
+      return { rate, trend };
+    },
+  });
+
+  const { data: trendData } = useQuery({
+    queryKey: ['trend-widget'],
+    queryFn: async () => {
+      const thirtyDaysAgo = subDays(new Date(), 30);
+      const sixtyDaysAgo = subDays(new Date(), 60);
+      
+      const [currentPeriod, previousPeriod] = await Promise.all([
+        supabase.from('page_views').select('id', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo.toISOString()),
+        supabase.from('page_views').select('id', { count: 'exact', head: true }).gte('created_at', sixtyDaysAgo.toISOString()).lt('created_at', thirtyDaysAgo.toISOString()),
+      ]);
+      
+      const current = currentPeriod.count || 0;
+      const previous = previousPeriod.count || 1;
+      const trend = ((current - previous) / previous) * 100;
+      
+      return { current, previous, trend };
+    },
+  });
+
   const sensors = useSensors(useSensor(PointerSensor));
 
   const visibleWidgets = useMemo(() => 
@@ -93,8 +160,11 @@ export function DashboardWidgetGrid({ onNavigate }: DashboardWidgetGridProps) {
   const renderWidget = (widget: Widget) => {
     switch (widget.type) {
       case 'stats':
-        let value = 0;
+        let value: string | number = 0;
         let icon = Activity;
+        let trend: number | null = null;
+        let subtitle = 'Güncel';
+        
         if (widget.id === 'sites-count') {
           value = dashboardStats?.totalSites || 0;
           icon = Activity;
@@ -107,9 +177,27 @@ export function DashboardWidgetGrid({ onNavigate }: DashboardWidgetGridProps) {
         } else if (widget.id === 'total-clicks') {
           value = dashboardStats?.totalClicks || 0;
           icon = Activity;
+        } else if (widget.id === 'total-revenue') {
+          value = `₺${(revenueData?.total || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          icon = DollarSign;
+          trend = revenueData?.trend || null;
+          subtitle = 'Toplam tahsil';
+        } else if (widget.id === 'conversion-rate') {
+          value = `${(conversionData?.rate || 0).toFixed(2)}%`;
+          icon = Percent;
+          trend = conversionData?.trend || null;
+          subtitle = 'Dönüşüm başarısı';
+        } else if (widget.id === 'trend-analysis') {
+          value = (trendData?.current || 0).toLocaleString();
+          icon = TrendingUp;
+          trend = trendData?.trend || null;
+          subtitle = 'Son 30 gün';
         }
 
         const Icon = icon;
+        const isPositiveTrend = trend !== null && trend > 0;
+        const TrendIcon = isPositiveTrend ? ArrowUpRight : ArrowDownRight;
+        
         return (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -117,10 +205,21 @@ export function DashboardWidgetGrid({ onNavigate }: DashboardWidgetGridProps) {
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{value.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {isLoadingStats ? 'Yükleniyor...' : 'Güncel'}
-              </p>
+              <div className="text-2xl font-bold">{typeof value === 'number' ? value.toLocaleString() : value}</div>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-muted-foreground">
+                  {isLoadingStats ? 'Yükleniyor...' : subtitle}
+                </p>
+                {trend !== null && trend !== 0 && (
+                  <div className={cn(
+                    "flex items-center gap-1 text-xs font-medium",
+                    isPositiveTrend ? "text-green-600" : "text-red-600"
+                  )}>
+                    <TrendIcon className="h-3 w-3" />
+                    {Math.abs(trend).toFixed(1)}%
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         );
