@@ -288,8 +288,8 @@ export default function SiteDetail() {
         title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
         description={`${site.name} bahis sitesi hakkında detaylı inceleme. ${site.bonus || 'Bonus kampanyaları'}, kullanıcı yorumları ve ${averageRating} puan değerlendirmesi. ${site.features?.slice(0, 3).join(', ')}`}
         keywords={[site.name, 'bahis sitesi', 'casino', 'bonus', ...(site.features || [])]}
-        canonical={`${window.location.origin}/${site.slug || `site/${site.id}`}`}
-        ogImage={logoUrl ? logoUrl : `${window.location.origin}/og-image.jpg`}
+        canonical={`${window.location.origin}/site/${site.slug}`}
+        ogImage={logoUrl || undefined}
         ogImageAlt={`${site.name} Logo`}
         structuredData={{
           '@context': 'https://schema.org',
