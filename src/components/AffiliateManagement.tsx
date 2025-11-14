@@ -29,17 +29,27 @@ export function AffiliateManagement() {
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
 
   // Fetch sites with affiliate contracts
-  const { data: sites, isLoading: sitesLoading } = useQuery({
+  const { data: sites, isLoading: sitesLoading, error: sitesError, refetch } = useQuery({
     queryKey: ['affiliate-sites'],
     queryFn: async () => {
+      console.log('🔍 Affiliate sites query başlatılıyor...');
       const { data, error } = await supabase
         .from('betting_sites')
         .select('*')
         .not('affiliate_contract_date', 'is', null)
         .order('name');
-      if (error) throw error;
+      
+      if (error) {
+        console.error('❌ Affiliate sites query hatası:', error);
+        throw error;
+      }
+      
+      console.log('✅ Affiliate sites query başarılı. Site sayısı:', data?.length || 0);
+      console.log('📋 Siteler:', data?.map(s => s.name).join(', '));
       return data;
     },
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: true, // Refetch when component mounts
   });
 
   // Fetch selected site details
@@ -129,33 +139,62 @@ export function AffiliateManagement() {
     return <div className="flex justify-center p-8">Yükleniyor...</div>;
   }
 
+  if (sitesError) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <p className="text-destructive mb-4">❌ Siteler yüklenirken hata oluştu</p>
+          <Button onClick={() => refetch()} variant="outline">Tekrar Dene</Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>🤝 Affiliate Yönetim Paneli</CardTitle>
-          <CardDescription>
-            Affiliate anlaşmalarınızı, ödemelerinizi ve performansınızı takip edin
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>🤝 Affiliate Yönetim Paneli</CardTitle>
+              <CardDescription>
+                Affiliate anlaşmalarınızı, ödemelerinizi ve performansınızı takip edin
+              </CardDescription>
+            </div>
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              Yenile
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Site Seçin</Label>
+              <div className="flex items-center justify-between">
+                <Label>Site Seçin</Label>
+                {sites && sites.length > 0 && (
+                  <Badge variant="secondary">{sites.length} site</Badge>
+                )}
+              </div>
               <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Affiliate anlaşması olan bir site seçin..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover">
                   {sites && sites.length > 0 ? (
                     sites.map((site) => (
                       <SelectItem key={site.id} value={site.id}>
                         {site.name}
+                        {site.affiliate_contract_date && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({new Date(site.affiliate_contract_date).toLocaleDateString('tr-TR')})
+                          </span>
+                        )}
                       </SelectItem>
                     ))
                   ) : (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Affiliate anlaşması olan site bulunamadı
+                    <div className="p-4 text-sm text-muted-foreground text-center">
+                      <p className="mb-2">⚠️ Affiliate anlaşması olan site bulunamadı</p>
+                      <p className="text-xs">Site Yönetimi'nden bir siteye "Anlaşma Tarihi" ekleyin</p>
                     </div>
                   )}
                 </SelectContent>
