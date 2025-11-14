@@ -27,18 +27,14 @@ export const usePageTracking = () => {
   const location = useLocation();
   const startTimeRef = useRef<number>(Date.now());
   const scrollDepthRef = useRef<number>(0);
-  const isInitialMount = useRef(true);
 
   useEffect(() => {
     // Reset scroll depth on route change
     scrollDepthRef.current = 0;
     
-    // Only track on initial mount, not on every route change
-    if (isInitialMount.current) {
-      startTimeRef.current = Date.now();
-      trackPageView();
-      isInitialMount.current = false;
-    }
+    // Track page view on every route change
+    startTimeRef.current = Date.now();
+    trackPageView();
 
     // Throttled scroll depth tracking (500ms)
     const handleScroll = throttle(() => {
