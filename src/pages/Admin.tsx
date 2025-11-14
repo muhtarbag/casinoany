@@ -5,7 +5,7 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { LoadingFallback } from '@/components/admin/LoadingFallback';
 import { Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -39,6 +39,7 @@ const AffiliateManagement = lazy(() => import('@/components/AffiliateManagement'
 export default function Admin() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Auth check
@@ -48,6 +49,13 @@ export default function Admin() {
       toast.error('Bu sayfaya erişim yetkiniz yok.');
     }
   }, [user, isAdmin, authLoading, navigate]);
+
+  // Invalidate affiliate data when switching to affiliate tab
+  useEffect(() => {
+    if (activeTab === 'affiliate') {
+      queryClient.invalidateQueries({ queryKey: ['affiliate-sites'] });
+    }
+  }, [activeTab, queryClient]);
 
   // Fetch user profile
   const { data: userProfile } = useQuery({
