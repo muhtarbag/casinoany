@@ -49,6 +49,8 @@ export const queryKeys = {
     details: () => [...queryKeys.sites.all, 'detail'] as const,
     detail: (slug: string) => [...queryKeys.sites.details(), slug] as const,
     stats: () => [...queryKeys.sites.all, 'stats'] as const,
+    statsByIds: (siteIds: string[]) => 
+      [...queryKeys.sites.all, 'stats', 'byIds', ...siteIds.sort()] as const,
     featured: () => [...queryKeys.sites.all, 'featured'] as const,
   },
   

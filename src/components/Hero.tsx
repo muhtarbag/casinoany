@@ -122,17 +122,21 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     },
   });
 
+  const featuredIds = featuredSites?.map((site: any) => site.id) || [];
+
   const { data: siteStats } = useQuery({
-    queryKey: ['site-stats'],
+    queryKey: ['site-stats', ...featuredIds.sort()],
     queryFn: async () => {
+      if (!featuredSites || featuredSites.length === 0) return [];
+      
       const { data, error } = await (supabase as any)
         .from('site_stats')
         .select('site_id, views, clicks')
-        .in('site_id', featuredSites?.map((s: any) => s.id) || []);
+        .in('site_id', featuredIds);
       if (error) throw error;
-      return data;
+      return data || [];
     },
-    enabled: !!featuredSites && featuredSites.length > 0, // Sadece featured sites yüklendiğinde çalış
+    enabled: !!featuredSites && featuredSites.length > 0,
   });
 
 
