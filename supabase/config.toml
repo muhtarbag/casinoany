@@ -3,6 +3,9 @@ project_id = "cpaukwimbfoembwwtqhj"
 [functions.admin-ai-assistant]
 verify_jwt = false
 
+[functions.rss-news-processor]
+verify_jwt = false
+
 [functions.ai-blog-info]
 verify_jwt = false
 
