@@ -188,22 +188,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                 <p className="text-muted-foreground text-sm sm:text-base md:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
               </div>
               <div className="relative max-w-7xl mx-auto">
-                <button 
-                  onClick={scrollPrev} 
-                  disabled={!canScrollPrev} 
-                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg touch-manipulation" 
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
-                </button>
-                <button 
-                  onClick={scrollNext} 
-                  disabled={!canScrollNext} 
-                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 lg:w-12 lg:h-12 items-center justify-center rounded-lg bg-card border border-border hover:border-primary hover:scale-110 disabled:opacity-30 transition-all duration-300 hover:shadow-lg touch-manipulation" 
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
-                </button>
                 <div 
                   className="overflow-hidden relative touch-pan-x" 
                   ref={emblaRef}
@@ -238,17 +222,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                       );
                     })}
                   </div>
-                </div>
-                <div className="flex justify-center gap-2 mt-6">
-                  {featuredSites.map((_, index) => (
-                    <button 
-                      key={index} 
-                      onClick={() => emblaApi?.scrollTo(index)} 
-                      className={`h-2.5 rounded-full transition-all duration-300 touch-manipulation ${selectedIndex === index ? 'bg-primary w-8' : 'bg-muted-foreground/30 w-2.5 hover:bg-muted-foreground/50'}`} 
-                      aria-label={`Go to slide ${index + 1}`}
-                      style={{ minWidth: '44px', minHeight: '44px', padding: '20px 8px' }}
-                    />
-                  ))}
                 </div>
               </div>
             </div>
