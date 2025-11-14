@@ -1,12 +1,14 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminErrorBoundary } from './AdminErrorBoundary';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Keyboard } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -18,11 +20,34 @@ interface AdminLayoutProps {
 export function AdminLayout({ children, activeTab, onTabChange, username }: AdminLayoutProps) {
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   const clearCache = () => {
     queryClient.clear();
     toast.success('Cache temizlendi');
   };
+
+  // Global keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: '/',
+      handler: (e) => {
+        e.preventDefault();
+        setShortcutsOpen(true);
+      },
+      description: 'Kısayolları göster',
+    },
+    {
+      key: 'r',
+      ctrl: true,
+      shift: true,
+      handler: (e) => {
+        e.preventDefault();
+        clearCache();
+      },
+      description: 'Cache temizle',
+    },
+  ]);
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
@@ -46,12 +71,23 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
               <Button
                 variant="outline"
                 size={isMobile ? "icon" : "sm"}
+                onClick={() => setShortcutsOpen(true)}
+                className="gap-2 shrink-0"
+                title="Klavye Kısayolları"
+              >
+                <Keyboard className="w-4 h-4" />
+                {!isMobile && <span className="hidden lg:inline">Kısayollar</span>}
+              </Button>
+
+              <Button
+                variant="outline"
+                size={isMobile ? "icon" : "sm"}
                 onClick={clearCache}
                 className="gap-2 shrink-0"
                 title="Cache Temizle"
               >
                 <RefreshCw className="w-4 h-4" />
-                {!isMobile && <span>Cache Temizle</span>}
+                {!isMobile && <span className="hidden xl:inline">Cache</span>}
               </Button>
             </div>
           </header>
@@ -66,6 +102,9 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
           </main>
         </div>
       </div>
+
+      {/* Shortcuts Dialog */}
+      <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
     </SidebarProvider>
   );
 }
