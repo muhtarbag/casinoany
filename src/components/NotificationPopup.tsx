@@ -53,10 +53,16 @@ export const NotificationPopup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const sessionId = getSessionId();
 
+  // Admin paneldeyse bildirimleri gösterme
+  const isAdminPanel = location.pathname.startsWith('/admin');
+
   // Aktif bildirimleri getir
   const { data: notifications } = useQuery({
     queryKey: ['active-notifications', location.pathname],
     queryFn: async () => {
+      // Admin paneldeyse boş dön
+      if (isAdminPanel) return [];
+      
       const now = new Date().toISOString();
       
       const { data, error } = await (supabase as any)
@@ -86,7 +92,7 @@ export const NotificationPopup = () => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('notification_views')
-        .select('notification_id, viewed_at')
+        .select('notification_id, viewed_at, dismissed')
         .eq('session_id', sessionId);
       
       if (error) throw error;
@@ -149,14 +155,27 @@ export const NotificationPopup = () => {
     const notificationToShow = notifications.find(notification => {
       const viewed = viewedNotifications.find(v => v.notification_id === notification.id);
       
+      // Dismissed bildirimler asla gösterilmez
+      if (viewed && viewed.dismissed) {
+        return false;
+      }
+      
+      // Hiç görüntülenmemişse göster
       if (!viewed) {
         return checkTrigger(notification);
       }
       
+      // "once" - bir kere gösterildiyse bir daha gösterme
+      if (notification.display_frequency === 'once') {
+        return false;
+      }
+      
+      // "always" - her zaman göster (dismissed olmadığı sürece)
       if (notification.display_frequency === 'always') {
         return checkTrigger(notification);
       }
       
+      // "daily" - 24 saat geçtiyse tekrar göster
       if (notification.display_frequency === 'daily') {
         const lastViewed = new Date(viewed.viewed_at);
         const now = new Date();
@@ -164,6 +183,7 @@ export const NotificationPopup = () => {
         return hoursSinceViewed >= 24 && checkTrigger(notification);
       }
       
+      // "session" - bu session'da zaten görüldü
       if (notification.display_frequency === 'session') {
         return false;
       }
