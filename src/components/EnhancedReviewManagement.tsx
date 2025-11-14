@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Star, Check, X, Trash2, Edit2, Search, TrendingUp } from "lucide-react";
+import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -50,6 +50,26 @@ export default function EnhancedReviewManagement() {
     rating: 5,
     title: "",
     comment: ""
+  });
+  
+  // AI Generation States
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiSelectedSite, setAiSelectedSite] = useState<string>("");
+  const [aiReviewCount, setAiReviewCount] = useState<string>("3");
+
+  // Fetch betting sites for AI generation
+  const { data: bettingSites = [] } = useQuery({
+    queryKey: ["betting-sites"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("betting_sites")
+        .select("id, name")
+        .eq("is_active", true)
+        .order("name");
+      
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Fetch all reviews with site and user data
@@ -226,6 +246,62 @@ export default function EnhancedReviewManagement() {
     });
   };
 
+  // AI Review Generation Handler
+  const handleAiGenerateReviews = async () => {
+    if (!aiSelectedSite) {
+      toast.error("Lütfen bir site seçin");
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const selectedSite = bettingSites.find(s => s.id === aiSelectedSite);
+      
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
+        body: { 
+          type: 'generate-reviews',
+          data: {
+            siteName: selectedSite?.name,
+            count: parseInt(aiReviewCount)
+          }
+        }
+      });
+
+      if (aiError) throw aiError;
+      if (!aiData?.success) throw new Error(aiData?.error || 'AI yanıtı alınamadı');
+
+      const reviews = aiData.data.reviews;
+      
+      const reviewsToInsert = reviews.map((review: any) => ({
+        site_id: aiSelectedSite,
+        name: review.name,
+        rating: Math.round(review.rating),
+        title: review.title,
+        comment: review.comment,
+        is_approved: false,
+        user_id: null,
+        email: null
+      }));
+
+      const { error: insertError } = await supabase
+        .from('site_reviews')
+        .insert(reviewsToInsert);
+
+      if (insertError) throw insertError;
+
+      toast.success(`${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`);
+      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
+      
+      setAiSelectedSite("");
+      setAiReviewCount("3");
+    } catch (error) {
+      console.error('AI yorum oluşturma hatası:', error);
+      toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star
@@ -243,6 +319,67 @@ export default function EnhancedReviewManagement() {
 
   return (
     <div className="space-y-6">
+      {/* AI Review Generation Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            AI ile Otomatik Yorum Oluştur
+          </CardTitle>
+          <CardDescription>
+            AI her yorum için benzersiz isimler ve farklı kullanıcı profilleri oluşturur. Organik ve gerçekçi yorumlar üretilir.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Site Seçin</label>
+              <Select value={aiSelectedSite} onValueChange={setAiSelectedSite}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Bir site seçin..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {bettingSites.map(site => (
+                    <SelectItem key={site.id} value={site.id}>
+                      {site.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="w-32">
+              <label className="text-sm font-medium mb-2 block">Yorum Sayısı</label>
+              <Input
+                type="number"
+                min="1"
+                max="10"
+                value={aiReviewCount}
+                onChange={(e) => setAiReviewCount(e.target.value)}
+              />
+            </div>
+
+            <Button 
+              onClick={handleAiGenerateReviews} 
+              disabled={isAiLoading || !aiSelectedSite}
+              className="gap-2"
+            >
+              {isAiLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Oluşturuluyor...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Oluştur
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Site Statistics */}
       <div>
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
