@@ -7,9 +7,11 @@ import { Bar, BarChart, Pie, PieChart as RechartsPie, Cell, ResponsiveContainer,
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function SiteStats() {
-  const { data: statsData, isLoading } = useQuery({
+  const { data: statsData, isLoading, error } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
+      console.log("Fetching stats from view...");
+      
       // Use the optimized database view
       const { data, error } = await (supabase as any)
         .from("site_stats_with_details")
@@ -21,27 +23,36 @@ export default function SiteStats() {
         throw error;
       }
 
-      // Map view data to match expected format
-      const formattedData = (data || []).map((row: any) => ({
-        id: row.id,
-        site_id: row.site_id,
-        views: row.views,
-        clicks: row.clicks,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        betting_sites: {
-          id: row.site_id,
-          name: row.site_name,
-          slug: row.site_slug,
-        },
-      }));
+      console.log("Raw data from view:", data);
 
-      console.log("Stats from view:", formattedData);
+      // Map view data to match expected format
+      const formattedData = (data || []).map((row: any) => {
+        console.log("Processing row:", row);
+        return {
+          id: row.id,
+          site_id: row.site_id,
+          views: row.views,
+          clicks: row.clicks,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          betting_sites: {
+            id: row.site_id,
+            name: row.site_name,
+            slug: row.site_slug,
+          },
+        };
+      });
+
+      console.log("Formatted stats:", formattedData);
       return formattedData;
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes cache
+    staleTime: 0, // No cache for testing
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
+
+  console.log("Current statsData state:", statsData);
+  console.log("Loading:", isLoading, "Error:", error);
 
   if (isLoading) {
     return (
