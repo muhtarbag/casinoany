@@ -1,12 +1,20 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSiteAnalytics } from '@/hooks/useSiteAnalytics';
 import { Eye, MousePointerClick, TrendingUp, TrendingDown, Minus, DollarSign, Target } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { SiteDetailDialog } from './SiteDetailDialog';
 
 export function SitePerformanceCards() {
   const { data: siteAnalytics, isLoading } = useSiteAnalytics();
+  const [selectedSite, setSelectedSite] = useState<{
+    id: string;
+    name: string;
+    logoUrl: string | null;
+    rating: number | null;
+  } | null>(null);
 
   if (isLoading) {
     return (
@@ -76,7 +84,16 @@ export function SitePerformanceCards() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {siteAnalytics.map((site) => (
-          <Card key={site.siteId} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card 
+            key={site.siteId} 
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => setSelectedSite({
+              id: site.siteId,
+              name: site.siteName,
+              logoUrl: site.logoUrl,
+              rating: site.rating,
+            })}
+          >
             <CardHeader className="pb-3 bg-gradient-to-br from-primary/5 to-accent/5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -159,6 +176,16 @@ export function SitePerformanceCards() {
           </Card>
         ))}
       </div>
+
+      {/* Detail Dialog */}
+      <SiteDetailDialog
+        open={!!selectedSite}
+        onOpenChange={(open) => !open && setSelectedSite(null)}
+        siteId={selectedSite?.id || null}
+        siteName={selectedSite?.name || ''}
+        logoUrl={selectedSite?.logoUrl || null}
+        rating={selectedSite?.rating || null}
+      />
     </div>
   );
 }
