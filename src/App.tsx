@@ -36,6 +36,7 @@ const AdminContentPlanner = lazy(() => import("./pages/admin/content/ContentPlan
 const AdminChangeHistory = lazy(() => import("./pages/admin/system/ChangeHistory"));
 const AdminPerformance = lazy(() => import("./pages/admin/system/Performance"));
 const AdminFeaturedSites = lazy(() => import("./pages/admin/sites/FeaturedSites"));
+const AdminBannerManagement = lazy(() => import("./pages/admin/sites/BannerManagement"));
 const AdminSiteStats = lazy(() => import("./pages/admin/sites/SiteStats"));
 const AdminBlogStats = lazy(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazy(() => import("./pages/admin/blog/BlogComments"));
@@ -99,6 +100,7 @@ const AppContent = () => {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="sites" element={<AdminSiteManagement />} />
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
+            <Route path="sites/banners" element={<AdminBannerManagement />} />
             <Route path="sites/stats" element={<AdminSiteStats />} />
             <Route path="blog" element={<AdminBlogManagement />} />
             <Route path="blog/stats" element={<AdminBlogStats />} />
