@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
+import { useNewsArticles, useDeleteNews, useToggleNewsPublish } from '@/hooks/queries/useNewsQueries';
 
 export function NewsManagement() {
   const { toast } = useToast();
@@ -27,51 +28,9 @@ export function NewsManagement() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: articles, isLoading } = useQuery({
-    queryKey: ['admin-news-articles'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('news_articles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('news_articles')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-news-articles'] });
-      toast({ title: 'Haber silindi' });
-    },
-    onError: () => {
-      toast({ title: 'Hata', description: 'Haber silinirken bir hata oluştu', variant: 'destructive' });
-    },
-  });
-
-  const togglePublishMutation = useMutation({
-    mutationFn: async ({ id, isPublished }: { id: string; isPublished: boolean }) => {
-      const { error } = await supabase
-        .from('news_articles')
-        .update({ is_published: !isPublished })
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-news-articles'] });
-      toast({ title: 'Yayın durumu güncellendi' });
-    },
-  });
+  const { data: articles, isLoading } = useNewsArticles();
+  const deleteMutation = useDeleteNews();
+  const togglePublishMutation = useToggleNewsPublish();
 
   const handleManualRSSProcess = async () => {
     setIsProcessing(true);
@@ -98,7 +57,7 @@ export function NewsManagement() {
     }
   };
 
-  const filteredArticles = articles?.filter((article) =>
+  const filteredArticles = articles?.filter((article: any) =>
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     article.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
