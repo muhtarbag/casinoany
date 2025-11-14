@@ -99,10 +99,15 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <AppContent />
-            </BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <ScrollToTop />
+        <AppContent />
+      </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
       </HelmetProvider>

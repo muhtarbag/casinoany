@@ -102,7 +102,10 @@ const BettingSiteCardComponent = ({
       }
     },
     onSuccess: () => {
+      // Invalidate all site-related queries (stats, featured, lists, etc.)
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
       queryClient.invalidateQueries({ queryKey: ['site-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
     },
   });
 
