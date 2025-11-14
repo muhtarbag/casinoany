@@ -8,8 +8,9 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, Eye, Monitor, Smartphone } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { optimizeImage, formatFileSize } from '@/utils/imageOptimizer';
 import { showSuccessToast, showErrorToast, showLoadingToast, updateToast } from '@/lib/toastHelpers';
@@ -43,6 +44,8 @@ export const BannerManagement = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [previewBanner, setPreviewBanner] = useState<Banner | null>(null);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [formData, setFormData] = useState<BannerFormData>({
     title: '',
     image_url: '',
@@ -480,6 +483,9 @@ export const BannerManagement = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setPreviewBanner(banner)}>
+                    <Eye className="w-4 h-4" />
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => handleEdit(banner)}>
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -532,6 +538,75 @@ export const BannerManagement = () => {
           </Card>
         )}
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewBanner} onOpenChange={() => setPreviewBanner(null)}>
+        <DialogContent className="max-w-6xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Banner Ön İzleme: {previewBanner?.title}</span>
+              <Tabs value={previewDevice} onValueChange={(v) => setPreviewDevice(v as 'desktop' | 'mobile')}>
+                <TabsList>
+                  <TabsTrigger value="desktop" className="gap-2">
+                    <Monitor className="w-4 h-4" />
+                    Desktop
+                  </TabsTrigger>
+                  <TabsTrigger value="mobile" className="gap-2">
+                    <Smartphone className="w-4 h-4" />
+                    Mobil
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className={`mx-auto transition-all ${
+              previewDevice === 'mobile' ? 'max-w-md' : 'w-full'
+            }`}>
+              <div className="bg-muted/20 rounded-lg p-4 border-2 border-dashed border-border">
+                <img
+                  src={previewDevice === 'mobile' && previewBanner?.mobile_image_url 
+                    ? previewBanner.mobile_image_url 
+                    : previewBanner?.image_url}
+                  alt={previewBanner?.alt_text || previewBanner?.title}
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+              </div>
+            </div>
+
+            <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Pozisyon:</span>
+                <span className="font-medium">{previewBanner?.position}. karttan sonra</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Sayfalar:</span>
+                <span className="font-medium">{previewBanner?.display_pages.join(', ')}</span>
+              </div>
+              {previewBanner?.target_url && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Hedef Link:</span>
+                  <a 
+                    href={previewBanner.target_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline font-medium"
+                  >
+                    {previewBanner.target_url}
+                  </a>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Durum:</span>
+                <span className={`font-medium ${previewBanner?.is_active ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  {previewBanner?.is_active ? 'Aktif' : 'Pasif'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
