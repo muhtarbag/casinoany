@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Eye, ExternalLink, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -22,9 +23,12 @@ const categories = [
   "iGaming Genel"
 ];
 
+const ITEMS_PER_PAGE = 12;
+
 export default function News() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: articles, isLoading } = useQuery({
     queryKey: ["news-articles"],
@@ -47,6 +51,23 @@ export default function News() {
     const matchesCategory = selectedCategory === "Tümü" || article.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Pagination
+  const totalPages = Math.ceil((filteredArticles?.length || 0) / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedArticles = filteredArticles?.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    setCurrentPage(1);
+  };
 
   if (isLoading) {
     return (
@@ -91,11 +112,11 @@ export default function News() {
               <Input
                 placeholder="Haber ara..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
               <SelectTrigger className="w-full md:w-[200px]">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Kategori" />
@@ -111,7 +132,7 @@ export default function News() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles?.map((article) => (
+            {paginatedArticles?.map((article) => (
               <Link key={article.id} to={`/haber/${article.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer">
                   <CardHeader>
@@ -160,6 +181,39 @@ export default function News() {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {filteredArticles && filteredArticles.length > ITEMS_PER_PAGE && (
+          <div className="flex items-center justify-center gap-2 mt-12">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              Önceki
+            </Button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="min-w-[40px]"
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Sonraki
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );
