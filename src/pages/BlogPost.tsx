@@ -14,7 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
 
 export default function BlogPost() {
@@ -23,6 +23,7 @@ export default function BlogPost() {
 
   const { data: post, isLoading } = useBlogPost(slug || '');
   const incrementView = useIncrementBlogView();
+  const viewTrackedRef = useRef(false);
 
   // Fetch related posts based on tags
   const { data: relatedPosts } = useQuery({
@@ -55,10 +56,11 @@ export default function BlogPost() {
   });
 
   useEffect(() => {
-    if (post?.id) {
+    if (post?.id && !viewTrackedRef.current) {
       incrementView.mutate(post.id);
+      viewTrackedRef.current = true;
     }
-  }, [post?.id]);
+  }, [post?.id, incrementView]);
 
   if (isLoading) {
     return (
