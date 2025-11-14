@@ -15,8 +15,11 @@ const DEFAULT_WIDGETS: Widget[] = [
   { id: 'active-sites', type: 'stats', title: 'Aktif Siteler', size: 'small', order: 1, visible: true },
   { id: 'total-views', type: 'stats', title: 'Toplam Görüntülenme', size: 'small', order: 2, visible: true },
   { id: 'total-clicks', type: 'stats', title: 'Toplam Tıklama', size: 'small', order: 3, visible: true },
-  { id: 'recent-changes', type: 'recent-activity', title: 'Son Değişiklikler', size: 'medium', order: 4, visible: true },
-  { id: 'quick-actions', type: 'quick-action', title: 'Hızlı İşlemler', size: 'medium', order: 5, visible: true },
+  { id: 'total-revenue', type: 'stats', title: 'Toplam Gelir', size: 'small', order: 4, visible: true },
+  { id: 'conversion-rate', type: 'stats', title: 'Dönüşüm Oranı', size: 'small', order: 5, visible: true },
+  { id: 'trend-analysis', type: 'stats', title: 'Trend Analizi', size: 'small', order: 6, visible: true },
+  { id: 'recent-changes', type: 'recent-activity', title: 'Son Değişiklikler', size: 'medium', order: 7, visible: true },
+  { id: 'quick-actions', type: 'quick-action', title: 'Hızlı İşlemler', size: 'medium', order: 8, visible: true },
 ];
 
 const STORAGE_KEY = 'dashboard-widgets';
