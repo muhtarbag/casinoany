@@ -46,7 +46,7 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Link 
-              to="/betist-inceleme"
+              to="/site/betist"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -71,7 +71,7 @@ const Index = () => {
             </Link>
 
             <Link 
-              to="/bets10-inceleme"
+              to="/site/bets10"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -96,7 +96,7 @@ const Index = () => {
             </Link>
 
             <Link 
-              to="/mobilbahis-inceleme"
+              to="/site/mobilbahis"
               className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex items-center gap-4 mb-4">
