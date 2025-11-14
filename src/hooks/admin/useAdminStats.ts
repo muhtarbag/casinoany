@@ -71,19 +71,18 @@ export const useAdminStats = () => {
     refetchInterval: 60000, // Refetch every minute
   });
 
-  // Daily page views (last 30 days) - MIGRATED to analytics_events
+  // Daily page views (last 30 days)
   const dailyPageViewsQuery = useQuery({
     queryKey: ['daily-page-views'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('analytics_events')
+      const { data, error } = await supabase
+        .from('page_views')
         .select('created_at')
-        .eq('event_type', 'page_view')
         .gte('created_at', subDays(new Date(), 30).toISOString());
 
       if (error) throw error;
 
-      const viewsByDate = data.reduce((acc, view) => {
+      const viewsByDate = (data || []).reduce((acc, view) => {
         const date = new Date(view.created_at).toLocaleDateString('tr-TR');
         acc[date] = (acc[date] || 0) + 1;
         return acc;
