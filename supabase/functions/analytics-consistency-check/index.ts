@@ -55,8 +55,7 @@ serve(async (req) => {
         slug,
         site_stats(views, clicks)
       `)
-      .eq('is_active', true)
-      .limit(10);
+      .eq('is_active', true);
 
     let mismatchCount = 0;
     if (sitesWithStats) {
@@ -68,10 +67,16 @@ serve(async (req) => {
 
         const statViews = (site.site_stats as any)?.[0]?.views || 0;
         const difference = Math.abs((actualViews || 0) - statViews);
-        const percentDiff = statViews > 0 ? (difference / statViews) * 100 : 100;
-
-        if (percentDiff > 30) {
-          mismatchCount++;
+        
+        // Only flag if both have data AND there's a significant difference (>5 views)
+        if (difference > 5 && (statViews > 0 || (actualViews || 0) > 0)) {
+          const percentDiff = Math.max(statViews, actualViews || 0) > 0 
+            ? (difference / Math.max(statViews, actualViews || 0)) * 100 
+            : 0;
+          
+          if (percentDiff > 30) {
+            mismatchCount++;
+          }
         }
       }
     }
