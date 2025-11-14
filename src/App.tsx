@@ -39,7 +39,7 @@ const AMPBlogPost = lazy(() => import("./pages/amp/AMPBlogPost"));
 const AMPSiteDetail = lazy(() => import("./pages/amp/AMPSiteDetail"));
 
 // SEO-optimized pages
-const DenemeBonusu = lazy(() => import("./pages/DenemeBonusu"));
+const DenemeBonusu = lazy(() => import("./pages/DenemeBonusuDynamic"));
 
 // Loading fallback component
 const PageLoader = () => (

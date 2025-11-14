@@ -98,6 +98,35 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     },
   });
 
+  // Fetch CMS content for hero title and description
+  const { data: cmsContent } = useQuery({
+    queryKey: ['hero-cms-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_key, setting_value')
+        .in('setting_key', ['hero_title', 'hero_description']);
+      
+      if (error) {
+        console.error('Error fetching CMS content:', error);
+        return { 
+          hero_title: 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu', 
+          hero_description: 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
+        };
+      }
+      
+      const contentMap: Record<string, string> = {};
+      data?.forEach(item => {
+        contentMap[item.setting_key] = item.setting_value;
+      });
+      
+      return {
+        hero_title: contentMap['hero_title'] || 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu',
+        hero_description: contentMap['hero_description'] || 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
+      };
+    },
+  });
+
   useEffect(() => {
     if (carouselSettings?.animation) {
       setAnimationType(carouselSettings.animation);

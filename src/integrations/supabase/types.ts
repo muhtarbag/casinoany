@@ -486,6 +486,62 @@ export type Database = {
           },
         ]
       }
+      bonus_offers: {
+        Row: {
+          bonus_amount: string
+          bonus_type: string
+          created_at: string | null
+          display_order: number | null
+          eligibility: string | null
+          id: string
+          is_active: boolean | null
+          site_id: string | null
+          terms: string | null
+          title: string
+          updated_at: string | null
+          validity_period: string | null
+          wagering_requirement: string | null
+        }
+        Insert: {
+          bonus_amount: string
+          bonus_type?: string
+          created_at?: string | null
+          display_order?: number | null
+          eligibility?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id?: string | null
+          terms?: string | null
+          title: string
+          updated_at?: string | null
+          validity_period?: string | null
+          wagering_requirement?: string | null
+        }
+        Update: {
+          bonus_amount?: string
+          bonus_type?: string
+          created_at?: string | null
+          display_order?: number | null
+          eligibility?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id?: string | null
+          terms?: string | null
+          title?: string
+          updated_at?: string | null
+          validity_period?: string | null
+          wagering_requirement?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_offers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       casino_content_analytics: {
         Row: {
           affiliate_clicks: number | null
