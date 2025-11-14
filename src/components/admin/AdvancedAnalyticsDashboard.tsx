@@ -13,12 +13,9 @@ export const AdvancedAnalyticsDashboard = () => {
   const { data: dailyMetrics } = useQuery({
     queryKey: ['daily-site-metrics-advanced'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('daily_site_metrics' as any)
-        .select('*')
-        .gte('metric_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-        .order('metric_date', { ascending: false })
-        .limit(30);
+      const { data, error } = await supabase.rpc('get_daily_site_metrics', {
+        days_back: 30
+      }) as any;
 
       if (error) throw error;
       return data || [];
@@ -89,10 +86,9 @@ export const AdvancedAnalyticsDashboard = () => {
   const { data: topSites } = useQuery({
     queryKey: ['top-performing-sites'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('daily_site_metrics' as any)
-        .select('*')
-        .gte('metric_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+      const { data, error } = await supabase.rpc('get_daily_site_metrics', {
+        days_back: 7
+      }) as any;
 
       if (error) throw error;
 
@@ -391,22 +387,22 @@ export const AdvancedAnalyticsDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Kayıtlı Kullanıcılar</span>
-                    <Badge>
-                      {dailyMetrics?.[0]?.logged_in_users || 0} kullanıcı
-                    </Badge>
+                  <div>
+                    <p className="font-medium">{dailyMetrics?.[0]?.site_name || 'N/A'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Kayıtlı: {(dailyMetrics?.[0] as any)?.logged_in_users || 0} kullanıcı
+                    </p>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Anonim Ziyaretçiler</span>
                     <Badge variant="secondary">
-                      {(dailyMetrics?.[0]?.unique_sessions || 0) - (dailyMetrics?.[0]?.logged_in_users || 0)} oturum
+                      {((dailyMetrics?.[0] as any)?.unique_sessions || 0) - ((dailyMetrics?.[0] as any)?.logged_in_users || 0)} oturum
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Affiliate Tıklamalar</span>
                     <Badge variant="outline">
-                      {dailyMetrics?.[0]?.affiliate_clicks || 0} tıklama
+                      {(dailyMetrics?.[0] as any)?.affiliate_clicks || 0} tıklama
                     </Badge>
                   </div>
                 </div>
