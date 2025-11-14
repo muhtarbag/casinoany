@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BettingSiteCard } from "./BettingSiteCard";
+import { useSiteStats } from "@/hooks/queries/useSiteQueries";
 
 interface RecommendedSitesProps {
   currentSiteId: string;
@@ -39,15 +40,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     staleTime: 10 * 60 * 1000, // 10 minutes cache
   });
 
-  const { data: siteStats } = useQuery({
-    queryKey: ['site-stats'],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any).from('site_stats').select('site_id, views, clicks');
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-  });
+  const { data: siteStats } = useSiteStats();
 
   // Memoize recommended sites selection - only recalculate when dependencies change
   const recommendedSites = useMemo(() => {

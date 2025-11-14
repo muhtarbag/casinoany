@@ -41,6 +41,7 @@ import { SystemLogsViewer } from '@/components/SystemLogsViewer';
 import { NewsManagement } from '@/components/NewsManagement';
 import { RefreshCw, Star } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useSiteStats } from '@/hooks/queries/useSiteQueries';
 
 interface SiteFormData {
   name: string;
@@ -246,14 +247,7 @@ export default function Admin() {
     },
   });
 
-  const { data: siteStats } = useQuery({
-    queryKey: ['all-site-stats'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('site_stats' as any).select('*');
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: siteStats } = useSiteStats();
 
   // Dashboard analytics data
   const { data: dailyPageViews } = useQuery({
