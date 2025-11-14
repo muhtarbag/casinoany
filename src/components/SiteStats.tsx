@@ -1,48 +1,27 @@
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, MousePointer, TrendingUp, BarChart3, PieChart } from "lucide-react";
 import { Bar, BarChart, Pie, PieChart as RechartsPie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useSiteStats } from "@/hooks/queries/useSiteQueries";
 
 export default function SiteStats() {
-  const { data: statsData, isLoading } = useQuery({
-    queryKey: ["all-site-stats"],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("site_stats")
-        .select(`
-          id,
-          site_id,
-          clicks,
-          views,
-          created_at,
-          updated_at,
-          betting_sites:site_id (
-            id,
-            name,
-            slug
-          )
-        `)
-        .order("clicks", { ascending: false });
-
-      if (error) throw error;
-
-      return data || [];
-    },
-    staleTime: 5 * 60 * 1000, // 5 dakika cache
-    refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
-  });
+  const { data: statsData, isLoading } = useSiteStats();
 
   const topClicked = useMemo(() => 
-    [...((statsData as any[]) || [])].sort((a: any, b: any) => b.clicks - a.clicks).slice(0, 5),
+    [...((statsData as any[]) || [])]
+      .filter((stat: any) => stat.site_name) // Sadece site bilgisi olanları göster
+      .sort((a: any, b: any) => b.clicks - a.clicks)
+      .slice(0, 5),
     [statsData]
   );
   
   const topViewed = useMemo(() => 
-    [...((statsData as any[]) || [])].sort((a: any, b: any) => b.views - a.views).slice(0, 5),
+    [...((statsData as any[]) || [])]
+      .filter((stat: any) => stat.site_name)
+      .sort((a: any, b: any) => b.views - a.views)
+      .slice(0, 5),
     [statsData]
   );
 
@@ -64,7 +43,7 @@ export default function SiteStats() {
   // Chart data
   const clicksChartData = useMemo(() => 
     topClicked.map((stat: any) => ({
-      name: stat.betting_sites?.name,
+      name: stat.site_name,
       clicks: stat.clicks,
     })),
     [topClicked]
@@ -72,7 +51,7 @@ export default function SiteStats() {
 
   const viewsChartData = useMemo(() => 
     topViewed.map((stat: any) => ({
-      name: stat.betting_sites?.name,
+      name: stat.site_name,
       views: stat.views,
     })),
     [topViewed]
@@ -80,9 +59,9 @@ export default function SiteStats() {
 
   const ctrChartData = useMemo(() => 
     [...((statsData as any[]) || [])]
-      .filter((stat: any) => stat.views > 0)
+      .filter((stat: any) => stat.views > 0 && stat.site_name)
       .map((stat: any) => ({
-        name: stat.betting_sites?.name,
+        name: stat.site_name,
         ctr: ((stat.clicks / stat.views) * 100).toFixed(2),
         clicks: stat.clicks,
         views: stat.views,
@@ -94,7 +73,7 @@ export default function SiteStats() {
 
   const pieChartData = useMemo(() => 
     topClicked.slice(0, 5).map((stat: any) => ({
-      name: stat.betting_sites?.name,
+      name: stat.site_name,
       value: stat.clicks,
     })),
     [topClicked]
