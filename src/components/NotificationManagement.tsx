@@ -46,6 +46,8 @@ interface Notification {
 export const NotificationManagement = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('desktop');
   const [editingNotification, setEditingNotification] = useState<Notification | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -767,18 +769,195 @@ export const NotificationManagement = () => {
                 <Label htmlFor="is_active">Aktif</Label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  İptal
+              <div className="flex justify-between gap-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  onClick={() => setIsPreviewOpen(true)}
+                  className="gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  Önizleme
                 </Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                  {editingNotification ? 'Güncelle' : 'Oluştur'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    İptal
+                  </Button>
+                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                    {editingNotification ? 'Güncelle' : 'Oluştur'}
+                  </Button>
+                </div>
               </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Önizleme Dialog */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle>Bildirim Önizleme</DialogTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant={previewDevice === 'mobile' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPreviewDevice('mobile')}
+                  className="gap-2"
+                >
+                  📱 Mobil
+                </Button>
+                <Button
+                  variant={previewDevice === 'desktop' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPreviewDevice('desktop')}
+                  className="gap-2"
+                >
+                  🖥️ Desktop
+                </Button>
+              </div>
+            </div>
+            <DialogDescription>
+              Bildirimin {previewDevice === 'mobile' ? 'mobil' : 'desktop'} görünümde nasıl görüneceğini kontrol edin
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4">
+            <div 
+              className={`mx-auto bg-background border rounded-lg overflow-hidden transition-all ${
+                previewDevice === 'mobile' ? 'max-w-[375px]' : 'max-w-full'
+              }`}
+              style={{
+                minHeight: previewDevice === 'mobile' ? '667px' : '500px',
+                position: 'relative',
+              }}
+            >
+              {/* Simulated device frame */}
+              <div className="absolute inset-0 pointer-events-none">
+                {previewDevice === 'mobile' && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-6 bg-background rounded-b-2xl border-x border-b" />
+                )}
+              </div>
+
+              {/* Preview content */}
+              <div className="p-8 h-full flex items-center justify-center bg-gradient-to-br from-muted/20 to-muted/5">
+                {/* Notification Preview */}
+                <div
+                  className={`relative bg-card border rounded-2xl shadow-2xl overflow-hidden ${
+                    previewDevice === 'mobile' ? 'w-full max-w-sm' : 'w-full max-w-md'
+                  }`}
+                  style={{
+                    backgroundColor: formData.background_color || '#3b82f6',
+                    color: formData.text_color || '#ffffff',
+                  }}
+                >
+                  {/* Close button */}
+                  <button
+                    className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center transition-colors"
+                    style={{ color: formData.text_color || '#ffffff' }}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="p-6 space-y-4">
+                    {formData.image_url && (
+                      <img
+                        src={formData.image_url}
+                        alt="Preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    )}
+
+                    <div className="space-y-2">
+                      <h3 
+                        className="text-2xl font-bold leading-tight"
+                        style={{ color: formData.text_color || '#ffffff' }}
+                      >
+                        {formData.title || 'Bildirim Başlığı'}
+                      </h3>
+                      {formData.content && (
+                        <p 
+                          className="text-sm opacity-90 leading-relaxed"
+                          style={{ color: formData.text_color || '#ffffff' }}
+                        >
+                          {formData.content}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Form fields preview */}
+                    {formData.notification_type === 'popup' && formData.form_fields && (
+                      <div className="space-y-3 pt-2">
+                        <Input
+                          type="email"
+                          placeholder={formData.form_fields.email_label}
+                          className="bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                          disabled
+                        />
+                        <Input
+                          type="tel"
+                          placeholder={formData.form_fields.phone_label}
+                          className="bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                          disabled
+                        />
+                        <Button
+                          className="w-full bg-white/90 hover:bg-white"
+                          style={{ color: formData.background_color || '#3b82f6' }}
+                          disabled
+                        >
+                          {formData.form_fields.submit_text}
+                        </Button>
+                        <p className="text-xs opacity-75 text-center">
+                          {formData.form_fields.privacy_text}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    {formData.button_text && formData.button_url && (
+                      <Button
+                        className="w-full mt-4 bg-white/90 hover:bg-white font-semibold"
+                        style={{ color: formData.background_color || '#3b82f6' }}
+                        disabled
+                      >
+                        {formData.button_text}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview info */}
+            <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-semibold">Görüntüleme Sıklığı:</span>{' '}
+                  {formData.display_frequency === 'once' ? 'Bir Kez' : 
+                   formData.display_frequency === 'daily' ? 'Günlük' :
+                   formData.display_frequency === 'session' ? 'Oturum Başına' : 'Her Zaman'}
+                </div>
+                <div>
+                  <span className="font-semibold">Tetikleyici:</span>{' '}
+                  {formData.trigger_type === 'instant' ? 'Anında' :
+                   formData.trigger_type === 'time_on_page' ? `${(formData.trigger_conditions as any)?.seconds || 10} saniye sonra` :
+                   formData.trigger_type === 'scroll_depth' ? `%${(formData.trigger_conditions as any)?.percentage || 50} scroll` :
+                   'Çıkış niyeti'}
+                </div>
+                <div>
+                  <span className="font-semibold">Hedef Kitle:</span>{' '}
+                  {formData.user_segments.includes('all') ? 'Tüm Kullanıcılar' : formData.user_segments.join(', ')}
+                </div>
+                <div>
+                  <span className="font-semibold">Sayfalar:</span>{' '}
+                  {formData.display_pages.includes('all') ? 'Tüm Sayfalar' : formData.display_pages.join(', ')}
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {notifications && notifications.length > 0 ? (
         <VirtualList
