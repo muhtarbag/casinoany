@@ -10,26 +10,26 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useQuery({
     queryKey: ["all-site-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("site_stats_with_details" as any)
-        .select("*")
+      const { data, error } = await (supabase as any)
+        .from("site_stats")
+        .select(`
+          id,
+          site_id,
+          clicks,
+          views,
+          created_at,
+          updated_at,
+          betting_sites:site_id (
+            id,
+            name,
+            slug
+          )
+        `)
         .order("clicks", { ascending: false });
 
       if (error) throw error;
 
-      return (data || []).map((row: any) => ({
-        id: row.id,
-        site_id: row.site_id,
-        views: row.views || 0,
-        clicks: row.clicks || 0,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        betting_sites: {
-          id: row.site_id,
-          name: row.site_name,
-          slug: row.site_slug,
-        },
-      }));
+      return data || [];
     },
     staleTime: 0,
     refetchInterval: 30000,
