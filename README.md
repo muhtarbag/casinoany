@@ -1,73 +1,253 @@
-# Welcome to your Lovable project
+# 🎰 BahisSiteleri - Türkiye'nin En Kapsamlı Bahis Sitesi Karşılaştırma Platformu
 
-## Project info
+<div align="center">
 
-**URL**: https://lovable.dev/projects/4e78fea3-70a4-4314-9f2b-f7f014635ad1
+![BahisSiteleri](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
+![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-Cloud-3ECF8E?style=for-the-badge&logo=supabase)
 
-## How can I edit this code?
+**Production-ready betting comparison platform with AI-powered content generation**
 
-There are several ways of editing your application.
+[Lovable Project](https://lovable.dev/projects/4e78fea3-70a4-4314-9f2b-f7f014635ad1) · [Report Bug](#) · [Request Feature](#)
 
-**Use Lovable**
+</div>
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4e78fea3-70a4-4314-9f2b-f7f014635ad1) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📋 İçindekiler
 
-**Use your preferred IDE**
+- [Hakkında](#-hakkında)
+- [Özellikler](#-özellikler)
+- [Teknoloji Stack'i](#-teknoloji-stacki)
+- [Kurulum](#-kurulum)
+- [Kullanım](#-kullanım)
+- [Admin Paneli](#-admin-paneli)
+- [Deployment](#-deployment)
+- [Güvenlik](#-güvenlik)
+- [Katkıda Bulunma](#-katkıda-bulunma)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🎯 Hakkında
 
-Follow these steps:
+**BahisSiteleri**, Türkiye'deki bahis sitelerini karşılaştıran, kullanıcı yorumlarını toplayan ve SEO-optimize edilmiş içerikler sunan modern bir web platformudur. Yapay zeka destekli içerik üretimi, gerçek zamanlı analytics ve kapsamlı admin paneli ile production-ready bir çözüm sunar.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### 🌟 Neden BahisSiteleri?
+
+- ✅ **AI-Powered Content**: Yapay zeka ile blog yazıları ve kullanıcı yorumları üretimi
+- ✅ **SEO Optimized**: Structured data, meta tags, sitemaps ve GSC entegrasyonu
+- ✅ **Real-time Analytics**: Kullanıcı davranışlarını anlık takip ve analiz
+- ✅ **Comprehensive Admin**: Her şeyi tek panelden yönetme imkanı
+- ✅ **Secure by Design**: RLS policies, authentication ve authorization
+- ✅ **Scalable Architecture**: Yüzlerce site ve binlerce içerik yönetimi
+
+---
+
+## ✨ Özellikler
+
+### 🎨 Frontend
+
+- 🌓 **Dark/Light Mode** + 📱 **Responsive Design**
+- ⚡ **Fast Performance** (Lazy loading, code splitting)
+- 🔍 **Smart Search** & **Advanced Filtering**
+- 🎯 **Interactive UI** (Smooth animations)
+
+### 🤖 AI Integration (Lovable AI Gateway)
+
+- ✍️ **Blog Generation**: 2000+ kelime SEO-optimize blog
+- 💬 **Review Generation**: Benzersiz isimlerle organik yorumlar
+- 📊 **Keyword Research** & **SEO Analysis**
+
+### 📊 Analytics & Tracking
+
+- Page views, user events, conversions
+- Session analytics, bounce rate, device stats
+- Real-time dashboard
+
+### 🎛️ Admin Panel
+
+- Site yönetimi (CRUD, drag-drop, logo upload)
+- Blog yönetimi (AI generation, rich editor)
+- Yorum moderasyonu (AI generation, approve/reject)
+- Casino içerik, haberler, bildirimler
+- Analytics dashboard, system logs, health monitoring
+
+---
+
+## 🛠️ Teknoloji Stack'i
+
+**Frontend**: React 18.3 + TypeScript + Tailwind CSS + Shadcn UI  
+**Backend**: Supabase (Lovable Cloud) + PostgreSQL + Edge Functions  
+**AI**: Lovable AI Gateway (Gemini 2.5 Flash, GPT-5)  
+**DevOps**: Vite + Git + Lovable Platform  
+
+---
+
+## 🚀 Kurulum
+
+### 1. Proje Kurulumu
+
+```bash
+# Repository'yi klonlayın
 git clone <YOUR_GIT_URL>
+cd bahissiteleri
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Bağımlılıkları yükleyin
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Development server'ı başlatın
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Uygulama `http://localhost:5173` adresinde çalışacaktır.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 2. Environment Variables
 
-**Use GitHub Codespaces**
+`.env` dosyası Lovable tarafından otomatik oluşturulur:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+VITE_SUPABASE_PROJECT_ID=your_project_id
+```
 
-## What technologies are used for this project?
+### 3. İlk Admin Girişi
 
-This project is built with:
+İlk kayıt olan kullanıcı otomatik admin olur:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. `/signup` sayfasından kayıt ol
+2. Email ve şifre ile giriş yap  
+3. `/admin` sayfasından admin paneline eriş
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/4e78fea3-70a4-4314-9f2b-f7f014635ad1) and click on Share -> Publish.
+## 💻 Kullanım
 
-## Can I connect a custom domain to my Lovable project?
+### AI ile Blog Oluşturma
 
-Yes, you can!
+```
+Admin Panel > Blog > AI Blog Oluştur
+- Konu girin: "2024 En İyi Bahis Siteleri"
+- AI otomatik: Keyword research + 2000+ kelime + SEO optimize
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### AI ile Yorum Oluşturma
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```
+Admin Panel > Yorumlar > AI Yorum Oluştur
+- Site seçin, yorum sayısı belirleyin (1-10)
+- AI otomatik: Benzersiz isimler + Organik yorumlar + Puan dağılımı
+```
+
+### Site Yönetimi
+
+```
+Admin Panel > Siteler
+- Yeni site ekle, düzenle, sil
+- Logo yükle, özellikler ekle
+- Drag-drop ile sıralama düzenle
+```
+
+---
+
+## 🎛️ Admin Paneli
+
+| Section | Özellikler |
+|---------|-----------|
+| **Dashboard** | Stats, charts, quick actions |
+| **Siteler** | CRUD, drag-drop, bulk ops, logo upload |
+| **Blog** | AI generation, rich editor, SEO tools |
+| **Yorumlar** | AI generation, approve/reject, moderation |
+| **Casino** | Modular blocks, content versions |
+| **Haberler** | RSS processor, news management |
+| **Bildirimler** | Popup, banner, targeting rules |
+| **Analytics** | Real-time stats, conversions, events |
+| **AI & Analizler** | Content planner, keywords, GSC guide |
+| **Sistem** | Health monitoring, logs, API stats |
+
+---
+
+## 🚢 Deployment
+
+### Lovable Platform (Önerilen)
+
+1. Lovable editor'de **"Publish"** butonuna tıklayın
+2. **"Update"** ile production'ı güncelleyin
+3. Custom domain bağlayın: Settings > Domains
+
+**Her code change otomatik deploy edilir!**
+
+### Self-Hosting
+
+```bash
+# Build
+npm run build
+
+# Deploy to Vercel
+vercel --prod
+
+# Deploy to Netlify  
+netlify deploy --prod --dir=dist
+```
+
+---
+
+## 🔒 Güvenlik
+
+✅ JWT-based authentication  
+✅ Role-based access control (RBAC)  
+✅ Row-Level Security (RLS)  
+✅ SQL injection protection  
+✅ XSS protection  
+✅ Secret management  
+
+**Production Checklist:**
+- [ ] Change default admin password
+- [ ] Enable rate limiting on AI endpoints  
+- [ ] Configure CORS for production
+- [ ] Monitor security logs
+
+---
+
+## 🤝 Katkıda Bulunma
+
+Contributions are welcome! [CONTRIBUTING.md](CONTRIBUTING.md) dosyasını okuyun.
+
+```bash
+# Fork & clone
+git clone https://github.com/YOUR_USERNAME/bahissiteleri.git
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Commit & push
+git commit -m "feat: add amazing feature"
+git push origin feature/amazing-feature
+
+# Open Pull Request
+```
+
+---
+
+## 📞 İletişim & Links
+
+- **Lovable Project**: [4e78fea3-70a4-4314-9f2b-f7f014635ad1](https://lovable.dev/projects/4e78fea3-70a4-4314-9f2b-f7f014635ad1)
+- **GitHub Issues**: Bug reports & feature requests
+- **Documentation**: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## 🙏 Credits
+
+Built with: [Lovable](https://lovable.dev) · [Supabase](https://supabase.com) · [Shadcn UI](https://ui.shadcn.com) · [React](https://react.dev)
+
+---
+
+<div align="center">
+
+**Made with ❤️ using Lovable**
+
+⭐ Star this repo if you find it helpful!
+
+</div>
