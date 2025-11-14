@@ -16,7 +16,21 @@ import { NotificationPopup } from "@/components/NotificationPopup";
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
-const Admin = lazy(() => import("./pages/Admin"));
+const AdminRoot = lazy(() => import("./pages/admin"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminSiteManagement = lazy(() => import("./pages/admin/sites/SiteManagement"));
+const AdminBlogManagement = lazy(() => import("./pages/admin/blog/BlogManagement"));
+const AdminAffiliateManagement = lazy(() => import("./pages/admin/finance/AffiliateManagement"));
+const AdminBonusManagement = lazy(() => import("./pages/admin/finance/BonusManagement"));
+const AdminReviews = lazy(() => import("./pages/admin/Reviews"));
+const AdminNotifications = lazy(() => import("./pages/admin/Notifications"));
+const AdminNews = lazy(() => import("./pages/admin/News"));
+const AdminAnalytics = lazy(() => import("./pages/admin/analytics/AnalyticsDashboard"));
+const AdminRealtimeAnalytics = lazy(() => import("./pages/admin/analytics/RealtimeAnalytics"));
+const AdminKeywords = lazy(() => import("./pages/admin/analytics/KeywordPerformance"));
+const AdminCasinoContent = lazy(() => import("./pages/admin/content/CasinoContent"));
+const AdminSystemHealth = lazy(() => import("./pages/admin/system/SystemHealth"));
+const AdminAI = lazy(() => import("./pages/admin/AIAssistant"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const News = lazy(() => import("./pages/News"));
@@ -66,7 +80,26 @@ const AppContent = () => {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/admin" element={<Admin />} />
+          
+          {/* Admin routes - nested */}
+          <Route path="/admin" element={<AdminRoot />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="sites" element={<AdminSiteManagement />} />
+            <Route path="blog" element={<AdminBlogManagement />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="notifications" element={<AdminNotifications />} />
+            <Route path="news" element={<AdminNews />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="analytics/realtime" element={<AdminRealtimeAnalytics />} />
+            <Route path="analytics/keywords" element={<AdminKeywords />} />
+            <Route path="content/casino" element={<AdminCasinoContent />} />
+            <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
+            <Route path="finance/bonus" element={<AdminBonusManagement />} />
+            <Route path="system/health" element={<AdminSystemHealth />} />
+            <Route path="ai" element={<AdminAI />} />
+          </Route>
+          
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
