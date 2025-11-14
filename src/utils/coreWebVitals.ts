@@ -39,154 +39,193 @@ const getRating = (
 };
 
 /**
- * Track Core Web Vitals
+ * Track Core Web Vitals - Optimized version
  */
 export const trackWebVitals = (onMetric: VitalHandler) => {
-  // Use web-vitals library if available
-  if ('PerformanceObserver' in window) {
-    // LCP - Largest Contentful Paint
-    try {
-      const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        const value = lastEntry.startTime;
-        
-        onMetric({
-          name: 'LCP',
-          value,
-          rating: getRating('LCP', value),
-          delta: value,
-          id: `lcp-${Date.now()}`
-        });
+  if (!('PerformanceObserver' in window)) return;
+
+  // Debounce mechanism to prevent excessive tracking
+  const debounce = (fn: Function, delay: number) => {
+    let timeoutId: number;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => fn(...args), delay);
+    };
+  };
+
+  // LCP - Largest Contentful Paint (optimized)
+  try {
+    const lcpObserver = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      const value = lastEntry.startTime;
+      
+      onMetric({
+        name: 'LCP',
+        value,
+        rating: getRating('LCP', value),
+        delta: value,
+        id: `lcp-${Date.now()}`
       });
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-    } catch (e) {
+    });
+    lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+  } catch (e) {
+    // Silently fail in production
+    if (process.env.NODE_ENV === 'development') {
       console.warn('LCP observer failed:', e);
     }
+  }
 
-    // CLS - Cumulative Layout Shift
-    try {
-      let clsValue = 0;
-      const clsObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
-          }
-        }
-        
-        onMetric({
-          name: 'CLS',
-          value: clsValue,
-          rating: getRating('CLS', clsValue),
-          delta: clsValue,
-          id: `cls-${Date.now()}`
-        });
+  // CLS - Cumulative Layout Shift (debounced)
+  try {
+    let clsValue = 0;
+    const debouncedCLS = debounce((value: number) => {
+      onMetric({
+        name: 'CLS',
+        value,
+        rating: getRating('CLS', value),
+        delta: value,
+        id: `cls-${Date.now()}`
       });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
-    } catch (e) {
+    }, 500);
+
+    const clsObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!(entry as any).hadRecentInput) {
+          clsValue += (entry as any).value;
+        }
+      }
+      debouncedCLS(clsValue);
+    });
+    clsObserver.observe({ type: 'layout-shift', buffered: true });
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('CLS observer failed:', e);
     }
+  }
 
-    // INP - Interaction to Next Paint
-    try {
-      const inpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
-        const value = lastEntry.processingStart - lastEntry.startTime;
-        
-        onMetric({
-          name: 'INP',
-          value,
-          rating: getRating('INP', value),
-          delta: value,
-          id: `inp-${Date.now()}`
-        });
-      });
-      inpObserver.observe({ type: 'event', buffered: true });
-    } catch (e) {
+  // INP - Interaction to Next Paint (optimized)
+  try {
+    let maxINP = 0;
+    const inpObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const inp = (entry as any).duration || 0;
+        if (inp > maxINP && inp > 40) { // Only track significant interactions
+          maxINP = inp;
+          onMetric({
+            name: 'INP',
+            value: inp,
+            rating: getRating('INP', inp),
+            delta: inp,
+            id: `inp-${Date.now()}`
+          });
+        }
+      }
+    });
+    inpObserver.observe({ type: 'event', buffered: true });
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('INP observer failed:', e);
     }
+  }
 
-    // FCP - First Contentful Paint
-    try {
-      const fcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const firstEntry = entries[0];
-        const value = firstEntry.startTime;
-        
-        onMetric({
-          name: 'FCP',
-          value,
-          rating: getRating('FCP', value),
-          delta: value,
-          id: `fcp-${Date.now()}`
-        });
+  // FCP - First Contentful Paint (once only)
+  try {
+    const fcpObserver = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const firstEntry = entries[0];
+      const value = firstEntry.startTime;
+      
+      onMetric({
+        name: 'FCP',
+        value,
+        rating: getRating('FCP', value),
+        delta: value,
+        id: `fcp-${Date.now()}`
       });
-      fcpObserver.observe({ type: 'paint', buffered: true });
-    } catch (e) {
+      
+      fcpObserver.disconnect(); // Disconnect after first paint
+    });
+    fcpObserver.observe({ type: 'paint', buffered: true });
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('FCP observer failed:', e);
     }
+  }
 
-    // TTFB - Time to First Byte
-    try {
-      const navigation = performance.getEntriesByType('navigation')[0] as any;
-      if (navigation) {
-        const value = navigation.responseStart - navigation.requestStart;
-        
-        onMetric({
-          name: 'TTFB',
-          value,
-          rating: getRating('TTFB', value),
-          delta: value,
-          id: `ttfb-${Date.now()}`
-        });
-      }
-    } catch (e) {
+  // TTFB - Time to First Byte (once only)
+  try {
+    const navigation = performance.getEntriesByType('navigation')[0] as any;
+    if (navigation) {
+      const value = navigation.responseStart - navigation.requestStart;
+      
+      onMetric({
+        name: 'TTFB',
+        value,
+        rating: getRating('TTFB', value),
+        delta: value,
+        id: `ttfb-${Date.now()}`
+      });
+    }
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('TTFB measurement failed:', e);
     }
   }
 };
 
 /**
- * Send vitals to analytics endpoint
+ * Send vitals to analytics endpoint - Optimized with batching
  */
+const vitalsBatch: WebVitalMetric[] = [];
+let batchTimeout: number | null = null;
+
+const flushVitalsBatch = async () => {
+  if (vitalsBatch.length === 0) return;
+  
+  const batch = [...vitalsBatch];
+  vitalsBatch.length = 0;
+  
+  try {
+    // Send batch to custom endpoint (non-blocking)
+    if ('sendBeacon' in navigator) {
+      const blob = new Blob([JSON.stringify({
+        metrics: batch,
+        url: window.location.href,
+        timestamp: Date.now()
+      })], { type: 'application/json' });
+      navigator.sendBeacon('/api/web-vitals', blob);
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Failed to send vitals batch:', error);
+    }
+  }
+};
+
 export const sendVitalsToAnalytics = (metric: WebVitalMetric) => {
-  // Log for development
+  // Log for development only
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Web Vitals] ${metric.name}:`, {
-      value: `${Math.round(metric.value)}ms`,
-      rating: metric.rating,
-      id: metric.id
+      value: `${Math.round(metric.value)}${metric.name === 'CLS' ? '' : 'ms'}`,
+      rating: metric.rating
     });
   }
 
-  // Send to analytics (Google Analytics, custom endpoint, etc.)
-  try {
-    // Example: Google Analytics 4
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', metric.name, {
-        event_category: 'Web Vitals',
-        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-        event_label: metric.id,
-        non_interaction: true,
-        metric_rating: metric.rating
-      });
-    }
-
-    // Example: Custom analytics endpoint
-    fetch('/api/web-vitals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        metric: metric.name,
-        value: metric.value,
-        rating: metric.rating,
-        url: window.location.href,
-        timestamp: Date.now()
-      })
-    }).catch(err => console.warn('Failed to send vitals:', err));
-  } catch (error) {
-    console.warn('Analytics error:', error);
+  // Add to batch
+  vitalsBatch.push(metric);
+  
+  // Schedule batch send (debounced)
+  if (batchTimeout) clearTimeout(batchTimeout);
+  batchTimeout = window.setTimeout(flushVitalsBatch, 1000);
+  
+  // Also flush on page unload
+  if (typeof window !== 'undefined' && vitalsBatch.length === 1) {
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        flushVitalsBatch();
+      }
+    }, { once: true });
   }
 };
 

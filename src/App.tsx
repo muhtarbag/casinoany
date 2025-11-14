@@ -10,7 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { NotificationPopup } from "@/components/NotificationPopup";
+import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -87,7 +87,7 @@ const AppContent = () => {
   
   return (
     <>
-      <NotificationPopup />
+      <OptimizedNotificationPopup />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Index />} />
