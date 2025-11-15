@@ -97,7 +97,7 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
-      // 1. Insert core site data
+      // Insert all site data including social media and affiliate info
       const { data: siteData, error: siteError } = await (supabase as any)
         .from('betting_sites')
         .insert([{
@@ -110,55 +110,29 @@ export const useAdminSiteManagement = () => {
           is_active: true,
           logo_url: logoUrl,
           features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
+          // Social media
+          email: formData.email || null,
+          whatsapp: formData.whatsapp || null,
+          telegram: formData.telegram || null,
+          twitter: formData.twitter || null,
+          instagram: formData.instagram || null,
+          facebook: formData.facebook || null,
+          youtube: formData.youtube || null,
+          // Affiliate data
+          affiliate_contract_date: formData.affiliate_contract_date || null,
+          affiliate_contract_terms: formData.affiliate_contract_terms || null,
+          affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+          affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
+          affiliate_commission_percentage: formData.affiliate_commission_percentage || null,
+          affiliate_panel_url: formData.affiliate_panel_url || null,
+          affiliate_panel_username: formData.affiliate_panel_username || null,
+          affiliate_panel_password: formData.affiliate_panel_password || null,
+          affiliate_notes: formData.affiliate_notes || null,
         }])
         .select()
         .single();
 
       if (siteError) throw siteError;
-
-      const siteId = siteData.id;
-
-      // 2. Insert social media data
-      if (formData.email || formData.whatsapp || formData.telegram || 
-          formData.twitter || formData.instagram || formData.facebook || formData.youtube) {
-        const { error: socialError } = await (supabase as any)
-          .from('site_social_media')
-          .insert([{
-            site_id: siteId,
-            email: formData.email || null,
-            whatsapp: formData.whatsapp || null,
-            telegram: formData.telegram || null,
-            twitter: formData.twitter || null,
-            instagram: formData.instagram || null,
-            facebook: formData.facebook || null,
-            youtube: formData.youtube || null,
-          }]);
-        
-        if (socialError) throw socialError;
-      }
-
-      // 3. Insert affiliate data (if any)
-      if (formData.affiliate_contract_date || formData.affiliate_panel_url) {
-        const { error: affiliateError } = await (supabase as any)
-          .from('site_affiliate_data')
-          .insert([{
-            site_id: siteId,
-            contract_date: formData.affiliate_contract_date || null,
-            contract_terms: formData.affiliate_contract_terms || null,
-            has_monthly_payment: formData.affiliate_has_monthly_payment || false,
-            monthly_payment: formData.affiliate_monthly_payment || null,
-            commission_percentage: formData.affiliate_commission_percentage || null,
-            panel_url: formData.affiliate_panel_url || null,
-            panel_username: formData.affiliate_panel_username || null,
-            panel_password: formData.affiliate_panel_password || null,
-            notes: formData.affiliate_notes || null,
-          }]);
-        
-        if (affiliateError) throw affiliateError;
-      }
-
-      // 4. Insert content data (pros, cons, etc.) - automatically created by trigger
-      // The site_content table will be populated with default values via ON INSERT trigger
 
       return siteData;
     },
@@ -181,7 +155,7 @@ export const useAdminSiteManagement = () => {
         logoUrl = await uploadLogo(logoFile, formData.name);
       }
 
-      // 1. Update core site data
+      // Update all site data including social media and affiliate info
       const updateData: any = {
         name: formData.name,
         slug: formData.slug,
@@ -189,6 +163,24 @@ export const useAdminSiteManagement = () => {
         bonus: formData.bonus,
         rating: formData.rating,
         features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
+        // Social media
+        email: formData.email || null,
+        whatsapp: formData.whatsapp || null,
+        telegram: formData.telegram || null,
+        twitter: formData.twitter || null,
+        instagram: formData.instagram || null,
+        facebook: formData.facebook || null,
+        youtube: formData.youtube || null,
+        // Affiliate data
+        affiliate_contract_date: formData.affiliate_contract_date || null,
+        affiliate_contract_terms: formData.affiliate_contract_terms || null,
+        affiliate_has_monthly_payment: formData.affiliate_has_monthly_payment || false,
+        affiliate_monthly_payment: formData.affiliate_monthly_payment || null,
+        affiliate_commission_percentage: formData.affiliate_commission_percentage || null,
+        affiliate_panel_url: formData.affiliate_panel_url || null,
+        affiliate_panel_username: formData.affiliate_panel_username || null,
+        affiliate_panel_password: formData.affiliate_panel_password || null,
+        affiliate_notes: formData.affiliate_notes || null,
       };
 
       if (logoUrl) {
@@ -201,40 +193,6 @@ export const useAdminSiteManagement = () => {
         .eq('id', id);
       
       if (siteError) throw siteError;
-
-      // 2. Upsert social media data
-      const { error: socialError } = await (supabase as any)
-        .from('site_social_media')
-        .upsert({
-          site_id: id,
-          email: formData.email || null,
-          whatsapp: formData.whatsapp || null,
-          telegram: formData.telegram || null,
-          twitter: formData.twitter || null,
-          instagram: formData.instagram || null,
-          facebook: formData.facebook || null,
-          youtube: formData.youtube || null,
-        }, { onConflict: 'site_id' });
-      
-      if (socialError) throw socialError;
-
-      // 3. Upsert affiliate data
-      const { error: affiliateError } = await (supabase as any)
-        .from('site_affiliate_data')
-        .upsert({
-          site_id: id,
-          contract_date: formData.affiliate_contract_date || null,
-          contract_terms: formData.affiliate_contract_terms || null,
-          has_monthly_payment: formData.affiliate_has_monthly_payment || false,
-          monthly_payment: formData.affiliate_monthly_payment || null,
-          commission_percentage: formData.affiliate_commission_percentage || null,
-          panel_url: formData.affiliate_panel_url || null,
-          panel_username: formData.affiliate_panel_username || null,
-          panel_password: formData.affiliate_panel_password || null,
-          notes: formData.affiliate_notes || null,
-        }, { onConflict: 'site_id' });
-      
-      if (affiliateError) throw affiliateError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
