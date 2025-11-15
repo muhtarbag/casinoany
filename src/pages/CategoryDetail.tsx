@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
@@ -8,6 +8,9 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { CategoryHero } from '@/components/categories/CategoryHero';
 import { CategorySiteGrid } from '@/components/categories/CategorySiteGrid';
 import { CategoryBlogSection } from '@/components/categories/CategoryBlogSection';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import NotFound from './NotFound';
 
 export default function CategoryDetail() {
@@ -71,19 +74,25 @@ export default function CategoryDetail() {
           />
         )}
 
-        {/* Empty State */}
+        {/* Empty State - İyileştirilmiş */}
         {(!category.sites || category.sites.length === 0) &&
           (!category.blogs || category.blogs.length === 0) && (
-            <div className="text-center py-16">
-              <p className="text-lg text-muted-foreground">
-                Bu kategoride henüz içerik bulunmamaktadır.
-              </p>
-              <a
-                href="/kategoriler"
-                className="inline-block mt-4 text-primary hover:underline"
-              >
-                Diğer kategorilere göz atın
-              </a>
+            <div className="text-center py-20 animate-fade-in">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="w-20 h-20 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+                  <LucideIcons.FolderOpen className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold">Henüz İçerik Yok</h3>
+                <p className="text-muted-foreground">
+                  Bu kategoride henüz site veya blog içeriği bulunmamaktadır.
+                </p>
+                <Link to="/kategoriler">
+                  <Button className="mt-4">
+                    Diğer Kategorilere Göz At
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
       </main>
