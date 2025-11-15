@@ -67,6 +67,8 @@ export const BonusRequestsManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    // 🔧 Memory leak fix: cleanup object URL
+    URL.revokeObjectURL(url);
   };
 
   if (isLoading) {
