@@ -34,9 +34,9 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip as RechartsTooltip,
+  Tooltip,
   ResponsiveContainer
-} from 'recharts';
+} from '@/components/LazyChart';
 
 interface DashboardStats {
   totalSites: number;
@@ -303,7 +303,7 @@ export function DashboardTab({
                       style={{ fontSize: '11px' }}
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" style={{ fontSize: '11px' }} />
-                    <RechartsTooltip 
+                    <Tooltip 
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--popover))', 
                         border: '1px solid hsl(var(--border))',
