@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -52,6 +53,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   meta_title: z.string().optional(),
   meta_description: z.string().optional(),
+  content: z.string().optional(),
   icon: z.string().default('folder'),
   color: z.string().default('#3b82f6'),
   display_order: z.number().default(0),
@@ -85,6 +87,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
           description: category.description || '',
           meta_title: category.meta_title || '',
           meta_description: category.meta_description || '',
+          content: category.content || '',
           icon: category.icon || 'folder',
           color: category.color || '#3b82f6',
           display_order: category.display_order || 0,
@@ -96,6 +99,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
           description: '',
           meta_title: '',
           meta_description: '',
+          content: '',
           icon: 'folder',
           color: '#3b82f6',
           display_order: 0,
@@ -104,6 +108,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
   });
 
   const nameValue = watch('name');
+  const contentValue = watch('content');
   const iconValue = watch('icon');
   const colorValue = watch('color');
   const isActiveValue = watch('is_active');
@@ -140,6 +145,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
           description: data.description,
           meta_title: data.meta_title,
           meta_description: data.meta_description,
+          content: data.content,
           icon: data.icon,
           color: data.color,
           display_order: data.display_order,
@@ -226,8 +232,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
         </div>
 
         {/* Sağ Kolon */}
-        <div className="space-y-4">
-          {/* İkon */}
+        <div className="space-y-4">{/* İkon */}
           <div className="space-y-2">
             <Label htmlFor="icon">İkon</Label>
             <Select
@@ -326,6 +331,22 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
             </div>
           </div>
         </div>
+      </div>
+
+      {/* SEO Makale İçeriği - Full Width */}
+      <div className="space-y-2">
+        <Label htmlFor="content">SEO Makale İçeriği</Label>
+        <p className="text-sm text-muted-foreground mb-2">
+          Kategori sayfasının altında görünecek detaylı içerik. SEO ve E-E-A-T için optimize edilmiş makale yazabilirsiniz.
+        </p>
+        <RichTextEditor
+          value={contentValue || ''}
+          onChange={(value) => setValue('content', value)}
+          placeholder="Kategori hakkında detaylı bilgi, öneriler, ipuçları ve rehber içeriği yazın..."
+        />
+        <p className="text-xs text-muted-foreground mt-2">
+          İpucu: Site içi linkleme, başlıklar, listeler kullanarak SEO dostu içerik oluşturun.
+        </p>
       </div>
 
       {/* Actions */}

@@ -872,6 +872,8 @@ export type Database = {
       categories: {
         Row: {
           color: string | null
+          content: string | null
+          content_updated_at: string | null
           created_at: string | null
           description: string | null
           display_order: number | null
@@ -886,6 +888,8 @@ export type Database = {
         }
         Insert: {
           color?: string | null
+          content?: string | null
+          content_updated_at?: string | null
           created_at?: string | null
           description?: string | null
           display_order?: number | null
@@ -900,6 +904,8 @@ export type Database = {
         }
         Update: {
           color?: string | null
+          content?: string | null
+          content_updated_at?: string | null
           created_at?: string | null
           description?: string | null
           display_order?: number | null
