@@ -24,7 +24,7 @@ const ContentPlanner = lazy(() => import('@/components/ContentPlanner').then(m =
 const KeywordPerformance = lazy(() => import('@/components/KeywordPerformance').then(m => ({ default: m.KeywordPerformance })));
 const CasinoContentManagement = lazy(() => import('@/components/CasinoContentManagement').then(m => ({ default: m.CasinoContentManagement })));
 const CasinoContentAnalytics = lazy(() => import('@/components/CasinoContentAnalytics').then(m => ({ default: m.CasinoContentAnalytics })));
-const NotificationManagement = lazy(() => import('@/components/NotificationManagement').then(m => ({ default: m.NotificationManagement })));
+const NotificationManagement = lazy(() => import('@/components/NotificationManagement'));
 const CarouselSettings = lazy(() => import('@/components/CarouselSettings').then(m => ({ default: m.CarouselSettings })));
 const AnalyticsDashboard = lazy(() => import('@/components/AnalyticsDashboard').then(m => ({ default: m.AnalyticsDashboard })));
 const SystemHealthDashboard = lazy(() => import('@/components/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
