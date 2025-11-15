@@ -45,7 +45,10 @@ Deno.serve(async (req) => {
 
     if (newsError) throw newsError;
 
-    const baseUrl = Deno.env.get('SITE_BASE_URL') || 'https://yourdomain.com';
+    // Get base URL from environment variable with proper fallback
+    const baseUrl = Deno.env.get('PRODUCTION_URL') || 
+      Deno.env.get('SITE_BASE_URL') || 
+      'https://casinoany.com';
 
     // Build XML sitemap
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
