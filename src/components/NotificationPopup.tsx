@@ -344,16 +344,12 @@ export const NotificationPopup = () => {
   return (
     <Dialog open={!!openNotificationId} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent 
-        className="max-w-2xl p-0 overflow-hidden"
-        style={{
-          backgroundColor: currentNotification.background_color || undefined,
-          color: currentNotification.text_color || undefined,
-        }}
+        className="max-w-2xl p-0 overflow-hidden border-0 bg-gradient-to-br from-primary/95 via-primary to-primary-foreground/10"
       >
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 z-10"
+          className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
           onClick={handleClose}
         >
           <X className="w-4 h-4" />
@@ -365,18 +361,18 @@ export const NotificationPopup = () => {
               <img
                 src={currentNotification.image_url}
                 alt={currentNotification.title}
-                className="w-full h-auto object-cover"
+                className="w-full h-auto object-cover rounded-t-lg"
               />
             </div>
           )}
 
           <div className="p-6 space-y-4">
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-2xl font-bold text-white">
               {currentNotification.title}
             </DialogTitle>
 
             {currentNotification.content && (
-              <p className="text-lg opacity-90">
+              <p className="text-base text-white/90 leading-relaxed">
                 {currentNotification.content}
               </p>
             )}
@@ -385,7 +381,7 @@ export const NotificationPopup = () => {
             {currentNotification.form_fields && !formSubmitted && (
               <form onSubmit={handleFormSubmit} className="space-y-4 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="bonus-email" className="text-sm font-medium">
+                  <Label htmlFor="bonus-email" className="text-sm font-medium text-white">
                     {currentNotification.form_fields.email_label}
                   </Label>
                   <Input
@@ -395,12 +391,12 @@ export const NotificationPopup = () => {
                     onChange={(e) => setFormEmail(e.target.value)}
                     placeholder="ornek@email.com"
                     required
-                    className="bg-background/50"
+                    className="bg-white/90 border-white/20 text-foreground placeholder:text-muted-foreground focus:bg-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bonus-phone" className="text-sm font-medium">
+                  <Label htmlFor="bonus-phone" className="text-sm font-medium text-white">
                     {currentNotification.form_fields.phone_label}
                   </Label>
                   <Input
@@ -410,19 +406,19 @@ export const NotificationPopup = () => {
                     onChange={(e) => setFormPhone(e.target.value)}
                     placeholder="+90 5XX XXX XX XX"
                     required
-                    className="bg-background/50"
+                    className="bg-white/90 border-white/20 text-foreground placeholder:text-muted-foreground focus:bg-white"
                   />
                 </div>
 
                 {currentNotification.form_fields.privacy_text && (
-                  <p className="text-xs opacity-75">
-                    {currentNotification.form_fields.privacy_text}
+                  <p className="text-xs text-white/75 leading-relaxed">
+                    🔒 {currentNotification.form_fields.privacy_text}
                   </p>
                 )}
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full bg-white text-primary hover:bg-white/90 font-semibold text-base shadow-lg"
                   size="lg"
                   disabled={isSubmitting}
                 >
@@ -433,8 +429,9 @@ export const NotificationPopup = () => {
 
             {/* Success Message */}
             {formSubmitted && currentNotification.form_fields && (
-              <div className="text-center py-6 space-y-2">
-                <p className="text-lg font-semibold">
+              <div className="text-center py-6 space-y-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
+                <div className="text-4xl">✅</div>
+                <p className="text-lg font-semibold text-white">
                   {currentNotification.form_fields.success_message}
                 </p>
               </div>
@@ -444,7 +441,7 @@ export const NotificationPopup = () => {
             {!currentNotification.form_fields && currentNotification.button_text && (
               <Button
                 onClick={() => handleButtonClick(currentNotification.button_url)}
-                className="w-full"
+                className="w-full bg-white text-primary hover:bg-white/90 font-semibold text-base shadow-lg"
                 size="lg"
               >
                 {currentNotification.button_text}
