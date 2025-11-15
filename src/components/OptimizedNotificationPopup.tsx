@@ -7,10 +7,6 @@ import { NotificationPopup } from './NotificationPopup';
  */
 export const OptimizedNotificationPopup = memo(() => {
   return <NotificationPopup />;
-}, () => {
-  // Custom comparison - always return true to prevent re-renders
-  // unless parent explicitly needs to update
-  return true;
 });
 
 OptimizedNotificationPopup.displayName = 'OptimizedNotificationPopup';
