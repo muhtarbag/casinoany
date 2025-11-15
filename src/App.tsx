@@ -176,10 +176,10 @@ const AppContent = () => {
   );
 };
 
-// CRITICAL: Create queryClient OUTSIDE component to avoid React hook issues
-const queryClient = createAppQueryClient();
-
 const App = () => {
+  // CRITICAL: Create queryClient inside component with useMemo to ensure React is initialized
+  const queryClient = React.useMemo(() => createAppQueryClient(), []);
+  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
