@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { subDays } from 'date-fns';
 import { QUERY_DEFAULTS, queryKeys } from '@/lib/queryClient';
 
 export interface SiteAnalytics {
@@ -25,100 +24,49 @@ export function useSiteAnalytics() {
   return useQuery({
     queryKey: [...queryKeys.analytics.all, 'site-analytics'],
     queryFn: async () => {
-      // Fetch all active sites
-      const { data: sites, error: sitesError } = await supabase
-        .from('betting_sites')
-        .select('id, name, slug, logo_url, rating, is_active')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
+      // ✅ OPTIMIZED: Single query using pre-computed VIEW
+      // Replaces 150+ operations (50 sites × 3 tables) with 1 query
+      const { data, error } = await supabase
+        .from('site_analytics_view')
+        .select('*')
+        .order('total_views', { ascending: false });
 
-      if (sitesError) throw sitesError;
-      if (!sites) return [];
+      if (error) throw error;
+      if (!data) return [];
 
-      // Fetch site stats
-      const { data: stats } = await supabase
-        .from('site_stats')
-        .select('site_id, views, clicks');
-
-      // Fetch casino analytics for last 30 days
-      const thirtyDaysAgo = subDays(new Date(), 30).toISOString().split('T')[0];
-      const { data: casinoAnalytics } = await supabase
-        .from('casino_content_analytics')
-        .select('site_id, total_views, affiliate_clicks, view_date')
-        .gte('view_date', thirtyDaysAgo);
-
-      // Fetch affiliate metrics for last 30 days
-      const { data: affiliateMetrics } = await supabase
-        .from('affiliate_metrics')
-        .select('site_id, total_views, total_clicks, total_conversions, estimated_revenue, metric_date')
-        .gte('metric_date', thirtyDaysAgo);
-
-      // Process data for each site
-      const sevenDaysAgo = subDays(new Date(), 7).toISOString().split('T')[0];
-      const fourteenDaysAgo = subDays(new Date(), 14).toISOString().split('T')[0];
-
-      const siteAnalytics: SiteAnalytics[] = sites.map(site => {
-        // Get site stats
-        const siteStats = stats?.find(s => s.site_id === site.id);
-        const totalViews = siteStats?.views || 0;
-        const totalClicks = siteStats?.clicks || 0;
-
-        // Get casino analytics for this site
-        const siteCasinoAnalytics = casinoAnalytics?.filter(ca => ca.site_id === site.id) || [];
-        const affiliateClicks = siteCasinoAnalytics.reduce((sum, ca) => sum + (ca.affiliate_clicks || 0), 0);
-
-        // Get last 7 days and previous 7 days data for trend
-        const last7DaysData = siteCasinoAnalytics.filter(ca => ca.view_date >= sevenDaysAgo);
-        const previous7DaysData = siteCasinoAnalytics.filter(
-          ca => ca.view_date >= fourteenDaysAgo && ca.view_date < sevenDaysAgo
-        );
-
-        const last7DaysViews = last7DaysData.reduce((sum, ca) => sum + (ca.total_views || 0), 0);
-        const previous7DaysViews = previous7DaysData.reduce((sum, ca) => sum + (ca.total_views || 0), 0);
-        const last7DaysClicks = last7DaysData.reduce((sum, ca) => sum + (ca.affiliate_clicks || 0), 0);
-
-        // Calculate trend
+      // Transform data to match interface
+      const siteAnalytics: SiteAnalytics[] = data.map((site: any) => {
+        // Calculate trend based on view comparison
         let trend: 'up' | 'down' | 'stable' = 'stable';
-        if (previous7DaysViews > 0) {
-          const changePercent = ((last7DaysViews - previous7DaysViews) / previous7DaysViews) * 100;
+        if (site.previous_7_days_views > 0) {
+          const changePercent = ((site.last_7_days_views - site.previous_7_days_views) / site.previous_7_days_views) * 100;
           if (changePercent > 10) trend = 'up';
           else if (changePercent < -10) trend = 'down';
-        } else if (last7DaysViews > 0) {
+        } else if (site.last_7_days_views > 0) {
           trend = 'up';
         }
 
-        // Get affiliate metrics for this site
-        const siteAffiliateMetrics = affiliateMetrics?.filter(am => am.site_id === site.id) || [];
-        const totalConversions = siteAffiliateMetrics.reduce((sum, am) => sum + (am.total_conversions || 0), 0);
-        const estimatedRevenue = siteAffiliateMetrics.reduce((sum, am) => sum + (am.estimated_revenue || 0), 0);
-
-        // Calculate CTR and conversion rate
-        const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0';
-        const conversionRate = totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : '0';
-
         return {
-          siteId: site.id,
-          siteName: site.name,
-          siteSlug: site.slug,
+          siteId: site.site_id,
+          siteName: site.site_name,
+          siteSlug: site.site_slug,
           logoUrl: site.logo_url,
           rating: site.rating,
           isActive: site.is_active,
-          totalViews,
-          totalClicks,
-          ctr,
-          affiliateClicks,
-          estimatedRevenue,
-          last7DaysViews,
-          last7DaysClicks,
+          totalViews: site.total_views,
+          totalClicks: site.total_clicks,
+          ctr: site.ctr?.toFixed(2) || '0.00',
+          affiliateClicks: site.affiliate_clicks,
+          estimatedRevenue: site.estimated_revenue,
+          last7DaysViews: site.last_7_days_views,
+          last7DaysClicks: site.last_7_days_clicks,
           trend,
-          conversionRate,
+          conversionRate: site.conversion_rate?.toFixed(2) || '0.00',
         };
       });
 
-      // Sort by total views descending
-      return siteAnalytics.sort((a, b) => b.totalViews - a.totalViews);
+      return siteAnalytics;
     },
-    // STANDARDIZED: Analytics pattern (2 dakika refetch)
     ...QUERY_DEFAULTS.analytics,
   });
 }
