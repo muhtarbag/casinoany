@@ -5,10 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useNotifications } from '@/hooks/useNotifications';
-import { Bell, Check, AlertCircle, Info, CheckCircle, XCircle } from 'lucide-react';
+import { Bell, Check, AlertCircle, Info, CheckCircle, XCircle, CheckCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { showSuccessToast } from '@/lib/toastHelpers';
+import { useQueryClient } from '@tanstack/react-query';
 
 const notificationIcons = {
   info: Info,
@@ -26,8 +29,40 @@ const notificationColors = {
 
 export function NotificationCenter() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { notifications, unreadCount } = useNotifications();
   const [open, setOpen] = useState(false);
+
+  const markAsRead = async (notificationId: string) => {
+    try {
+      await supabase
+        .from('change_history')
+        .update({ metadata: { ...notifications.find(n => n.id === notificationId)?.metadata, read: true } })
+        .eq('id', notificationId);
+      
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+      
+      for (const id of unreadIds) {
+        await supabase
+          .from('change_history')
+          .update({ metadata: { ...notifications.find(n => n.id === id)?.metadata, read: true } })
+          .eq('id', id);
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
+      showSuccessToast('Tüm bildirimler okundu işaretlendi');
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+    }
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -44,14 +79,27 @@ export function NotificationCenter() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent className="w-96 p-0" align="end">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold">Bildirimler</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">Bildirimler</h3>
+            {unreadCount > 0 && (
+              <Badge variant="secondary">{unreadCount} okunmamış</Badge>
+            )}
+          </div>
           {unreadCount > 0 && (
-            <Badge variant="secondary">{unreadCount} okunmamış</Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={markAllAsRead}
+              className="gap-2"
+            >
+              <CheckCheck className="w-4 h-4" />
+              <span className="hidden sm:inline">Tümünü Okundu İşaretle</span>
+            </Button>
           )}
         </div>
-        <ScrollArea className="h-[400px]">
+        <ScrollArea className="h-[500px]">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Bell className="w-12 h-12 mb-4 opacity-20" />
@@ -67,9 +115,10 @@ export function NotificationCenter() {
                   <div
                     key={notification.id}
                     className={cn(
-                      'p-4 hover:bg-muted/50 transition-colors',
+                      'p-4 hover:bg-muted/50 transition-colors cursor-pointer',
                       !notification.read && 'bg-muted/30'
                     )}
+                    onClick={() => !notification.read && markAsRead(notification.id)}
                   >
                     <div className="flex items-start gap-3">
                       <div className={cn('mt-1', colorClass)}>
