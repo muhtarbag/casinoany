@@ -63,6 +63,13 @@ export type Database = {
             foreignKeyName: "affiliate_metrics_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -118,6 +125,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_payments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -335,6 +349,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_daily_summary_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -578,6 +599,237 @@ export type Database = {
         }
         Relationships: []
       }
+      betting_sites_affiliate: {
+        Row: {
+          affiliate_commission_percentage: number | null
+          affiliate_contract_date: string | null
+          affiliate_contract_terms: string | null
+          affiliate_has_monthly_payment: boolean | null
+          affiliate_link: string
+          affiliate_monthly_payment: number | null
+          affiliate_notes: string | null
+          affiliate_panel_password: string | null
+          affiliate_panel_url: string | null
+          affiliate_panel_username: string | null
+          created_at: string | null
+          id: string
+          site_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          affiliate_commission_percentage?: number | null
+          affiliate_contract_date?: string | null
+          affiliate_contract_terms?: string | null
+          affiliate_has_monthly_payment?: boolean | null
+          affiliate_link: string
+          affiliate_monthly_payment?: number | null
+          affiliate_notes?: string | null
+          affiliate_panel_password?: string | null
+          affiliate_panel_url?: string | null
+          affiliate_panel_username?: string | null
+          created_at?: string | null
+          id?: string
+          site_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          affiliate_commission_percentage?: number | null
+          affiliate_contract_date?: string | null
+          affiliate_contract_terms?: string | null
+          affiliate_has_monthly_payment?: boolean | null
+          affiliate_link?: string
+          affiliate_monthly_payment?: number | null
+          affiliate_notes?: string | null
+          affiliate_panel_password?: string | null
+          affiliate_panel_url?: string | null
+          affiliate_panel_username?: string | null
+          created_at?: string | null
+          id?: string
+          site_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "betting_sites_affiliate_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_affiliate_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_affiliate_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "betting_sites_affiliate_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
+        ]
+      }
+      betting_sites_content: {
+        Row: {
+          block_styles: Json | null
+          cons: string[] | null
+          created_at: string | null
+          expert_review: string | null
+          faq: Json | null
+          features: string[] | null
+          game_categories: Json | null
+          id: string
+          login_guide: string | null
+          pros: string[] | null
+          site_id: string
+          updated_at: string | null
+          verdict: string | null
+          withdrawal_guide: string | null
+        }
+        Insert: {
+          block_styles?: Json | null
+          cons?: string[] | null
+          created_at?: string | null
+          expert_review?: string | null
+          faq?: Json | null
+          features?: string[] | null
+          game_categories?: Json | null
+          id?: string
+          login_guide?: string | null
+          pros?: string[] | null
+          site_id: string
+          updated_at?: string | null
+          verdict?: string | null
+          withdrawal_guide?: string | null
+        }
+        Update: {
+          block_styles?: Json | null
+          cons?: string[] | null
+          created_at?: string | null
+          expert_review?: string | null
+          faq?: Json | null
+          features?: string[] | null
+          game_categories?: Json | null
+          id?: string
+          login_guide?: string | null
+          pros?: string[] | null
+          site_id?: string
+          updated_at?: string | null
+          verdict?: string | null
+          withdrawal_guide?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "betting_sites_content_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_content_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_content_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "betting_sites_content_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
+        ]
+      }
+      betting_sites_social: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          facebook: string | null
+          id: string
+          instagram: string | null
+          site_id: string
+          telegram: string | null
+          twitter: string | null
+          updated_at: string | null
+          whatsapp: string | null
+          youtube: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          facebook?: string | null
+          id?: string
+          instagram?: string | null
+          site_id: string
+          telegram?: string | null
+          twitter?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+          youtube?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          facebook?: string | null
+          id?: string
+          instagram?: string | null
+          site_id?: string
+          telegram?: string | null
+          twitter?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+          youtube?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "betting_sites_social_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_social_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "betting_sites_social_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "betting_sites_social_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
+        ]
+      }
       blog_categories: {
         Row: {
           created_at: string
@@ -687,6 +939,13 @@ export type Database = {
             foreignKeyName: "blog_post_related_sites_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_post_related_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -788,6 +1047,13 @@ export type Database = {
             foreignKeyName: "blog_posts_primary_site_id_fkey"
             columns: ["primary_site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_posts_primary_site_id_fkey"
+            columns: ["primary_site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -852,6 +1118,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonus_offers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -957,6 +1230,13 @@ export type Database = {
             foreignKeyName: "casino_content_analytics_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "casino_content_analytics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -1027,6 +1307,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "casino_content_versions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -1237,6 +1524,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -1468,6 +1762,13 @@ export type Database = {
             foreignKeyName: "recommended_sites_pool_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommended_sites_pool_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -1637,6 +1938,13 @@ export type Database = {
             foreignKeyName: "site_categories_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_categories_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -1788,6 +2096,13 @@ export type Database = {
             foreignKeyName: "site_recommended_sites_recommended_site_id_fkey"
             columns: ["recommended_site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_recommended_site_id_fkey"
+            columns: ["recommended_site_id"]
+            isOneToOne: false
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -1803,6 +2118,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -1867,6 +2189,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_reviews_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -1940,6 +2269,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: true
             referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
           {
@@ -2119,6 +2455,59 @@ export type Database = {
       }
     }
     Views: {
+      betting_sites_full: {
+        Row: {
+          affiliate_commission_percentage: number | null
+          affiliate_contract_date: string | null
+          affiliate_contract_terms: string | null
+          affiliate_has_monthly_payment: boolean | null
+          affiliate_link: string | null
+          affiliate_monthly_payment: number | null
+          affiliate_notes: string | null
+          affiliate_panel_password: string | null
+          affiliate_panel_url: string | null
+          affiliate_panel_username: string | null
+          avg_rating: number | null
+          block_styles: Json | null
+          bonus: string | null
+          cons: string[] | null
+          created_at: string | null
+          display_order: number | null
+          email: string | null
+          expert_review: string | null
+          facebook: string | null
+          faq: Json | null
+          features: string[] | null
+          game_categories: Json | null
+          id: string | null
+          instagram: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          login_guide: string | null
+          logo_url: string | null
+          name: string | null
+          pros: string[] | null
+          rating: number | null
+          review_count: number | null
+          slug: string | null
+          telegram: string | null
+          twitter: string | null
+          updated_at: string | null
+          verdict: string | null
+          whatsapp: string | null
+          withdrawal_guide: string | null
+          youtube: string | null
+        }
+        Relationships: []
+      }
+      cache_statistics: {
+        Row: {
+          cache_name: string | null
+          cached_items: number | null
+          last_update: string | null
+        }
+        Relationships: []
+      }
       daily_site_metrics: {
         Row: {
           affiliate_clicks: number | null
@@ -2131,6 +2520,13 @@ export type Database = {
           total_conversions: number | null
           total_views: number | null
           unique_sessions: number | null
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          metric: string | null
+          value: string | null
         }
         Relationships: []
       }
@@ -2181,6 +2577,13 @@ export type Database = {
             foreignKeyName: "site_stats_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
@@ -2196,6 +2599,24 @@ export type Database = {
     }
     Functions: {
       can_view_site_stats: { Args: never; Returns: boolean }
+      daily_analytics_maintenance: { Args: never; Returns: undefined }
+      database_health_check: {
+        Args: never
+        Returns: {
+          metric_name: string
+          metric_value: string
+          status: string
+        }[]
+      }
+      detect_slow_queries: {
+        Args: { threshold_ms?: number }
+        Returns: {
+          calls: number
+          mean_time_ms: number
+          query_text: string
+          total_time_ms: number
+        }[]
+      }
       get_daily_site_metrics: {
         Args: { days_back?: number }
         Returns: {
@@ -2279,6 +2700,28 @@ export type Database = {
         }
         Returns: string
       }
+      monitor_index_usage: {
+        Args: never
+        Returns: {
+          idx_scan: number
+          idx_tup_fetch: number
+          idx_tup_read: number
+          indexname: string
+          schemaname: string
+          tablename: string
+          usage_ratio: number
+        }[]
+      }
+      monitor_query_performance: {
+        Args: never
+        Returns: {
+          calls: number
+          max_time: number
+          mean_time: number
+          query_text: string
+          total_time: number
+        }[]
+      }
       record_health_metric: {
         Args: {
           p_metadata?: Json
@@ -2289,6 +2732,7 @@ export type Database = {
         }
         Returns: string
       }
+      refresh_all_materialized_views: { Args: never; Returns: undefined }
       refresh_daily_site_metrics: { Args: never; Returns: undefined }
       sync_daily_affiliate_metrics: { Args: never; Returns: undefined }
       track_conversion: {
