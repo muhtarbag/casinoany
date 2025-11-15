@@ -15,22 +15,23 @@ interface CategoryBlogSectionProps {
 export function CategoryBlogSection({ blogs, categoryName, categorySlug }: CategoryBlogSectionProps) {
   return (
     <section className="mb-16 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
-        <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+      {/* Header - MOBİL RESPONSIVE */}
+      <div className="flex items-center justify-between mb-6 sm:mb-8 pb-4 border-b border-border/50">
+        <h2 className="text-2xl sm:text-3xl md:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
           {categoryName} Blog Yazıları
         </h2>
         {blogs.length > 6 && (
           <Link to="/blog">
-            <Button variant="ghost" size="sm" className="hover:bg-primary/10">
-              Tümünü Gör
-              <ArrowRight className="ml-2 w-4 h-4" />
+            <Button variant="ghost" size="sm" className="hover:bg-primary/10 h-10 sm:h-9">
+              <span className="hidden sm:inline">Tümünü Gör</span>
+              <ArrowRight className="w-4 h-4 sm:ml-2" />
             </Button>
           </Link>
         )}
       </div>
 
-      <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {/* Grid - MOBİL 1 KOLON */}
+      <div className="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {blogs.slice(0, 6).map((blog, index) => (
           <Link 
             key={blog.id} 
@@ -38,11 +39,11 @@ export function CategoryBlogSection({ blogs, categoryName, categorySlug }: Categ
             style={{ animationDelay: `${index * 100}ms` }}
             className="animate-scale-in"
           >
-            <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 h-full bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30">
+            <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 h-full bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 active:scale-95">
               {/* Gradient accent */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
-              <CardHeader className="relative">
+              <CardHeader className="relative p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   {blog.category && (
                     <Badge variant="secondary" className="text-xs font-medium">
@@ -57,18 +58,18 @@ export function CategoryBlogSection({ blogs, categoryName, categorySlug }: Categ
                   )}
                 </div>
 
-                <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+                <CardTitle className="line-clamp-2 text-lg sm:text-xl group-hover:text-primary transition-colors leading-snug">
                   {blog.title}
                 </CardTitle>
 
                 {blog.excerpt && (
-                  <CardDescription className="line-clamp-3 leading-relaxed">
+                  <CardDescription className="line-clamp-3 text-sm leading-relaxed">
                     {blog.excerpt}
                   </CardDescription>
                 )}
               </CardHeader>
 
-              <CardContent className="relative">
+              <CardContent className="relative px-5 sm:px-6 pb-5 sm:pb-6">
                 {blog.published_at && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />

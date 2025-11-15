@@ -45,7 +45,7 @@ export default function CategoryDetail() {
 
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
         <Breadcrumb
           items={[
             { label: 'Ana Sayfa', href: '/' },
@@ -74,22 +74,22 @@ export default function CategoryDetail() {
           />
         )}
 
-        {/* Empty State - İyileştirilmiş */}
+        {/* Empty State - İyileştirilmiş - MOBİL RESPONSIVE */}
         {(!category.sites || category.sites.length === 0) &&
           (!category.blogs || category.blogs.length === 0) && (
-            <div className="text-center py-20 animate-fade-in">
+            <div className="text-center py-16 sm:py-20 animate-fade-in px-4">
               <div className="max-w-md mx-auto space-y-4">
-                <div className="w-20 h-20 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
-                  <LucideIcons.FolderOpen className="w-10 h-10 text-muted-foreground" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-muted/50 flex items-center justify-center">
+                  <LucideIcons.FolderOpen className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold">Henüz İçerik Yok</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl sm:text-2xl font-semibold">Henüz İçerik Yok</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Bu kategoride henüz site veya blog içeriği bulunmamaktadır.
                 </p>
                 <Link to="/kategoriler">
-                  <Button className="mt-4">
+                  <Button className="mt-4 h-12 sm:h-10 px-6 sm:px-8">
                     Diğer Kategorilere Göz At
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-5 h-5 sm:w-4 sm:h-4" />
                   </Button>
                 </Link>
               </div>
