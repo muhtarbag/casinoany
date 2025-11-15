@@ -12,6 +12,7 @@ import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 
@@ -95,6 +96,8 @@ const AppContent = () => {
   
   return (
     <>
+      <OfflineIndicator />
+      <PWAInstallPrompt />
       <OptimizedNotificationPopup />
       <Suspense fallback={<PageLoader />}>
         <Routes>
