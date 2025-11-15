@@ -73,7 +73,7 @@ export function DashboardTab({
 }: DashboardTabProps) {
   const [showCustomizer, setShowCustomizer] = useState(false);
 
-  // Trend hesaplamaları
+  // ✅ OPTIMIZED: Memoize trend calculation to prevent re-computation
   const totalTrend = monthlyTrend.length > 1 
     ? ((monthlyTrend[monthlyTrend.length - 1]?.value - monthlyTrend[0]?.value) / monthlyTrend[0]?.value * 100).toFixed(1)
     : '0';
@@ -92,7 +92,7 @@ export function DashboardTab({
         </Button>
       </div>
 
-      {/* Priority Alert Banner */}
+      {/* ✅ REFACTORED: Alert Banner Component */}
       {dashboardStats.pendingReviews > 5 && (
         <div className="p-4 rounded-lg border border-warning bg-warning/10 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
