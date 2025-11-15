@@ -20,9 +20,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-dark">
       <SEO
-        title="BahisSiteleri - En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu 2025"
-        description="Türkiye'nin en güvenilir casino ve bahis siteleri listesi. Yüksek bonuslar, hızlı ödemeler ve 7/24 destek. 50+ lisanslı casino sitesi karşılaştırması ve detaylı incelemeleri."
-        keywords={['casino siteleri', 'bahis siteleri', 'güvenilir casino', 'casino bonusları', 'canlı bahis', 'online casino']}
+        title="Güvenilir Casino Siteleri 2025 | %500 Bonus"
+        description="Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, hızlı para çekme garantisi. 50+ lisanslı casino incelemesi. Slot, rulet, canlı casino oyunları."
+        keywords={[
+          'casino siteleri',
+          'güvenilir casino',
+          'casino bonusları',
+          'canlı casino',
+          'slot siteleri',
+          'bahis siteleri',
+          'deneme bonusu',
+          'çevrimsiz bonus',
+          'hızlı para çeken casino',
+          'online casino türkiye',
+          'casino incelemeleri'
+        ]}
       />
       <OrganizationSchema />
       <WebSiteSchema />
