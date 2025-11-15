@@ -84,7 +84,6 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   useEffect(() => {
     if (!localSearch.trim() || !allSites) {
       setSuggestions([]);
-      setShowSuggestions(false);
       return;
     }
 
@@ -102,7 +101,6 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
       .slice(0, 5);
 
     setSuggestions(searchResults);
-    setShowSuggestions(searchResults.length > 0);
   }, [localSearch, allSites]);
 
   // Close suggestions when clicking outside
@@ -166,9 +164,17 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             onFocus={() => {
               if (!localSearch.trim() && popularSearches && popularSearches.length > 0) {
                 setShowPopular(true);
-              } else if (suggestions.length > 0) {
+              }
+              if (localSearch.trim() && suggestions.length > 0) {
                 setShowSuggestions(true);
               }
+            }}
+            onBlur={() => {
+              // Delay to allow click events to fire first
+              setTimeout(() => {
+                setShowSuggestions(false);
+                setShowPopular(false);
+              }, 200);
             }}
             className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
@@ -210,8 +216,8 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             </div>
           )}
 
-          {/* Suggestions Dropdown */}
-          {showSuggestions && suggestions.length > 0 && (
+      {/* Suggestions Dropdown */}
+      {suggestions.length > 0 && showSuggestions && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
               {suggestions.map((site, index) => (
                 <button
