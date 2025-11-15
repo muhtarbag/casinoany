@@ -1,23 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2, CheckSquare, Square } from "lucide-react";
+import { Check, X, Trash2 } from "lucide-react";
 import { EnhancedTablePagination } from "@/components/table/EnhancedTablePagination";
 import { EnhancedTableToolbar } from "@/components/table/EnhancedTableToolbar";
+import { AIGenerationPanel } from "@/components/reviews/AIGenerationPanel";
+import { SiteStatsGrid } from "@/components/reviews/SiteStatsGrid";
+import { ReviewEditDialog } from "@/components/reviews/ReviewEditDialog";
+import { ReviewDeleteDialog } from "@/components/reviews/ReviewDeleteDialog";
+import { ReviewsTable } from "@/components/reviews/ReviewsTable";
 import { toast } from "sonner";
-import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-
 
 // Type for review updates
 interface ReviewUpdate {
@@ -84,11 +82,6 @@ export default function EnhancedReviewManagement() {
   const [selectedRating, setSelectedRating] = useState<string>("all");
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({
-    rating: 5,
-    title: "",
-    comment: ""
-  });
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -97,20 +90,13 @@ export default function EnhancedReviewManagement() {
   
   // AI Generation States
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiSelectedSite, setAiSelectedSite] = useState<string>("");
-  const [aiReviewCount, setAiReviewCount] = useState<string>("3");
-  const [aiReviewTone, setAiReviewTone] = useState<"positive" | "negative" | "neutral">("neutral");
-  const [aiRatingMin, setAiRatingMin] = useState<string>("3");
-  const [aiRatingMax, setAiRatingMax] = useState<string>("5");
-  const [aiLanguage, setAiLanguage] = useState<"tr" | "en">("tr");
-  const [aiAutoPublish, setAiAutoPublish] = useState(false);
   
   // Bulk actions
   const [selectedReviews, setSelectedReviews] = useState<Set<string>>(new Set());
   const [isBulkActionLoading, setIsBulkActionLoading] = useState(false);
 
-  // Fetch betting sites for AI generation
-  const { data: bettingSites = [] } = useQuery({
+  // Fetch betting sites
+  const { data: sites = [] } = useQuery({
     queryKey: ["betting-sites"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -120,42 +106,35 @@ export default function EnhancedReviewManagement() {
         .order("name");
       
       if (error) throw error;
-      return data || [];
-    },
+      return data as BettingSite[];
+    }
   });
 
-  // Fetch all reviews with site and user data (with pagination)
+  // Fetch reviews with pagination
   const { data: reviews, isLoading } = useQuery({
     queryKey: ["enhanced-reviews", currentPage, pageSize],
     queryFn: async () => {
-      // First, get total count
-      const { count } = await supabase
-        .from("site_reviews")
-        .select("*", { count: 'exact', head: true });
-      
-      if (count !== null) {
-        setTotalCount(count);
-      }
-
-      // Then get paginated data
       const from = (currentPage - 1) * pageSize;
       const to = from + pageSize - 1;
-      
-      const { data: reviewsData, error } = await supabase
+
+      const { data: reviewsData, error, count } = await supabase
         .from("site_reviews")
-        .select("*")
+        .select("*", { count: 'exact' })
         .order("created_at", { ascending: false })
         .range(from, to);
 
       if (error) throw error;
+      
+      setTotalCount(count || 0);
 
-      const siteIds = [...new Set(reviewsData.map(r => r.site_id))];
-      const userIds = reviewsData
-        .map(r => r.user_id)
-        .filter((id): id is string => id !== null);
+      // Fetch related data
+      const siteIds = [...new Set(reviewsData?.map(r => r.site_id) || [])];
+      const userIds = [...new Set(reviewsData?.map(r => r.user_id).filter(Boolean) || [])];
 
       const [sitesResult, profilesResult] = await Promise.all([
-        supabase.from("betting_sites").select("id, name").in("id", siteIds),
+        siteIds.length > 0
+          ? supabase.from("betting_sites").select("id, name").in("id", siteIds)
+          : Promise.resolve({ data: [] }),
         userIds.length > 0
           ? supabase.from("profiles").select("id, username").in("id", userIds)
           : Promise.resolve({ data: [] })
@@ -254,13 +233,16 @@ export default function EnhancedReviewManagement() {
         .from("site_reviews")
         .update({ is_approved: true })
         .eq("id", id);
+      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
       toast.success("Yorum onaylandı");
     },
-    onError: () => toast.error("Yorum onaylanırken hata oluştu")
+    onError: () => {
+      toast.error("Yorum onaylanırken hata oluştu");
+    }
   });
 
   const rejectMutation = useMutation({
@@ -269,13 +251,16 @@ export default function EnhancedReviewManagement() {
         .from("site_reviews")
         .update({ is_approved: false })
         .eq("id", id);
+      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
       toast.success("Yorum reddedildi");
     },
-    onError: () => toast.error("Yorum reddedilirken hata oluştu")
+    onError: () => {
+      toast.error("Yorum reddedilirken hata oluştu");
+    }
   });
 
   const deleteMutation = useMutation({
@@ -284,6 +269,7 @@ export default function EnhancedReviewManagement() {
         .from("site_reviews")
         .delete()
         .eq("id", id);
+      
       if (error) throw error;
     },
     onSuccess: () => {
@@ -291,7 +277,9 @@ export default function EnhancedReviewManagement() {
       toast.success("Yorum silindi");
       setDeleteReviewId(null);
     },
-    onError: () => toast.error("Yorum silinirken hata oluştu")
+    onError: () => {
+      toast.error("Yorum silinirken hata oluştu");
+    }
   });
 
   const updateMutation = useMutation({
@@ -300,6 +288,7 @@ export default function EnhancedReviewManagement() {
         .from("site_reviews")
         .update(updates)
         .eq("id", id);
+      
       if (error) throw error;
     },
     onSuccess: () => {
@@ -307,23 +296,19 @@ export default function EnhancedReviewManagement() {
       toast.success("Yorum güncellendi");
       setEditingReview(null);
     },
-    onError: () => toast.error("Yorum güncellenirken hata oluştu")
+    onError: () => {
+      toast.error("Yorum güncellenirken hata oluştu");
+    }
   });
 
   const handleEdit = (review: Review) => {
     setEditingReview(review);
-    setEditForm({
-      rating: review.rating,
-      title: review.title,
-      comment: review.comment
-    });
   };
 
-  const handleSaveEdit = () => {
-    if (!editingReview) return;
+  const handleSaveEdit = (reviewId: string, data: { rating: number; title: string; comment: string }) => {
     updateMutation.mutate({
-      id: editingReview.id,
-      updates: editForm
+      id: reviewId,
+      updates: data
     });
   };
 
@@ -425,6 +410,70 @@ export default function EnhancedReviewManagement() {
     }
   };
 
+  // AI Generation Handler
+  const handleAiGenerate = useCallback(async (params: {
+    siteId: string;
+    count: string;
+    tone: "positive" | "negative" | "neutral";
+    ratingMin: string;
+    ratingMax: string;
+    language: "tr" | "en";
+    autoPublish: boolean;
+  }) => {
+    if (!params.siteId) {
+      toast.error("Lütfen bir site seçin");
+      return;
+    }
+
+    setIsAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-reviews-info', {
+        body: {
+          siteId: params.siteId,
+          count: parseInt(params.count),
+          tone: params.tone,
+          ratingRange: { min: parseInt(params.ratingMin), max: parseInt(params.ratingMax) },
+          language: params.language
+        }
+      });
+
+      if (error) throw error;
+
+      const reviews = data.reviews;
+      if (!reviews || reviews.length === 0) {
+        throw new Error('AI yorumlar oluşturulamadı');
+      }
+
+      const reviewsToInsert = reviews.map((review: any) => ({
+        site_id: params.siteId,
+        name: review.name,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        is_approved: params.autoPublish,
+        user_id: null,
+        email: null
+      }));
+
+      const { error: insertError } = await supabase
+        .from('site_reviews')
+        .insert(reviewsToInsert);
+
+      if (insertError) throw insertError;
+
+      const message = params.autoPublish 
+        ? `${reviews.length} yorum başarıyla oluşturuldu ve yayınlandı`
+        : `${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`;
+      toast.success(message);
+      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
+    } catch (error) {
+      console.error('AI yorum oluşturma hatası:', error);
+      toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
+    } finally {
+      setIsAiLoading(false);
+    }
+  }, [queryClient]);
+
   // Handle export
   const handleExport = () => {
     if (!filteredReviews.length) {
@@ -463,86 +512,6 @@ export default function EnhancedReviewManagement() {
     setSelectedRating("all");
   };
 
-  // AI Review Generation Handler
-  const handleAiGenerateReviews = async () => {
-    if (!aiSelectedSite) {
-      toast.error("Lütfen bir site seçin");
-      return;
-    }
-
-    setIsAiLoading(true);
-    try {
-      const selectedSite = bettingSites.find(s => s.id === aiSelectedSite);
-      
-      const { data: aiData, error: aiError } = await supabase.functions.invoke('admin-ai-assistant', {
-        body: { 
-          type: 'generate-reviews',
-          data: {
-            siteName: selectedSite?.name,
-            count: parseInt(aiReviewCount),
-            tone: aiReviewTone,
-            ratingMin: parseInt(aiRatingMin),
-            ratingMax: parseInt(aiRatingMax),
-            language: aiLanguage
-          }
-        }
-      });
-
-      if (aiError) throw aiError;
-      if (!aiData?.success) throw new Error(aiData?.error || 'AI yanıtı alınamadı');
-
-      const reviews = aiData.data.reviews;
-      
-      const reviewsToInsert = reviews.map((review: any) => ({
-        site_id: aiSelectedSite,
-        name: review.name,
-        rating: Math.round(review.rating),
-        title: review.title,
-        comment: review.comment,
-        is_approved: aiAutoPublish,
-        user_id: null,
-        email: null
-      }));
-
-      const { error: insertError } = await supabase
-        .from('site_reviews')
-        .insert(reviewsToInsert);
-
-      if (insertError) throw insertError;
-
-      const message = aiAutoPublish 
-        ? `${reviews.length} yorum başarıyla oluşturuldu ve yayınlandı`
-        : `${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`;
-      toast.success(message);
-      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
-      
-      setAiSelectedSite("");
-      setAiReviewCount("3");
-      setAiReviewTone("neutral");
-      setAiRatingMin("3");
-      setAiRatingMax("5");
-      setAiLanguage("tr");
-      setAiAutoPublish(false);
-    } catch (error) {
-      console.error('AI yorum oluşturma hatası:', error);
-      toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
-  // Render star rating (type-safe)
-  const renderStars = (rating: number): JSX.Element[] => {
-    return Array.from({ length: 5 }).map((_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${
-          i < rating ? "fill-yellow-400 text-yellow-400" : "text-muted"
-        }`}
-      />
-    ));
-  };
-
   if (isLoading) {
     return <div className="text-center py-8">Yükleniyor...</div>;
   }
@@ -550,170 +519,14 @@ export default function EnhancedReviewManagement() {
   return (
     <div className="space-y-6">
       {/* AI Review Generation Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            AI ile Otomatik Yorum Oluştur
-          </CardTitle>
-          <CardDescription>
-            AI her yorum için benzersiz isimler ve farklı kullanıcı profilleri oluşturur. Organik ve gerçekçi yorumlar üretilir.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Site Seçin</label>
-              <Select value={aiSelectedSite} onValueChange={setAiSelectedSite}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Bir site seçin..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {bettingSites.map(site => (
-                    <SelectItem key={site.id} value={site.id}>
-                      {site.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-2 block">Yorum Tonu</label>
-              <Select value={aiReviewTone} onValueChange={(value: "positive" | "negative" | "neutral") => setAiReviewTone(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="positive">👍 Pozitif</SelectItem>
-                  <SelectItem value="neutral">😐 Nötr</SelectItem>
-                  <SelectItem value="negative">👎 Negatif</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Puan Aralığı</label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={aiRatingMin}
-                  onChange={(e) => setAiRatingMin(e.target.value)}
-                  className="w-20"
-                />
-                <span className="text-muted-foreground">-</span>
-                <Input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={aiRatingMax}
-                  onChange={(e) => setAiRatingMax(e.target.value)}
-                  className="w-20"
-                />
-                <span className="text-sm text-muted-foreground">⭐</span>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Dil</label>
-              <Select value={aiLanguage} onValueChange={(value: "tr" | "en") => setAiLanguage(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tr">🇹🇷 Türkçe</SelectItem>
-                  <SelectItem value="en">🇬🇧 İngilizce</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Yorum Sayısı</label>
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                value={aiReviewCount}
-                onChange={(e) => setAiReviewCount(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
-            <Checkbox
-              id="auto-publish"
-              checked={aiAutoPublish}
-              onCheckedChange={(checked) => setAiAutoPublish(checked as boolean)}
-            />
-            <label
-              htmlFor="auto-publish"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-            >
-              Yorumları otomatik yayınla (onay beklemeden)
-            </label>
-          </div>
-
-          <Button 
-            onClick={handleAiGenerateReviews} 
-            disabled={isAiLoading || !aiSelectedSite}
-            className="w-full gap-2"
-          >
-            {isAiLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Oluşturuluyor...
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                Yorumları Oluştur
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+      <AIGenerationPanel
+        sites={sites}
+        isLoading={isAiLoading}
+        onGenerate={handleAiGenerate}
+      />
 
       {/* Site Statistics */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          Site İstatistikleri
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {siteStats.slice(0, 6).map(stat => (
-            <Card key={stat.site_id}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">
-                  {stat.site_name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Toplam:</span>
-                  <span className="font-semibold">{stat.total_reviews}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Onaylı:</span>
-                  <span className="text-green-600">{stat.approved_reviews}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Bekleyen:</span>
-                  <span className="text-yellow-600">{stat.pending_reviews}</span>
-                </div>
-                <div className="flex justify-between text-sm items-center">
-                  <span className="text-muted-foreground">Ort. Puan:</span>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{stat.avg_rating.toFixed(1)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <SiteStatsGrid stats={siteStats} maxItems={6} />
 
       {/* Filters */}
       <Card>
@@ -799,253 +612,55 @@ export default function EnhancedReviewManagement() {
                 <SelectItem key={stat.site_id} value={stat.site_id}>
                   {stat.site_name} ({stat.total_reviews})
                 </SelectItem>
-              ))}
-            </SelectContent>
+              ))}</SelectContent>
           </Select>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Toplam {filteredReviews.length} yorum gösteriliyor
-              {selectedReviews.size > 0 && (
-                <span className="ml-2 text-primary font-medium">
-                  ({selectedReviews.size} seçili)
-                </span>
-              )}
-            </div>
-
-            {selectedReviews.size > 0 && (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleBulkApprove}
-                  disabled={isBulkActionLoading}
-                  className="gap-2"
-                >
-                  <Check className="h-4 w-4" />
-                  Onayla ({selectedReviews.size})
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleBulkReject}
-                  disabled={isBulkActionLoading}
-                  className="gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  Reddet ({selectedReviews.size})
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleBulkDelete}
-                  disabled={isBulkActionLoading}
-                  className="gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Sil ({selectedReviews.size})
-                </Button>
-              </div>
-            )}
-          </div>
-
           {/* Reviews Table */}
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={selectedReviews.size === filteredReviews.length && filteredReviews.length > 0}
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead>Site</TableHead>
-                  <TableHead>Kullanıcı</TableHead>
-                  <TableHead>Puan</TableHead>
-                  <TableHead>Başlık</TableHead>
-                  <TableHead>Durum</TableHead>
-                  <TableHead>Tarih</TableHead>
-                  <TableHead className="text-right">İşlemler</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredReviews.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      Yorum bulunamadı
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredReviews.map(review => (
-                    <TableRow key={review.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedReviews.has(review.id)}
-                          onCheckedChange={() => toggleReviewSelection(review.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {getSiteName(review)}
-                      </TableCell>
-                      <TableCell>
-                        {getUserDisplayName(review)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          {renderStars(review.rating)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {review.title}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={review.is_approved ? "default" : "secondary"}>
-                          {review.is_approved ? "Onaylı" : "Beklemede"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {format(new Date(review.created_at), "dd MMM yyyy", { locale: tr })}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(review)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          {!review.is_approved && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => approveMutation.mutate(review.id)}
-                            >
-                              <Check className="h-4 w-4 text-green-600" />
-                            </Button>
-                          )}
-                          {review.is_approved && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => rejectMutation.mutate(review.id)}
-                            >
-                              <X className="h-4 w-4 text-yellow-600" />
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setDeleteReviewId(review.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          
+          <ReviewsTable
+            reviews={filteredReviews}
+            selectedReviews={selectedReviews}
+            onToggleSelection={toggleReviewSelection}
+            onToggleSelectAll={toggleSelectAll}
+            onApprove={(id) => approveMutation.mutate(id)}
+            onReject={(id) => rejectMutation.mutate(id)}
+            onEdit={handleEdit}
+            onDelete={(id) => setDeleteReviewId(id)}
+            getSiteName={getSiteName}
+            getUserDisplayName={getUserDisplayName}
+            isLoading={isLoading}
+          />
+
           {/* Pagination */}
           <EnhancedTablePagination
             currentPage={currentPage}
-            totalPages={Math.ceil(totalCount / pageSize)}
             pageSize={pageSize}
             totalItems={totalCount}
-            onPageChange={(page) => {
-              setCurrentPage(page);
-              setSelectedReviews(new Set()); // Clear selection on page change
-            }}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setCurrentPage(1); // Reset to first page when changing page size
-              setSelectedReviews(new Set());
+            totalPages={Math.ceil(totalCount / pageSize)}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setCurrentPage(1);
             }}
           />
         </CardContent>
       </Card>
 
       {/* Edit Dialog */}
-      <Dialog open={!!editingReview} onOpenChange={() => setEditingReview(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Yorumu Düzenle</DialogTitle>
-            <DialogDescription>
-              {editingReview ? getSiteName(editingReview) : 'Site'} için yapılan yorumu düzenleyin
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Puan</label>
-              <Select
-                value={editForm.rating.toString()}
-                onValueChange={(value) => setEditForm({ ...editForm, rating: parseInt(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5].map(num => (
-                    <SelectItem key={num} value={num.toString()}>
-                      {num} Yıldız
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Başlık</label>
-              <Input
-                value={editForm.title}
-                onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                placeholder="Yorum başlığı"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Yorum</label>
-              <Textarea
-                value={editForm.comment}
-                onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
-                placeholder="Yorum içeriği"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingReview(null)}>
-              İptal
-            </Button>
-            <Button onClick={handleSaveEdit} disabled={updateMutation.isPending}>
-              Kaydet
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ReviewEditDialog
+        review={editingReview}
+        isOpen={!!editingReview}
+        onClose={() => setEditingReview(null)}
+        onSave={handleSaveEdit}
+        isSaving={updateMutation.isPending}
+      />
 
-      {/* Delete Confirmation */}
-      <AlertDialog open={!!deleteReviewId} onOpenChange={() => setDeleteReviewId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Yorumu sil</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bu yorumu kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteReviewId && deleteMutation.mutate(deleteReviewId)}
-              className="bg-destructive text-destructive-foreground"
-            >
-              Sil
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Dialog */}
+      <ReviewDeleteDialog
+        isOpen={!!deleteReviewId}
+        onClose={() => setDeleteReviewId(null)}
+        onConfirm={() => deleteReviewId && deleteMutation.mutate(deleteReviewId)}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }
