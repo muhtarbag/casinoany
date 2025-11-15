@@ -20,7 +20,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const AdminRoot = lazy(() => import("./pages/admin"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminSiteManagement = lazy(() => import("./pages/admin/sites/SiteManagement"));
-const AdminLogoRestore = lazy(() => import("./pages/admin/sites/LogoRestore"));
+
 const AdminBlogManagement = lazy(() => import("./pages/admin/blog/BlogManagement"));
 const AdminAffiliateManagement = lazy(() => import("./pages/admin/finance/AffiliateManagement"));
 const AdminBonusManagement = lazy(() => import("./pages/admin/finance/BonusManagement"));
@@ -101,7 +101,7 @@ const AppContent = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="sites" element={<AdminSiteManagement />} />
-            <Route path="sites/logo-restore" element={<AdminLogoRestore />} />
+            
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
             <Route path="sites/banners" element={<AdminBannerManagement />} />
             <Route path="sites/stats" element={<AdminSiteStats />} />
