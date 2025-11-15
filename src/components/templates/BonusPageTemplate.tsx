@@ -287,12 +287,15 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
       size="lg"
       className={`w-full md:w-auto md:ml-auto px-6 md:px-8 py-5 md:py-6 text-sm md:text-base font-semibold transition-all duration-300 ${
         rank <= 3 
-          ? 'animate-glow bg-gradient-to-r from-primary via-primary to-primary-glow hover:scale-105 hover:shadow-[0_0_30px_rgba(var(--primary),0.5)] shadow-lg' 
-          : 'hover:scale-[1.02] hover:shadow-md'
+          ? 'bg-gradient-to-r from-gold via-primary to-gold shadow-glow-gold hover:scale-110 hover:shadow-[0_0_40px_hsl(var(--gold)/0.6)] relative overflow-hidden group' 
+          : 'hover:scale-105 hover:shadow-lg'
       }`}
       onClick={() => window.open(bonus.affiliateLink, '_blank')}
     >
-      {rank <= 3 ? '🎁 ' : ''}Bonusu Al →
+      {rank <= 3 && (
+        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+      )}
+      <span className="relative z-10">{rank <= 3 ? '🎁 ' : ''}Bonusu Al →</span>
     </Button>
   </div>
 );
