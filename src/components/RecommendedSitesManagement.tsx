@@ -3,9 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, GripVertical, Save, Search, AlertCircle, CheckCircle, CheckSquare, Square } from 'lucide-react';
+import { Trash2, Plus, GripVertical, Save, CheckSquare, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -17,7 +16,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface RecommendedSite {
   id: string;
   site_id: string;
-  recommended_site_id: string;
   display_order: number;
   betting_sites: {
     name: string;
@@ -87,7 +85,6 @@ function SortableItem({ id, site, onRemove }: SortableItemProps) {
 export const RecommendedSitesManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedMainSite, setSelectedMainSite] = useState<string>('');
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [localRecommendations, setLocalRecommendations] = useState<RecommendedSite[]>([]);
 
@@ -112,30 +109,26 @@ export const RecommendedSitesManagement = () => {
     },
   });
 
-  // Fetch recommended sites for selected main site
+  // Fetch recommended sites from global pool
   const { data: recommendations, isLoading } = useQuery({
-    queryKey: ['site-recommendations', selectedMainSite],
+    queryKey: ['global-recommended-sites'],
     queryFn: async () => {
-      if (!selectedMainSite) return [];
       const { data, error } = await supabase
-        .from('site_recommended_sites')
+        .from('recommended_sites_pool')
         .select(`
           id,
           site_id,
-          recommended_site_id,
           display_order,
-          betting_sites!site_recommended_sites_recommended_site_id_fkey (
+          betting_sites!recommended_sites_pool_site_id_fkey (
             name,
             slug,
             logo_url
           )
         `)
-        .eq('site_id', selectedMainSite)
         .order('display_order');
       if (error) throw error;
       return data as RecommendedSite[];
     },
-    enabled: !!selectedMainSite,
   });
 
   // Update local state when recommendations change
@@ -148,18 +141,12 @@ export const RecommendedSitesManagement = () => {
   // Add recommendations mutation (multiple sites)
   const addMutation = useMutation({
     mutationFn: async (siteIds: string[]) => {
-      if (!selectedMainSite || siteIds.length === 0) {
+      if (siteIds.length === 0) {
         throw new Error('Site seçimi gerekli');
       }
 
-      // Get current count
-      const { data: currentRecs } = await supabase
-        .from('site_recommended_sites')
-        .select('id')
-        .eq('site_id', selectedMainSite);
-
-      const currentCount = currentRecs?.length || 0;
-      const availableSlots = 4 - currentCount;
+      const currentCount = localRecommendations?.length || 0;
+      const availableSlots = 8 - currentCount;
 
       if (siteIds.length > availableSlots) {
         throw new Error(`Maksimum ${availableSlots} site daha ekleyebilirsiniz`);
@@ -167,9 +154,8 @@ export const RecommendedSitesManagement = () => {
 
       // Get next display order
       const { data: maxOrder } = await supabase
-        .from('site_recommended_sites')
+        .from('recommended_sites_pool')
         .select('display_order')
-        .eq('site_id', selectedMainSite)
         .order('display_order', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -178,21 +164,20 @@ export const RecommendedSitesManagement = () => {
 
       // Insert all selected sites
       const inserts = siteIds.map((siteId) => ({
-        site_id: selectedMainSite,
-        recommended_site_id: siteId,
+        site_id: siteId,
         display_order: nextOrder++,
       }));
 
       const { error } = await supabase
-        .from('site_recommended_sites')
+        .from('recommended_sites_pool')
         .insert(inserts);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-recommendations', selectedMainSite] });
+      queryClient.invalidateQueries({ queryKey: ['global-recommended-sites'] });
       setSelectedSites(new Set());
-      toast({ title: `${selectedSites.size} site eklendi` });
+      toast({ title: `${selectedSites.size} site global havuza eklendi` });
     },
     onError: (error: any) => {
       toast({ 
@@ -207,14 +192,14 @@ export const RecommendedSitesManagement = () => {
   const removeMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('site_recommended_sites')
+        .from('recommended_sites_pool')
         .delete()
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-recommendations', selectedMainSite] });
-      toast({ title: 'Önerilen site kaldırıldı' });
+      queryClient.invalidateQueries({ queryKey: ['global-recommended-sites'] });
+      toast({ title: 'Site global havuzdan kaldırıldı' });
     },
     onError: (error: any) => {
       toast({ 
@@ -228,10 +213,9 @@ export const RecommendedSitesManagement = () => {
   // Save order mutation
   const saveOrderMutation = useMutation({
     mutationFn: async (items: RecommendedSite[]) => {
-      // Update each item's display_order individually
       const promises = items.map((item, index) => 
         supabase
-          .from('site_recommended_sites')
+          .from('recommended_sites_pool')
           .update({ display_order: index })
           .eq('id', item.id)
       );
@@ -244,7 +228,7 @@ export const RecommendedSitesManagement = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-recommendations', selectedMainSite] });
+      queryClient.invalidateQueries({ queryKey: ['global-recommended-sites'] });
       toast({ title: 'Sıralama kaydedildi' });
     },
     onError: (error: any) => {
@@ -269,9 +253,7 @@ export const RecommendedSitesManagement = () => {
   };
 
   const availableSites = allSites?.filter(
-    (site) => 
-      site.id !== selectedMainSite && 
-      !localRecommendations?.find((rec) => rec.recommended_site_id === site.id)
+    (site) => !localRecommendations?.find((rec) => rec.site_id === site.id)
   );
 
   const hasOrderChanged = JSON.stringify(localRecommendations?.map(r => r.id)) !== 
@@ -282,7 +264,7 @@ export const RecommendedSitesManagement = () => {
     if (newSelected.has(siteId)) {
       newSelected.delete(siteId);
     } else {
-      const remainingSlots = 4 - (localRecommendations?.length || 0);
+      const remainingSlots = 8 - (localRecommendations?.length || 0);
       if (newSelected.size >= remainingSlots) {
         toast({
           title: 'Uyarı',
@@ -297,7 +279,7 @@ export const RecommendedSitesManagement = () => {
   };
 
   const handleSelectAll = () => {
-    const remainingSlots = 4 - (localRecommendations?.length || 0);
+    const remainingSlots = 8 - (localRecommendations?.length || 0);
     if (!availableSites) return;
     
     const sitesToSelect = availableSites.slice(0, remainingSlots);
@@ -311,251 +293,217 @@ export const RecommendedSitesManagement = () => {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Önerilen Siteler</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Global Öneriler Havuzu</h1>
         <p className="text-muted-foreground mt-2">
-          Site detay sayfalarında gösterilecek önerilen siteleri yönetin
+          Tüm site detay sayfalarında gösterilecek önerilen siteleri buradan yönetin
         </p>
       </div>
+
+      <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+          <strong>Nasıl Çalışır?</strong> Buradan seçtiğiniz siteler, <strong>TÜM</strong> site detay sayfalarında "Önerilen Siteler" bölümünde gösterilecek. Maksimum 8 site ekleyebilirsiniz.
+        </AlertDescription>
+      </Alert>
 
       <Card className="border-2">
         <CardHeader className="border-b bg-muted/30">
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle className="text-xl">Site Önerileri</CardTitle>
+              <CardTitle className="text-xl">Önerilen Siteler</CardTitle>
               <CardDescription className="mt-1.5">
-                Her site için maksimum 4 önerilen site ekleyebilir ve sıralayabilirsiniz
+                Maksimum 8 site seçebilirsiniz
               </CardDescription>
             </div>
-            {selectedMainSite && localRecommendations?.length > 0 && (
+            {localRecommendations?.length > 0 && (
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {localRecommendations.length}/4 Site
+                {localRecommendations.length}/8 Site
               </Badge>
             )}
           </div>
         </CardHeader>
         <CardContent className="space-y-8 pt-6">
-          {/* Main Site Selection */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <label className="text-sm font-semibold">1. Ana Siteyi Seçin</label>
-            </div>
-            <Select value={selectedMainSite} onValueChange={setSelectedMainSite}>
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Öneriler eklemek istediğiniz siteyi seçin..." />
-              </SelectTrigger>
-              <SelectContent className="z-50 bg-background">
-                {allSites?.length ? (
-                  allSites.map((site) => (
-                    <SelectItem key={site.id} value={site.id}>
-                      <div className="flex items-center gap-2">
-                        <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
-                        {site.name}
-                      </div>
-                    </SelectItem>
-                  ))
-                ) : (
-                  <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                    Site bulunamadı
-                  </div>
+          {/* Add Sites with Checkboxes */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckSquare className="w-4 h-4 text-muted-foreground" />
+                <label className="text-sm font-semibold">Önerilen Siteleri Seçin</label>
+                {selectedSites.size > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {selectedSites.size} seçili
+                  </Badge>
                 )}
-              </SelectContent>
-            </Select>
-            {!selectedMainSite && (
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAll}
+                  disabled={!availableSites || availableSites.length === 0}
+                >
+                  Tümünü Seç
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeselectAll}
+                  disabled={selectedSites.size === 0}
+                >
+                  Temizle
+                </Button>
+              </div>
+            </div>
+
+            {localRecommendations?.length >= 8 ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Maksimum 8 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
+                </AlertDescription>
+              </Alert>
+            ) : availableSites && availableSites.length > 0 ? (
+              <>
+                <ScrollArea className="h-[300px] border rounded-lg p-2">
+                  <div className="space-y-2">
+                    {availableSites.map((site) => (
+                      <div
+                        key={site.id}
+                        onClick={() => handleToggleSite(site.id)}
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:bg-muted/50 ${
+                          selectedSites.has(site.id)
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border'
+                        }`}
+                      >
+                        <Checkbox
+                          checked={selectedSites.has(site.id)}
+                          onCheckedChange={() => handleToggleSite(site.id)}
+                          className="pointer-events-none"
+                        />
+                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted/30 p-2 border">
+                          <img
+                            src={site.logo_url}
+                            alt={site.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{site.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">/{site.slug}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-xs text-muted-foreground">
+                    {8 - (localRecommendations?.length || 0)} slot boş
+                  </p>
+                  <Button
+                    onClick={() => addMutation.mutate(Array.from(selectedSites))}
+                    disabled={selectedSites.size === 0 || addMutation.isPending}
+                    size="lg"
+                    className="px-6"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {selectedSites.size > 0 ? `${selectedSites.size} Site Ekle` : 'Site Ekle'}
+                  </Button>
+                </div>
+              </>
+            ) : (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  Önce bir ana site seçin, ardından bu site için öneriler ekleyebilirsiniz
+                <AlertDescription>
+                  Tüm siteler zaten global havuza eklenmiş.
                 </AlertDescription>
               </Alert>
             )}
           </div>
 
-          {selectedMainSite && (
-            <>
-              {/* Add Recommended Sites with Checkboxes */}
-              <div className="space-y-4 pb-6 border-b">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckSquare className="w-4 h-4 text-muted-foreground" />
-                    <label className="text-sm font-semibold">2. Önerilen Siteleri Seçin</label>
-                    {selectedSites.size > 0 && (
-                      <Badge variant="secondary" className="ml-2">
-                        {selectedSites.size} seçili
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleSelectAll}
-                      disabled={!availableSites || availableSites.length === 0}
-                    >
-                      Tümünü Seç
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDeselectAll}
-                      disabled={selectedSites.size === 0}
-                    >
-                      Temizle
-                    </Button>
-                  </div>
-                </div>
-
-                {localRecommendations?.length >= 4 ? (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Maksimum 4 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
-                    </AlertDescription>
-                  </Alert>
-                ) : availableSites && availableSites.length > 0 ? (
-                  <>
-                    <ScrollArea className="h-[300px] border rounded-lg p-2">
-                      <div className="space-y-2">
-                        {availableSites.map((site) => (
-                          <div
-                            key={site.id}
-                            onClick={() => handleToggleSite(site.id)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:bg-muted/50 ${
-                              selectedSites.has(site.id)
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border'
-                            }`}
-                          >
-                            <Checkbox
-                              checked={selectedSites.has(site.id)}
-                              onCheckedChange={() => handleToggleSite(site.id)}
-                              className="pointer-events-none"
-                            />
-                            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted/30 p-2 border">
-                              <img
-                                src={site.logo_url}
-                                alt={site.name}
-                                className="w-full h-full object-contain"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm truncate">{site.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">/{site.slug}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-
-                    <div className="flex items-center justify-between pt-2">
-                      <p className="text-xs text-muted-foreground">
-                        {4 - (localRecommendations?.length || 0)} slot boş
-                      </p>
-                      <Button
-                        onClick={() => addMutation.mutate(Array.from(selectedSites))}
-                        disabled={selectedSites.size === 0 || addMutation.isPending}
-                        size="lg"
-                        className="px-6"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        {selectedSites.size > 0 ? `${selectedSites.size} Site Ekle` : 'Site Ekle'}
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Tüm siteler zaten eklenmiş veya ana site olarak seçilmiş.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-
-              {/* Current Recommendations */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <GripVertical className="w-4 h-4 text-muted-foreground" />
-                    <label className="text-sm font-semibold">
-                      3. Sıralama ve Yönetim
-                      {localRecommendations && localRecommendations.length > 0 && (
-                        <span className="text-muted-foreground font-normal ml-2">
-                          ({localRecommendations.length}/4)
-                        </span>
-                      )}
-                    </label>
-                  </div>
-                  {hasOrderChanged && (
-                    <Button
-                      onClick={() => saveOrderMutation.mutate(localRecommendations)}
-                      disabled={saveOrderMutation.isPending}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Sıralamayı Kaydet
-                    </Button>
+          {/* Current Recommendations */}
+          <div className="space-y-4 pt-6 border-t">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <GripVertical className="w-4 h-4 text-muted-foreground" />
+                <label className="text-sm font-semibold">
+                  Mevcut Öneriler
+                  {localRecommendations && localRecommendations.length > 0 && (
+                    <span className="text-muted-foreground font-normal ml-2">
+                      ({localRecommendations.length}/8)
+                    </span>
                   )}
-                </div>
-
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center space-y-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
-                      <p className="text-sm text-muted-foreground">Yükleniyor...</p>
-                    </div>
-                  </div>
-                ) : localRecommendations && localRecommendations.length > 0 ? (
-                  <div className="space-y-4">
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <SortableContext
-                        items={localRecommendations.map(r => r.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <div className="space-y-3">
-                          {localRecommendations.map((site, index) => (
-                            <div key={site.id} className="flex items-center gap-3">
-                              <Badge variant="outline" className="w-8 h-8 flex items-center justify-center rounded-full">
-                                {index + 1}
-                              </Badge>
-                              <div className="flex-1">
-                                <SortableItem
-                                  id={site.id}
-                                  site={site}
-                                  onRemove={() => removeMutation.mutate(site.id)}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </SortableContext>
-                    </DndContext>
-                    
-                    <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                      <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>İpucu:</strong> Siteleri sürükleyip bırakarak sıralayın. Değişiklikleri kaydetmek için "Sıralamayı Kaydet" butonuna tıklayın.
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg bg-muted/20">
-                    <div className="mx-auto w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
-                      <Plus className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm font-medium mb-1">Henüz önerilen site yok</p>
-                    <p className="text-xs text-muted-foreground">
-                      Yukarıdaki alandan site ekleyerek başlayın
-                    </p>
-                  </div>
-                )}
+                </label>
               </div>
-            </>
-          )}
+              {hasOrderChanged && (
+                <Button
+                  onClick={() => saveOrderMutation.mutate(localRecommendations)}
+                  disabled={saveOrderMutation.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Sıralamayı Kaydet
+                </Button>
+              )}
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center space-y-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
+                  <p className="text-sm text-muted-foreground">Yükleniyor...</p>
+                </div>
+              </div>
+            ) : localRecommendations && localRecommendations.length > 0 ? (
+              <div className="space-y-4">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={localRecommendations.map(r => r.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {localRecommendations.map((site, index) => (
+                        <div key={site.id} className="flex items-center gap-3">
+                          <Badge variant="outline" className="w-8 h-8 flex items-center justify-center rounded-full">
+                            {index + 1}
+                          </Badge>
+                          <div className="flex-1">
+                            <SortableItem
+                              id={site.id}
+                              site={site}
+                              onRemove={() => removeMutation.mutate(site.id)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                
+                <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                  <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>İpucu:</strong> Siteleri sürükleyip bırakarak sıralayın. Değişiklikleri kaydetmek için "Sıralamayı Kaydet" butonuna tıklayın.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            ) : (
+              <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg bg-muted/20">
+                <div className="mx-auto w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                  <Plus className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium mb-1">Henüz önerilen site yok</p>
+                <p className="text-xs text-muted-foreground">
+                  Yukarıdaki alandan site ekleyerek başlayın
+                </p>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

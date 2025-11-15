@@ -12,22 +12,23 @@ interface RecommendedSitesProps {
 }
 
 const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: RecommendedSitesProps) => {
-  // 🎯 STEP 1: Check for admin-managed recommendations first
-  const { data: adminRecommendations, isLoading: adminLoading } = useQuery({
-    queryKey: ["admin-recommended-sites", currentSiteId],
+  // 🎯 STEP 1: Fetch from global pool
+  const { data: globalRecommendations, isLoading: globalLoading } = useQuery({
+    queryKey: ["global-recommended-sites-display"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("site_recommended_sites")
+        .from("recommended_sites_pool")
         .select(`
-          recommended_site_id,
-          betting_sites!site_recommended_sites_recommended_site_id_fkey (
+          site_id,
+          display_order,
+          betting_sites!recommended_sites_pool_site_id_fkey (
             id, name, logo_url, slug, rating, bonus, features, 
             affiliate_link, email, whatsapp, telegram, twitter, 
             instagram, facebook, youtube
           )
         `)
-        .eq("site_id", currentSiteId)
-        .order("display_order");
+        .order("display_order")
+        .limit(4);
 
       if (error) throw error;
       
@@ -37,7 +38,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
-  // 🎯 STEP 2: Fallback to algorithmic recommendations if no admin ones exist
+  // 🎯 STEP 2: Fallback to algorithmic recommendations if no global ones exist
   const { data: algorithmicSites, isLoading: algorithmicLoading } = useQuery({
     queryKey: ["recommended-sites-algorithmic", currentSiteId],
     queryFn: async () => {
@@ -64,12 +65,12 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
       return data;
     },
     staleTime: 10 * 60 * 1000,
-    enabled: !adminLoading && (!adminRecommendations || adminRecommendations.length === 0),
+    enabled: !globalLoading && (!globalRecommendations || globalRecommendations.length === 0),
   });
 
-  const isLoading = adminLoading || algorithmicLoading;
-  const allSites = adminRecommendations && adminRecommendations.length > 0 
-    ? adminRecommendations 
+  const isLoading = globalLoading || algorithmicLoading;
+  const allSites = globalRecommendations && globalRecommendations.length > 0 
+    ? globalRecommendations 
     : algorithmicSites;
 
   const { data: siteStats } = useSiteStats();

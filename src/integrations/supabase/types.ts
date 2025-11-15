@@ -1248,6 +1248,45 @@ export type Database = {
         }
         Relationships: []
       }
+      recommended_sites_pool: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          site_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          site_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          site_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommended_sites_pool_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommended_sites_pool_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+        ]
+      }
       search_history: {
         Row: {
           created_at: string | null
