@@ -30,19 +30,13 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules')) {
             // CRITICAL: Keep React ecosystem as SINGLE MONOLITHIC chunk
             // This prevents ALL dispatcher null errors by guaranteeing single React instance
+            // Include recharts in React bundle to prevent initialization errors
             if (id.includes('react') || id.includes('react-dom') || 
                 id.includes('react-router') || id.includes('scheduler') ||
                 id.includes('@tanstack/react-query') || id.includes('three') ||
-                id.includes('@radix-ui') || id.includes('react-helmet-async')) {
-              return 'vendor-react'; // All React + Radix + Helmet in one chunk
-            }
-            // Split recharts separately with proper initialization
-            if (id.includes('recharts')) {
-              return 'vendor-charts';
-            }
-            // Keep d3 separate from recharts to avoid circular deps
-            if (id.includes('d3-')) {
-              return 'vendor-d3';
+                id.includes('@radix-ui') || id.includes('react-helmet-async') ||
+                id.includes('recharts') || id.includes('d3-')) {
+              return 'vendor-react'; // All React + Radix + Helmet + Charts in one chunk
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
