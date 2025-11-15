@@ -28,8 +28,13 @@ export const useAdminSiteManagement = () => {
         return;
       }
 
+      const objectUrl = URL.createObjectURL(file);
       const img = new Image();
+      
       img.onload = () => {
+        // 🔧 Memory leak fix: cleanup object URL
+        URL.revokeObjectURL(objectUrl);
+
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -64,8 +69,14 @@ export const useAdminSiteManagement = () => {
           }
         }, 'image/webp', 0.85);
       };
-      img.onerror = () => reject(new Error('Resim yüklenemedi'));
-      img.src = URL.createObjectURL(file);
+      
+      img.onerror = () => {
+        // 🔧 Memory leak fix: cleanup on error too
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('Resim yüklenemedi'));
+      };
+      
+      img.src = objectUrl;
     });
   };
 
