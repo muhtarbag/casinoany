@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, X, ChevronDown } from 'lucide-react';
 import type { NotificationFormData } from './types';
 
@@ -124,7 +125,7 @@ export function NotificationForm({
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => handleChange('image_url', '')}
               >
                 <X className="h-4 w-4" />
@@ -132,16 +133,12 @@ export function NotificationForm({
             )}
           </div>
           {formData.image_url && (
-            <img
-              src={formData.image_url}
-              alt="Preview"
-              className="mt-2 h-32 w-auto rounded-md object-cover"
-            />
+            <img src={formData.image_url} alt="Preview" className="mt-2 rounded-lg max-h-40 object-cover" />
           )}
         </div>
       </div>
 
-      {/* Type & Behavior */}
+      {/* Settings */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="notification_type">Bildirim Tipi</Label>
@@ -155,7 +152,6 @@ export function NotificationForm({
             <SelectContent>
               <SelectItem value="popup">Pop-up</SelectItem>
               <SelectItem value="banner">Banner</SelectItem>
-              <SelectItem value="toast">Toast</SelectItem>
               <SelectItem value="form">Form</SelectItem>
             </SelectContent>
           </Select>
@@ -179,16 +175,138 @@ export function NotificationForm({
         </div>
       </div>
 
-      {/* Form Fields - Only shown when notification type is "form" */}
+      {/* Display Pages */}
+      <div className="space-y-3 border rounded-lg p-4 bg-muted/20">
+        <Label className="text-base font-semibold">📄 Gösterilecek Sayfalar</Label>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: 'all', label: 'Tüm Sayfalar' },
+            { value: 'home', label: 'Ana Sayfa (/)' },
+            { value: 'casino-sites', label: 'Casino Siteleri' },
+            { value: 'sports-betting', label: 'Spor Bahisleri' },
+            { value: 'live-casino', label: 'Canlı Casino' },
+            { value: 'blog', label: 'Blog' },
+            { value: 'categories', label: 'Kategoriler' },
+            { value: 'news', label: 'Haberler' },
+          ].map((page) => (
+            <div key={page.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={`page-${page.value}`}
+                checked={formData.display_pages.includes(page.value)}
+                onCheckedChange={() => handleArrayChange('display_pages', page.value)}
+              />
+              <label
+                htmlFor={`page-${page.value}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {page.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* User Segments */}
+      <div className="space-y-3 border rounded-lg p-4 bg-muted/20">
+        <Label className="text-base font-semibold">👥 Hedef Kitle</Label>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: 'all', label: 'Herkes' },
+            { value: 'new_visitor', label: 'Yeni Ziyaretçiler' },
+            { value: 'returning_visitor', label: 'Geri Dönen Ziyaretçiler' },
+            { value: 'registered', label: 'Kayıtlı Kullanıcılar' },
+          ].map((segment) => (
+            <div key={segment.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={`segment-${segment.value}`}
+                checked={formData.user_segments.includes(segment.value)}
+                onCheckedChange={() => handleArrayChange('user_segments', segment.value)}
+              />
+              <label
+                htmlFor={`segment-${segment.value}`}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {segment.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Trigger Settings */}
+      <Collapsible className="border rounded-lg p-4 space-y-4 bg-muted/20">
+        <CollapsibleTrigger className="flex items-center justify-between w-full">
+          <h3 className="font-semibold text-sm">⚡ Tetikleme Ayarları</h3>
+          <ChevronDown className="h-4 w-4" />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-4 pt-4">
+          <div>
+            <Label htmlFor="trigger_type">Tetikleme Türü</Label>
+            <Select
+              value={formData.trigger_type}
+              onValueChange={(value) => handleChange('trigger_type', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="instant">⚡ Anında</SelectItem>
+                <SelectItem value="time_on_page">⏱️ Sayfada Geçirilen Süre</SelectItem>
+                <SelectItem value="scroll_depth">📜 Scroll Derinliği</SelectItem>
+                <SelectItem value="exit_intent">🚪 Çıkış Niyeti</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Time on Page Condition */}
+          {formData.trigger_type === 'time_on_page' && (
+            <div>
+              <Label htmlFor="time_seconds">Süre (saniye)</Label>
+              <Input
+                id="time_seconds"
+                type="number"
+                min="1"
+                value={(formData.trigger_conditions as any)?.timeSeconds || 5}
+                onChange={(e) => handleChange('trigger_conditions', { timeSeconds: parseInt(e.target.value) || 5 })}
+                placeholder="5"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Bildirim bu süre sonra gösterilecek
+              </p>
+            </div>
+          )}
+
+          {/* Scroll Depth Condition */}
+          {formData.trigger_type === 'scroll_depth' && (
+            <div>
+              <Label htmlFor="scroll_percentage">Scroll Yüzdesi (%)</Label>
+              <Input
+                id="scroll_percentage"
+                type="number"
+                min="1"
+                max="100"
+                value={(formData.trigger_conditions as any)?.scrollPercentage || 50}
+                onChange={(e) => handleChange('trigger_conditions', { scrollPercentage: parseInt(e.target.value) || 50 })}
+                placeholder="50"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Sayfa bu kadar scroll edildiğinde bildirim gösterilecek
+              </p>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Form Fields */}
       {formData.notification_type === 'form' && (
         <Collapsible open={true} className="border rounded-lg p-4 space-y-4 bg-muted/20">
           <CollapsibleTrigger className="flex items-center justify-between w-full">
-            <h3 className="font-semibold text-sm">Form Alanları Ayarları</h3>
+            <h3 className="font-semibold text-sm">📝 Form Alanları</h3>
             <ChevronDown className="h-4 w-4" />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-4 pt-4">
             <div>
-              <Label htmlFor="email_label">E-posta Alanı Etiketi</Label>
+              <Label htmlFor="email_label">E-posta Etiketi</Label>
               <Input
                 id="email_label"
                 value={formData.form_fields?.email_label || ''}
@@ -196,9 +314,8 @@ export function NotificationForm({
                 placeholder="E-posta Adresiniz"
               />
             </div>
-
             <div>
-              <Label htmlFor="phone_label">Telefon Alanı Etiketi</Label>
+              <Label htmlFor="phone_label">Telefon Etiketi</Label>
               <Input
                 id="phone_label"
                 value={formData.form_fields?.phone_label || ''}
@@ -206,9 +323,8 @@ export function NotificationForm({
                 placeholder="Telefon Numaranız"
               />
             </div>
-
             <div>
-              <Label htmlFor="submit_text">Gönder Butonu Metni</Label>
+              <Label htmlFor="submit_text">Gönder Butonu</Label>
               <Input
                 id="submit_text"
                 value={formData.form_fields?.submit_text || ''}
@@ -216,25 +332,21 @@ export function NotificationForm({
                 placeholder="Bonus Kodumu Gönder"
               />
             </div>
-
             <div>
               <Label htmlFor="success_message">Başarı Mesajı</Label>
               <Textarea
                 id="success_message"
                 value={formData.form_fields?.success_message || ''}
                 onChange={(e) => handleFormFieldChange('success_message', e.target.value)}
-                placeholder="✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi."
                 rows={2}
               />
             </div>
-
             <div>
               <Label htmlFor="privacy_text">Gizlilik Metni</Label>
               <Textarea
                 id="privacy_text"
                 value={formData.form_fields?.privacy_text || ''}
                 onChange={(e) => handleFormFieldChange('privacy_text', e.target.value)}
-                placeholder="🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır."
                 rows={2}
               />
             </div>
@@ -242,7 +354,7 @@ export function NotificationForm({
         </Collapsible>
       )}
 
-      {/* Buttons */}
+      {/* Button Settings */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="button_text">Buton Metni</Label>
@@ -253,9 +365,8 @@ export function NotificationForm({
             placeholder="Detayları Gör"
           />
         </div>
-
         <div>
-          <Label htmlFor="button_url">Buton URL'si</Label>
+          <Label htmlFor="button_url">Buton URL</Label>
           <Input
             id="button_url"
             value={formData.button_url}
@@ -268,7 +379,7 @@ export function NotificationForm({
       {/* Dates */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="start_date">Başlangıç Tarihi</Label>
+          <Label htmlFor="start_date">Başlangıç</Label>
           <Input
             id="start_date"
             type="datetime-local"
@@ -276,9 +387,8 @@ export function NotificationForm({
             onChange={(e) => handleChange('start_date', e.target.value)}
           />
         </div>
-
         <div>
-          <Label htmlFor="end_date">Bitiş Tarihi</Label>
+          <Label htmlFor="end_date">Bitiş</Label>
           <Input
             id="end_date"
             type="datetime-local"
@@ -291,7 +401,7 @@ export function NotificationForm({
       {/* Colors */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="background_color">Arkaplan Rengi</Label>
+          <Label htmlFor="background_color">Arkaplan</Label>
           <Input
             id="background_color"
             type="color"
@@ -299,7 +409,6 @@ export function NotificationForm({
             onChange={(e) => handleChange('background_color', e.target.value)}
           />
         </div>
-
         <div>
           <Label htmlFor="text_color">Metin Rengi</Label>
           <Input
@@ -312,162 +421,53 @@ export function NotificationForm({
       </div>
 
       {/* Advanced Styling */}
-      <div className="border-t pt-4 space-y-4">
-        <h3 className="font-semibold">Gelişmiş Stil Seçenekleri</h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="font_family">Font</Label>
-            <Select
-              value={formData.font_family}
-              onValueChange={(value) => handleChange('font_family', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Inter">Inter</SelectItem>
-                <SelectItem value="Roboto">Roboto</SelectItem>
-                <SelectItem value="Poppins">Poppins</SelectItem>
-                <SelectItem value="Playfair Display">Playfair Display</SelectItem>
-                <SelectItem value="Montserrat">Montserrat</SelectItem>
-              </SelectContent>
-            </Select>
+      <Collapsible className="border rounded-lg p-4 space-y-4 bg-muted/20">
+        <CollapsibleTrigger className="flex items-center justify-between w-full">
+          <h3 className="font-semibold text-sm">🎨 Gelişmiş Stiller</h3>
+          <ChevronDown className="h-4 w-4" />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-4 pt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Font</Label>
+              <Select value={formData.font_family} onValueChange={(v) => handleChange('font_family', v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Inter">Inter</SelectItem>
+                  <SelectItem value="Roboto">Roboto</SelectItem>
+                  <SelectItem value="Poppins">Poppins</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Boyut</Label>
+              <Select value={formData.font_size} onValueChange={(v) => handleChange('font_size', v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sm">Küçük</SelectItem>
+                  <SelectItem value="base">Normal</SelectItem>
+                  <SelectItem value="lg">Büyük</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </CollapsibleContent>
+      </Collapsible>
 
-          <div>
-            <Label htmlFor="font_size">Yazı Boyutu</Label>
-            <Select
-              value={formData.font_size}
-              onValueChange={(value) => handleChange('font_size', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="xs">Çok Küçük</SelectItem>
-                <SelectItem value="sm">Küçük</SelectItem>
-                <SelectItem value="base">Normal</SelectItem>
-                <SelectItem value="lg">Büyük</SelectItem>
-                <SelectItem value="xl">Çok Büyük</SelectItem>
-                <SelectItem value="2xl">Ekstra Büyük</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="border_radius">Köşe Yuvarlaklığı</Label>
-            <Select
-              value={formData.border_radius}
-              onValueChange={(value) => handleChange('border_radius', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Yok</SelectItem>
-                <SelectItem value="sm">Az</SelectItem>
-                <SelectItem value="md">Orta</SelectItem>
-                <SelectItem value="lg">Çok</SelectItem>
-                <SelectItem value="xl">Ekstra</SelectItem>
-                <SelectItem value="2xl">Maksimum</SelectItem>
-                <SelectItem value="full">Tam Yuvarlak</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="max_width">Maksimum Genişlik</Label>
-            <Select
-              value={formData.max_width}
-              onValueChange={(value) => handleChange('max_width', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sm">Küçük (384px)</SelectItem>
-                <SelectItem value="md">Orta (448px)</SelectItem>
-                <SelectItem value="lg">Büyük (512px)</SelectItem>
-                <SelectItem value="xl">Çok Büyük (576px)</SelectItem>
-                <SelectItem value="2xl">Ekstra Büyük (672px)</SelectItem>
-                <SelectItem value="full">Tam Genişlik</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="padding">İç Boşluk</Label>
-            <Select
-              value={formData.padding}
-              onValueChange={(value) => handleChange('padding', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tight">Sıkı</SelectItem>
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="relaxed">Rahat</SelectItem>
-                <SelectItem value="loose">Geniş</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="shadow_size">Gölge</Label>
-            <Select
-              value={formData.shadow_size}
-              onValueChange={(value) => handleChange('shadow_size', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Yok</SelectItem>
-                <SelectItem value="sm">Küçük</SelectItem>
-                <SelectItem value="md">Orta</SelectItem>
-                <SelectItem value="lg">Büyük</SelectItem>
-                <SelectItem value="xl">Çok Büyük</SelectItem>
-                <SelectItem value="2xl">Ekstra Büyük</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="border_color">Kenarlık Rengi</Label>
-            <Input
-              id="border_color"
-              type="color"
-              value={formData.border_color}
-              onChange={(e) => handleChange('border_color', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="border_width">Kenarlık Kalınlığı</Label>
-            <Select
-              value={formData.border_width}
-              onValueChange={(value) => handleChange('border_width', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Yok</SelectItem>
-                <SelectItem value="1">İnce (1px)</SelectItem>
-                <SelectItem value="2">Orta (2px)</SelectItem>
-                <SelectItem value="4">Kalın (4px)</SelectItem>
-                <SelectItem value="8">Çok Kalın (8px)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Priority */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="priority">Öncelik (0-100)</Label>
+          <Input
+            id="priority"
+            type="number"
+            min="0"
+            max="100"
+            value={formData.priority}
+            onChange={(e) => handleChange('priority', parseInt(e.target.value) || 0)}
+          />
         </div>
-      </div>
-
-      {/* Status & Priority */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 pt-6">
           <Switch
             id="is_active"
             checked={formData.is_active}
@@ -475,22 +475,11 @@ export function NotificationForm({
           />
           <Label htmlFor="is_active">Aktif</Label>
         </div>
-
-        <div className="w-24">
-          <Label htmlFor="priority">Öncelik</Label>
-          <Input
-            id="priority"
-            type="number"
-            value={formData.priority}
-            onChange={(e) => handleChange('priority', parseInt(e.target.value) || 0)}
-            min={0}
-          />
-        </div>
       </div>
 
-      {/* Form Actions */}
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      {/* Buttons */}
+      <div className="flex justify-end gap-2 pt-6 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           İptal
         </Button>
         <Button type="submit" disabled={isSubmitting}>
