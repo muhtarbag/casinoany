@@ -84,19 +84,21 @@ export const MobileMenu = () => {
             <span>Hakkımızda</span>
           </NavLink>
 
-          {user && isAdmin && (
+          {user && (
             <>
               <div className="my-2 border-t border-border" />
               
-              <NavLink
-                to="/admin"
-                onClick={handleNavClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
-                activeClassName="text-primary bg-muted font-semibold"
-              >
-                <Shield className="w-5 h-5" />
-                <span>Admin Panel</span>
-              </NavLink>
+              {isAdmin && (
+                <NavLink
+                  to="/admin"
+                  onClick={handleNavClick}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  activeClassName="text-primary bg-muted font-semibold"
+                >
+                  <Shield className="w-5 h-5" />
+                  <span>Admin Panel</span>
+                </NavLink>
+              )}
 
               <button
                 onClick={() => {
