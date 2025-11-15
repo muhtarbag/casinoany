@@ -1,4 +1,4 @@
-import { Mail, Twitter, Facebook, Instagram, Youtube, Linkedin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
+import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
 import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
@@ -198,25 +198,30 @@ export const Footer = () => {
 
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
             <div className="flex gap-3 flex-wrap">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10">
+              <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                aria-label="Twitter/X">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10">
+              <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                aria-label="Facebook">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10">
+              <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                aria-label="Instagram">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10">
+              <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                aria-label="YouTube">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" 
-                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10">
-                <Linkedin className="w-5 h-5" />
+              <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                aria-label="Pinterest">
+                <Pin className="w-5 h-5" />
               </a>
             </div>
           </div>
