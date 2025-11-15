@@ -16,25 +16,24 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      'react': path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
     },
     dedupe: ['react', 'react-dom', 'react-router-dom', 'scheduler'],
   },
   ssr: {
-    noExternal: ['react', 'react-dom'],
+    noExternal: ['react', 'react-dom', 'react-router-dom'],
   },
     build: {
       rollupOptions: {
+        external: [],
         output: {
-          manualChunks: undefined, // Disable manual chunking to prevent React splitting
+          manualChunks: undefined,
         },
       },
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 2000,
     sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
-    cssCodeSplit: true,
+    cssCodeSplit: false,
     assetsInlineLimit: 4096,
   },
   // Optimize dependencies
