@@ -46,6 +46,7 @@ export const OptimizedImage = ({
 
   const handleError = () => {
     console.warn(`Image failed to load: ${imageSrc}`);
+    console.log('Image error details:', { src: imageSrc, hasError });
     if (!hasError) {
       setHasError(true);
       setImageSrc(fallback);
@@ -53,6 +54,7 @@ export const OptimizedImage = ({
   };
 
   const handleLoad = () => {
+    console.log('Image loaded successfully:', imageSrc);
     setIsLoaded(true);
   };
 
@@ -61,41 +63,29 @@ export const OptimizedImage = ({
     return null;
   }
 
-  // Convert to WebP if not already
-  const webpSrc = imageSrc.match(/\.(jpg|jpeg|png)$/i) 
-    ? imageSrc.replace(/\.(jpg|jpeg|png)$/i, '.webp')
-    : imageSrc;
-
   return (
-    <picture>
-      {/* WebP source with fallback */}
-      {!hasError && imageSrc !== fallback && (
-        <source srcSet={webpSrc} type="image/webp" />
+    <img
+      src={imageSrc}
+      alt={alt}
+      className={cn(
+        'transition-opacity duration-300',
+        isLoaded ? 'opacity-100' : 'opacity-70',
+        className
       )}
-      
-      <img
-        src={imageSrc}
-        alt={alt}
-        className={cn(
-          'transition-opacity duration-300',
-          isLoaded ? 'opacity-100' : 'opacity-0',
-          className
-        )}
-        style={{
-          objectFit,
-          ...(width && { width: `${width}px` }),
-          ...(height && { height: `${height}px` })
-        }}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
-        fetchPriority={priority ? 'high' : fetchPriority}
-        sizes={sizes}
-        onLoad={handleLoad}
-        onError={handleError}
-        width={width}
-        height={height}
-      />
-    </picture>
+      style={{
+        objectFit,
+        ...(width && { width: `${width}px` }),
+        ...(height && { height: `${height}px` })
+      }}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchPriority={priority ? 'high' : fetchPriority}
+      sizes={sizes}
+      onLoad={handleLoad}
+      onError={handleError}
+      width={width}
+      height={height}
+    />
   );
 };
 
