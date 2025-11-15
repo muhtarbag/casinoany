@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+// CRITICAL: Create context outside component to ensure single instance
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
