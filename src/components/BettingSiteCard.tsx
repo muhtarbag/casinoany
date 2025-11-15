@@ -67,11 +67,16 @@ const BettingSiteCardComponent = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useAuth();
+  const showFallback = !logo || !logoUrl || imageError;
 
 
   useEffect(() => {
     if (logo) {
+      setIsLoading(true);
+      setImageError(false);
       // Eğer logo zaten tam bir URL ise direkt kullan
       if (logo.startsWith('http')) {
         setLogoUrl(logo);
@@ -80,6 +85,8 @@ const BettingSiteCardComponent = ({
         const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
         setLogoUrl(data.publicUrl);
       }
+    } else {
+      setIsLoading(false);
     }
   }, [logo]);
 
@@ -140,17 +147,33 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm">
-            {logoUrl ? (
+          <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm relative">
+            {/* Loading Skeleton */}
+            {isLoading && !showFallback && (
+              <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse" />
+            )}
+            
+            {!showFallback ? (
               <img 
-                src={logoUrl} 
-                alt={name} 
-                className="w-full h-full object-contain p-2"
+                src={logoUrl!} 
+                alt={`${name} logo`}
+                className={`w-full h-full object-contain p-2 transition-opacity duration-300 ${
+                  isLoading ? 'opacity-0' : 'opacity-100'
+                }`}
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setIsLoading(false);
+                }}
                 loading="lazy"
                 decoding="async"
               />
             ) : (
-              <span className="text-2xl font-bold text-muted-foreground">{name[0]}</span>
+              <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center animate-scale-in">
+                <span className="text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  {name.charAt(0)}
+                </span>
+              </div>
             )}
           </div>
           <div className="flex flex-col items-end gap-2">
