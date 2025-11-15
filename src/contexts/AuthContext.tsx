@@ -107,23 +107,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (error) return { error };
     
-    // Check if user is approved
+    // Check if user is approved (only for users with role records)
     if (data.user) {
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('status')
         .eq('user_id', data.user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to allow null
       
-      if (roleData?.status === 'pending') {
-        await supabase.auth.signOut();
-        return { error: { message: 'Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin.' } };
+      // Only block if role record exists and status is pending/rejected
+      if (roleData) {
+        if (roleData.status === 'pending') {
+          await supabase.auth.signOut();
+          return { error: { message: 'Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin.' } };
+        }
+        
+        if (roleData.status === 'rejected') {
+          await supabase.auth.signOut();
+          return { error: { message: 'Hesabınız reddedildi. Destek ile iletişime geçin.' } };
+        }
       }
-      
-      if (roleData?.status === 'rejected') {
-        await supabase.auth.signOut();
-        return { error: { message: 'Hesabınız reddedildi. Destek ile iletişime geçin.' } };
-      }
+      // If no role record exists (old users), allow login
     }
     
     return { error: null };
