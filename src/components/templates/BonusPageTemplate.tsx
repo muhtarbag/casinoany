@@ -202,37 +202,40 @@ export const BonusPageTemplate = ({
 };
 
 const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
-  <div className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow bg-card">
-    <div className="flex items-center gap-4 flex-1">
-      <div className="text-2xl font-bold text-muted-foreground w-8">
+  <div className="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 border-2 rounded-xl hover:shadow-lg hover:border-primary/20 transition-all bg-card">
+    <div className="flex items-center gap-6 flex-1">
+      <div className="text-3xl font-bold text-primary w-10 flex-shrink-0">
         #{rank}
       </div>
       
-      <OptimizedImage
-        src={bonus.casino.logo}
-        alt={bonus.casino.name}
-        width={60}
-        height={60}
-        className="rounded"
-      />
+      <div className="w-24 h-24 flex-shrink-0 bg-background rounded-lg border-2 border-border p-2 flex items-center justify-center">
+        <OptimizedImage
+          src={bonus.casino.logo}
+          alt={bonus.casino.name}
+          width={88}
+          height={88}
+          className="rounded object-contain w-full h-full"
+          priority={rank <= 3}
+        />
+      </div>
       
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-lg mb-1">{bonus.casino.name}</h3>
+        <h3 className="font-bold text-xl mb-2">{bonus.casino.name}</h3>
         <Badge className={`${BONUS_TYPE_COLORS[bonus.bonusType]} text-white mb-2`}>
           {BONUS_TYPE_LABELS[bonus.bonusType]}
         </Badge>
-        <p className="text-sm text-muted-foreground">{bonus.title}</p>
-        <div className="flex flex-wrap gap-3 mt-2 text-xs">
-          <span className="flex items-center gap-1">
-            <Gift className="w-3 h-3" />
+        <p className="text-sm text-muted-foreground mb-3">{bonus.title}</p>
+        <div className="flex flex-wrap gap-4 text-sm font-medium">
+          <span className="flex items-center gap-2 text-primary">
+            <Gift className="w-4 h-4" />
             {bonus.amount}
           </span>
-          <span className="flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
+          <span className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
             Çevrim: {bonus.wageringRequirement}
           </span>
           {bonus.bonusCode && (
-            <Badge variant="outline" className="font-mono">
+            <Badge variant="outline" className="font-mono text-xs">
               Kod: {bonus.bonusCode}
             </Badge>
           )}
@@ -242,7 +245,7 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
     
     <Button
       size="lg"
-      className="w-full md:w-auto"
+      className="w-full md:w-auto px-8 py-6 text-base font-semibold"
       onClick={() => window.open(bonus.affiliateLink, '_blank')}
     >
       Bonusu Al →
