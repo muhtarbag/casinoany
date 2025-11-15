@@ -109,7 +109,7 @@ export const useAdminSiteManagement = () => {
           is_featured: false,
           is_active: true,
           logo_url: logoUrl,
-          features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
+          features: (formData.features as string) ? (formData.features as string).split(',').map(f => f.trim()) : [],
           // Social media
           email: formData.email || null,
           whatsapp: formData.whatsapp || null,
@@ -164,7 +164,7 @@ export const useAdminSiteManagement = () => {
         affiliate_link: formData.affiliate_link,
         bonus: formData.bonus,
         rating: formData.rating,
-        features: formData.features ? formData.features.split(',').map(f => f.trim()) : [],
+        features: (formData.features as string) ? (formData.features as string).split(',').map(f => f.trim()) : [],
         // Social media
         email: formData.email || null,
         whatsapp: formData.whatsapp || null,
