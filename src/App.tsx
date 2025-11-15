@@ -17,8 +17,8 @@ import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 
 // Lazy load pages with preloading capability
-// Lazy load pages with preloading capability
-const Index = lazyWithPreload(() => import("./pages/Index"));
+// CRITICAL: Index page must NOT be lazy loaded for FCP performance
+import Index from "./pages/Index";
 const Login = lazyWithPreload(() => import("./pages/Login"));
 const Signup = lazyWithPreload(() => import("./pages/Signup"));
 

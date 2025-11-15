@@ -163,7 +163,7 @@ export default defineConfig(({ mode }) => ({
         moduleSideEffects: false,
       }
     },
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 400,
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
@@ -171,11 +171,12 @@ export default defineConfig(({ mode }) => ({
         drop_console: true,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
-        passes: 2,
+        passes: 3,
         unsafe: true,
         unsafe_comps: true,
         unsafe_math: true,
         unsafe_methods: true,
+        unsafe_proto: true,
       },
       mangle: {
         safari10: true,
