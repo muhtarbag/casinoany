@@ -41,6 +41,7 @@ const AdminContentPlanner = lazyWithPreload(() => import("./pages/admin/content/
 const AdminChangeHistory = lazyWithPreload(() => import("./pages/admin/system/ChangeHistory"));
 const AdminPerformance = lazyWithPreload(() => import("./pages/admin/system/Performance"));
 const AdminBuildHealth = lazyWithPreload(() => import("./pages/admin/system/BuildHealth"));
+const AdminCacheManagement = lazyWithPreload(() => import("./pages/admin/system/CacheManagement"));
 const AdminFeaturedSites = lazyWithPreload(() => import("./pages/admin/sites/FeaturedSites"));
 const AdminBannerManagement = lazyWithPreload(() => import("./pages/admin/sites/BannerManagement"));
 const AdminRecommendedSites = lazyWithPreload(() => import("./pages/admin/sites/RecommendedSites"));
@@ -129,6 +130,7 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/performance" element={<AdminPerformance />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
+            <Route path="system/cache" element={<AdminCacheManagement />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
             <Route path="ai" element={<AdminAI />} />
