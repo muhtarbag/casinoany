@@ -148,6 +148,18 @@ export default function EnhancedReviewManagement() {
     }
   });
 
+  // Type-safe helper functions
+  const getSiteName = useCallback((review: Review): string => {
+    return hasValidSiteInfo(review) ? review.betting_sites.name : "Bilinmeyen Site";
+  }, []);
+
+  const getUserDisplayName = useCallback((review: Review): string => {
+    if (hasValidUserInfo(review)) {
+      return review.profiles.username;
+    }
+    return review.name || "Anonim";
+  }, []);
+
   // Calculate site statistics
   const siteStats = useMemo<SiteStats[]>(() => {
     if (!reviews) return [];
@@ -186,19 +198,7 @@ export default function EnhancedReviewManagement() {
         avg_rating: stats.total_reviews > 0 ? stats.avg_rating / stats.total_reviews : 0
       }))
       .sort((a, b) => b.total_reviews - a.total_reviews);
-  }, [reviews]);
-
-  // Type-safe helper functions
-  const getSiteName = useCallback((review: Review): string => {
-    return hasValidSiteInfo(review) ? review.betting_sites.name : "Bilinmeyen Site";
-  }, []);
-
-  const getUserDisplayName = useCallback((review: Review): string => {
-    if (hasValidUserInfo(review)) {
-      return review.profiles.username;
-    }
-    return review.name || "Anonim";
-  }, []);
+  }, [reviews, getSiteName]);
 
   // Filter reviews with type-safe checks
   const filteredReviews = useMemo(() => {
