@@ -8,6 +8,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { EmptyState } from '@/components/EmptyState';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Eye, MousePointerClick, TrendingUp, Users, Target, Clock, BarChart3 } from 'lucide-react';
+import { TypedQueries } from '@/lib/supabase-typed';
 
 export const AnalyticsDashboard = () => {
   // Fetch analytics summary
@@ -17,12 +18,12 @@ export const AnalyticsDashboard = () => {
       const today = new Date();
       const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      // Paralel sorgular ile hızlandırma
+      // ✅ TYPED: Parallel queries with proper types
       const [pageViewsRes, eventsRes, conversionsRes, sessionsRes] = await Promise.all([
-        (supabase as any).from('page_views').select('*').gte('created_at', sevenDaysAgo.toISOString()),
-        (supabase as any).from('user_events').select('*').gte('created_at', sevenDaysAgo.toISOString()),
-        (supabase as any).from('conversions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
-        (supabase as any).from('analytics_sessions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        supabase.from('page_views').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        TypedQueries.userEvents(supabase).select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        supabase.from('conversions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
+        supabase.from('analytics_sessions').select('*').gte('created_at', sevenDaysAgo.toISOString()),
       ]);
 
       if (pageViewsRes.error) throw pageViewsRes.error;
