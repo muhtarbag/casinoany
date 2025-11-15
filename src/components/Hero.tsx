@@ -7,6 +7,7 @@ import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import BlurText from './BlurText';
 import FloatingLines from './FloatingLines';
+import { RetryBoundary } from './feedback/RetryBoundary';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -175,15 +176,17 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     <div className="relative overflow-hidden bg-background touch-manipulation">
       {/* Three.js Floating Lines Background */}
       <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none z-0">
-        <FloatingLines 
-          enabledWaves={['top', 'middle', 'bottom']}
-          lineCount={[10, 15, 20]}
-          lineDistance={[8, 6, 4]}
-          bendRadius={5.0}
-          bendStrength={-0.5}
-          interactive={true}
-          parallax={true}
-        />
+        <RetryBoundary fallback={<div className="w-full h-full bg-gradient-to-b from-background to-muted/20" />}>
+          <FloatingLines 
+            enabledWaves={['top', 'middle', 'bottom']}
+            lineCount={[10, 15, 20]}
+            lineDistance={[8, 6, 4]}
+            bendRadius={5.0}
+            bendStrength={-0.5}
+            interactive={true}
+            parallax={true}
+          />
+        </RetryBoundary>
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-8 md:py-12 lg:py-20">
