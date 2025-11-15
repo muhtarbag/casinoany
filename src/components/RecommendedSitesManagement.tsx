@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, GripVertical, Save } from 'lucide-react';
+import { Trash2, Plus, GripVertical, Save, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface RecommendedSite {
   id: string;
@@ -30,7 +31,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, site, onRemove }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -41,30 +42,41 @@ function SortableItem({ id, site, onRemove }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border"
+      className={`group flex items-center gap-4 p-4 bg-card rounded-lg border-2 transition-all ${
+        isDragging 
+          ? 'border-primary shadow-lg scale-[1.02] opacity-90' 
+          : 'border-border hover:border-primary/50 hover:shadow-md'
+      }`}
     >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-        <GripVertical className="w-4 h-4 text-muted-foreground" />
+      <div 
+        {...attributes} 
+        {...listeners} 
+        className="cursor-grab active:cursor-grabbing p-2 -ml-2 rounded-md hover:bg-muted/50 transition-colors"
+      >
+        <GripVertical className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
       </div>
       
-      <img 
-        src={site.betting_sites.logo_url} 
-        alt={site.betting_sites.name}
-        className="w-8 h-8 object-contain rounded"
-      />
+      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-muted/30 p-2 border border-border">
+        <img 
+          src={site.betting_sites.logo_url} 
+          alt={site.betting_sites.name}
+          className="w-full h-full object-contain"
+        />
+      </div>
       
-      <div className="flex-1">
-        <p className="font-medium text-sm">{site.betting_sites.name}</p>
-        <p className="text-xs text-muted-foreground">{site.betting_sites.slug}</p>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-sm truncate">{site.betting_sites.name}</p>
+        <p className="text-xs text-muted-foreground truncate">/{site.betting_sites.slug}</p>
       </div>
 
       <Button
         variant="ghost"
-        size="icon"
+        size="sm"
         onClick={() => onRemove(site.id)}
-        className="text-destructive hover:text-destructive"
+        className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
       >
-        <Trash2 className="w-4 h-4" />
+        <Trash2 className="w-4 h-4 mr-1" />
+        Kaldır
       </Button>
     </div>
   );
@@ -260,55 +272,98 @@ export const RecommendedSitesManagement = () => {
                           JSON.stringify(recommendations?.map(r => r.id));
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Önerilen Siteler Yönetimi</CardTitle>
-          <CardDescription>
-            Her site için gösterilecek önerilen siteleri yönetin (maksimum 4 site)
-          </CardDescription>
+    <div className="space-y-6 p-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Önerilen Siteler</h1>
+        <p className="text-muted-foreground mt-2">
+          Site detay sayfalarında gösterilecek önerilen siteleri yönetin
+        </p>
+      </div>
+
+      <Card className="border-2">
+        <CardHeader className="border-b bg-muted/30">
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-xl">Site Önerileri</CardTitle>
+              <CardDescription className="mt-1.5">
+                Her site için maksimum 4 önerilen site ekleyebilir ve sıralayabilirsiniz
+              </CardDescription>
+            </div>
+            {selectedMainSite && localRecommendations?.length > 0 && (
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                {localRecommendations.length}/4 Site
+              </Badge>
+            )}
+          </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 pt-6">
           {/* Main Site Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Ana Site Seçin</label>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Search className="w-4 h-4 text-muted-foreground" />
+              <label className="text-sm font-semibold">1. Ana Siteyi Seçin</label>
+            </div>
             <Select value={selectedMainSite} onValueChange={setSelectedMainSite}>
-              <SelectTrigger>
-                <SelectValue placeholder="Site seçin..." />
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Öneriler eklemek istediğiniz siteyi seçin..." />
               </SelectTrigger>
               <SelectContent>
                 {allSites?.map((site) => (
                   <SelectItem key={site.id} value={site.id}>
-                    {site.name}
+                    <div className="flex items-center gap-2">
+                      <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
+                      {site.name}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {!selectedMainSite && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  Önce bir ana site seçin, ardından bu site için öneriler ekleyebilirsiniz
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           {selectedMainSite && (
             <>
               {/* Add Recommended Site */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Önerilen Site Ekle
+              <div className="space-y-3 pb-6 border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-muted-foreground" />
+                    <label className="text-sm font-semibold">2. Önerilen Site Ekle</label>
+                  </div>
                   {localRecommendations?.length >= 4 && (
-                    <Badge variant="secondary" className="ml-2">Maksimum 4 site</Badge>
+                    <Badge variant="outline" className="border-orange-500/50 text-orange-600">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      Maksimum 4 site
+                    </Badge>
                   )}
-                </label>
-                <div className="flex gap-2">
+                </div>
+                <div className="flex gap-3">
                   <Select 
                     value={selectedRecommendedSite} 
                     onValueChange={setSelectedRecommendedSite}
                     disabled={!availableSites || availableSites.length === 0 || localRecommendations?.length >= 4}
                   >
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Önerilecek siteyi seçin..." />
+                    <SelectTrigger className="flex-1 h-11">
+                      <SelectValue placeholder={
+                        availableSites?.length === 0 
+                          ? "Tüm siteler eklendi" 
+                          : "Önerilecek siteyi seçin..."
+                      } />
                     </SelectTrigger>
                     <SelectContent>
                       {availableSites?.map((site) => (
                         <SelectItem key={site.id} value={site.id}>
-                          {site.name}
+                          <div className="flex items-center gap-2">
+                            <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
+                            {site.name}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -316,6 +371,8 @@ export const RecommendedSitesManagement = () => {
                   <Button
                     onClick={() => addMutation.mutate()}
                     disabled={!selectedRecommendedSite || addMutation.isPending || localRecommendations?.length >= 4}
+                    size="lg"
+                    className="px-6"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Ekle
@@ -324,57 +381,87 @@ export const RecommendedSitesManagement = () => {
               </div>
 
               {/* Current Recommendations */}
-              {isLoading ? (
-                <div className="text-sm text-muted-foreground">Yükleniyor...</div>
-              ) : localRecommendations && localRecommendations.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">
-                      Mevcut Öneriler ({localRecommendations.length}/4)
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="w-4 h-4 text-muted-foreground" />
+                    <label className="text-sm font-semibold">
+                      3. Sıralama ve Yönetim
+                      {localRecommendations && localRecommendations.length > 0 && (
+                        <span className="text-muted-foreground font-normal ml-2">
+                          ({localRecommendations.length}/4)
+                        </span>
+                      )}
                     </label>
-                    {hasOrderChanged && (
-                      <Button
-                        size="sm"
-                        onClick={() => saveOrderMutation.mutate(localRecommendations)}
-                        disabled={saveOrderMutation.isPending}
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        Sıralamayı Kaydet
-                      </Button>
-                    )}
                   </div>
-                  
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={localRecommendations.map(r => r.id)}
-                      strategy={verticalListSortingStrategy}
+                  {hasOrderChanged && (
+                    <Button
+                      onClick={() => saveOrderMutation.mutate(localRecommendations)}
+                      disabled={saveOrderMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700"
                     >
-                      <div className="space-y-2">
-                        {localRecommendations.map((site) => (
-                          <SortableItem
-                            key={site.id}
-                            id={site.id}
-                            site={site}
-                            onRemove={() => removeMutation.mutate(site.id)}
-                          />
-                        ))}
-                      </div>
-                    </SortableContext>
-                  </DndContext>
-                  
-                  <p className="text-xs text-muted-foreground">
-                    💡 Sürükle-bırak ile sıralayın, ardından "Sıralamayı Kaydet" butonuna tıklayın
-                  </p>
+                      <Save className="w-4 h-4 mr-2" />
+                      Sıralamayı Kaydet
+                    </Button>
+                  )}
                 </div>
-              ) : (
-                <div className="text-sm text-muted-foreground p-4 border rounded-lg text-center">
-                  Henüz önerilen site eklenmemiş. Yukarıdan site ekleyerek başlayın.
-                </div>
-              )}
+
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
+                      <p className="text-sm text-muted-foreground">Yükleniyor...</p>
+                    </div>
+                  </div>
+                ) : localRecommendations && localRecommendations.length > 0 ? (
+                  <div className="space-y-4">
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={localRecommendations.map(r => r.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-3">
+                          {localRecommendations.map((site, index) => (
+                            <div key={site.id} className="flex items-center gap-3">
+                              <Badge variant="outline" className="w-8 h-8 flex items-center justify-center rounded-full">
+                                {index + 1}
+                              </Badge>
+                              <div className="flex-1">
+                                <SortableItem
+                                  id={site.id}
+                                  site={site}
+                                  onRemove={() => removeMutation.mutate(site.id)}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                    
+                    <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                      <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                        <strong>İpucu:</strong> Siteleri sürükleyip bırakarak sıralayın. Değişiklikleri kaydetmek için "Sıralamayı Kaydet" butonuna tıklayın.
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 px-4 border-2 border-dashed rounded-lg bg-muted/20">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                      <Plus className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium mb-1">Henüz önerilen site yok</p>
+                    <p className="text-xs text-muted-foreground">
+                      Yukarıdaki alandan site ekleyerek başlayın
+                    </p>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </CardContent>
