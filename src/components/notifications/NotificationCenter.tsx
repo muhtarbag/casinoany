@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,6 +25,7 @@ const notificationColors = {
 };
 
 export function NotificationCenter() {
+  const navigate = useNavigate();
   const { notifications, unreadCount } = useNotifications();
   const [open, setOpen] = useState(false);
 
@@ -94,7 +96,10 @@ export function NotificationCenter() {
                             variant="link"
                             size="sm"
                             className="h-auto p-0 mt-2"
-                            onClick={() => window.location.href = notification.action!.url}
+                            onClick={() => {
+                              navigate(notification.action!.url);
+                              setOpen(false);
+                            }}
                           >
                             {notification.action.label}
                           </Button>
