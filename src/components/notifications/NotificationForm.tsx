@@ -350,6 +350,15 @@ export function NotificationForm({
                 rows={2}
               />
             </div>
+            <div>
+              <Label htmlFor="button_color">Buton Rengi</Label>
+              <Input
+                id="button_color"
+                type="color"
+                value={formData.form_fields?.button_color || '#ffffff'}
+                onChange={(e) => handleFormFieldChange('button_color', e.target.value)}
+              />
+            </div>
           </CollapsibleContent>
         </Collapsible>
       )}
