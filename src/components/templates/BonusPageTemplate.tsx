@@ -208,7 +208,7 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
         #{rank}
       </div>
       
-      <div className="w-32 h-20 flex-shrink-0 bg-white rounded-lg border-2 border-border p-3 flex items-center justify-center">
+      <div className="w-32 h-20 flex-shrink-0 bg-gray-900 rounded-lg border-2 border-border p-3 flex items-center justify-center">
         <OptimizedImage
           src={bonus.casino.logo}
           alt={bonus.casino.name}
