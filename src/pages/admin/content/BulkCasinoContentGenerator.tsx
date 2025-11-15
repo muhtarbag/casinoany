@@ -36,21 +36,42 @@ export default function BulkCasinoContentGenerator() {
     setProgress(0);
     
     try {
-      const siteIds = missingSites.map(s => s.id);
-      
-      setCurrentSite('Toplu içerik üretimi başlatılıyor...');
-      
-      const { data, error } = await supabase.functions.invoke('generate-casino-content', {
-        body: {
-          isBulk: true,
-          siteIds: siteIds
-        }
-      });
+      // Process in batches of 3 to avoid timeout
+      const batchSize = 3;
+      const batches = [];
+      for (let i = 0; i < missingSites.length; i += batchSize) {
+        batches.push(missingSites.slice(i, i + batchSize));
+      }
 
-      if (error) throw error;
+      let completedCount = 0;
+      const totalSites = missingSites.length;
+
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
+        const siteIds = batch.map(s => s.id);
+        
+        setCurrentSite(`Batch ${batchIndex + 1}/${batches.length} işleniyor: ${batch.map(s => s.name).join(', ')}...`);
+        
+        const { data, error } = await supabase.functions.invoke('generate-casino-content', {
+          body: {
+            isBulk: true,
+            siteIds: siteIds
+          }
+        });
+
+        if (error) {
+          console.error(`Batch ${batchIndex + 1} error:`, error);
+          toast.error(`Batch ${batchIndex + 1} için hata: ${error.message}`);
+        } else {
+          completedCount += batch.length;
+          const progressPercent = Math.round((completedCount / totalSites) * 100);
+          setProgress(progressPercent);
+          toast.success(`${batch.length} site tamamlandı (${completedCount}/${totalSites})`);
+        }
+      }
 
       setProgress(100);
-      setCurrentSite('Tamamlandı!');
+      setCurrentSite('Tüm siteler tamamlandı!');
       toast.success(`${missingSites.length} site için casino içeriği başarıyla oluşturuldu!`);
       
       // Reload page after 2 seconds
