@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCategories } from '@/hooks/queries/useCategoryQueries';
 
 import { RichTextEditor } from './RichTextEditor';
 
@@ -32,6 +34,7 @@ interface BlogPost {
   view_count: number;
   read_time?: number;
   category?: string;
+  category_id?: string;
   tags?: string[];
   display_order: number;
   primary_site_id?: string;
@@ -50,12 +53,14 @@ interface BlogFormData {
   read_time: string;
   is_published: boolean;
   primary_site_id: string;
+  category_id: string;
 }
 
 export const BlogManagement = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { data: categories } = useCategories({ isActive: true });
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -78,6 +83,7 @@ export const BlogManagement = () => {
     read_time: '5',
     is_published: false,
     primary_site_id: '',
+    category_id: '',
   });
 
   const { data: posts, isLoading } = useQuery({
@@ -154,6 +160,7 @@ export const BlogManagement = () => {
         meta_description: data.meta_description || data.excerpt,
         meta_keywords: data.meta_keywords ? data.meta_keywords.split(',').map(k => k.trim()) : [],
         category: data.category,
+        category_id: data.category_id || null,
         tags: data.tags ? data.tags.split(',').map(t => t.trim()) : [],
         read_time: parseInt(data.read_time) || 5,
         is_published: data.is_published,
@@ -226,6 +233,7 @@ export const BlogManagement = () => {
         meta_description: data.meta_description || data.excerpt,
         meta_keywords: data.meta_keywords ? data.meta_keywords.split(',').map(k => k.trim()) : [],
         category: data.category,
+        category_id: data.category_id || null,
         tags: data.tags ? data.tags.split(',').map(t => t.trim()) : [],
         read_time: parseInt(data.read_time) || 5,
         is_published: data.is_published,
@@ -379,6 +387,7 @@ export const BlogManagement = () => {
       read_time: '5',
       is_published: false,
       primary_site_id: '',
+      category_id: '',
     });
     setImageFile(null);
     setImagePreview(null);
@@ -402,6 +411,7 @@ export const BlogManagement = () => {
       read_time: post.read_time?.toString() || '5',
       is_published: post.is_published,
       primary_site_id: post.primary_site_id || '',
+      category_id: post.category_id || '',
     });
     setImagePreview(post.featured_image || null);
     setImageFile(null);
@@ -633,13 +643,22 @@ export const BlogManagement = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategori</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="Bahis İpuçları"
-                  />
+                  <Label htmlFor="category_id">Kategori</Label>
+                  <Select
+                    value={formData.category_id}
+                    onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kategori seçin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories && categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tags">Etiketler (virgülle ayırın)</Label>
@@ -972,6 +991,7 @@ export const BlogManagement = () => {
                         read_time: post.read_time?.toString() || '5',
                         is_published: post.is_published,
                         primary_site_id: post.primary_site_id || '',
+                        category_id: post.category_id || '',
                       });
                       setImagePreview(post.featured_image || null);
                       setIsPreviewOpen(true);

@@ -5,6 +5,8 @@ import { siteFormSchema, SiteFormData, generateSlug } from '@/schemas/siteValida
 import { Form } from '@/components/ui/form';
 import { UseMutationResult } from '@tanstack/react-query';
 import { SiteFormWizard } from './SiteFormWizard';
+import { useUpdateSiteCategories } from '@/hooks/queries/useCategoryQueries';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SiteFormWrapperProps {
   editingId: string | null;
@@ -30,6 +32,7 @@ export function SiteFormWrapper({
   updateSiteMutation,
 }: SiteFormWrapperProps) {
   const editingSite = sites.find((s) => s.id === editingId);
+  const updateCategoriesMutation = useUpdateSiteCategories();
 
   const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
@@ -56,6 +59,7 @@ export function SiteFormWrapper({
       affiliate_panel_password: '',
       affiliate_notes: '',
       affiliate_commission_percentage: undefined,
+      category_ids: [],
     },
   });
 
@@ -68,37 +72,57 @@ export function SiteFormWrapper({
   }, [nameValue, editingId, form]);
 
   useEffect(() => {
-    if (editingSite) {
-      form.reset({
-        name: editingSite.name,
-        slug: editingSite.slug,
-        rating: editingSite.rating,
-        bonus: editingSite.bonus || '',
-        features: Array.isArray(editingSite.features) ? editingSite.features.join(', ') : '',
-        affiliate_link: editingSite.affiliate_link,
-        email: editingSite.email || '',
-        whatsapp: editingSite.whatsapp || '',
-        telegram: editingSite.telegram || '',
-        twitter: editingSite.twitter || '',
-        instagram: editingSite.instagram || '',
-        facebook: editingSite.facebook || '',
-        youtube: editingSite.youtube || '',
-        affiliate_contract_date: editingSite.affiliate_contract_date || '',
-        affiliate_contract_terms: editingSite.affiliate_contract_terms || '',
-        affiliate_has_monthly_payment: editingSite.affiliate_has_monthly_payment || false,
-        affiliate_monthly_payment: editingSite.affiliate_monthly_payment || undefined,
-        affiliate_panel_url: editingSite.affiliate_panel_url || '',
-        affiliate_panel_username: editingSite.affiliate_panel_username || '',
-        affiliate_panel_password: editingSite.affiliate_panel_password || '',
-        affiliate_notes: editingSite.affiliate_notes || '',
-        affiliate_commission_percentage: editingSite.affiliate_commission_percentage || undefined,
-      });
-      if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
-    } else {
-      form.reset();
-      onLogoFileChange(null);
-      onLogoPreviewChange(null);
-    }
+    const loadSiteData = async () => {
+      if (editingSite) {
+        // Load site categories
+        let categoryIds: string[] = [];
+        try {
+          const { data: siteCategories } = await supabase
+            .from('site_categories')
+            .select('category_id')
+            .eq('site_id', editingSite.id);
+          
+          if (siteCategories) {
+            categoryIds = siteCategories.map((sc) => sc.category_id);
+          }
+        } catch (error) {
+          console.error('Error loading site categories:', error);
+        }
+
+        form.reset({
+          name: editingSite.name,
+          slug: editingSite.slug,
+          rating: editingSite.rating,
+          bonus: editingSite.bonus || '',
+          features: Array.isArray(editingSite.features) ? editingSite.features.join(', ') : '',
+          affiliate_link: editingSite.affiliate_link,
+          email: editingSite.email || '',
+          whatsapp: editingSite.whatsapp || '',
+          telegram: editingSite.telegram || '',
+          twitter: editingSite.twitter || '',
+          instagram: editingSite.instagram || '',
+          facebook: editingSite.facebook || '',
+          youtube: editingSite.youtube || '',
+          affiliate_contract_date: editingSite.affiliate_contract_date || '',
+          affiliate_contract_terms: editingSite.affiliate_contract_terms || '',
+          affiliate_has_monthly_payment: editingSite.affiliate_has_monthly_payment || false,
+          affiliate_monthly_payment: editingSite.affiliate_monthly_payment || undefined,
+          affiliate_panel_url: editingSite.affiliate_panel_url || '',
+          affiliate_panel_username: editingSite.affiliate_panel_username || '',
+          affiliate_panel_password: editingSite.affiliate_panel_password || '',
+          affiliate_notes: editingSite.affiliate_notes || '',
+          affiliate_commission_percentage: editingSite.affiliate_commission_percentage || undefined,
+          category_ids: categoryIds,
+        });
+        if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
+      } else {
+        form.reset();
+        onLogoFileChange(null);
+        onLogoPreviewChange(null);
+      }
+    };
+
+    loadSiteData();
   }, [editingSite, form, onLogoFileChange, onLogoPreviewChange]);
 
   useEffect(() => {
@@ -110,13 +134,35 @@ export function SiteFormWrapper({
     }
   }, [createSiteMutation.isSuccess, updateSiteMutation.isSuccess, form, onLogoFileChange, onLogoPreviewChange, onEditingIdChange]);
 
-  const onSubmit = useCallback((data: SiteFormData) => {
-    if (editingId) {
-      updateSiteMutation.mutate({ id: editingId, formData: data, logoFile });
-    } else {
-      createSiteMutation.mutate({ formData: data, logoFile });
+  const onSubmit = useCallback(async (data: SiteFormData) => {
+    try {
+      const categoryIds = data.category_ids || [];
+      
+      if (editingId) {
+        // Update site
+        await updateSiteMutation.mutateAsync({ id: editingId, formData: data, logoFile });
+        
+        // Update categories
+        await updateCategoriesMutation.mutateAsync({
+          siteId: editingId,
+          categoryIds,
+        });
+      } else {
+        // Create site and get the result
+        const result: any = await createSiteMutation.mutateAsync({ formData: data, logoFile });
+        
+        // Update categories for new site
+        if (result?.id && categoryIds.length > 0) {
+          await updateCategoriesMutation.mutateAsync({
+            siteId: result.id,
+            categoryIds,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error saving site:', error);
     }
-  }, [editingId, logoFile, createSiteMutation, updateSiteMutation]);
+  }, [editingId, logoFile, createSiteMutation, updateSiteMutation, updateCategoriesMutation]);
 
   const handleCancel = useCallback(() => {
     form.reset();

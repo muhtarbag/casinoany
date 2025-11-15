@@ -113,6 +113,11 @@ export const siteFormSchema = z.object({
     .max(100, 'Komisyon yüzdesi 100\'den büyük olamaz')
     .optional()
     .nullable(),
+  
+  // Categories
+  category_ids: z.array(z.string())
+    .optional()
+    .default([]),
 });
 
 export type SiteFormData = z.infer<typeof siteFormSchema>;

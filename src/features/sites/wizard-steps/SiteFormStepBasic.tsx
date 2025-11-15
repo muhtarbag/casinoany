@@ -4,8 +4,11 @@ import { FormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { FormFieldWrapper } from '@/components/forms/FormFieldWrapper';
 import { Button } from '@/components/ui/button';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, FolderTree } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCategories } from '@/hooks/queries/useCategoryQueries';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SiteFormStepBasicProps {
   form: UseFormReturn<SiteFormData>;
@@ -22,6 +25,8 @@ export function SiteFormStepBasic({
   onLogoFileChange,
   onLogoPreviewChange,
 }: SiteFormStepBasicProps) {
+  const { data: categories } = useCategories({ isActive: true });
+  
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -137,6 +142,51 @@ export function SiteFormStepBasic({
           )}
         />
       </div>
+
+      {/* Categories Selection */}
+      <FormField
+        control={form.control}
+        name="category_ids"
+        render={({ field }) => (
+          <FormFieldWrapper 
+            label="Kategoriler"
+            helpText="Bu sitenin hangi kategorilerde görüneceğini seçin"
+          >
+            <div className="border rounded-md p-4">
+              {categories && categories.length > 0 ? (
+                <ScrollArea className="h-48">
+                  <div className="space-y-3">
+                    {categories.map((category) => (
+                      <div key={category.id} className="flex items-center space-x-3">
+                        <Checkbox
+                          id={`category-${category.id}`}
+                          checked={field.value?.includes(category.id)}
+                          onCheckedChange={(checked) => {
+                            const currentValue = field.value || [];
+                            const newValue = checked
+                              ? [...currentValue, category.id]
+                              : currentValue.filter((id) => id !== category.id);
+                            field.onChange(newValue);
+                          }}
+                        />
+                        <label
+                          htmlFor={`category-${category.id}`}
+                          className="flex items-center gap-2 cursor-pointer text-sm"
+                        >
+                          <FolderTree className="h-4 w-4" style={{ color: category.color || '#3b82f6' }} />
+                          <span>{category.name}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              ) : (
+                <p className="text-sm text-muted-foreground">Henüz kategori eklenmemiş</p>
+              )}
+            </div>
+          </FormFieldWrapper>
+        )}
+      />
 
       {/* Logo Upload */}
       <div className="border-t pt-6">
