@@ -23,13 +23,13 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
   const showFallback = !site.logo_url || imageError;
 
   return (
-    <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30">
+    <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 active:scale-95">
       {/* Gradient accent on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
-      <CardContent className="p-4 relative">
+      <CardContent className="p-5 sm:p-4 relative">
         {/* Logo Section - Kompakt */}
-        <div className="flex items-center justify-center h-14 mb-3 relative">
+        <div className="flex items-center justify-center h-16 sm:h-14 mb-4 sm:mb-3 relative">
           {/* Loading Skeleton */}
           {isLoading && !showFallback && (
             <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded" />
@@ -52,7 +52,7 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-lg flex items-center justify-center animate-scale-in">
-              <span className="text-3xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+              <span className="text-4xl sm:text-3xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
                 {site.name.charAt(0)}
               </span>
             </div>
@@ -60,51 +60,51 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
         </div>
 
         {/* Site Name - Bold & Prominent */}
-        <h3 className="text-center font-bold text-base mb-2 truncate group-hover:text-primary transition-colors">
+        <h3 className="text-center font-bold text-lg sm:text-base mb-3 sm:mb-2 truncate group-hover:text-primary transition-colors">
           {site.name}
         </h3>
 
-        {/* Rating + Bonus - Single Line */}
-        <div className="flex items-center justify-center gap-3 mb-3 text-sm">
+        {/* Rating + Bonus - Single Line - MOBİL OPTIMIZE */}
+        <div className="flex items-center justify-center gap-3 mb-4 sm:mb-3 text-sm flex-wrap">
           {site.rating && (
-            <div className="flex items-center gap-1 text-primary">
-              <Star className="w-3.5 h-3.5 fill-primary" />
-              <span className="font-bold">{site.rating.toFixed(1)}</span>
+            <div className="flex items-center gap-1.5 text-primary">
+              <Star className="w-4 h-4 sm:w-3.5 sm:h-3.5 fill-primary" />
+              <span className="font-bold text-base sm:text-sm">{site.rating.toFixed(1)}</span>
             </div>
           )}
           
           {site.rating && site.bonus && (
-            <span className="text-muted-foreground">•</span>
+            <span className="text-muted-foreground hidden sm:inline">•</span>
           )}
           
           {site.bonus && (
-            <div className="flex items-center gap-1 text-accent">
-              <Gift className="w-3.5 h-3.5" />
-              <span className="font-semibold text-xs">{site.bonus}</span>
+            <div className="flex items-center gap-1.5 text-accent">
+              <Gift className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+              <span className="font-semibold text-sm sm:text-xs">{site.bonus}</span>
             </div>
           )}
         </div>
 
-        {/* Primary CTA - Kayıt Ol */}
+        {/* Primary CTA - Kayıt Ol - MOBİL TOUCH TARGET */}
         <a
           href={site.affiliate_link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block mb-2"
+          className="block mb-3 sm:mb-2"
         >
           <Button 
-            size="sm" 
-            className="w-full group-hover:bg-primary group-hover:scale-105 transition-all duration-200 shadow-md hover:shadow-xl"
+            size="lg"
+            className="w-full h-12 sm:h-10 text-base sm:text-sm group-hover:bg-primary group-hover:scale-105 transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
           >
             Kayıt Ol
-            <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="ml-2 w-5 h-5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </a>
 
-        {/* Secondary Link - Detay */}
+        {/* Secondary Link - Detay - MOBİL TOUCH TARGET */}
         <Link 
           to={`/site/${site.slug}`} 
-          className="block text-center text-xs text-muted-foreground hover:text-primary transition-colors story-link"
+          className="block text-center text-sm sm:text-xs text-muted-foreground hover:text-primary transition-colors story-link py-2 sm:py-1"
         >
           detaylı inceleme
         </Link>
