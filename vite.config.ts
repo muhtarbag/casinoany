@@ -28,33 +28,14 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            // CRITICAL: EVERYTHING React-related in ONE MONOLITHIC chunk
-            // This is the ONLY way to prevent React dispatcher errors
-            if (id.includes('react') || id.includes('scheduler') || 
-                id.includes('@radix-ui') || id.includes('@tanstack') ||
-                id.includes('react-helmet-async') || id.includes('three') ||
-                id.includes('recharts') || id.includes('d3-') || 
-                id.includes('lodash')) {
-              return 'vendor-react'; // Everything in ONE chunk
-            }
-            if (id.includes('react-quill') || id.includes('quill')) {
-              return 'vendor-editor';
-            }
-          }
-          // Bundle all admin pages together for consistency
-          if (id.includes('src/pages/admin') || id.includes('src/components/admin')) {
-            return 'admin-bundle';
-          }
-        },
+        manualChunks: undefined, // Disable code splitting completely
       },
     },
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 5000, // Increase limit for single bundle
     sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
-    cssCodeSplit: true,
+    cssCodeSplit: false, // Keep all CSS together
     assetsInlineLimit: 4096,
   },
   // Optimize dependencies - CRITICAL for preventing multiple React instances
