@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, Save, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutHint } from '@/components/shortcuts/ShortcutHint';
+import { toast } from 'sonner';
 
 interface SiteFormWizardProps {
   form: UseFormReturn<SiteFormData>;
@@ -85,7 +86,27 @@ export function SiteFormWizard({
 
   const handleNext = async () => {
     const isValid = await validateCurrentStep();
-    if (isValid && currentStep < STEPS.length - 1) {
+    if (!isValid) {
+      // Show which fields have errors
+      const errors = form.formState.errors;
+      const fieldsForStep = getFieldsForStep(currentStep);
+      const errorFields = fieldsForStep.filter(field => errors[field as keyof typeof errors]);
+      
+      if (errorFields.length > 0) {
+        const errorMessages = errorFields
+          .map(field => {
+            const error = errors[field as keyof typeof errors];
+            return `${field}: ${error?.message}`;
+          })
+          .join(', ');
+        
+        console.error('Validation errors:', errorMessages);
+        toast.error(`Lütfen gerekli alanları kontrol edin: ${errorFields.join(', ')}`);
+      }
+      return;
+    }
+    
+    if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };

@@ -33,8 +33,10 @@ export const siteFormSchema = z.object({
     .trim(),
   
   email: z.string()
-    .email('Geçerli bir email giriniz')
-    .or(z.literal(''))
+    .trim()
+    .refine((val) => !val || z.string().email().safeParse(val).success, {
+      message: 'Geçerli bir email giriniz'
+    })
     .optional()
     .default(''),
   
@@ -88,8 +90,10 @@ export const siteFormSchema = z.object({
     .nullable(),
   
   affiliate_panel_url: z.string()
-    .url('Geçerli bir URL giriniz')
-    .or(z.literal(''))
+    .trim()
+    .refine((val) => !val || z.string().url().safeParse(val).success, {
+      message: 'Geçerli bir URL giriniz'
+    })
     .optional()
     .default(''),
   
