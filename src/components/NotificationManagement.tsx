@@ -161,7 +161,18 @@ export function NotificationManagement() {
 
     if (notification_type === 'popup') {
       return (
-        <div className={`mx-auto ${baseClasses}`} style={containerStyle}>
+        <div className={`mx-auto ${baseClasses} relative`} style={containerStyle}>
+          {/* Close button - positioned absolutely for better visibility */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10"
+            onClick={() => setPreviewNotification(null)}
+            style={{ color: text_color }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          
           {image_url && (
             <img 
               src={image_url} 
@@ -170,17 +181,7 @@ export function NotificationManagement() {
             />
           )}
           <div className={contentClasses}>
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-xl font-bold pr-8">{title}</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 rounded-full"
-                onClick={() => setPreviewNotification(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <h3 className="text-xl font-bold pr-10 mb-4">{title}</h3>
             {content && (
               <p className="mb-4 opacity-90">{content}</p>
             )}
@@ -197,7 +198,7 @@ export function NotificationManagement() {
     if (notification_type === 'banner') {
       return (
         <div 
-          className={`w-full ${baseClasses} flex items-center justify-between`}
+          className={`w-full ${baseClasses} flex items-center justify-between relative`}
           style={containerStyle}
         >
           <div className={`flex items-center gap-4 flex-1 ${contentClasses}`}>
@@ -224,8 +225,9 @@ export function NotificationManagement() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm shrink-0"
               onClick={() => setPreviewNotification(null)}
+              style={{ color: text_color }}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -237,7 +239,18 @@ export function NotificationManagement() {
     if (notification_type === 'form') {
       const formFields = previewNotification.form_fields;
       return (
-        <div className={`mx-auto ${baseClasses}`} style={containerStyle}>
+        <div className={`mx-auto ${baseClasses} relative`} style={containerStyle}>
+          {/* Close button - positioned absolutely */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10"
+            onClick={() => setPreviewNotification(null)}
+            style={{ color: text_color }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          
           {image_url && (
             <img 
               src={image_url} 
@@ -246,17 +259,7 @@ export function NotificationManagement() {
             />
           )}
           <div className={contentClasses}>
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-xl font-bold pr-8">{title}</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 rounded-full"
-                onClick={() => setPreviewNotification(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <h3 className="text-xl font-bold pr-10 mb-4">{title}</h3>
             {content && (
               <p className="mb-6 opacity-90">{content}</p>
             )}
