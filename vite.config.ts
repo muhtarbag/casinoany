@@ -36,63 +36,47 @@ export default defineConfig(({ mode }) => ({
     ],
   },
   build: {
-    // Aggressive chunk splitting for optimal loading
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Vendor chunks
           if (id.includes('node_modules')) {
-            // React core
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            // CRITICAL: Keep ALL React in single chunk to prevent multiple instances
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || 
+                id.includes('scheduler') || id.includes('@remix-run')) {
               return 'vendor-react';
             }
-            // UI libraries
-            if (id.includes('@radix-ui')) {
+            
+            // Keep React-dependent UI libraries together
+            if (id.includes('@radix-ui') || id.includes('framer-motion')) {
               return 'vendor-ui';
             }
-            // Query library
-            if (id.includes('@tanstack/react-query')) {
+            
+            // Query library - depends on React
+            if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) {
               return 'vendor-query';
             }
+            
             // Chart library
             if (id.includes('recharts')) {
               return 'vendor-charts';
             }
-            // Date utilities
-            if (id.includes('date-fns')) {
-              return 'vendor-dates';
+            
+            // Other large dependencies
+            if (id.includes('date-fns') || id.includes('react-hook-form') || 
+                id.includes('zod') || id.includes('react-quill')) {
+              return 'vendor-libs';
             }
-            // Form libraries
-            if (id.includes('react-hook-form') || id.includes('zod')) {
-              return 'vendor-forms';
-            }
-            // Rich text editor
-            if (id.includes('react-quill')) {
-              return 'vendor-editor';
-            }
+            
             // All other node_modules
             return 'vendor-other';
-          }
-          
-          // Split large route components
-          if (id.includes('/pages/admin/')) {
-            return 'admin-routes';
-          }
-          if (id.includes('/pages/')) {
-            return 'app-routes';
           }
         },
       },
     },
-    // Increase chunk size warning limit
-    chunkSizeWarningLimit: 600,
-    // Disable source maps in production
+    chunkSizeWarningLimit: 1000,
     sourcemap: false,
-    // Use esbuild for minification (faster)
     minify: 'esbuild',
-    // Target modern browsers for smaller bundle
     target: 'es2020',
-    // CSS code splitting
     cssCodeSplit: true,
   },
   // Optimize dependencies
