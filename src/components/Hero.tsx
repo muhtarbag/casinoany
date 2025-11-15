@@ -5,6 +5,7 @@ import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-rea
 import { BettingSiteCard } from './BettingSiteCard';
 import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
+import BlurText from './BlurText';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -178,8 +179,21 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <span className="text-xs md:text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold leading-tight">
-            <span className="text-primary">En İyi Bahis Siteleri</span><br />
-            <span className="text-foreground text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">Güvenilir ve Kazançlı</span>
+            <BlurText
+              text="En İyi Bahis Siteleri"
+              delay={150}
+              animateBy="words"
+              direction="top"
+              className="text-primary"
+            />
+            <br />
+            <BlurText
+              text="Güvenilir ve Kazançlı"
+              delay={200}
+              animateBy="words"
+              direction="top"
+              className="text-foreground text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block"
+            />
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
