@@ -43,7 +43,7 @@ const DEFAULT_FORM_DATA: NotificationFormData = {
   border_radius: 'lg',
   max_width: 'md',
   padding: 'normal',
-  border_color: '',
+  border_color: '#ffffff',
   border_width: '0',
   shadow_size: 'lg',
 };
