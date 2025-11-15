@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.analytics-consistency-check]
 verify_jwt = false
+
+[functions.domain-health-check]
+verify_jwt = false
+
+[functions.get-active-domain]
+verify_jwt = false
