@@ -9,7 +9,7 @@ export const FeaturedSitesSection = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('name, slug, logo_url, rating, bonus')
+        .select('name, slug, logo_url, rating, bonus, review_count, avg_rating')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
@@ -57,7 +57,8 @@ export const FeaturedSitesSection = () => {
                 {site.name} İnceleme
               </h3>
               <p className="text-sm text-muted-foreground">
-                ⭐ {site.rating}/5.0
+                ⭐ {(site.avg_rating || site.rating || 0).toFixed(1)}/5.0
+                {site.review_count > 0 && ` (${site.review_count} yorum)`}
               </p>
             </div>
           </div>

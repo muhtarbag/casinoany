@@ -43,6 +43,8 @@ interface BettingSiteCardProps {
   youtube?: string;
   views?: number;
   clicks?: number;
+  reviewCount?: number;
+  avgRating?: number;
 }
 
 const BettingSiteCardComponent = ({
@@ -63,6 +65,8 @@ const BettingSiteCardComponent = ({
   youtube,
   views = 0,
   clicks = 0,
+  reviewCount = 0,
+  avgRating = 0,
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -181,6 +185,11 @@ const BettingSiteCardComponent = ({
               <Star className="w-4 h-4 fill-gold text-gold" />
               <span className="font-bold text-sm">{rating.toFixed(1)}</span>
             </div>
+            {reviewCount > 0 && (
+              <div className="text-xs text-muted-foreground">
+                {reviewCount} yorum
+              </div>
+            )}
           </div>
         </div>
         <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">

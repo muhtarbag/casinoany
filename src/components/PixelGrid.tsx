@@ -14,7 +14,7 @@ export const PixelGrid = () => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
@@ -133,6 +133,8 @@ export const PixelGrid = () => {
                 instagram={site.instagram || ''}
                 facebook={site.facebook || ''}
                 youtube={site.youtube || ''}
+                reviewCount={site.review_count || 0}
+                avgRating={site.avg_rating || 0}
               />
               {bannersAtPosition.length > 0 && (
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">
