@@ -58,10 +58,13 @@ export default defineConfig(({ mode }) => ({
       'react-dom', 
       'react-router-dom',
       '@tanstack/react-query',
-      'react-helmet-async'
+      'react-helmet-async',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-separator'
     ],
     exclude: [],
-    force: true,
+    force: false, // Only force when needed
     esbuildOptions: {
       target: 'es2020',
       plugins: []
