@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
-import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema } from '@/components/StructuredData';
+import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema, FAQSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,29 @@ const Index = () => {
 
   const breadcrumbItems = [
     { name: 'Ana Sayfa', url: window.location.origin }
+  ];
+
+  const faqData = [
+    {
+      question: "Türkiye'nin en güvenilir casino siteleri hangileri?",
+      answer: "CasinoAny.com'da lisanslı, yüksek güvenlik standartlarına sahip ve hızlı ödeme yapan 50+ casino sitesini inceleyebilirsiniz. Tüm siteler detaylı analizlerle değerlendirilmiştir."
+    },
+    {
+      question: "Casino bonusları nasıl kullanılır?",
+      answer: "Casino bonusları genellikle ilk üyelikte hoş geldin bonusu olarak verilir. Bonus kullanmadan önce çevrim şartlarını mutlaka okuyun. %500'e varan bonuslarımızı karşılaştırabilirsiniz."
+    },
+    {
+      question: "Deneme bonusu veren siteler güvenilir mi?",
+      answer: "Evet, CasinoAny.com'da listelenen tüm deneme bonusu veren siteler güvenilir lisanslara sahiptir. Her sitenin detaylı incelemesini yaparak kullanıcılarımıza sunuyoruz."
+    },
+    {
+      question: "Casino sitelerinde para çekme ne kadar sürer?",
+      answer: "Güvenilir casino sitelerinde para çekme süresi ortalama 24-48 saat arasındadır. Bazı siteler anlık ödeme de yapabilmektedir. Her sitenin ödeme süresini incelemelerimizde bulabilirsiniz."
+    },
+    {
+      question: "Hangi casino oyunları en çok kazandırır?",
+      answer: "RTP (Return to Player) oranı yüksek olan slot oyunları, blackjack ve poker genellikle daha yüksek kazanç şansı sunar. Her sitenin oyun çeşitliliğini ve RTP oranlarını karşılaştırabilirsiniz."
+    }
   ];
 
   return (
@@ -39,6 +62,7 @@ const Index = () => {
       <OrganizationSchema />
       <WebSiteSchema />
       <BreadcrumbSchema items={breadcrumbItems} />
+      <FAQSchema faqs={faqData} />
       <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
       

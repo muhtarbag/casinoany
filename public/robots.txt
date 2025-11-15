@@ -11,6 +11,7 @@ Allow: /
 # SITEMAP LOCATIONS
 # =============================================================================
 Sitemap: https://casinoany.com/sitemap.xml
+Sitemap: https://casinoany.com/image-sitemap.xml
 
 # =============================================================================
 # CRAWL RATE OPTIMIZATION

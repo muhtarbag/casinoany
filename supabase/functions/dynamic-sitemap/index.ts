@@ -104,6 +104,7 @@ serve(async (req) => {
   <!-- Static Pages -->
   <url>
     <loc>${finalBaseUrl}/about</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -112,6 +113,30 @@ serve(async (req) => {
     <lastmod>${posts?.[0]?.updated_at ? new Date(posts[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${finalBaseUrl}/haberler</loc>
+    <lastmod>${news?.[0]?.updated_at ? new Date(news[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>${finalBaseUrl}/deneme-bonusu</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>${finalBaseUrl}/privacy</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${finalBaseUrl}/terms</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>${finalBaseUrl}/casino-siteleri</loc>
