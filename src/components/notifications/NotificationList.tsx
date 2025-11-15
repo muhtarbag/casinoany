@@ -7,6 +7,7 @@ import { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { VirtualList } from '@/components/VirtualList';
 import type { Notification } from './types';
@@ -15,14 +16,16 @@ interface NotificationListProps {
   notifications: Notification[];
   onEdit: (notification: Notification) => void;
   onDelete: (id: string) => void;
+  onToggle: (id: string, currentStatus: boolean) => void;
   onPreview?: (notification: Notification) => void;
   isDeleting: boolean;
 }
 
-const NotificationItem = memo(({ notification, onEdit, onDelete, onPreview }: {
+const NotificationItem = memo(({ notification, onEdit, onDelete, onToggle, onPreview }: {
   notification: Notification;
   onEdit: (notification: Notification) => void;
   onDelete: (id: string) => void;
+  onToggle: (id: string, currentStatus: boolean) => void;
   onPreview?: (notification: Notification) => void;
 }) => {
   return (
@@ -32,9 +35,16 @@ const NotificationItem = memo(({ notification, onEdit, onDelete, onPreview }: {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="font-semibold">{notification.title}</h3>
-              <Badge variant={notification.is_active ? 'default' : 'secondary'}>
-                {notification.is_active ? 'Aktif' : 'Pasif'}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={notification.is_active}
+                  onCheckedChange={() => onToggle(notification.id, notification.is_active)}
+                  aria-label="Bildirimi aktif/pasif yap"
+                />
+                <Badge variant={notification.is_active ? 'default' : 'secondary'}>
+                  {notification.is_active ? 'Aktif' : 'Pasif'}
+                </Badge>
+              </div>
               <Badge variant="outline">{notification.notification_type}</Badge>
             </div>
             
@@ -113,6 +123,7 @@ export function NotificationList({
   notifications,
   onEdit,
   onDelete,
+  onToggle,
   onPreview,
   isDeleting,
 }: NotificationListProps) {
@@ -138,6 +149,7 @@ export function NotificationList({
             notification={notification}
             onEdit={onEdit}
             onDelete={onDelete}
+            onToggle={onToggle}
             onPreview={onPreview}
           />
         )}
