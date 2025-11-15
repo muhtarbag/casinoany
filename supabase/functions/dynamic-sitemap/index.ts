@@ -123,6 +123,11 @@ serve(async (req) => {
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>${baseUrl}/deneme-bonusu</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>${baseUrl}/mobil-bahis</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

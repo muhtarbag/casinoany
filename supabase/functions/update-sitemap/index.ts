@@ -107,6 +107,11 @@ Deno.serve(async (req) => {
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>${baseUrl}/deneme-bonusu</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Betting Sites -->
 ${sites?.map((site: any) => `  <url>
