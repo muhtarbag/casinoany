@@ -184,22 +184,22 @@ const App = () => {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <HelmetProvider>
-          <AuthProvider>
-            <TooltipProvider>
-              <OfflineIndicator />
-              <PWAInstallPrompt />
+        <AuthProvider>
+          <TooltipProvider>
+            <OfflineIndicator />
+            <PWAInstallPrompt />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <OptimizedNotificationPopup />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter
-                future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true,
-                }}
-              >
-                <ScrollToTop />
-                <AppContent />
-              </BrowserRouter>
+              <ScrollToTop />
+              <AppContent />
+            </BrowserRouter>
             </TooltipProvider>
           </AuthProvider>
         </HelmetProvider>
