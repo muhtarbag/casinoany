@@ -174,20 +174,22 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
   return (
     <div className="relative overflow-hidden bg-background touch-manipulation">
-      {/* Three.js Floating Lines Background */}
-      <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none z-0">
-        <RetryBoundary fallback={<div className="w-full h-full bg-gradient-to-b from-background to-muted/20" />}>
-          <FloatingLines 
-            enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={[10, 15, 20]}
-            lineDistance={[8, 6, 4]}
-            bendRadius={5.0}
-            bendStrength={-0.5}
-            interactive={true}
-            parallax={true}
-          />
-        </RetryBoundary>
-      </div>
+      {/* Three.js Floating Lines Background - Desktop only, lazy loaded */}
+      {typeof window !== 'undefined' && window.innerWidth > 1024 && (
+        <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none z-0">
+          <RetryBoundary fallback={<div className="w-full h-full bg-gradient-to-b from-background to-muted/20" />}>
+            <FloatingLines 
+              enabledWaves={['middle']}
+              lineCount={[8]}
+              lineDistance={[6]}
+              bendRadius={3.0}
+              bendStrength={-0.3}
+              interactive={false}
+              parallax={false}
+            />
+          </RetryBoundary>
+        </div>
+      )}
 
       <div className="container relative z-10 mx-auto px-4 py-8 md:py-12 lg:py-20">
         <div className="text-center space-y-4 md:space-y-6 lg:space-y-8 mb-8 md:mb-12 lg:mb-16">
