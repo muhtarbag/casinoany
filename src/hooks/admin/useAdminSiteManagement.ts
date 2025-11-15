@@ -73,7 +73,26 @@ export const useAdminSiteManagement = () => {
   const uploadLogo = async (file: File, siteName: string): Promise<string> => {
     const optimizedFile = await optimizeLogo(file);
     const fileExt = optimizedFile.name.split('.').pop();
-    const fileName = `${siteName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.${fileExt}`;
+    
+    // Sanitize filename: remove Turkish and special characters
+    const sanitizedName = siteName
+      .toLowerCase()
+      .replace(/ı/g, 'i')
+      .replace(/ğ/g, 'g')
+      .replace(/ü/g, 'u')
+      .replace(/ş/g, 's')
+      .replace(/ö/g, 'o')
+      .replace(/ç/g, 'c')
+      .replace(/İ/g, 'i')
+      .replace(/Ğ/g, 'g')
+      .replace(/Ü/g, 'u')
+      .replace(/Ş/g, 's')
+      .replace(/Ö/g, 'o')
+      .replace(/Ç/g, 'c')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    
+    const fileName = `${sanitizedName}-${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
 
     const { error: uploadError } = await supabase.storage
