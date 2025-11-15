@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
     // CRITICAL: Force single React instance across all modules
-    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router', 'scheduler', '@tanstack/react-query'],
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router', 'scheduler', '@tanstack/react-query', 'react-helmet-async'],
   },
   ssr: {
     noExternal: ['react', 'react-dom', 'react-router-dom'],
@@ -33,8 +33,8 @@ export default defineConfig(({ mode }) => ({
             if (id.includes('react') || id.includes('react-dom') || 
                 id.includes('react-router') || id.includes('scheduler') ||
                 id.includes('@tanstack/react-query') || id.includes('three') ||
-                id.includes('@radix-ui')) {
-              return 'vendor-react'; // All React + Radix in one chunk
+                id.includes('@radix-ui') || id.includes('react-helmet-async')) {
+              return 'vendor-react'; // All React + Radix + Helmet in one chunk
             }
             // Split recharts separately with proper initialization
             if (id.includes('recharts')) {
