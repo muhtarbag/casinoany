@@ -92,14 +92,11 @@ export const AIAssistant = () => {
         .select('*', { count: 'exact', head: true });
       const blogCount = blogResponse.count || 0;
 
-      const { data, error } = await supabase.functions.invoke('ai-site-monitor', {
+      const { data, error } = await supabase.functions.invoke('ai-seo-analyzer', {
         body: {
-          action: 'analyze-seo',
-          data: {
-            siteUrl: window.location.origin,
-            sites: sites?.map(s => ({ name: s.name, rating: s.rating })) || [],
-            blogCount: blogCount || 0,
-          }
+          siteUrl: window.location.origin,
+          sites: sites?.map(s => ({ name: s.name, rating: s.rating })) || [],
+          blogCount: blogCount || 0,
         }
       });
 
@@ -123,7 +120,7 @@ export const AIAssistant = () => {
 
       toast({
         title: "Analiz Tamamlandı",
-        description: `AI Provider: ${data.provider === 'openai' ? 'OpenAI GPT-4o-mini' : 'Lovable AI Gemini'}`,
+        description: `AI Provider: Lovable AI (Gemini 2.5 Flash)`,
       });
     } catch (error) {
       console.error('Analysis error:', error);
