@@ -55,6 +55,24 @@ serve(async (req) => {
 
     if (postsError) throw postsError;
 
+    // Fetch all active categories
+    const { data: categories, error: categoriesError } = await supabase
+      .from('categories')
+      .select('slug, updated_at')
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false });
+
+    if (categoriesError) throw categoriesError;
+
+    // Fetch all published news articles
+    const { data: news, error: newsError } = await supabase
+      .from('news_articles')
+      .select('slug, updated_at')
+      .eq('is_published', true)
+      .order('updated_at', { ascending: false });
+
+    if (newsError) throw newsError;
+
     // Get base URL from environment variable or request origin
     const baseUrl = Deno.env.get('PRODUCTION_URL') || 
       req.headers.get('origin') || 
@@ -114,6 +132,18 @@ serve(async (req) => {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>${baseUrl}/kategoriler</loc>
+    <lastmod>${categories?.[0]?.updated_at ? new Date(categories[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>${baseUrl}/news</loc>
+    <lastmod>${news?.[0]?.updated_at ? new Date(news[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
 
   <!-- Betting Sites -->
   ${sites?.map(site => `
@@ -130,6 +160,24 @@ serve(async (req) => {
     <loc>${baseUrl}/blog/${post.slug}</loc>
     <lastmod>${new Date(post.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('') || ''}
+
+  <!-- Categories -->
+  ${categories?.map(category => `
+  <url>
+    <loc>${baseUrl}/kategoriler/${category.slug}</loc>
+    <lastmod>${new Date(category.updated_at).toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('') || ''}
+
+  <!-- News Articles -->
+  ${news?.map(article => `
+  <url>
+    <loc>${baseUrl}/news/${article.slug}</loc>
+    <lastmod>${new Date(article.updated_at).toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>`).join('') || ''}
 
