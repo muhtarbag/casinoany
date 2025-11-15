@@ -1,8 +1,10 @@
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { Loader2 } from 'lucide-react';
 import { DashboardTab } from '@/components/admin/DashboardTab';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { 
     dashboardStats, 
     isLoadingStats, 
@@ -34,14 +36,15 @@ export default function Dashboard() {
           monthlyTrend={monthlyTrend}
           customMetrics={customMetrics}
           onNavigate={(tab) => {
-            // Route-based navigation
+            // Route-based navigation using React Router
             const routeMap: Record<string, string> = {
               'manage': '/admin/sites',
               'blog': '/admin/blog',
               'analytics': '/admin/analytics',
+              'yorumlar': '/admin/reviews',
             };
             const route = routeMap[tab] || `/admin/${tab}`;
-            window.location.href = route;
+            navigate(route);
           }}
         />
       )}
