@@ -38,8 +38,42 @@ export default defineConfig(({ mode }) => ({
     build: {
       rollupOptions: {
         output: {
-          // Let Vite handle chunking automatically - more reliable
-          manualChunks: undefined,
+          // Manual chunking stratejisi - vendor, ui, admin ayrımı
+          manualChunks: (id) => {
+            // Node modules - vendor chunk
+            if (id.includes('node_modules')) {
+              // React ecosystem - ayrı chunk
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor-react';
+              }
+              // UI libraries - ayrı chunk
+              if (id.includes('@radix-ui') || id.includes('sonner') || id.includes('recharts')) {
+                return 'vendor-ui';
+              }
+              // Query & State - ayrı chunk
+              if (id.includes('@tanstack') || id.includes('react-query')) {
+                return 'vendor-query';
+              }
+              // Supabase - ayrı chunk
+              if (id.includes('supabase')) {
+                return 'vendor-supabase';
+              }
+              // Diğer vendor kütüphaneleri
+              return 'vendor-misc';
+            }
+            // Admin pages - ayrı chunk
+            if (id.includes('/src/pages/admin/')) {
+              return 'pages-admin';
+            }
+            // Public pages - ayrı chunk
+            if (id.includes('/src/pages/') && !id.includes('/admin/')) {
+              return 'pages-public';
+            }
+            // UI components - ayrı chunk
+            if (id.includes('/src/components/ui/')) {
+              return 'components-ui';
+            }
+          },
         },
       },
     chunkSizeWarningLimit: 1000,
