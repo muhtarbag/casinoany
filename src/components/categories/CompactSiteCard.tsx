@@ -14,6 +14,8 @@ interface CompactSiteCardProps {
     rating: number | null;
     bonus: string | null;
     affiliate_link: string;
+    review_count?: number;
+    avg_rating?: number;
   };
 }
 
@@ -67,9 +69,18 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
         {/* Rating + Bonus - Single Line - MOBİL OPTIMIZE */}
         <div className="flex items-center justify-center gap-3 mb-4 sm:mb-3 text-sm flex-wrap">
           {site.rating && (
-            <div className="flex items-center gap-1.5 text-primary">
-              <Star className="w-4 h-4 sm:w-3.5 sm:h-3.5 fill-primary" />
-              <span className="font-bold text-base sm:text-sm">{site.rating.toFixed(1)}</span>
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-1.5 text-primary">
+                <Star className="w-4 h-4 sm:w-3.5 sm:h-3.5 fill-primary" />
+                <span className="font-bold text-base sm:text-sm">
+                  {(site.avg_rating || site.rating).toFixed(1)}
+                </span>
+              </div>
+              {site.review_count > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {site.review_count} yorum
+                </span>
+              )}
             </div>
           )}
           
