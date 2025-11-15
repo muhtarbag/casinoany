@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,26 +10,30 @@ export default function BulkCasinoContentGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentSite, setCurrentSite] = useState('');
+  const [missingSites, setMissingSites] = useState<Array<{ id: string; name: string }>>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const missingSites = [
-    { id: 'db05e0fd-dd3c-4cf9-a353-eb948b21f650', name: 'Tokyobet' },
-    { id: '4e8bffff-f943-44af-8eda-a5c34b22dcca', name: 'Bahsegel' },
-    { id: '3dc0d826-215f-4a47-b0db-e3789faa7a32', name: 'Mariobet' },
-    { id: '18996917-230d-4f81-a8ff-9010464aeb16', name: 'Matbet' },
-    { id: '13a96806-ae6f-4c59-b6fe-e2b2325d787e', name: 'SavaBet' },
-    { id: '72e9c4d2-3582-44e6-8216-609eb77b4cbe', name: 'Meritking' },
-    { id: '70060c32-d52b-49da-84e9-935a29868720', name: 'Palacebet' },
-    { id: 'c5f7696f-d197-4829-9d9f-0754f7937a4b', name: 'Betwild' },
-    { id: '80bd1f31-4657-4e36-821c-d096288431d9', name: 'Enbet' },
-    { id: '1e7047bd-9c60-4252-a883-578e826d5412', name: 'İbizabet' },
-    { id: '0d8a4b8e-3d7c-4e1f-a54e-2eeb4cec8fc4', name: 'Tikobet' },
-    { id: 'c33b2232-0b6d-4ad4-90a5-a23fa0b92df4', name: 'Betsilin' },
-    { id: '74e8d716-0391-49a7-b146-b2ba73cd14c3', name: 'Hitbet' },
-    { id: '2b98baee-d6cc-481c-8aa0-053c12672fb1', name: 'Rbet' },
-    { id: '25ac0663-ff4f-4e33-8221-5605db6ca5a1', name: 'KingRoyal' },
-    { id: '18d7c854-b5e8-4957-8c35-d8e6415fa179', name: 'Ramadabet' },
-    { id: '9a99b7e7-08a0-44f9-8b9f-7a482ed2f577', name: 'DinamoBet' },
-  ];
+  useEffect(() => {
+    const fetchMissingSites = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('betting_sites')
+          .select('id, name')
+          .eq('is_active', true)
+          .or('pros.is.null,cons.is.null,verdict.is.null,expert_review.is.null');
+
+        if (error) throw error;
+        setMissingSites(data || []);
+      } catch (error) {
+        console.error('Error fetching missing sites:', error);
+        toast.error('Casino içeriği eksik siteler yüklenemedi');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMissingSites();
+  }, []);
 
   const generateContent = async () => {
     setIsGenerating(true);
@@ -86,6 +90,35 @@ export default function BulkCasinoContentGenerator() {
       setIsGenerating(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            Yükleniyor...
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (missingSites.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            Toplu Casino İçerik Üretimi
+          </CardTitle>
+          <CardDescription>
+            Tüm siteler için casino içeriği mevcut!
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card>
