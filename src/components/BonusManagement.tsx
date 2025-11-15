@@ -9,8 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, GripVertical } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface BonusOffer {
   id: string;
@@ -133,6 +136,55 @@ export const BonusManagement = () => {
       });
     },
   });
+
+  // Reorder mutation
+  const reorderMutation = useMutation({
+    mutationFn: async (items: BonusOffer[]) => {
+      const updates = items.map((item, index) => 
+        supabase
+          .from('bonus_offers')
+          .update({ display_order: index })
+          .eq('id', item.id)
+      );
+      await Promise.all(updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers'] });
+      toast({
+        title: 'Başarılı',
+        description: 'Sıralama güncellendi.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = bonusOffers?.findIndex((item) => item.id === active.id) ?? -1;
+      const newIndex = bonusOffers?.findIndex((item) => item.id === over.id) ?? -1;
+
+      if (oldIndex !== -1 && newIndex !== -1 && bonusOffers) {
+        const newItems = arrayMove(bonusOffers, oldIndex, newIndex);
+        reorderMutation.mutate(newItems);
+      }
+    }
+  };
 
   const handleOpenDialog = (bonus?: BonusOffer) => {
     if (bonus) {
@@ -342,60 +394,114 @@ export const BonusManagement = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {bonusOffers?.map((bonus: any) => (
-              <div
-                key={bonus.id}
-                className="flex items-center justify-between p-4 rounded-lg border bg-card"
-              >
-                <div className="flex items-center gap-4">
-                  {bonus.betting_sites?.logo_url && (
-                    <img
-                      src={bonus.betting_sites.logo_url}
-                      alt={bonus.betting_sites?.name}
-                      className="w-12 h-12 object-contain rounded"
-                    />
-                  )}
-                  <div>
-                    <p className="font-medium">{bonus.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {bonus.betting_sites?.name} - {bonus.bonus_amount}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {bonus.is_active ? '✓ Aktif' : '✗ Pasif'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenDialog(bonus)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={bonusOffers?.map(b => b.id) ?? []}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {bonusOffers?.map((bonus: any) => (
+                  <SortableBonusItem
+                    key={bonus.id}
+                    bonus={bonus}
+                    onEdit={handleOpenDialog}
+                    onDelete={(id) => {
                       if (confirm('Bu bonusu silmek istediğinize emin misiniz?')) {
-                        deleteMutation.mutate(bonus.id);
+                        deleteMutation.mutate(id);
                       }
                     }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                  />
+                ))}
+                {bonusOffers?.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">
+                    Henüz bonus eklenmemiş.
+                  </p>
+                )}
               </div>
-            ))}
-            {bonusOffers?.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">
-                Henüz bonus eklenmemiş.
-              </p>
-            )}
-          </div>
+            </SortableContext>
+          </DndContext>
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+interface SortableBonusItemProps {
+  bonus: any;
+  onEdit: (bonus: any) => void;
+  onDelete: (id: string) => void;
+}
+
+const SortableBonusItem = ({ bonus, onEdit, onDelete }: SortableBonusItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: bonus.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 p-4 rounded-lg border bg-card"
+    >
+      <button
+        className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-muted rounded"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="w-5 h-5 text-muted-foreground" />
+      </button>
+      
+      <div className="flex items-center justify-between flex-1">
+        <div className="flex items-center gap-4">
+          {bonus.betting_sites?.logo_url && (
+            <img
+              src={bonus.betting_sites.logo_url}
+              alt={bonus.betting_sites?.name}
+              className="w-12 h-12 object-contain rounded"
+            />
+          )}
+          <div>
+            <p className="font-medium">{bonus.title}</p>
+            <p className="text-sm text-muted-foreground">
+              {bonus.betting_sites?.name} - {bonus.bonus_amount}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {bonus.is_active ? '✓ Aktif' : '✗ Pasif'}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(bonus)}
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDelete(bonus.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
