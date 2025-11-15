@@ -53,6 +53,7 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     target: 'es2020',
     cssCodeSplit: true,
+    assetsInlineLimit: 4096, // Inline assets < 4kb as base64
   },
   // Optimize dependencies
   optimizeDeps: {
