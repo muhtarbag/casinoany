@@ -1,7 +1,9 @@
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { LoadingState } from '@/components/admin/LoadingState';
+import { LoadingState } from '@/components/ui/loading-state';
 import { DashboardTab } from '@/components/admin/DashboardTab';
 import { useNavigate } from 'react-router-dom';
+import { ErrorState } from '@/components/ui/error-state';
+import { RetryBoundary } from '@/components/feedback/RetryBoundary';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -16,35 +18,36 @@ export default function Dashboard() {
     customMetrics
   } = useAdminStats();
 
-  // ✅ STANDARDIZED: LoadingState component
+  // Loading state
   if (isLoadingStats) {
     return <LoadingState variant="skeleton" text="Dashboard yükleniyor..." />;
   }
 
   return (
-    <div className="space-y-6">
-      {dashboardStats && (
-        <DashboardTab 
-          dashboardStats={dashboardStats}
-          dailyPageViews={dailyPageViews || []}
-          deviceStats={deviceStats || []}
-          topPages={topPages || []}
-          weeklyComparison={weeklyComparison}
-          monthlyTrend={monthlyTrend}
-          customMetrics={customMetrics}
-          onNavigate={(tab) => {
-            // Route-based navigation using React Router
-            const routeMap: Record<string, string> = {
-              'manage': '/admin/sites',
-              'blog': '/admin/blog',
-              'analytics': '/admin/analytics',
-              'yorumlar': '/admin/reviews',
-            };
-            const route = routeMap[tab] || `/admin/${tab}`;
-            navigate(route);
-          }}
-        />
-      )}
-    </div>
+    <RetryBoundary>
+      <div className="space-y-6">
+        {dashboardStats && (
+          <DashboardTab 
+            dashboardStats={dashboardStats}
+            dailyPageViews={dailyPageViews || []}
+            deviceStats={deviceStats || []}
+            topPages={topPages || []}
+            weeklyComparison={weeklyComparison}
+            monthlyTrend={monthlyTrend}
+            customMetrics={customMetrics}
+            onNavigate={(tab) => {
+              const routeMap: Record<string, string> = {
+                'manage': '/admin/sites',
+                'blog': '/admin/blog',
+                'analytics': '/admin/analytics',
+                'yorumlar': '/admin/reviews',
+              };
+              const route = routeMap[tab] || `/admin/${tab}`;
+              navigate(route);
+            }}
+          />
+        )}
+      </div>
+    </RetryBoundary>
   );
 }

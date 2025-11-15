@@ -117,3 +117,15 @@ export const handleLoading = (message: string, title = "Yükleniyor...") => {
     className: "border-muted",
   });
 };
+
+export const logger = {
+  logError: (message: string, error?: Error | unknown) => {
+    console.error(`[ERROR] ${message}`, error);
+  },
+  logWarning: (message: string, data?: unknown) => {
+    console.warn(`[WARNING] ${message}`, data);
+  },
+  logInfo: (message: string, data?: unknown) => {
+    console.info(`[INFO] ${message}`, data);
+  }
+};
