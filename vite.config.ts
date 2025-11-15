@@ -18,7 +18,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
     // Dedupe React to prevent multiple instances
-    dedupe: ['react', 'react-dom', 'react-router-dom'],
+    dedupe: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      '@tanstack/react-query',
+      'react-helmet-async'
+    ],
   },
   build: {
     // Aggressive chunk splitting for optimal loading
