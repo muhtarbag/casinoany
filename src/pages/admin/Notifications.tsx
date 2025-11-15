@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { LoadingFallback } from '@/components/admin/LoadingFallback';
 
-const NotificationManagement = lazy(() => import('@/components/NotificationManagement').then(m => ({ default: m.NotificationManagement })));
+const NotificationManagement = lazy(() => import('@/components/NotificationManagement'));
 
 export default function Notifications() {
   return (
