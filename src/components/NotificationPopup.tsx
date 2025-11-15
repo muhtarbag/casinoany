@@ -356,16 +356,6 @@ export const NotificationPopup = () => {
         className="max-w-2xl p-0 overflow-hidden border-0"
         style={{ backgroundColor: bgColor, color: textColor }}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 z-10"
-          style={{ color: closeButtonColor }}
-          onClick={handleClose}
-        >
-          <X className="w-4 h-4" />
-        </Button>
-
         <div className="space-y-4">
           {currentNotification.image_url && (
             <div className="w-full">
