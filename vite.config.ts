@@ -69,9 +69,12 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-separator',
       '@radix-ui/react-tooltip',
-      'three'
+      'three',
+      'recharts',
+      'lodash',
+      'lodash/get'
     ],
-    exclude: ['recharts'], // Exclude recharts from pre-bundling
+    exclude: [],
     force: true,
     esbuildOptions: {
       target: 'es2020',
