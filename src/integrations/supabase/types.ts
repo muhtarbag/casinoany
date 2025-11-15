@@ -2074,7 +2074,13 @@ export type Database = {
       undo_change: { Args: { p_change_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role:
+        | "admin"
+        | "user"
+        | "content_editor"
+        | "finance"
+        | "seo_manager"
+        | "moderator"
       user_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -2203,7 +2209,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: [
+        "admin",
+        "user",
+        "content_editor",
+        "finance",
+        "seo_manager",
+        "moderator",
+      ],
       user_status: ["pending", "approved", "rejected"],
     },
   },
