@@ -235,7 +235,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <div className="relative z-10 space-y-8">
               <div className="text-center">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">Öne Çıkan Siteler</h2>
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
+                <p className="text-primary font-semibold text-sm sm:text-base md:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
               </div>
               <div className="relative max-w-7xl mx-auto">
                 <div 
