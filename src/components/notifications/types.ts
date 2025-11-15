@@ -9,6 +9,7 @@ export interface NotificationFormFields {
   submit_text: string;
   success_message: string;
   privacy_text: string;
+  button_color: string;
 }
 
 export interface Notification {

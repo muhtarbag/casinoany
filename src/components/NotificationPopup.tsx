@@ -30,6 +30,7 @@ interface Notification {
     submit_text: string;
     success_message: string;
     privacy_text: string;
+    button_color: string;
   } | null;
 }
 
@@ -418,9 +419,15 @@ export const NotificationPopup = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-white text-primary hover:bg-white/90 font-semibold text-base shadow-lg"
                   size="lg"
                   disabled={isSubmitting}
+                  style={{
+                    backgroundColor: currentNotification.form_fields.button_color || '#ffffff',
+                    color: currentNotification.form_fields.button_color && 
+                           parseInt(currentNotification.form_fields.button_color.slice(1), 16) > 0xffffff/2 
+                           ? '#000000' : '#ffffff'
+                  }}
+                  className="w-full font-semibold text-base shadow-lg hover:opacity-90"
                 >
                   {isSubmitting ? 'Gönderiliyor...' : currentNotification.form_fields.submit_text}
                 </Button>

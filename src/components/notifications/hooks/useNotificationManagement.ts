@@ -35,6 +35,7 @@ const DEFAULT_FORM_DATA: NotificationFormData = {
     submit_text: 'Bonus Kodumu Gönder',
     success_message: '✅ Teşekkürler! Bonus kodunuz e-posta adresinize gönderildi.',
     privacy_text: '🔒 Bilgileriniz tamamen güvendedir. KVKK uyumlu olarak saklanır ve hiçbir şekilde üçüncü kişilerle paylaşılmaz.',
+    button_color: '#ffffff',
   },
   // Advanced styling options
   font_family: 'Inter',
