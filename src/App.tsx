@@ -30,6 +30,7 @@ const AdminAnalytics = lazy(() => import("./pages/admin/analytics/AnalyticsDashb
 const AdminRealtimeAnalytics = lazy(() => import("./pages/admin/analytics/RealtimeAnalytics"));
 const AdminKeywords = lazy(() => import("./pages/admin/analytics/KeywordPerformance"));
 const AdminCasinoContent = lazy(() => import("./pages/admin/content/CasinoContent"));
+const AdminCategoryManagement = lazy(() => import("./pages/admin/content/CategoryManagement"));
 const AdminSystemHealth = lazy(() => import("./pages/admin/system/SystemHealth"));
 const AdminAI = lazy(() => import("./pages/admin/AIAssistant"));
 const AdminBonusRequests = lazy(() => import("./pages/admin/finance/BonusRequests"));
@@ -110,6 +111,7 @@ const AppContent = () => {
             <Route path="analytics/realtime" element={<AdminRealtimeAnalytics />} />
             <Route path="analytics/keywords" element={<AdminKeywords />} />
             <Route path="content/casino" element={<AdminCasinoContent />} />
+            <Route path="content/categories" element={<AdminCategoryManagement />} />
             <Route path="content/casino-analytics" element={<AdminCasinoAnalytics />} />
             <Route path="content/planner" element={<AdminContentPlanner />} />
             <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
