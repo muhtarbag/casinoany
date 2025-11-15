@@ -44,9 +44,17 @@ export default function Categories() {
             <LoadingSpinner />
           </div>
         ) : categories && categories.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {categories.map((category) => (
-              <CategoryCard key={category.id} category={category} />
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+            {categories.map((category, index) => (
+              <div 
+                key={category.id}
+                style={{
+                  animationDelay: `${index * 100}ms`
+                }}
+                className="animate-scale-in"
+              >
+                <CategoryCard category={category} />
+              </div>
             ))}
           </div>
         ) : (
