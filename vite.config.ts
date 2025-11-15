@@ -40,41 +40,47 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: Keep ALL React ecosystem in single chunk
+            // React ecosystem - keep everything React-related together
             if (id.includes('react') || 
-                id.includes('react-dom') || 
-                id.includes('react-router') || 
                 id.includes('scheduler') || 
                 id.includes('@remix-run') ||
-                id.includes('react-helmet-async') ||
-                id.includes('react-hook-form') ||
-                id.includes('react-quill') ||
-                id.includes('react-icons') ||
-                id.includes('react-day-picker')) {
+                id.includes('react-dom') || 
+                id.includes('react-router')) {
               return 'vendor-react';
             }
             
-            // Keep React-dependent UI libraries together
-            if (id.includes('@radix-ui') || id.includes('framer-motion') || id.includes('sonner')) {
+            // UI libraries that depend on React
+            if (id.includes('@radix-ui') || 
+                id.includes('framer-motion') || 
+                id.includes('sonner') ||
+                id.includes('vaul') ||
+                id.includes('@dnd-kit')) {
               return 'vendor-ui';
             }
             
-            // Query library - depends on React
-            if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) {
+            // Query and state management
+            if (id.includes('@tanstack')) {
               return 'vendor-query';
             }
             
-            // Chart library
+            // Form libraries
+            if (id.includes('react-hook-form') || 
+                id.includes('zod') || 
+                id.includes('@hookform')) {
+              return 'vendor-forms';
+            }
+            
+            // Supabase
+            if (id.includes('@supabase')) {
+              return 'vendor-supabase';
+            }
+            
+            // Charts
             if (id.includes('recharts')) {
               return 'vendor-charts';
             }
             
-            // Other large dependencies
-            if (id.includes('date-fns') || id.includes('zod') || id.includes('@supabase')) {
-              return 'vendor-libs';
-            }
-            
-            // All other node_modules
+            // Everything else
             return 'vendor-other';
           }
         },
