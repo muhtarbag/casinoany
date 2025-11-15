@@ -50,9 +50,12 @@ export const BonusManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bonus_offers')
-        .select('*, betting_sites(name, logo_url)')
+        .select('*, betting_sites!inner(name, logo_url, slug)')
         .order('display_order', { ascending: true });
-      if (error) throw error;
+      if (error) {
+        console.error('Bonus offers fetch error:', error);
+        throw error;
+      }
       return data;
     },
   });
