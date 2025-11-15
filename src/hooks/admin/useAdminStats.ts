@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { subDays } from 'date-fns';
+import { TypedQueries } from '@/lib/supabase-typed';
 
 export const useAdminStats = () => {
   // Dashboard stats
@@ -25,18 +26,17 @@ export const useAdminStats = () => {
       ] = await Promise.all([
         supabase.from('betting_sites').select('*', { count: 'exact', head: true }),
         supabase.from('betting_sites').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        (supabase as any).from('profiles').select('*', { count: 'exact', head: true }),
-        (supabase as any).from('site_reviews').select('*', { count: 'exact', head: true }),
-        (supabase as any).from('site_reviews').select('*', { count: 'exact', head: true }).eq('is_approved', false),
-        (supabase as any).from('site_reviews').select('*', { count: 'exact', head: true }).eq('is_approved', true),
-        (supabase as any).from('blog_posts').select('*', { count: 'exact', head: true }),
-        (supabase as any).from('blog_posts').select('*', { count: 'exact', head: true }).eq('is_published', true),
-        (supabase as any).from('blog_comments').select('*', { count: 'exact', head: true }),
-        (supabase as any).from('blog_comments').select('*', { count: 'exact', head: true }).eq('is_approved', false),
-        // ✅ FIX: Use actual page_views instead of site_stats
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        TypedQueries.siteReviews(supabase).select('*', { count: 'exact', head: true }),
+        TypedQueries.siteReviews(supabase).select('*', { count: 'exact', head: true }).eq('is_approved', false),
+        TypedQueries.siteReviews(supabase).select('*', { count: 'exact', head: true }).eq('is_approved', true),
+        supabase.from('blog_posts').select('*', { count: 'exact', head: true }),
+        supabase.from('blog_posts').select('*', { count: 'exact', head: true }).eq('is_published', true),
+        supabase.from('blog_comments').select('*', { count: 'exact', head: true }),
+        supabase.from('blog_comments').select('*', { count: 'exact', head: true }).eq('is_approved', false),
         supabase.from('page_views').select('*', { count: 'exact', head: true }),
         supabase.from('conversions').select('*', { count: 'exact', head: true }).eq('conversion_type', 'affiliate_click'),
-        (supabase as any).from('blog_posts').select('view_count'),
+        supabase.from('blog_posts').select('view_count'),
         supabase.from('affiliate_payments').select('payment_amount, payment_status'),
       ]);
 
