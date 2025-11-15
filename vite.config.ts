@@ -40,14 +40,22 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: Keep ALL React in single chunk to prevent multiple instances
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || 
-                id.includes('scheduler') || id.includes('@remix-run')) {
+            // CRITICAL: Keep ALL React ecosystem in single chunk
+            if (id.includes('react') || 
+                id.includes('react-dom') || 
+                id.includes('react-router') || 
+                id.includes('scheduler') || 
+                id.includes('@remix-run') ||
+                id.includes('react-helmet-async') ||
+                id.includes('react-hook-form') ||
+                id.includes('react-quill') ||
+                id.includes('react-icons') ||
+                id.includes('react-day-picker')) {
               return 'vendor-react';
             }
             
             // Keep React-dependent UI libraries together
-            if (id.includes('@radix-ui') || id.includes('framer-motion')) {
+            if (id.includes('@radix-ui') || id.includes('framer-motion') || id.includes('sonner')) {
               return 'vendor-ui';
             }
             
@@ -62,8 +70,7 @@ export default defineConfig(({ mode }) => ({
             }
             
             // Other large dependencies
-            if (id.includes('date-fns') || id.includes('react-hook-form') || 
-                id.includes('zod') || id.includes('react-quill')) {
+            if (id.includes('date-fns') || id.includes('zod') || id.includes('@supabase')) {
               return 'vendor-libs';
             }
             
