@@ -391,7 +391,7 @@ export const NotificationPopup = () => {
                     onChange={(e) => setFormEmail(e.target.value)}
                     placeholder="ornek@email.com"
                     required
-                    className="bg-white/90 border-white/20 text-foreground placeholder:text-muted-foreground focus:bg-white"
+                    className="bg-white border-white/20 text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
 
@@ -406,7 +406,7 @@ export const NotificationPopup = () => {
                     onChange={(e) => setFormPhone(e.target.value)}
                     placeholder="+90 5XX XXX XX XX"
                     required
-                    className="bg-white/90 border-white/20 text-foreground placeholder:text-muted-foreground focus:bg-white"
+                    className="bg-white border-white/20 text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
 
