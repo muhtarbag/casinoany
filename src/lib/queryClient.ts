@@ -33,20 +33,20 @@ export const QUERY_DEFAULTS = {
   
   // DYNAMIC DATA: Sık değişebilen veriler (user stats, notifications)
   dynamic: {
-    staleTime: CACHE_TIMES.SHORT,     // 1 dakika
-    gcTime: CACHE_TIMES.MEDIUM,       // 5 dakika
-    refetchOnWindowFocus: true,        // Window focus'ta refetch et
-    refetchOnMount: 'always' as const, // Her mount'ta refetch et
-    refetchOnReconnect: true,          // Reconnect'te refetch et
+    staleTime: CACHE_TIMES.MEDIUM,    // 5 dakika (1dk → 5dk)
+    gcTime: CACHE_TIMES.LONG,         // 15 dakika
+    refetchOnWindowFocus: false,       // Gereksiz refetch kaldırıldı
+    refetchOnMount: false,             // Her mount'ta refetch kaldırıldı
+    refetchOnReconnect: true,          // Sadece reconnect'te refetch
   },
   
   // ANALYTICS: Analytics ve metrics data
   analytics: {
-    staleTime: CACHE_TIMES.MEDIUM,    // 5 dakika
-    gcTime: CACHE_TIMES.LONG,         // 15 dakika
+    staleTime: CACHE_TIMES.LONG,      // 15 dakika (5dk → 15dk)
+    gcTime: CACHE_TIMES.VERY_LONG,    // 1 saat
     refetchOnWindowFocus: false,       // Window focus'ta refetch etme
     refetchOnMount: false,             // Mount'ta refetch etme
-    refetchInterval: REFETCH_INTERVALS.NORMAL, // 2 dakikada bir otomatik refetch
+    refetchInterval: false,            // Otomatik refetch KALDIRILDI
   },
   
   // REALTIME: Real-time subscriptions için (manual refetch, realtime updates)
@@ -60,10 +60,10 @@ export const QUERY_DEFAULTS = {
   
   // ADMIN: Admin panel data (change history, logs, etc.)
   admin: {
-    staleTime: CACHE_TIMES.SHORT,     // 1 dakika
-    gcTime: CACHE_TIMES.MEDIUM,       // 5 dakika
-    refetchOnWindowFocus: true,        // Window focus'ta refetch et
-    refetchInterval: REFETCH_INTERVALS.NORMAL, // 2 dakikada bir refetch
+    staleTime: CACHE_TIMES.LONG,      // 15 dakika (1dk → 15dk)
+    gcTime: CACHE_TIMES.VERY_LONG,    // 1 saat
+    refetchOnWindowFocus: false,       // Gereksiz refetch kaldırıldı
+    refetchInterval: false,            // Otomatik polling KALDIRILDI
   },
   
   // CONTENT: Blog, news, static content
