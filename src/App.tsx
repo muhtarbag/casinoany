@@ -36,6 +36,7 @@ const AdminBonusRequests = lazy(() => import("./pages/admin/finance/BonusRequest
 const AdminContentPlanner = lazy(() => import("./pages/admin/content/ContentPlanner"));
 const AdminChangeHistory = lazy(() => import("./pages/admin/system/ChangeHistory"));
 const AdminPerformance = lazy(() => import("./pages/admin/system/Performance"));
+const AdminBuildHealth = lazy(() => import("./pages/admin/system/BuildHealth"));
 const AdminFeaturedSites = lazy(() => import("./pages/admin/sites/FeaturedSites"));
 const AdminBannerManagement = lazy(() => import("./pages/admin/sites/BannerManagement"));
 const AdminSiteStats = lazy(() => import("./pages/admin/sites/SiteStats"));
@@ -117,6 +118,7 @@ const AppContent = () => {
             <Route path="system/health" element={<AdminSystemHealth />} />
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/performance" element={<AdminPerformance />} />
+            <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
             <Route path="ai" element={<AdminAI />} />
