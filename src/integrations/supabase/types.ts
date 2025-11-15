@@ -368,6 +368,7 @@ export type Database = {
           affiliate_panel_password: string | null
           affiliate_panel_url: string | null
           affiliate_panel_username: string | null
+          avg_rating: number | null
           block_styles: Json | null
           bonus: string | null
           cons: string[] | null
@@ -388,6 +389,7 @@ export type Database = {
           name: string
           pros: string[] | null
           rating: number | null
+          review_count: number | null
           slug: string
           telegram: string | null
           twitter: string | null
@@ -408,6 +410,7 @@ export type Database = {
           affiliate_panel_password?: string | null
           affiliate_panel_url?: string | null
           affiliate_panel_username?: string | null
+          avg_rating?: number | null
           block_styles?: Json | null
           bonus?: string | null
           cons?: string[] | null
@@ -428,6 +431,7 @@ export type Database = {
           name: string
           pros?: string[] | null
           rating?: number | null
+          review_count?: number | null
           slug: string
           telegram?: string | null
           twitter?: string | null
@@ -448,6 +452,7 @@ export type Database = {
           affiliate_panel_password?: string | null
           affiliate_panel_url?: string | null
           affiliate_panel_username?: string | null
+          avg_rating?: number | null
           block_styles?: Json | null
           bonus?: string | null
           cons?: string[] | null
@@ -468,6 +473,7 @@ export type Database = {
           name?: string
           pros?: string[] | null
           rating?: number | null
+          review_count?: number | null
           slug?: string
           telegram?: string | null
           twitter?: string | null
