@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
       'react': path.resolve('./node_modules/react'),
       'react-dom': path.resolve('./node_modules/react-dom'),
     },
+    dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
     build: {
       rollupOptions: {
@@ -65,6 +66,8 @@ export default defineConfig(({ mode }) => ({
       'react-helmet-async'
     ],
     exclude: ['@tanstack/react-virtual'],
-    force: true
+    esbuildOptions: {
+      plugins: []
+    }
   },
 }));
