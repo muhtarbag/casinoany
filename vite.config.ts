@@ -28,15 +28,13 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: Keep React ecosystem as SINGLE MONOLITHIC chunk
-            // This prevents ALL dispatcher null errors by guaranteeing single React instance
-            // Include recharts in React bundle to prevent initialization errors
-            if (id.includes('react') || id.includes('react-dom') || 
-                id.includes('react-router') || id.includes('scheduler') ||
-                id.includes('@tanstack/react-query') || id.includes('three') ||
-                id.includes('@radix-ui') || id.includes('react-helmet-async') ||
-                id.includes('recharts') || id.includes('d3-')) {
-              return 'vendor-react'; // All React + Radix + Helmet + Charts in one chunk
+            // CRITICAL: ALL React ecosystem and dependencies in ONE chunk
+            // This is the ONLY way to guarantee single React instance
+            if (id.includes('react') || id.includes('scheduler') || 
+                id.includes('@radix-ui') || id.includes('recharts') ||
+                id.includes('d3-') || id.includes('@tanstack') ||
+                id.includes('react-helmet-async') || id.includes('three')) {
+              return 'vendor-react'; // Everything React-related in one monolithic chunk
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
