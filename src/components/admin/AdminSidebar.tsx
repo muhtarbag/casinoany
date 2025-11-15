@@ -23,7 +23,8 @@ import {
   Gauge,
   Mail,
   Shield,
-  Image
+  Image,
+  AlertCircle
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -101,6 +102,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       label: 'Sistem',
       items: [
         { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null, route: '/admin/system/health', roles: [] },
+        { id: 'build-health', icon: AlertCircle, label: 'Build Sağlığı', badge: 'NEW', route: '/admin/system/build-health', roles: [] },
         { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null, route: '/admin/system/history', roles: [] },
         { id: 'performance', icon: Gauge, label: 'Performance İzleme', badge: null, route: '/admin/system/performance', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', badge: null, route: '/admin/system/roles', roles: [] },
