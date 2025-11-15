@@ -41,6 +41,7 @@ export function NotificationManagement() {
     handleImageUpload,
     handleSubmit,
     handleEdit,
+    handleToggle,
     handleDelete,
     resetForm,
     isSubmitting,
@@ -382,6 +383,7 @@ export function NotificationManagement() {
             notifications={notifications || []}
             onEdit={handleEditClick}
             onDelete={handleDelete}
+            onToggle={handleToggle}
             onPreview={handlePreview}
             isDeleting={isDeleting}
           />
@@ -392,6 +394,7 @@ export function NotificationManagement() {
             notifications={notifications?.filter(n => n.is_active) || []}
             onEdit={handleEditClick}
             onDelete={handleDelete}
+            onToggle={handleToggle}
             onPreview={handlePreview}
             isDeleting={isDeleting}
           />
@@ -402,6 +405,7 @@ export function NotificationManagement() {
             notifications={notifications?.filter(n => !n.is_active) || []}
             onEdit={handleEditClick}
             onDelete={handleDelete}
+            onToggle={handleToggle}
             onPreview={handlePreview}
             isDeleting={isDeleting}
           />

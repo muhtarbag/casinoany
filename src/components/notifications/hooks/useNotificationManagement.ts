@@ -212,6 +212,23 @@ export function useNotificationManagement() {
     }
   }, [deleteMutation]);
 
+  // Toggle active status handler
+  const handleToggle = useCallback(async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('site_notifications')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+      toast.success(currentStatus ? 'Bildirim pasif edildi' : 'Bildirim aktif edildi');
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    } catch (error: any) {
+      console.error('Error toggling notification:', error);
+      toast.error('Durum güncellenemedi: ' + error.message);
+    }
+  }, [queryClient]);
+
   // Reset form
   const resetForm = useCallback(() => {
     setFormData(DEFAULT_FORM_DATA);
@@ -228,6 +245,7 @@ export function useNotificationManagement() {
     handleImageUpload,
     handleSubmit,
     handleEdit,
+    handleToggle,
     handleDelete,
     resetForm,
     isSubmitting: createMutation.isPending || updateMutation.isPending,
