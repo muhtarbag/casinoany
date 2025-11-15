@@ -16,9 +16,11 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Force recharts to use lodash-es instead of lodash
+      "lodash": "lodash-es"
     },
     // CRITICAL: Force single React instance across all modules
-    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router', 'scheduler', '@tanstack/react-query', 'react-helmet-async'],
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router', 'scheduler', '@tanstack/react-query', 'react-helmet-async', 'lodash'],
   },
   ssr: {
     noExternal: ['react', 'react-dom', 'react-router-dom'],
