@@ -232,13 +232,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           <LoadingSpinner size="lg" text="Öne çıkan siteler yükleniyor..." />
         ) : featuredSites && featuredSites.length > 0 ? (
           <div className="relative -mx-4 px-4 py-12 overflow-hidden">
-            {/* Animated Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
-              <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute top-1/2 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-              <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-            </div>
-
             <div className="relative z-10 space-y-8">
               <div className="text-center">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">Öne Çıkan Siteler</h2>
