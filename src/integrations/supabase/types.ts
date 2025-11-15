@@ -555,6 +555,7 @@ export type Database = {
         Row: {
           author_id: string | null
           category: string | null
+          category_id: string | null
           content: string
           created_at: string
           display_order: number | null
@@ -577,6 +578,7 @@ export type Database = {
         Insert: {
           author_id?: string | null
           category?: string | null
+          category_id?: string | null
           content: string
           created_at?: string
           display_order?: number | null
@@ -599,6 +601,7 @@ export type Database = {
         Update: {
           author_id?: string | null
           category?: string | null
+          category_id?: string | null
           content?: string
           created_at?: string
           display_order?: number | null
@@ -619,6 +622,13 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "blog_posts_primary_site_id_fkey"
             columns: ["primary_site_id"]
@@ -858,6 +868,51 @@ export type Database = {
             referencedColumns: ["site_id"]
           },
         ]
+      }
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       change_history: {
         Row: {
@@ -1302,6 +1357,52 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      site_categories: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          site_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          site_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_categories_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_categories_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+        ]
       }
       site_notifications: {
         Row: {
