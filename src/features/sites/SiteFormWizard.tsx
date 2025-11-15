@@ -41,6 +41,13 @@ export function SiteFormWizard({
   const [currentStep, setCurrentStep] = useState(0);
   const isMobile = useIsMobile();
 
+  // Reset wizard to first step when form is cleared (editingId becomes null)
+  useEffect(() => {
+    if (!editingId) {
+      setCurrentStep(0);
+    }
+  }, [editingId]);
+
   // Keyboard shortcuts
   useKeyboardShortcuts([
     {
