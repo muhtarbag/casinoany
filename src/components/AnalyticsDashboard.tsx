@@ -37,11 +37,11 @@ export const AnalyticsDashboard = () => {
         sessions: sessionsRes.data || [],
       };
     },
-    staleTime: 3 * 60 * 1000, // 3 dakika cache
-    refetchInterval: 2 * 60 * 1000, // 2 dakikada bir yenile
+    staleTime: 5 * 60 * 1000, // 5 minutes (was 3min - optimized)
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (was 2min - too aggressive)
   });
 
-  // Process data for charts - Memoize expensive computations
+  // ✅ OPTIMIZED: Memoize expensive computations
   const processedData = useMemo(() => {
     if (!summary) return null;
     

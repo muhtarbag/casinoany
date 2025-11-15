@@ -1,5 +1,5 @@
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { Loader2 } from 'lucide-react';
+import { LoadingState } from '@/components/admin/LoadingState';
 import { DashboardTab } from '@/components/admin/DashboardTab';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,12 +16,9 @@ export default function Dashboard() {
     customMetrics
   } = useAdminStats();
 
+  // ✅ STANDARDIZED: LoadingState component
   if (isLoadingStats) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <LoadingState variant="skeleton" text="Dashboard yükleniyor..." />;
   }
 
   return (
