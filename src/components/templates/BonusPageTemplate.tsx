@@ -62,7 +62,7 @@ export const BonusPageTemplate = ({
   howToSteps
 }: BonusPageTemplateProps) => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-4 md:px-6 lg:px-8">
       {/* Schema for first bonus (featured) */}
       {bonusOffers[0] && (
         <BonusOfferSchema
@@ -88,23 +88,23 @@ export const BonusPageTemplate = ({
       )}
 
       {/* Hero Section */}
-      <div className="text-center space-y-4 py-8">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+      <div className="text-center space-y-4 py-6 md:py-8 px-4">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-tight">
           {pageTitle}
         </h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+        <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-2">
           {pageDescription}
         </p>
-        <div className="flex items-center justify-center gap-4 text-sm">
-          <Badge variant="secondary" className="px-3 py-1">
+        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-xs md:text-sm px-2">
+          <Badge variant="secondary" className="px-2 md:px-3 py-1">
             <Clock className="w-3 h-3 mr-1" />
             Güncel Liste 2025
           </Badge>
-          <Badge variant="secondary" className="px-3 py-1">
+          <Badge variant="secondary" className="px-2 md:px-3 py-1">
             <Shield className="w-3 h-3 mr-1" />
             Doğrulanmış Bonuslar
           </Badge>
-          <Badge variant="secondary" className="px-3 py-1">
+          <Badge variant="secondary" className="px-2 md:px-3 py-1">
             <TrendingUp className="w-3 h-3 mr-1" />
             {bonusOffers.length} Kampanya
           </Badge>
@@ -202,8 +202,35 @@ export const BonusPageTemplate = ({
 };
 
 const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
-  <div className="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 border-2 rounded-xl hover:shadow-lg hover:border-primary/20 transition-all bg-card">
-    <div className="flex items-center gap-6 flex-1">
+  <div className="flex flex-col gap-4 p-4 md:p-6 border-2 rounded-xl hover:shadow-lg hover:border-primary/20 transition-all bg-card">
+    {/* Mobile: Vertical Layout */}
+    <div className="flex items-start gap-3 md:hidden">
+      <div className="text-2xl font-bold text-primary w-8 flex-shrink-0 pt-1">
+        #{rank}
+      </div>
+      
+      <div className="w-24 h-16 flex-shrink-0 bg-gray-900 rounded-lg border-2 border-border p-2 flex items-center justify-center">
+        <OptimizedImage
+          src={bonus.casino.logo}
+          alt={bonus.casino.name}
+          width={88}
+          height={48}
+          className="object-contain w-full h-full"
+          objectFit="contain"
+          priority={rank <= 3}
+        />
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-base mb-1 leading-tight">{bonus.casino.name}</h3>
+        <Badge className={`${BONUS_TYPE_COLORS[bonus.bonusType]} text-white text-xs`}>
+          {BONUS_TYPE_LABELS[bonus.bonusType]}
+        </Badge>
+      </div>
+    </div>
+
+    {/* Desktop: Horizontal Layout */}
+    <div className="hidden md:flex items-center gap-6 flex-1">
       <div className="text-3xl font-bold text-primary w-10 flex-shrink-0">
         #{rank}
       </div>
@@ -243,10 +270,30 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
         </div>
       </div>
     </div>
+
+    {/* Mobile: Details Section */}
+    <div className="md:hidden space-y-2">
+      <p className="text-sm text-muted-foreground line-clamp-2">{bonus.title}</p>
+      <div className="flex flex-wrap gap-3 text-sm font-medium">
+        <span className="flex items-center gap-1.5 text-primary">
+          <Gift className="w-4 h-4" />
+          {bonus.amount}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <TrendingUp className="w-4 h-4" />
+          Çevrim: {bonus.wageringRequirement}
+        </span>
+        {bonus.bonusCode && (
+          <Badge variant="outline" className="font-mono text-xs">
+            Kod: {bonus.bonusCode}
+          </Badge>
+        )}
+      </div>
+    </div>
     
     <Button
       size="lg"
-      className="w-full md:w-auto px-8 py-6 text-base font-semibold"
+      className="w-full md:w-auto md:ml-auto px-6 md:px-8 py-5 md:py-6 text-sm md:text-base font-semibold"
       onClick={() => window.open(bonus.affiliateLink, '_blank')}
     >
       Bonusu Al →
