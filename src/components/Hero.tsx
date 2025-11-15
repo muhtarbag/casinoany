@@ -6,7 +6,6 @@ import { BettingSiteCard } from './BettingSiteCard';
 import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import BlurText from './BlurText';
-import LightRays from './LightRays';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -173,18 +172,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
   return (
     <div className="relative overflow-hidden bg-background touch-manipulation">
-      <LightRays
-        raysOrigin="top-center"
-        raysColor="#a855f7"
-        raysSpeed={1.5}
-        lightSpread={0.8}
-        rayLength={1.2}
-        followMouse={true}
-        mouseInfluence={0.1}
-        noiseAmount={0.1}
-        distortion={0.05}
-      />
-      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-20 relative z-10">
+      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-20">
         <div className="text-center space-y-4 md:space-y-6 lg:space-y-8 mb-8 md:mb-12 lg:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary/10 border border-primary/20">
             <Award className="w-3 h-3 md:w-4 md:h-4 text-primary" />
