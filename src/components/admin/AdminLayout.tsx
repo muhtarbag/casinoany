@@ -146,9 +146,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
           {/* Main Content */}
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-3 sm:p-6">
-              <AdminErrorBoundary fallbackMessage="Bu modülde bir hata oluştu">
-                {children}
-              </AdminErrorBoundary>
+              {children}
             </div>
           </main>
         </div>

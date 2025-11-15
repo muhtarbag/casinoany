@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminErrorBoundary } from '@/components/admin/AdminErrorBoundary';
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { LoadingFallback } from '@/components/admin/LoadingFallback';
 import { Loader2 } from 'lucide-react';
@@ -104,49 +105,51 @@ export default function Admin() {
       onTabChange={setActiveTab}
       username={userProfile?.username || 'Admin'}
     >
-      <Suspense fallback={<LoadingFallback />}>
-        {activeTab === 'dashboard' && dashboardStats && (
-          <DashboardTab 
-            dashboardStats={dashboardStats}
-            dailyPageViews={dailyPageViews || []}
-            deviceStats={deviceStats || []}
-            topPages={topPages || []}
-            weeklyComparison={weeklyComparison}
-            monthlyTrend={monthlyTrend}
-            customMetrics={customMetrics}
-            onNavigate={setActiveTab}
-          />
-        )}
+      <AdminErrorBoundary fallbackMessage="Bu modülde bir hata oluştu. Sayfayı yenileyerek tekrar deneyin.">
+        <Suspense fallback={<LoadingFallback />}>
+          {activeTab === 'dashboard' && dashboardStats && (
+            <DashboardTab 
+              dashboardStats={dashboardStats}
+              dailyPageViews={dailyPageViews || []}
+              deviceStats={deviceStats || []}
+              topPages={topPages || []}
+              weeklyComparison={weeklyComparison}
+              monthlyTrend={monthlyTrend}
+              customMetrics={customMetrics}
+              onNavigate={setActiveTab}
+            />
+          )}
 
-        {activeTab === 'manage' && <SiteManagementContainer />}
-        {activeTab === 'featured' && <FeaturedSitesManagement />}
-        {activeTab === 'site-stats' && <SiteStats />}
-        {activeTab === 'blog-stats' && <BlogStats />}
-        {activeTab === 'reviews' && <EnhancedReviewManagement />}
-        {activeTab === 'blog' && <BlogManagement />}
-        {activeTab === 'comments' && <BlogCommentManagement />}
-        {activeTab === 'ai' && <AIAssistant />}
-        {activeTab === 'ai-history' && <AnalysisHistory />}
-        {activeTab === 'content-planner' && <ContentPlanner />}
-        {activeTab === 'keywords' && <KeywordPerformance />}
-        {activeTab === 'casino-content' && <CasinoContentManagement />}
-        {activeTab === 'casino-analytics' && <CasinoContentAnalytics />}
-        {activeTab === 'notifications' && <NotificationManagement />}
-        {activeTab === 'carousel' && <CarouselSettings />}
-        {activeTab === 'analytics' && <AnalyticsDashboard />}
-        {activeTab === 'health' && <SystemHealthDashboard />}
-        {activeTab === 'logs' && <SystemLogsViewer />}
-        {activeTab === 'news' && <NewsManagement />}
-        {activeTab === 'realtime' && <RealtimeAnalyticsDashboard />}
-        {activeTab === 'gsc' && <GSCSetupGuide />}
-        {activeTab === 'bonus' && <BonusManagement />}
-        {activeTab === 'cms' && <CMSContentManagement />}
-        {activeTab === 'affiliate' && <AffiliateManagement />}
-        {activeTab === 'bonus-requests' && <BonusRequestsManagement />}
-        {activeTab === 'banners' && <BannerManagement />}
-        {activeTab === 'history' && <ChangeHistoryViewer tableFilter="betting_sites" limit={50} />}
-        {activeTab === 'performance' && <PerformanceDashboard />}
-      </Suspense>
+          {activeTab === 'manage' && <SiteManagementContainer />}
+          {activeTab === 'featured' && <FeaturedSitesManagement />}
+          {activeTab === 'site-stats' && <SiteStats />}
+          {activeTab === 'blog-stats' && <BlogStats />}
+          {activeTab === 'reviews' && <EnhancedReviewManagement />}
+          {activeTab === 'blog' && <BlogManagement />}
+          {activeTab === 'comments' && <BlogCommentManagement />}
+          {activeTab === 'ai' && <AIAssistant />}
+          {activeTab === 'ai-history' && <AnalysisHistory />}
+          {activeTab === 'content-planner' && <ContentPlanner />}
+          {activeTab === 'keywords' && <KeywordPerformance />}
+          {activeTab === 'casino-content' && <CasinoContentManagement />}
+          {activeTab === 'casino-analytics' && <CasinoContentAnalytics />}
+          {activeTab === 'notifications' && <NotificationManagement />}
+          {activeTab === 'carousel' && <CarouselSettings />}
+          {activeTab === 'analytics' && <AnalyticsDashboard />}
+          {activeTab === 'health' && <SystemHealthDashboard />}
+          {activeTab === 'logs' && <SystemLogsViewer />}
+          {activeTab === 'news' && <NewsManagement />}
+          {activeTab === 'realtime' && <RealtimeAnalyticsDashboard />}
+          {activeTab === 'gsc' && <GSCSetupGuide />}
+          {activeTab === 'bonus' && <BonusManagement />}
+          {activeTab === 'cms' && <CMSContentManagement />}
+          {activeTab === 'affiliate' && <AffiliateManagement />}
+          {activeTab === 'bonus-requests' && <BonusRequestsManagement />}
+          {activeTab === 'banners' && <BannerManagement />}
+          {activeTab === 'history' && <ChangeHistoryViewer tableFilter="betting_sites" limit={50} />}
+          {activeTab === 'performance' && <PerformanceDashboard />}
+        </Suspense>
+      </AdminErrorBoundary>
     </AdminLayout>
   );
 }
