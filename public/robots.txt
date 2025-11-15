@@ -10,9 +10,8 @@ Allow: /
 # =============================================================================
 # SITEMAP LOCATIONS
 # =============================================================================
+Sitemap: https://www.casinoany.com/sitemap.xml
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/dynamic-sitemap
-# Add your custom domain sitemap when available:
-# Sitemap: https://yourdomain.com/sitemap.xml
 
 # =============================================================================
 # CRAWL RATE OPTIMIZATION
