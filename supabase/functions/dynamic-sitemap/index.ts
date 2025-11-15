@@ -78,6 +78,12 @@ serve(async (req) => {
       req.headers.get('origin') || 
       req.headers.get('referer')?.split('?')[0].replace(/\/$/, '') ||
       'https://www.casinoany.com';
+    
+    // Try to get primary domain from database
+    const { data: primaryDomain } = await supabase
+      .rpc('get_primary_domain');
+    
+    const finalBaseUrl = primaryDomain ? `https://${primaryDomain}` : baseUrl;
 
     // Build XML sitemap
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -89,7 +95,7 @@ serve(async (req) => {
   
   <!-- Homepage -->
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>${finalBaseUrl}/</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -97,54 +103,54 @@ serve(async (req) => {
 
   <!-- Static Pages -->
   <url>
-    <loc>${baseUrl}/about</loc>
+    <loc>${finalBaseUrl}/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>${baseUrl}/blog</loc>
+    <loc>${finalBaseUrl}/blog</loc>
     <lastmod>${posts?.[0]?.updated_at ? new Date(posts[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/casino-siteleri</loc>
+    <loc>${finalBaseUrl}/casino-siteleri</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/spor-bahisleri</loc>
+    <loc>${finalBaseUrl}/spor-bahisleri</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/bonus-kampanyalari</loc>
+    <loc>${finalBaseUrl}/bonus-kampanyalari</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/deneme-bonusu</loc>
+    <loc>${finalBaseUrl}/deneme-bonusu</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/mobil-bahis</loc>
+    <loc>${finalBaseUrl}/mobil-bahis</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>${baseUrl}/canli-casino</loc>
+    <loc>${finalBaseUrl}/canli-casino</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>${baseUrl}/kategoriler</loc>
+    <loc>${finalBaseUrl}/kategoriler</loc>
     <lastmod>${categories?.[0]?.updated_at ? new Date(categories[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/news</loc>
+    <loc>${finalBaseUrl}/news</loc>
     <lastmod>${news?.[0]?.updated_at ? new Date(news[0].updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -153,7 +159,7 @@ serve(async (req) => {
   <!-- Betting Sites -->
   ${sites?.map(site => `
   <url>
-    <loc>${baseUrl}/${site.slug}</loc>
+    <loc>${finalBaseUrl}/${site.slug}</loc>
     <lastmod>${new Date(site.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -162,7 +168,7 @@ serve(async (req) => {
   <!-- Blog Posts -->
   ${posts?.map(post => `
   <url>
-    <loc>${baseUrl}/blog/${post.slug}</loc>
+    <loc>${finalBaseUrl}/blog/${post.slug}</loc>
     <lastmod>${new Date(post.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -171,7 +177,7 @@ serve(async (req) => {
   <!-- Categories -->
   ${categories?.map(category => `
   <url>
-    <loc>${baseUrl}/kategoriler/${category.slug}</loc>
+    <loc>${finalBaseUrl}/kategoriler/${category.slug}</loc>
     <lastmod>${new Date(category.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -180,7 +186,7 @@ serve(async (req) => {
   <!-- News Articles -->
   ${news?.map(article => `
   <url>
-    <loc>${baseUrl}/news/${article.slug}</loc>
+    <loc>${finalBaseUrl}/news/${article.slug}</loc>
     <lastmod>${new Date(article.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -188,22 +194,22 @@ serve(async (req) => {
 
   <!-- Legal Pages -->
   <url>
-    <loc>${baseUrl}/privacy</loc>
+    <loc>${finalBaseUrl}/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>${baseUrl}/terms</loc>
+    <loc>${finalBaseUrl}/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>${baseUrl}/cookies</loc>
+    <loc>${finalBaseUrl}/cookies</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>${baseUrl}/kvkk</loc>
+    <loc>${finalBaseUrl}/kvkk</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

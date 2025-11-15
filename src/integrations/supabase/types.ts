@@ -218,6 +218,48 @@ export type Database = {
         }
         Relationships: []
       }
+      alternative_domains: {
+        Row: {
+          blocked_at: string | null
+          created_at: string | null
+          domain: string
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          last_checked_at: string | null
+          notes: string | null
+          priority: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          blocked_at?: string | null
+          created_at?: string | null
+          domain: string
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          last_checked_at?: string | null
+          notes?: string | null
+          priority?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          blocked_at?: string | null
+          created_at?: string | null
+          domain?: string
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          last_checked_at?: string | null
+          notes?: string | null
+          priority?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       analytics_sessions: {
         Row: {
           browser: string | null
@@ -1973,6 +2015,8 @@ export type Database = {
           unique_sessions: number
         }[]
       }
+      get_next_available_domain: { Args: never; Returns: string }
+      get_primary_domain: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

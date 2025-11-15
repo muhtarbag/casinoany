@@ -50,6 +50,7 @@ const AdminCasinoAnalytics = lazyWithPreload(() => import("./pages/admin/content
 const AdminAIHistory = lazyWithPreload(() => import("./pages/admin/ai/AIHistory"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
 const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
+const AdminDomainManagement = lazyWithPreload(() => import("./pages/admin/system/DomainManagement"));
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
 const BlogPost = lazyWithPreload(() => import("./pages/BlogPost"));
 const News = lazyWithPreload(() => import("./pages/News"));
@@ -130,6 +131,7 @@ const AppContent = () => {
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
+            <Route path="system/domains" element={<AdminDomainManagement />} />
             <Route path="ai" element={<AdminAI />} />
             <Route path="ai/history" element={<AdminAIHistory />} />
           </Route>
