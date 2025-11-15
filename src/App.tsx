@@ -11,6 +11,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 
