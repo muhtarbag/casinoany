@@ -62,6 +62,3 @@ verify_jwt = false
 
 [functions.get-active-domain]
 verify_jwt = false
-
-[functions.homepage-data]
-verify_jwt = false
