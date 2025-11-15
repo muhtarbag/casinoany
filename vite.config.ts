@@ -30,15 +30,14 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: Keep React ecosystem in ONE chunk WITHOUT recharts
+            // CRITICAL: EVERYTHING React-related in ONE MONOLITHIC chunk
+            // This is the ONLY way to prevent React dispatcher errors
             if (id.includes('react') || id.includes('scheduler') || 
                 id.includes('@radix-ui') || id.includes('@tanstack') ||
-                id.includes('react-helmet-async') || id.includes('three')) {
-              return 'vendor-react';
-            }
-            // Recharts gets its own separate chunk to prevent conflicts
-            if (id.includes('recharts') || id.includes('d3-')) {
-              return 'vendor-charts';
+                id.includes('react-helmet-async') || id.includes('three') ||
+                id.includes('recharts') || id.includes('d3-') || 
+                id.includes('lodash')) {
+              return 'vendor-react'; // Everything in ONE chunk
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
