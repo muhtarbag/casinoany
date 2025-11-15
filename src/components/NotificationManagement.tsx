@@ -410,19 +410,19 @@ export function NotificationManagement() {
 
       {/* Preview Dialog */}
       <Dialog open={!!previewNotification} onOpenChange={() => setPreviewNotification(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Bildirim Ön İzleme: {previewNotification?.title}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg">Bildirim Ön İzleme: {previewNotification?.title}</DialogTitle>
+            <DialogDescription className="text-sm">
               Bu bildirim şu şekilde görünecek ({previewNotification?.notification_type})
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-8 px-4 bg-muted/20 rounded-lg min-h-[300px] flex items-center justify-center">
+          <div className="py-4 px-2 bg-muted/20 rounded-lg flex items-center justify-center">
             {renderPreviewContent()}
           </div>
 
-          <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+          <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <span className="text-muted-foreground">Tip:</span>
