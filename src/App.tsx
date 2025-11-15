@@ -75,6 +75,8 @@ const Terms = lazyWithPreload(() => import("./pages/Terms"));
 const Cookies = lazyWithPreload(() => import("./pages/Cookies"));
 const KVKK = lazyWithPreload(() => import("./pages/KVKK"));
 const Sitemap = lazyWithPreload(() => import("./pages/Sitemap"));
+const SitemapXML = lazyWithPreload(() => import("./pages/SitemapXML"));
+const RobotsTXT = lazyWithPreload(() => import("./pages/RobotsTXT"));
 const SiteRedirect = lazyWithPreload(() => import("./pages/SiteRedirect"));
 const AMPBlogPost = lazyWithPreload(() => import("./pages/amp/AMPBlogPost"));
 const AMPSiteDetail = lazyWithPreload(() => import("./pages/amp/AMPSiteDetail"));
@@ -151,7 +153,9 @@ const AppContent = () => {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
-          <Route path="/sitemap.xml" element={<Sitemap />} />
+          <Route path="/sitemap" element={<Sitemap />} />
+          <Route path="/sitemap.xml" element={<SitemapXML />} />
+          <Route path="/robots.txt" element={<RobotsTXT />} />
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
