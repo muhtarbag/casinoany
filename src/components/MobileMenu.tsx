@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Home, Info, FileText, Shield, LogOut, Gift } from 'lucide-react';
+import { Menu, Home, Info, FileText, Shield, LogOut, Gift, Folder } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/casinodoo-logo.svg';
 
@@ -52,6 +52,16 @@ export const MobileMenu = () => {
           >
             <Gift className="w-5 h-5" />
             <span>Deneme Bonusu</span>
+          </NavLink>
+
+          <NavLink
+            to="/kategoriler"
+            onClick={handleNavClick}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            activeClassName="text-primary bg-muted font-semibold"
+          >
+            <Folder className="w-5 h-5" />
+            <span>Kategoriler</span>
           </NavLink>
 
           <NavLink
