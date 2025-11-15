@@ -285,10 +285,14 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
     
     <Button
       size="lg"
-      className="w-full md:w-auto md:ml-auto px-6 md:px-8 py-5 md:py-6 text-sm md:text-base font-semibold"
+      className={`w-full md:w-auto md:ml-auto px-6 md:px-8 py-5 md:py-6 text-sm md:text-base font-semibold transition-all duration-300 ${
+        rank <= 3 
+          ? 'animate-glow bg-gradient-to-r from-primary via-primary to-primary-glow hover:scale-105 hover:shadow-[0_0_30px_rgba(var(--primary),0.5)] shadow-lg' 
+          : 'hover:scale-[1.02] hover:shadow-md'
+      }`}
       onClick={() => window.open(bonus.affiliateLink, '_blank')}
     >
-      Bonusu Al →
+      {rank <= 3 ? '🎁 ' : ''}Bonusu Al →
     </Button>
   </div>
 );
