@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const AnalyticsDashboardComponent = lazy(() => import('@/components/AnalyticsDashboard').then(m => ({ default: m.AnalyticsDashboard })));
+import { AnalyticsDashboard as AnalyticsDashboardComponent } from '@/components/AnalyticsDashboard';
 
 export default function AnalyticsDashboard() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <AnalyticsDashboardComponent />
-    </Suspense>
-  );
+  return <AnalyticsDashboardComponent />;
 }

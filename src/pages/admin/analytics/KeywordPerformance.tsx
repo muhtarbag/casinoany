@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const KeywordPerformanceComponent = lazy(() => import('@/components/KeywordPerformance').then(m => ({ default: m.KeywordPerformance })));
+import { KeywordPerformance as KeywordPerformanceComponent } from '@/components/KeywordPerformance';
 
 export default function KeywordPerformance() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <KeywordPerformanceComponent />
-    </Suspense>
-  );
+  return <KeywordPerformanceComponent />;
 }

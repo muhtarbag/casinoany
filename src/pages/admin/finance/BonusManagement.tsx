@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const BonusManagementComponent = lazy(() => import('@/components/BonusManagement').then(m => ({ default: m.BonusManagement })));
+import { BonusManagement as BonusManagementComponent } from '@/components/BonusManagement';
 
 export default function BonusManagement() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <BonusManagementComponent />
-    </Suspense>
-  );
+  return <BonusManagementComponent />;
 }

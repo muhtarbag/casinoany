@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const AIAssistantComponent = lazy(() => import('@/components/AIAssistant').then(m => ({ default: m.AIAssistant })));
+import { AIAssistant as AIAssistantComponent } from '@/components/AIAssistant';
 
 export default function AIAssistant() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <AIAssistantComponent />
-    </Suspense>
-  );
+  return <AIAssistantComponent />;
 }

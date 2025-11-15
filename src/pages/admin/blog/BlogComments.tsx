@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const BlogCommentManagement = lazy(() => import('@/components/BlogCommentManagement').then(m => ({ default: m.BlogCommentManagement })));
+import { BlogCommentManagement } from '@/components/BlogCommentManagement';
 
 export default function BlogComments() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <BlogCommentManagement />
-    </Suspense>
-  );
+  return <BlogCommentManagement />;
 }

@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const SiteStatsComponent = lazy(() => import('@/components/SiteStats'));
+import SiteStatsComponent from '@/components/SiteStats';
 
 export default function SiteStats() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SiteStatsComponent />
-    </Suspense>
-  );
+  return <SiteStatsComponent />;
 }

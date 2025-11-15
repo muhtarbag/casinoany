@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const NewsManagement = lazy(() => import('@/components/NewsManagement').then(m => ({ default: m.NewsManagement })));
+import { NewsManagement } from '@/components/NewsManagement';
 
 export default function News() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <NewsManagement />
-    </Suspense>
-  );
+  return <NewsManagement />;
 }

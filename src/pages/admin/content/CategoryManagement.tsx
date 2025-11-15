@@ -1,14 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const CategoryManagementComponent = lazy(() => 
-  import('@/components/admin/CategoryManagement').then(m => ({ default: m.CategoryManagement }))
-);
+import { CategoryManagement as CategoryManagementComponent } from '@/components/admin/CategoryManagement';
 
 export default function CategoryManagement() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <CategoryManagementComponent />
-    </Suspense>
-  );
+  return <CategoryManagementComponent />;
 }
