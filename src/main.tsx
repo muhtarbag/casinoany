@@ -4,13 +4,13 @@ import App from "./App.tsx";
 import "./index.css";
 import { initWebVitalsTracking } from './utils/coreWebVitals';
 import { initPerformanceObserver } from './lib/performanceMonitor';
-import { initPerformanceOptimizations } from './utils/performanceOptimizations';
+import { initPerformanceOptimizations, requestIdleCallback } from './utils/performanceOptimizations';
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 
 // Initialize Performance Optimizations
 initPerformanceOptimizations();
 
-// Initialize Route Preloading
+// Initialize Route Preloading with polyfilled requestIdleCallback
 requestIdleCallback(() => {
   setupRoutePreloading();
 }, { timeout: 2000 });
