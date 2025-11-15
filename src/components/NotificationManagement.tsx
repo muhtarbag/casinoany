@@ -234,6 +234,82 @@ export function NotificationManagement() {
       );
     }
 
+    if (notification_type === 'form') {
+      const formFields = previewNotification.form_fields;
+      return (
+        <div className={`mx-auto ${baseClasses}`} style={containerStyle}>
+          {image_url && (
+            <img 
+              src={image_url} 
+              alt={title}
+              className="w-full h-48 object-cover"
+            />
+          )}
+          <div className={contentClasses}>
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-xl font-bold pr-8">{title}</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 rounded-full"
+                onClick={() => setPreviewNotification(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            {content && (
+              <p className="mb-6 opacity-90">{content}</p>
+            )}
+            
+            {/* Form Fields Preview */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-2 opacity-80">
+                  {formFields?.email_label || 'E-posta Adresiniz'}
+                </label>
+                <input
+                  type="email"
+                  placeholder="ornek@email.com"
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white/50"
+                  style={{ color: text_color }}
+                  disabled
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2 opacity-80">
+                  {formFields?.phone_label || 'Telefon Numaranız'}
+                </label>
+                <input
+                  type="tel"
+                  placeholder="5XX XXX XX XX"
+                  className="w-full px-4 py-2 rounded-md border border-gray-300 bg-white/50"
+                  style={{ color: text_color }}
+                  disabled
+                />
+              </div>
+
+              <Button className="w-full" disabled>
+                {formFields?.submit_text || 'Gönder'}
+              </Button>
+
+              {formFields?.success_message && (
+                <div className="text-sm opacity-80 mt-4 p-3 rounded-md bg-green-50" style={{ color: text_color }}>
+                  {formFields.success_message}
+                </div>
+              )}
+
+              {formFields?.privacy_text && (
+                <p className="text-xs opacity-70 mt-4 leading-relaxed">
+                  {formFields.privacy_text}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   }, [previewNotification]);
 
