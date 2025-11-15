@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, GripVertical, Save, CheckSquare, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Trash2, Plus, GripVertical, Save, CheckSquare, AlertCircle, CheckCircle, Info, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -12,6 +12,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
 
 interface RecommendedSite {
   id: string;
@@ -87,6 +88,7 @@ export const RecommendedSitesManagement = () => {
   const queryClient = useQueryClient();
   const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [localRecommendations, setLocalRecommendations] = useState<RecommendedSite[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -256,6 +258,11 @@ export const RecommendedSitesManagement = () => {
     (site) => !localRecommendations?.find((rec) => rec.site_id === site.id)
   );
 
+  const filteredSites = availableSites?.filter((site) => 
+    site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    site.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const hasOrderChanged = JSON.stringify(localRecommendations?.map(r => r.id)) !== 
                           JSON.stringify(recommendations?.map(r => r.id));
 
@@ -280,9 +287,9 @@ export const RecommendedSitesManagement = () => {
 
   const handleSelectAll = () => {
     const remainingSlots = 8 - (localRecommendations?.length || 0);
-    if (!availableSites) return;
+    if (!filteredSites) return;
     
-    const sitesToSelect = availableSites.slice(0, remainingSlots);
+    const sitesToSelect = filteredSites.slice(0, remainingSlots);
     setSelectedSites(new Set(sitesToSelect.map(s => s.id)));
   };
 
@@ -340,7 +347,7 @@ export const RecommendedSitesManagement = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAll}
-                  disabled={!availableSites || availableSites.length === 0}
+                  disabled={!filteredSites || filteredSites.length === 0}
                 >
                   Tümünü Seç
                 </Button>
@@ -355,6 +362,17 @@ export const RecommendedSitesManagement = () => {
               </div>
             </div>
 
+            {/* Search Box */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Site ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
             {localRecommendations?.length >= 8 ? (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
@@ -362,11 +380,11 @@ export const RecommendedSitesManagement = () => {
                   Maksimum 8 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
                 </AlertDescription>
               </Alert>
-            ) : availableSites && availableSites.length > 0 ? (
+            ) : filteredSites && filteredSites.length > 0 ? (
               <>
                 <ScrollArea className="h-[300px] border rounded-lg p-2">
                   <div className="space-y-2">
-                    {availableSites.map((site) => (
+                    {filteredSites.map((site) => (
                       <div
                         key={site.id}
                         onClick={() => handleToggleSite(site.id)}
@@ -412,6 +430,13 @@ export const RecommendedSitesManagement = () => {
                   </Button>
                 </div>
               </>
+            ) : searchQuery ? (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  "{searchQuery}" araması için sonuç bulunamadı.
+                </AlertDescription>
+              </Alert>
             ) : (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
