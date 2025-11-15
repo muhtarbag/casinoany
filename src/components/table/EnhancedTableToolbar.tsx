@@ -16,6 +16,9 @@ interface EnhancedTableToolbarProps {
   onClearFilters: () => void;
   onExport?: () => void;
   onSavedFilters?: () => void;
+  searchPlaceholder?: string;
+  statusOptions?: { value: string; label: string }[];
+  ratingOptions?: { value: string; label: string }[];
 }
 
 export function EnhancedTableToolbar({
@@ -30,6 +33,18 @@ export function EnhancedTableToolbar({
   onClearFilters,
   onExport,
   onSavedFilters,
+  searchPlaceholder = "Site adı veya slug ile ara...",
+  statusOptions = [
+    { value: "all", label: "Tüm Durumlar" },
+    { value: "active", label: "Aktif" },
+    { value: "inactive", label: "Pasif" }
+  ],
+  ratingOptions = [
+    { value: "all", label: "Tüm Ratingler" },
+    { value: "5", label: "⭐ 5 Yıldız" },
+    { value: "4", label: "⭐ 4+ Yıldız" },
+    { value: "3", label: "⭐ 3+ Yıldız" }
+  ]
 }: EnhancedTableToolbarProps) {
   const hasActiveFilters = searchQuery || statusFilter !== 'all' || ratingFilter !== 'all';
   const isFiltered = filteredItems < totalItems;
@@ -41,7 +56,7 @@ export function EnhancedTableToolbar({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Site adı veya slug ile ara..."
+            placeholder={searchPlaceholder}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"
@@ -76,9 +91,11 @@ export function EnhancedTableToolbar({
             <SelectValue placeholder="Durum" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tüm Durumlar</SelectItem>
-            <SelectItem value="active">Aktif</SelectItem>
-            <SelectItem value="inactive">Pasif</SelectItem>
+            {statusOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -87,10 +104,11 @@ export function EnhancedTableToolbar({
             <SelectValue placeholder="Rating" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tüm Ratingler</SelectItem>
-            <SelectItem value="5">⭐ 5 Yıldız</SelectItem>
-            <SelectItem value="4">⭐ 4+ Yıldız</SelectItem>
-            <SelectItem value="3">⭐ 3+ Yıldız</SelectItem>
+            {ratingOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -110,7 +128,7 @@ export function EnhancedTableToolbar({
       {/* Results Summary */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span>
-          Toplam <Badge variant="secondary" className="mx-1">{totalItems}</Badge> siteden
+          Toplam <Badge variant="secondary" className="mx-1">{totalItems}</Badge> kayıttan
           {isFiltered && (
             <>
               {' '}<Badge variant="default" className="mx-1">{filteredItems}</Badge> tanesi gösteriliyor

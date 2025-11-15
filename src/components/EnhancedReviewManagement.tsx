@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2, CheckSquare, Square } from "lucide-react";
 import { EnhancedTablePagination } from "@/components/table/EnhancedTablePagination";
+import { EnhancedTableToolbar } from "@/components/table/EnhancedTableToolbar";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
@@ -80,6 +81,7 @@ export default function EnhancedReviewManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSite, setSelectedSite] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedRating, setSelectedRating] = useState<string>("all");
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
@@ -239,9 +241,11 @@ export default function EnhancedReviewManagement() {
         (selectedStatus === "pending" && !review.is_approved) ||
         (selectedStatus === "approved" && review.is_approved);
 
-      return matchesSearch && matchesSite && matchesStatus;
+      const matchesRating = selectedRating === "all" || review.rating === parseInt(selectedRating);
+
+      return matchesSearch && matchesSite && matchesStatus && matchesRating;
     });
-  }, [reviews, searchTerm, selectedSite, selectedStatus]);
+  }, [reviews, searchTerm, selectedSite, selectedStatus, selectedRating]);
 
   // Mutations
   const approveMutation = useMutation({
@@ -419,6 +423,44 @@ export default function EnhancedReviewManagement() {
     } finally {
       setIsBulkActionLoading(false);
     }
+  };
+
+  // Handle export
+  const handleExport = () => {
+    if (!filteredReviews.length) {
+      toast.error("Dışa aktarılacak veri yok");
+      return;
+    }
+
+    const csvData = filteredReviews.map(review => ({
+      "Site": getSiteName(review),
+      "Kullanıcı": getUserDisplayName(review),
+      "Başlık": review.title,
+      "Yorum": review.comment,
+      "Puan": review.rating,
+      "Durum": review.is_approved ? "Onaylandı" : "Beklemede",
+      "Tarih": format(new Date(review.created_at), "dd MMMM yyyy", { locale: tr })
+    }));
+
+    const csv = [
+      Object.keys(csvData[0]).join(","),
+      ...csvData.map(row => Object.values(row).map(val => `"${val}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `yorumlar-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+    toast.success("Yorumlar dışa aktarıldı");
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedSite("all");
+    setSelectedStatus("all");
+    setSelectedRating("all");
   };
 
   // AI Review Generation Handler
@@ -676,43 +718,90 @@ export default function EnhancedReviewManagement() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Yorum Yönetimi</CardTitle>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Yorum Yönetimi</CardTitle>
+              <CardDescription>
+                Toplam {totalCount} yorum bulundu
+              </CardDescription>
+            </div>
+            {selectedReviews.size > 0 && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{selectedReviews.size} seçili</Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleBulkApprove}
+                  disabled={isBulkActionLoading}
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Toplu Onayla
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleBulkReject}
+                  disabled={isBulkActionLoading}
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Toplu Reddet
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleBulkDelete}
+                  disabled={isBulkActionLoading}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Toplu Sil
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Yorum ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedSite} onValueChange={setSelectedSite}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Tüm Siteler" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Siteler</SelectItem>
-                {siteStats.map(stat => (
-                  <SelectItem key={stat.site_id} value={stat.site_id}>
-                    {stat.site_name} ({stat.total_reviews})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Durum" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Durumlar</SelectItem>
-                <SelectItem value="pending">Onay Bekleyen</SelectItem>
-                <SelectItem value="approved">Onaylanmış</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Enhanced Toolbar */}
+          <EnhancedTableToolbar
+            searchQuery={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={selectedStatus}
+            onStatusFilterChange={setSelectedStatus}
+            ratingFilter={selectedRating}
+            onRatingFilterChange={setSelectedRating}
+            totalItems={totalCount}
+            filteredItems={filteredReviews.length}
+            onExport={handleExport}
+            onClearFilters={clearFilters}
+            searchPlaceholder="Yorum ara..."
+            statusOptions={[
+              { value: "all", label: "Tüm Durumlar" },
+              { value: "pending", label: "Onay Bekleyen" },
+              { value: "approved", label: "Onaylanmış" }
+            ]}
+            ratingOptions={[
+              { value: "all", label: "Tüm Puanlar" },
+              { value: "5", label: "⭐ 5 Yıldız" },
+              { value: "4", label: "⭐ 4 Yıldız" },
+              { value: "3", label: "⭐ 3 Yıldız" },
+              { value: "2", label: "⭐ 2 Yıldız" },
+              { value: "1", label: "⭐ 1 Yıldız" }
+            ]}
+          />
+
+          {/* Site Filter - Keep this separate as it's specific to reviews */}
+          <Select value={selectedSite} onValueChange={setSelectedSite}>
+            <SelectTrigger className="w-full sm:w-[250px]">
+              <SelectValue placeholder="Tüm Siteler" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Siteler</SelectItem>
+              {siteStats.map(stat => (
+                <SelectItem key={stat.site_id} value={stat.site_id}>
+                  {stat.site_name} ({stat.total_reviews})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
