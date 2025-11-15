@@ -29,6 +29,9 @@ const shortcuts: Shortcut[] = [
   { key: 'g then b', description: 'Blog\'a git', category: 'Navigasyon' },
   { key: 'g then a', description: 'Affiliate\'e git', category: 'Navigasyon' },
   { key: 'g then p', description: 'Performans\'a git', category: 'Navigasyon' },
+  { key: 'g then c', description: 'Cache Yönetimi\'ne git', category: 'Navigasyon' },
+  { key: 'g then l', description: 'Canlı Takip\'e git', category: 'Navigasyon' },
+  { key: 'g then y', description: 'Analytics\'e git', category: 'Navigasyon' },
   { key: 'Escape', description: 'Dialog/Modal kapat', category: 'Navigasyon' },
   
   // Actions

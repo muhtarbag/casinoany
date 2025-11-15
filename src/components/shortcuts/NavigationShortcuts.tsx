@@ -16,8 +16,9 @@ const shortcuts: ShortcutConfig[] = [
   { key: 'b', route: '/admin/blog/posts', label: 'Blog' },
   { key: 'a', route: '/admin/finance/affiliate', label: 'Affiliate' },
   { key: 'p', route: '/admin/system/performance', label: 'Performans' },
+  { key: 'c', route: '/admin/system/cache', label: 'Cache Yönetimi' },
   { key: 'l', route: '/admin/analytics/realtime', label: 'Canlı Takip' },
-  { key: 'c', route: '/admin/content/casino', label: 'Casino İçerik' },
+  { key: 'n', route: '/admin/content/casino', label: 'Casino İçerik' },
   { key: 'y', route: '/admin/analytics', label: 'Analytics' },
 ];
 

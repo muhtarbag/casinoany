@@ -15,7 +15,8 @@ import {
   Shield,
   AlertCircle,
   Folder,
-  Bell
+  Bell,
+  HardDrive
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -88,7 +89,8 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'analytics', icon: BarChart3, label: 'Analytics', route: '/admin/analytics', roles: ['seo_manager'], shortcut: 'g y' },
         { id: 'ai', icon: FileCode, label: 'AI Asistan', route: '/admin/ai/assistant', roles: ['content_editor'] },
-        { id: 'performance', icon: Gauge, label: 'Performans', route: '/admin/system/performance', roles: [] },
+        { id: 'performance', icon: Gauge, label: 'Performans', route: '/admin/system/performance', roles: [], shortcut: 'g p' },
+        { id: 'cache', icon: HardDrive, label: 'Cache Yönetimi', route: '/admin/system/cache', roles: [] },
         { id: 'health', icon: AlertCircle, label: 'Sistem Sağlığı', route: '/admin/system/health', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
       ],
