@@ -26,8 +26,7 @@ import {
   Image,
   AlertCircle,
   Folder,
-  Link2,
-  Network
+  Link2
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -107,7 +106,6 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
     {
       label: 'Sistem',
       items: [
-        { id: 'domains', icon: Network, label: 'Domain Yönetimi', badge: 'TİB', route: '/admin/system/domains', roles: [] },
         { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null, route: '/admin/system/health', roles: [] },
         { id: 'build-health', icon: AlertCircle, label: 'Build Sağlığı', badge: 'NEW', route: '/admin/system/build-health', roles: [] },
         { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null, route: '/admin/system/history', roles: [] },
