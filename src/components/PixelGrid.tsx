@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
@@ -115,9 +116,8 @@ export const PixelGrid = () => {
           const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
           
           return (
-            <>
+            <React.Fragment key={site.id}>
               <BettingSiteCard
-                key={site.id}
                 id={site.id}
                 slug={site.slug}
                 name={site.name}
@@ -148,7 +148,7 @@ export const PixelGrid = () => {
                   ))}
                 </div>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </div>
