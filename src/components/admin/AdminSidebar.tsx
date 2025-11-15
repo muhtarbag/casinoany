@@ -74,6 +74,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
         { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino', roles: ['content_editor'] },
         { id: 'featured-sites', icon: Star, label: 'Öne Çıkan Siteler', badge: null, route: '/admin/sites/featured', roles: ['content_editor'] },
         { id: 'recommended-sites', icon: Link2, label: 'Önerilen Siteler', badge: 'NEW', route: '/admin/sites/recommended', roles: ['content_editor'] },
+        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null, route: '/admin/finance/bonus', roles: ['content_editor', 'finance'] },
         { id: 'categories', icon: Folder, label: 'Kategoriler', badge: 'NEW', route: '/admin/content/categories', roles: ['content_editor'] },
         { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
         { id: 'banners', icon: Image, label: 'Banner Yönetimi', badge: null, route: '/admin/sites/banners', roles: ['content_editor'] },
@@ -84,7 +85,6 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       label: 'Finans',
       items: [
         { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null, route: '/admin/finance/affiliate', roles: ['finance'] },
-        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null, route: '/admin/finance/bonus', roles: ['finance'] },
         { id: 'bonus-requests', icon: Mail, label: 'Bonus Talepleri', badge: null, route: '/admin/finance/bonus-requests', roles: ['finance'] },
       ],
     },
