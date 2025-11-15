@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Star, Check, X, Trash2, Edit2, Search, TrendingUp, Sparkles, Loader2, CheckSquare, Square } from "lucide-react";
+import { EnhancedTablePagination } from "@/components/table/EnhancedTablePagination";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
@@ -53,6 +54,11 @@ export default function EnhancedReviewManagement() {
     comment: ""
   });
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
+  
   // AI Generation States
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiSelectedSite, setAiSelectedSite] = useState<string>("");
@@ -82,14 +88,28 @@ export default function EnhancedReviewManagement() {
     },
   });
 
-  // Fetch all reviews with site and user data
+  // Fetch all reviews with site and user data (with pagination)
   const { data: reviews, isLoading } = useQuery({
-    queryKey: ["enhanced-reviews"],
+    queryKey: ["enhanced-reviews", currentPage, pageSize],
     queryFn: async () => {
+      // First, get total count
+      const { count } = await supabase
+        .from("site_reviews")
+        .select("*", { count: 'exact', head: true });
+      
+      if (count !== null) {
+        setTotalCount(count);
+      }
+
+      // Then get paginated data
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      
       const { data: reviewsData, error } = await supabase
         .from("site_reviews")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
 
@@ -792,6 +812,23 @@ export default function EnhancedReviewManagement() {
               </TableBody>
             </Table>
           </div>
+          
+          {/* Pagination */}
+          <EnhancedTablePagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalCount / pageSize)}
+            pageSize={pageSize}
+            totalItems={totalCount}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              setSelectedReviews(new Set()); // Clear selection on page change
+            }}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1); // Reset to first page when changing page size
+              setSelectedReviews(new Set());
+            }}
+          />
         </CardContent>
       </Card>
 
