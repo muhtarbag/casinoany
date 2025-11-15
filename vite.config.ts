@@ -26,24 +26,19 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Only split heavy non-React dependencies to avoid dispatcher issues
           if (id.includes('node_modules')) {
-            // Charts library (heavy)
+            // Keep React ecosystem COMPLETELY together - critical for hooks
+            if (id.includes('react') || id.includes('react-dom') || 
+                id.includes('react-router') || id.includes('scheduler') ||
+                id.includes('@tanstack/react-query')) {
+              return undefined; // Let Vite handle React bundling
+            }
+            // Only split truly independent heavy libraries
             if (id.includes('recharts') || id.includes('d3-')) {
               return 'vendor-charts';
             }
-            // Rich text editor (heavy)
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
-            }
-            // Keep React ecosystem together (critical for hooks)
-            if (id.includes('react') || id.includes('react-dom') || 
-                id.includes('scheduler') || id.includes('react-router')) {
-              return 'vendor-react';
-            }
-            // UI libraries
-            if (id.includes('@radix-ui')) {
-              return 'vendor-ui';
             }
           }
         },

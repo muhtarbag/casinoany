@@ -1,0 +1,191 @@
+/**
+ * Extended Supabase Helpers - Comprehensive Type-Safe Wrappers
+ * Eliminates need for 'as any' across the application
+ */
+
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+
+// Core table types from Database
+type Tables = Database['public']['Tables'];
+
+// Extended query builders for ALL tables with relations
+export const TypedDB = {
+  // ===== SITES =====
+  bettingSites: () => supabase.from('betting_sites').select('*'),
+  
+  bettingSiteWithStats: (siteId: string) =>
+    supabase.from('betting_sites')
+      .select(`
+        *,
+        affiliate:betting_sites_affiliate(*),
+        content:betting_sites_content(*),
+        social:betting_sites_social(*)
+      `)
+      .eq('id', siteId)
+      .single(),
+
+  // ===== BLOG =====
+  blogPosts: () => supabase.from('blog_posts').select('*'),
+  
+  blogPostWithRelations: (postId: string) =>
+    supabase.from('blog_posts')
+      .select(`
+        *,
+        related_sites:blog_post_related_sites(
+          site_id,
+          display_order,
+          site:betting_sites(*)
+        ),
+        category:categories(*)
+      `)
+      .eq('id', postId)
+      .single(),
+  
+  blogComments: (postId: string) =>
+    supabase.from('blog_comments')
+      .select('*')
+      .eq('post_id', postId)
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false }),
+
+  // ===== REVIEWS =====
+  siteReviews: () => 
+    supabase.from('site_reviews')
+      .select('*')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false }),
+  
+  reviewsWithSites: () =>
+    supabase.from('site_reviews')
+      .select(`
+        *,
+        site:betting_sites(id, name, logo_url, slug)
+      `)
+      .eq('is_approved', true),
+
+  // ===== NOTIFICATIONS =====
+  activeNotifications: () =>
+    supabase.from('site_notifications')
+      .select('*')
+      .eq('is_active', true)
+      .gte('expire_at', new Date().toISOString())
+      .order('priority', { ascending: false }),
+
+  // ===== ANALYTICS =====
+  analyticsSummary: (siteId?: string) => {
+    const query = supabase.from('analytics_daily_summary').select('*');
+    return siteId ? query.eq('site_id', siteId) : query;
+  },
+
+  pageViews: (dateFrom?: string) => {
+    const query = supabase.from('page_views').select('*');
+    return dateFrom ? query.gte('created_at', dateFrom) : query;
+  },
+
+  // ===== CATEGORIES =====
+  activeCategories: () =>
+    supabase.from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order'),
+
+  // ===== BONUS =====
+  bonusOffers: (siteId?: string) => {
+    const query = supabase.from('bonus_offers').select('*').eq('is_active', true);
+    return siteId ? query.eq('site_id', siteId) : query;
+  },
+
+  // ===== AFFILIATE =====
+  affiliateMetrics: (siteId: string) =>
+    supabase.from('affiliate_metrics')
+      .select('*')
+      .eq('site_id', siteId)
+      .order('metric_date', { ascending: false }),
+
+  // ===== NEWS =====
+  publishedNews: () =>
+    supabase.from('news_articles')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false }),
+};
+
+/**
+ * Type-safe mutation helpers
+ */
+export const TypedMutations = {
+  // Blog post related sites
+  upsertBlogRelatedSites: async (postId: string, siteIds: string[]) => {
+    // Delete existing
+    await supabase.from('blog_post_related_sites').delete().eq('post_id', postId);
+    
+    // Insert new
+    if (siteIds.length > 0) {
+      const relations = siteIds.map((siteId, index) => ({
+        post_id: postId,
+        site_id: siteId,
+        display_order: index
+      }));
+      
+      return supabase.from('blog_post_related_sites').insert(relations);
+    }
+    
+    return { data: null, error: null };
+  },
+
+  // Increment site clicks
+  incrementSiteClicks: async (siteId: string) => {
+    // Use RPC for atomic increment if available, otherwise manual
+    const { data: stats } = await supabase
+      .from('affiliate_metrics')
+      .select('total_clicks')
+      .eq('site_id', siteId)
+      .eq('metric_date', new Date().toISOString().split('T')[0])
+      .single();
+
+    if (stats) {
+      return supabase
+        .from('affiliate_metrics')
+        .update({ total_clicks: stats.total_clicks + 1 })
+        .eq('site_id', siteId)
+        .eq('metric_date', new Date().toISOString().split('T')[0]);
+    }
+
+    return supabase.from('affiliate_metrics').insert({
+      site_id: siteId,
+      total_clicks: 1,
+      metric_date: new Date().toISOString().split('T')[0],
+    });
+  },
+
+  // Track notification view
+  trackNotificationView: async (notificationId: string, userId?: string) => {
+    return supabase.from('notification_views').insert({
+      notification_id: notificationId,
+      user_id: userId || null,
+      viewed_at: new Date().toISOString()
+    });
+  },
+
+  // Track notification click
+  trackNotificationClick: async (notificationId: string, userId?: string) => {
+    return supabase.from('notification_views')
+      .update({ 
+        clicked: true, 
+        clicked_at: new Date().toISOString() 
+      })
+      .eq('notification_id', notificationId)
+      .is('clicked', null);
+  },
+};
+
+/**
+ * Type-safe RPC helpers
+ */
+export const TypedRPC = {
+  trackSearch: (searchTerm: string) =>
+    supabase.rpc('track_search', { p_search_term: searchTerm }),
+};
+
+export default TypedDB;
