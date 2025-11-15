@@ -166,10 +166,24 @@ export const useAdminSiteManagement = () => {
 
       return siteData;
     },
-    onSuccess: () => {
+    onSuccess: (newSite) => {
+      // Log the change for history
+      logChange.mutateAsync({
+        actionType: 'create',
+        tableName: 'betting_sites',
+        recordId: newSite.id,
+        newData: newSite,
+        metadata: {
+          description: `${newSite.name} oluşturuldu`,
+        },
+      }).catch(() => {
+        // Silently ignore logging errors - don't block user success
+      });
+
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
       queryClient.invalidateQueries({ queryKey: ['betting-sites-active'] });
       queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['change-history'] });
       showSuccessToast('Site başarıyla eklendi!');
       setLogoFile(null);
       setLogoPreview(null);
@@ -182,6 +196,13 @@ export const useAdminSiteManagement = () => {
   // Update site mutation - NORMALIZED SCHEMA
   const updateSiteMutation = useMutation({
     mutationFn: async ({ id, formData, logoFile }: { id: string; formData: SiteFormData; logoFile: File | null }) => {
+      // Get previous data for change history
+      const { data: previousData } = await supabase
+        .from('betting_sites')
+        .select('*')
+        .eq('id', id)
+        .single();
+
       let logoUrl;
       if (logoFile) {
         logoUrl = await uploadLogo(logoFile, formData.name);
@@ -219,17 +240,34 @@ export const useAdminSiteManagement = () => {
         updateData.logo_url = logoUrl;
       }
 
-      const { error: siteError } = await (supabase as any)
+      const { data: updatedData, error: siteError } = await (supabase as any)
         .from('betting_sites')
         .update(updateData)
-        .eq('id', id);
+        .eq('id', id)
+        .select()
+        .single();
       
       if (siteError) throw siteError;
+
+      // Log the change for history
+      if (previousData && updatedData) {
+        await logChange.mutateAsync({
+          actionType: 'update',
+          tableName: 'betting_sites',
+          recordId: updatedData.id,
+          previousData,
+          newData: updatedData,
+          metadata: {
+            description: `${updatedData.name} güncellendi`,
+          },
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
       queryClient.invalidateQueries({ queryKey: ['betting-sites-active'] });
       queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['change-history'] });
       showSuccessToast('Site başarıyla güncellendi!');
       setEditingId(null);
       setLogoFile(null);
