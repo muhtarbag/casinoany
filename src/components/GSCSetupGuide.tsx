@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function GSCSetupGuide() {
   const siteUrl = window.location.origin;
-  const sitemapUrl = `https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/dynamic-sitemap`;
+  const sitemapUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap-xml`;
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);

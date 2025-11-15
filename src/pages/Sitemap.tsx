@@ -13,11 +13,10 @@ export default function Sitemap() {
     const fetchSitemap = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dynamic-sitemap`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap-xml`,
           {
             headers: {
-              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              'origin': window.location.origin,
+              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
             },
           }
         );
@@ -137,12 +136,12 @@ export default function Sitemap() {
               Arama motorları için XML formatındaki site haritasına aşağıdaki linkten ulaşabilirsiniz:
             </p>
             <a 
-              href={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap`}
+              href={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap-xml`}
               className="text-primary hover:underline inline-flex items-center gap-2"
               target="_blank"
               rel="noopener noreferrer"
             >
-              XML Sitemap <ExternalLink className="w-4 h-4 opacity-0" />
+              XML Sitemap <ExternalLink className="w-4 h-4" />
             </a>
           </CardContent>
         </Card>
