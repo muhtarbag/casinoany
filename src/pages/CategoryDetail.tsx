@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { CategoryHero } from '@/components/categories/CategoryHero';
 import { CategorySiteGrid } from '@/components/categories/CategorySiteGrid';
 import { CategoryBlogSection } from '@/components/categories/CategoryBlogSection';
+import { CategoryArticleSection } from '@/components/categories/CategoryArticleSection';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -73,6 +74,14 @@ export default function CategoryDetail() {
             categorySlug={category.slug}
           />
         )}
+
+        {/* Category Article Section - SEO & E-E-A-T */}
+        <CategoryArticleSection
+          categoryName={category.name}
+          categorySlug={category.slug}
+          content={category.content}
+          updatedAt={category.content_updated_at}
+        />
 
         {/* Empty State - İyileştirilmiş - MOBİL RESPONSIVE */}
         {(!category.sites || category.sites.length === 0) &&

@@ -18,6 +18,8 @@ export interface Category {
   color: string;
   display_order: number;
   is_active: boolean;
+  content: string | null;
+  content_updated_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +40,7 @@ export interface CreateCategoryInput {
   description?: string;
   meta_title?: string;
   meta_description?: string;
+  content?: string;
   icon?: string;
   color?: string;
   display_order?: number;
