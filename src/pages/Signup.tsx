@@ -69,9 +69,15 @@ const Signup = () => {
       analytics.trackSignup();
       
       toast({
-        title: 'Başarılı!',
-        description: 'Kayıt tamamlandı, giriş yapılıyor...',
+        title: 'Kayıt Başarılı!',
+        description: 'Hesabınız oluşturuldu. Admin onayı bekleniyor. Onaylandığında giriş yapabileceksiniz.',
+        duration: 6000,
       });
+      
+      // Redirect to login
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     }
   };
 
