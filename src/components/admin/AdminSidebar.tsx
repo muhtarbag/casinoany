@@ -2,33 +2,22 @@ import {
   LayoutDashboard, 
   Globe, 
   FileText, 
-  MessageSquare, 
-  Users, 
-  BarChart3, 
-  Settings,
-  TrendingUp,
-  Bell,
+  MessageSquare,
+  BarChart3,
   Activity,
   FileCode,
   Newspaper,
-  Star,
-  Search,
-  Calendar,
   Gamepad2,
-  PieChart,
   Gift,
-  FileEdit,
   DollarSign,
-  History,
   Gauge,
   Mail,
   Shield,
-  Image,
   AlertCircle,
   Folder,
-  Link2
+  Bell
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -42,76 +31,66 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
 
 interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
 
-export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab }: AdminSidebarProps) {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const { userRoles } = useAuth();
 
-  // Rol bazlı erişim kontrolü
   const hasRole = (requiredRoles: string[]) => {
-    if (userRoles.includes('admin')) return true; // Admin her şeye erişir
+    if (userRoles.includes('admin')) return true;
     return requiredRoles.some(role => userRoles.includes(role));
   };
 
+  // 🎯 5 Main Hubs (simplified from 7 groups)
   const navigationGroups = [
     {
-      label: 'Gösterge Paneli',
+      label: '🏠 Dashboard',
       items: [
-        { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', badge: null, route: '/admin/dashboard', roles: [] },
-        { id: 'realtime', icon: Activity, label: 'Canlı Takip', badge: null, route: '/admin/analytics/realtime', roles: ['seo_manager'] },
+        { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', route: '/admin/dashboard', roles: [], shortcut: 'g d' },
+        { id: 'realtime', icon: Activity, label: 'Canlı Takip', route: '/admin/analytics/realtime', roles: ['seo_manager'], shortcut: 'g l' },
       ],
     },
     {
-      label: 'İçerik',
+      label: '📝 İçerik Hub',
       items: [
-        { id: 'manage', icon: Globe, label: 'Site Yönetimi', badge: null, route: '/admin/sites', roles: ['content_editor'] },
-        { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino', roles: ['content_editor'] },
-        { id: 'featured-sites', icon: Star, label: 'Öne Çıkan Siteler', badge: null, route: '/admin/sites/featured', roles: ['content_editor'] },
-        { id: 'recommended-sites', icon: Link2, label: 'Önerilen Siteler', badge: 'NEW', route: '/admin/sites/recommended', roles: ['content_editor'] },
-        { id: 'bonus', icon: Gift, label: 'Bonuslar', badge: null, route: '/admin/finance/bonus', roles: ['content_editor', 'finance'] },
-        { id: 'categories', icon: Folder, label: 'Kategoriler', badge: 'NEW', route: '/admin/content/categories', roles: ['content_editor'] },
-        { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
-        { id: 'banners', icon: Image, label: 'Banner Yönetimi', badge: null, route: '/admin/sites/banners', roles: ['content_editor'] },
-        { id: 'news', icon: Newspaper, label: 'Haberler', badge: null, route: '/admin/news', roles: ['content_editor'] },
+        { id: 'sites', icon: Globe, label: 'Siteler', route: '/admin/sites', roles: ['content_editor'], shortcut: 'g s' },
+        { id: 'casino', icon: Gamepad2, label: 'Casino', route: '/admin/content/casino', roles: ['content_editor'], shortcut: 'g c' },
+        { id: 'blog', icon: FileText, label: 'Blog', route: '/admin/blog', roles: ['content_editor'], shortcut: 'g b' },
+        { id: 'categories', icon: Folder, label: 'Kategoriler', route: '/admin/content/categories', roles: ['content_editor'] },
+        { id: 'news', icon: Newspaper, label: 'Haberler', route: '/admin/news', roles: ['content_editor'] },
       ],
     },
     {
-      label: 'Finans',
+      label: '💰 Gelir Hub',
       items: [
-        { id: 'affiliate', icon: DollarSign, label: 'Affiliate', badge: null, route: '/admin/finance/affiliate', roles: ['finance'] },
-        { id: 'bonus-requests', icon: Mail, label: 'Bonus Talepleri', badge: null, route: '/admin/finance/bonus-requests', roles: ['finance'] },
+        { id: 'affiliate', icon: DollarSign, label: 'Affiliate', route: '/admin/finance/affiliate', roles: ['finance'], shortcut: 'g a' },
+        { id: 'bonus', icon: Gift, label: 'Bonuslar', route: '/admin/finance/bonus', roles: ['content_editor', 'finance'] },
+        { id: 'requests', icon: Mail, label: 'Bonus Talepleri', route: '/admin/finance/bonus-requests', roles: ['finance'] },
       ],
     },
     {
-      label: 'Etkileşim',
+      label: '👥 Kullanıcı Hub',
       items: [
-        { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', badge: null, route: '/admin/reviews', roles: ['content_editor'] },
-        { id: 'notifications', icon: Bell, label: 'Bildirimler', badge: null, route: '/admin/notifications', roles: ['content_editor'] },
+        { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', route: '/admin/reviews', roles: ['content_editor'], shortcut: 'g r' },
+        { id: 'comments', icon: MessageSquare, label: 'Blog Yorumları', route: '/admin/blog/comments', roles: ['content_editor'] },
+        { id: 'notifications', icon: Bell, label: 'Bildirimler', route: '/admin/notifications', roles: ['content_editor'] },
       ],
     },
     {
-      label: 'Analiz & SEO',
+      label: '⚙️ Sistem Hub',
       items: [
-        { id: 'analytics', icon: BarChart3, label: 'Analytics', badge: null, route: '/admin/analytics', roles: ['seo_manager'] },
-        { id: 'keywords', icon: Search, label: 'SEO Takip', badge: null, route: '/admin/analytics/keywords', roles: ['seo_manager'] },
-        { id: 'content-planner', icon: Calendar, label: 'İçerik Planlama', badge: null, route: '/admin/content/planner', roles: ['seo_manager', 'content_editor'] },
-      ],
-    },
-    {
-      label: 'Sistem',
-      items: [
-        { id: 'health', icon: Activity, label: 'Sistem Durumu', badge: null, route: '/admin/system/health', roles: [] },
-        { id: 'build-health', icon: AlertCircle, label: 'Build Sağlığı', badge: 'NEW', route: '/admin/system/build-health', roles: [] },
-        { id: 'history', icon: History, label: 'Değişiklik Geçmişi', badge: null, route: '/admin/system/history', roles: [] },
-        { id: 'performance', icon: Gauge, label: 'Performance İzleme', badge: null, route: '/admin/system/performance', roles: [] },
-        { id: 'roles', icon: Shield, label: 'Rol Yönetimi', badge: null, route: '/admin/system/roles', roles: [] },
-        { id: 'ai', icon: Gamepad2, label: 'AI Asistan', badge: 'BETA', route: '/admin/ai', roles: ['content_editor', 'seo_manager'] },
+        { id: 'analytics', icon: BarChart3, label: 'Analytics', route: '/admin/analytics', roles: ['seo_manager'], shortcut: 'g y' },
+        { id: 'ai', icon: FileCode, label: 'AI Asistan', route: '/admin/ai/assistant', roles: ['content_editor'] },
+        { id: 'performance', icon: Gauge, label: 'Performans', route: '/admin/system/performance', roles: [] },
+        { id: 'health', icon: AlertCircle, label: 'Sistem Sağlığı', route: '/admin/system/health', roles: [] },
+        { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
       ],
     },
   ].map(group => ({
@@ -125,7 +104,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
         {navigationGroups.map((group) => (
           <SidebarGroup key={group.label}>
             {!collapsed && (
-              <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground">
+              <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground px-2">
                 {group.label}
               </SidebarGroupLabel>
             )}
@@ -133,26 +112,27 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={activeTab === item.id}
-                      className={cn(
-                        "w-full justify-between transition-all",
-                        activeTab === item.id
-                          ? 'bg-primary/10 text-primary font-semibold border-l-4 border-primary shadow-sm'
-                          : 'hover:bg-muted/50'
-                      )}
-                      tooltip={collapsed ? item.label : undefined}
-                    >
-                      <Link to={item.route}>
-                        <div className="flex items-center gap-3 flex-1">
-                          <item.icon className={cn("w-4 h-4", activeTab === item.id && 'text-primary')} />
-                          {!collapsed && <span>{item.label}</span>}
-                        </div>
-                        {!collapsed && item.badge && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground font-semibold">
-                            {item.badge}
-                          </span>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        to={item.route}
+                        className={cn(
+                          'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground',
+                          activeTab === item.id && 'bg-accent text-accent-foreground font-medium'
+                        )}
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span className="flex-1">{item.label}</span>
+                            {item.shortcut && (
+                              <Badge 
+                                variant="outline" 
+                                className="ml-auto text-[9px] font-mono px-1.5 py-0 opacity-40"
+                              >
+                                {item.shortcut}
+                              </Badge>
+                            )}
+                          </>
                         )}
                       </Link>
                     </SidebarMenuButton>

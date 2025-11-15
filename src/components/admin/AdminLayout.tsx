@@ -10,6 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { NavigationShortcuts } from '@/components/shortcuts/NavigationShortcuts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +77,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
+      <NavigationShortcuts />
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background to-muted relative">
         <div className="z-40 relative">
           <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
