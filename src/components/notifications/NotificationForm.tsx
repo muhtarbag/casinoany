@@ -436,6 +436,17 @@ export function NotificationForm({
           <ChevronDown className="h-4 w-4" />
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 pt-4">
+          {/* Border Color */}
+          <div>
+            <Label htmlFor="border_color">Çerçeve Rengi</Label>
+            <Input
+              id="border_color"
+              type="color"
+              value={formData.border_color || '#ffffff'}
+              onChange={(e) => handleChange('border_color', e.target.value)}
+            />
+          </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Font</Label>

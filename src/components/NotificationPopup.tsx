@@ -342,15 +342,25 @@ export const NotificationPopup = () => {
 
   if (!currentNotification) return null;
 
+  // Dinamik renkler
+  const bgColor = currentNotification.background_color || '#8b5cf6';
+  const textColor = currentNotification.text_color || '#ffffff';
+  
+  // Text color için contrast kontrolü (kapatma butonu için)
+  const isLightBackground = parseInt(bgColor.slice(1), 16) > 0xffffff/2;
+  const closeButtonColor = isLightBackground ? '#000000' : '#ffffff';
+
   return (
     <Dialog open={!!openNotificationId} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent 
-        className="max-w-2xl p-0 overflow-hidden border-0 bg-gradient-to-br from-primary/95 via-primary to-primary-foreground/10"
+        className="max-w-2xl p-0 overflow-hidden border-0"
+        style={{ backgroundColor: bgColor, color: textColor }}
       >
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
+          className="absolute top-2 right-2 z-10"
+          style={{ color: closeButtonColor }}
           onClick={handleClose}
         >
           <X className="w-4 h-4" />
@@ -368,12 +378,12 @@ export const NotificationPopup = () => {
           )}
 
           <div className="p-6 space-y-4">
-            <DialogTitle className="text-2xl font-bold text-white">
+            <DialogTitle className="text-2xl font-bold" style={{ color: textColor }}>
               {currentNotification.title}
             </DialogTitle>
 
             {currentNotification.content && (
-              <p className="text-base text-white/90 leading-relaxed">
+              <p className="text-base leading-relaxed" style={{ color: textColor, opacity: 0.9 }}>
                 {currentNotification.content}
               </p>
             )}
@@ -382,7 +392,7 @@ export const NotificationPopup = () => {
             {currentNotification.form_fields && !formSubmitted && (
               <form onSubmit={handleFormSubmit} className="space-y-4 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="bonus-email" className="text-sm font-medium text-white">
+                  <Label htmlFor="bonus-email" className="text-sm font-medium" style={{ color: textColor }}>
                     {currentNotification.form_fields.email_label}
                   </Label>
                   <Input
@@ -397,7 +407,7 @@ export const NotificationPopup = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bonus-phone" className="text-sm font-medium text-white">
+                  <Label htmlFor="bonus-phone" className="text-sm font-medium" style={{ color: textColor }}>
                     {currentNotification.form_fields.phone_label}
                   </Label>
                   <Input
@@ -412,7 +422,7 @@ export const NotificationPopup = () => {
                 </div>
 
                 {currentNotification.form_fields.privacy_text && (
-                  <p className="text-xs text-white/75 leading-relaxed">
+                  <p className="text-xs leading-relaxed" style={{ color: textColor, opacity: 0.75 }}>
                     🔒 {currentNotification.form_fields.privacy_text}
                   </p>
                 )}
@@ -436,9 +446,10 @@ export const NotificationPopup = () => {
 
             {/* Success Message */}
             {formSubmitted && currentNotification.form_fields && (
-              <div className="text-center py-6 space-y-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
+              <div className="text-center py-6 space-y-3 rounded-lg backdrop-blur-sm border" 
+                   style={{ backgroundColor: `${textColor}15`, borderColor: `${textColor}33` }}>
                 <div className="text-4xl">✅</div>
-                <p className="text-lg font-semibold text-white">
+                <p className="text-lg font-semibold" style={{ color: textColor }}>
                   {currentNotification.form_fields.success_message}
                 </p>
               </div>
@@ -448,8 +459,12 @@ export const NotificationPopup = () => {
             {!currentNotification.form_fields && currentNotification.button_text && (
               <Button
                 onClick={() => handleButtonClick(currentNotification.button_url)}
-                className="w-full bg-white text-primary hover:bg-white/90 font-semibold text-base shadow-lg"
+                className="w-full font-semibold text-base shadow-lg hover:opacity-90"
                 size="lg"
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: parseInt('#ffffff'.slice(1), 16) > 0xffffff/2 ? '#000000' : '#ffffff'
+                }}
               >
                 {currentNotification.button_text}
               </Button>
