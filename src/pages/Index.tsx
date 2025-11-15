@@ -33,6 +33,10 @@ const Index = () => {
       <main>
         <Hero onSearch={handleSearch} searchTerm="" />
         
+        <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
+          <PixelGrid />
+        </div>
+
         {/* Featured Casino Reviews Section */}
         <section className="container mx-auto px-4 py-8 md:py-12">
           <div className="text-center mb-8">
@@ -59,10 +63,6 @@ const Index = () => {
             </Link>
           </div>
         </section>
-        
-        <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-          <PixelGrid />
-        </div>
       </main>
 
       <Footer />
