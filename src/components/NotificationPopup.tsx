@@ -105,7 +105,7 @@ export const NotificationPopup = () => {
         .from('site_notifications')
         .select('*')
         .eq('is_active', true)
-        .eq('notification_type', 'popup')
+        .in('notification_type', ['popup', 'form'])
         .or(`start_date.is.null,start_date.lte.${now}`)
         .or(`end_date.is.null,end_date.gte.${now}`)
         .order('priority', { ascending: false });
