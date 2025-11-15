@@ -136,6 +136,7 @@ const AppContent = () => {
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
             <Route path="ai" element={<AdminAI />} />
+            <Route path="ai/assistant" element={<AdminAI />} />
             <Route path="ai/history" element={<AdminAIHistory />} />
           </Route>
           
