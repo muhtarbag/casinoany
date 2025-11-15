@@ -19,7 +19,10 @@ export default defineConfig(({ mode }) => ({
       'react': path.resolve('./node_modules/react'),
       'react-dom': path.resolve('./node_modules/react-dom'),
     },
-    dedupe: ['react', 'react-dom', 'react-router-dom'],
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'scheduler'],
+  },
+  ssr: {
+    noExternal: ['react', 'react-dom'],
   },
     build: {
       rollupOptions: {
@@ -43,8 +46,10 @@ export default defineConfig(({ mode }) => ({
       '@tanstack/react-query',
       'react-helmet-async'
     ],
-    exclude: ['@tanstack/react-virtual'],
+    exclude: [],
+    force: true,
     esbuildOptions: {
+      target: 'es2020',
       plugins: []
     }
   },
