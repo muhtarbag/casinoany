@@ -25,7 +25,8 @@ import {
   Shield,
   Image,
   AlertCircle,
-  Folder
+  Folder,
+  Link2
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -76,6 +77,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
         { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
         { id: 'news', icon: Newspaper, label: 'Haberler', badge: null, route: '/admin/news', roles: ['content_editor'] },
         { id: 'banners', icon: Image, label: 'Banner Yönetimi', badge: null, route: '/admin/sites/banners', roles: ['content_editor'] },
+        { id: 'recommended-sites', icon: Link2, label: 'Önerilen Siteler', badge: 'NEW', route: '/admin/sites/recommended', roles: ['content_editor'] },
       ],
     },
     {
