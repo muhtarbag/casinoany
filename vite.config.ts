@@ -36,9 +36,13 @@ export default defineConfig(({ mode }) => ({
                 id.includes('@radix-ui')) {
               return 'vendor-react'; // All React + Radix in one chunk
             }
-            // Only split heavy non-React libraries
-            if (id.includes('recharts') || id.includes('d3-')) {
+            // Split recharts separately with proper initialization
+            if (id.includes('recharts')) {
               return 'vendor-charts';
+            }
+            // Keep d3 separate from recharts to avoid circular deps
+            if (id.includes('d3-')) {
+              return 'vendor-d3';
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
