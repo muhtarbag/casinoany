@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, GripVertical, Save, Search, AlertCircle, CheckCircle } from 'lucide-react';
+import { Trash2, Plus, GripVertical, Save, Search, AlertCircle, CheckCircle, CheckSquare, Square } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface RecommendedSite {
   id: string;
@@ -86,7 +88,7 @@ export const RecommendedSitesManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedMainSite, setSelectedMainSite] = useState<string>('');
-  const [selectedRecommendedSite, setSelectedRecommendedSite] = useState<string>('');
+  const [selectedSites, setSelectedSites] = useState<Set<string>>(new Set());
   const [localRecommendations, setLocalRecommendations] = useState<RecommendedSite[]>([]);
 
   const sensors = useSensors(
@@ -143,23 +145,24 @@ export const RecommendedSitesManagement = () => {
     }
   }, [recommendations]);
 
-  // Add recommendation mutation
+  // Add recommendations mutation (multiple sites)
   const addMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedMainSite || !selectedRecommendedSite) {
+    mutationFn: async (siteIds: string[]) => {
+      if (!selectedMainSite || siteIds.length === 0) {
         throw new Error('Site seçimi gerekli');
       }
 
-      // Check if already exists
-      const { data: existing } = await supabase
+      // Get current count
+      const { data: currentRecs } = await supabase
         .from('site_recommended_sites')
         .select('id')
-        .eq('site_id', selectedMainSite)
-        .eq('recommended_site_id', selectedRecommendedSite)
-        .maybeSingle();
+        .eq('site_id', selectedMainSite);
 
-      if (existing) {
-        throw new Error('Bu site zaten öneriler listesinde');
+      const currentCount = currentRecs?.length || 0;
+      const availableSlots = 4 - currentCount;
+
+      if (siteIds.length > availableSlots) {
+        throw new Error(`Maksimum ${availableSlots} site daha ekleyebilirsiniz`);
       }
 
       // Get next display order
@@ -171,22 +174,25 @@ export const RecommendedSitesManagement = () => {
         .limit(1)
         .maybeSingle();
 
-      const nextOrder = (maxOrder?.display_order ?? -1) + 1;
+      let nextOrder = (maxOrder?.display_order ?? -1) + 1;
+
+      // Insert all selected sites
+      const inserts = siteIds.map((siteId) => ({
+        site_id: selectedMainSite,
+        recommended_site_id: siteId,
+        display_order: nextOrder++,
+      }));
 
       const { error } = await supabase
         .from('site_recommended_sites')
-        .insert({
-          site_id: selectedMainSite,
-          recommended_site_id: selectedRecommendedSite,
-          display_order: nextOrder,
-        });
+        .insert(inserts);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-recommendations', selectedMainSite] });
-      setSelectedRecommendedSite('');
-      toast({ title: 'Önerilen site eklendi' });
+      setSelectedSites(new Set());
+      toast({ title: `${selectedSites.size} site eklendi` });
     },
     onError: (error: any) => {
       toast({ 
@@ -271,6 +277,37 @@ export const RecommendedSitesManagement = () => {
   const hasOrderChanged = JSON.stringify(localRecommendations?.map(r => r.id)) !== 
                           JSON.stringify(recommendations?.map(r => r.id));
 
+  const handleToggleSite = (siteId: string) => {
+    const newSelected = new Set(selectedSites);
+    if (newSelected.has(siteId)) {
+      newSelected.delete(siteId);
+    } else {
+      const remainingSlots = 4 - (localRecommendations?.length || 0);
+      if (newSelected.size >= remainingSlots) {
+        toast({
+          title: 'Uyarı',
+          description: `Maksimum ${remainingSlots} site daha seçebilirsiniz`,
+          variant: 'destructive'
+        });
+        return;
+      }
+      newSelected.add(siteId);
+    }
+    setSelectedSites(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    const remainingSlots = 4 - (localRecommendations?.length || 0);
+    if (!availableSites) return;
+    
+    const sitesToSelect = availableSites.slice(0, remainingSlots);
+    setSelectedSites(new Set(sitesToSelect.map(s => s.id)));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedSites(new Set());
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -336,62 +373,103 @@ export const RecommendedSitesManagement = () => {
 
           {selectedMainSite && (
             <>
-              {/* Add Recommended Site */}
-              <div className="space-y-3 pb-6 border-b">
+              {/* Add Recommended Sites with Checkboxes */}
+              <div className="space-y-4 pb-6 border-b">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Plus className="w-4 h-4 text-muted-foreground" />
-                    <label className="text-sm font-semibold">2. Önerilen Site Ekle</label>
+                    <CheckSquare className="w-4 h-4 text-muted-foreground" />
+                    <label className="text-sm font-semibold">2. Önerilen Siteleri Seçin</label>
+                    {selectedSites.size > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {selectedSites.size} seçili
+                      </Badge>
+                    )}
                   </div>
-                  {localRecommendations?.length >= 4 && (
-                    <Badge variant="outline" className="border-orange-500/50 text-orange-600">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      Maksimum 4 site
-                    </Badge>
-                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSelectAll}
+                      disabled={!availableSites || availableSites.length === 0}
+                    >
+                      Tümünü Seç
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDeselectAll}
+                      disabled={selectedSites.size === 0}
+                    >
+                      Temizle
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-3">
-                  <Select 
-                    value={selectedRecommendedSite} 
-                    onValueChange={setSelectedRecommendedSite}
-                    disabled={!availableSites || availableSites.length === 0 || localRecommendations?.length >= 4}
-                  >
-                    <SelectTrigger className="flex-1 h-11">
-                      <SelectValue placeholder={
-                        availableSites?.length === 0 
-                          ? "Tüm siteler eklendi" 
-                          : "Önerilecek siteyi seçin..."
-                      } />
-                    </SelectTrigger>
-                    <SelectContent className="z-50 bg-background">
-                      {availableSites?.length ? (
-                        availableSites.map((site) => (
-                          <SelectItem key={site.id} value={site.id}>
-                            <div className="flex items-center gap-2">
-                              <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
-                              {site.name}
+
+                {localRecommendations?.length >= 4 ? (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Maksimum 4 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
+                    </AlertDescription>
+                  </Alert>
+                ) : availableSites && availableSites.length > 0 ? (
+                  <>
+                    <ScrollArea className="h-[300px] border rounded-lg p-2">
+                      <div className="space-y-2">
+                        {availableSites.map((site) => (
+                          <div
+                            key={site.id}
+                            onClick={() => handleToggleSite(site.id)}
+                            className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:bg-muted/50 ${
+                              selectedSites.has(site.id)
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border'
+                            }`}
+                          >
+                            <Checkbox
+                              checked={selectedSites.has(site.id)}
+                              onCheckedChange={() => handleToggleSite(site.id)}
+                              className="pointer-events-none"
+                            />
+                            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted/30 p-2 border">
+                              <img
+                                src={site.logo_url}
+                                alt={site.name}
+                                className="w-full h-full object-contain"
+                              />
                             </div>
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                          {localRecommendations?.length >= 4 
-                            ? "Maksimum 4 site eklenebilir" 
-                            : "Eklenebilecek site yok"}
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    onClick={() => addMutation.mutate()}
-                    disabled={!selectedRecommendedSite || addMutation.isPending || localRecommendations?.length >= 4}
-                    size="lg"
-                    className="px-6"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Ekle
-                  </Button>
-                </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{site.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">/{site.slug}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <p className="text-xs text-muted-foreground">
+                        {4 - (localRecommendations?.length || 0)} slot boş
+                      </p>
+                      <Button
+                        onClick={() => addMutation.mutate(Array.from(selectedSites))}
+                        disabled={selectedSites.size === 0 || addMutation.isPending}
+                        size="lg"
+                        className="px-6"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {selectedSites.size > 0 ? `${selectedSites.size} Site Ekle` : 'Site Ekle'}
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Tüm siteler zaten eklenmiş veya ana site olarak seçilmiş.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
 
               {/* Current Recommendations */}
