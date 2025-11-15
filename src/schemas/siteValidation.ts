@@ -28,9 +28,9 @@ export const siteFormSchema = z.object({
     .default(''),
   
   affiliate_link: z.string()
-    .url('Geçerli bir URL giriniz')
+    .trim()
     .max(500, 'Link en fazla 500 karakter olabilir')
-    .trim(),
+    .default(''),
   
   email: z.string()
     .trim()

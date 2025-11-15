@@ -86,7 +86,7 @@ export function SiteFormWrapper({
             .eq('site_id', editingSite.id);
           
           if (siteCategories) {
-            categoryIds = siteCategories.map((sc) => sc.category_id);
+            categoryIds = siteCategories.map((sc: any) => sc.category_id);
           }
         } catch (error) {
           console.error('Error loading site categories:', error);
@@ -142,7 +142,7 @@ export function SiteFormWrapper({
 
   const onSubmit = useCallback(async (data: SiteFormData) => {
     try {
-      const categoryIds = data.category_ids || [];
+      const categoryIds = (data.category_ids || []) as string[];
       
       if (editingId) {
         // Update site
