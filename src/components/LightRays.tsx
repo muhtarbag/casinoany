@@ -37,6 +37,45 @@ export const LightRays = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Get computed color from CSS variable if needed
+    const getComputedColor = (color: string): string => {
+      if (color.includes('var(')) {
+        const computedStyle = getComputedStyle(document.documentElement);
+        const hslValue = computedStyle.getPropertyValue('--primary').trim();
+        if (hslValue) {
+          // Convert HSL to RGB for canvas
+          const [h, s, l] = hslValue.split(' ').map(v => parseFloat(v));
+          const rgb = hslToRgb(h, s / 100, l / 100);
+          return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+        }
+      }
+      return color;
+    };
+
+    const hslToRgb = (h: number, s: number, l: number): [number, number, number] => {
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p: number, q: number, t: number) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, (h / 360) + 1/3);
+        g = hue2rgb(p, q, h / 360);
+        b = hue2rgb(p, q, (h / 360) - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    };
+
+    const computedRaysColor = getComputedColor(raysColor);
+
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
@@ -93,8 +132,17 @@ export const LightRays = ({
         const gradient = ctx.createLinearGradient(origin.x, origin.y, endX, endY);
         const opacity = 0.05 + Math.sin(time + i) * 0.03;
         
-        gradient.addColorStop(0, `${raysColor}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`);
-        gradient.addColorStop(1, 'transparent');
+        // Extract RGB values and create rgba string
+        const rgbMatch = computedRaysColor.match(/\d+/g);
+        if (rgbMatch) {
+          const [r, g, b] = rgbMatch.map(Number);
+          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${opacity})`);
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        } else {
+          // Fallback to cyan if parsing fails
+          gradient.addColorStop(0, `rgba(0, 255, 255, ${opacity})`);
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        }
 
         ctx.strokeStyle = gradient;
         ctx.lineWidth = 2;

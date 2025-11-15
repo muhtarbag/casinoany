@@ -175,7 +175,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     <div className="relative overflow-hidden bg-background touch-manipulation">
       <LightRays
         raysOrigin="top-center"
-        raysColor="hsl(var(--primary))"
+        raysColor="#a855f7"
         raysSpeed={1.5}
         lightSpread={0.8}
         rayLength={1.2}
