@@ -3,206 +3,111 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 const DenemeBonusu = () => {
-  const bonusOffers = [
-    {
-      id: '1',
-      casino: {
-        name: 'Betist',
-        slug: 'betist',
-        logo: '/logos/betist-logo.png',
-        rating: 4.8
-      },
-      bonusType: 'nodeposit' as const,
-      title: '100 TL Deneme Bonusu + 50 Free Spin',
-      amount: '100 TL + 50 FS',
-      wageringRequirement: '35x',
-      validUntil: '2025-03-31T23:59:59Z',
-      bonusCode: 'DENEME100',
-      terms: [
-        '18+ yaş sınırı geçerlidir',
-        'Sadece yeni üyeler için geçerlidir',
-        'Bonus 7 gün içinde kullanılmalıdır',
-        'Maksimum çekim 500 TL'
-      ],
-      eligibility: [
-        'Türkiye\'den kayıt olmuş kullanıcılar',
-        'İlk üyelik bonusudur',
-        'Kişi başına tek hesap',
-        'Email veya SMS doğrulaması gereklidir'
-      ],
-      affiliateLink: 'https://betist.com'
+  // Fetch bonus offers from database
+  const { data: bonusOffers, isLoading } = useQuery({
+    queryKey: ['bonus-offers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bonus_offers')
+        .select('*, betting_sites!inner(name, logo_url, slug, rating, affiliate_link)')
+        .eq('is_active', true)
+        .eq('bonus_type', 'no_deposit')
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Transform data to match BonusPageTemplate interface
+      return data.map((bonus: any) => ({
+        id: bonus.id,
+        casino: {
+          name: bonus.betting_sites.name,
+          slug: bonus.betting_sites.slug,
+          logo: bonus.betting_sites.logo_url,
+          rating: bonus.betting_sites.rating || 4.5
+        },
+        bonusType: 'nodeposit' as const,
+        title: bonus.title,
+        amount: bonus.bonus_amount,
+        wageringRequirement: bonus.wagering_requirement || 'Belirtilmemiş',
+        validUntil: bonus.validity_period || '2025-12-31T23:59:59Z',
+        bonusCode: bonus.bonus_code,
+        terms: bonus.terms ? bonus.terms.split('\n').filter((t: string) => t.trim()) : [],
+        eligibility: bonus.eligibility ? bonus.eligibility.split(',').map((e: string) => e.trim()) : [],
+        affiliateLink: bonus.betting_sites.affiliate_link
+      }));
     },
-    {
-      id: '2',
-      casino: {
-        name: 'Bets10',
-        slug: 'bets10',
-        logo: '/logos/bets10-logo.png',
-        rating: 4.7
-      },
-      bonusType: 'nodeposit' as const,
-      title: '150 TL Yatırımsız Deneme Bonusu',
-      amount: '150 TL',
-      wageringRequirement: '40x',
-      validUntil: '2025-03-31T23:59:59Z',
-      bonusCode: 'FREEBONUS',
-      terms: [
-        '18+ yaş kontrolü zorunludur',
-        'Yeni üyeler için',
-        'Bonus 5 gün içinde çevrilmelidir',
-        'Maksimum bonus çekim tutarı 750 TL'
-      ],
-      eligibility: [
-        'TR IP adresinden kayıt',
-        'Tek hesap kuralı geçerlidir',
-        'Telefon doğrulaması gereklidir'
-      ],
-      affiliateLink: 'https://bets10.com'
-    },
-    {
-      id: '3',
-      casino: {
-        name: 'Mobilbahis',
-        slug: 'mobilbahis',
-        logo: '/logos/mobilbahis-logo.png',
-        rating: 4.6
-      },
-      bonusType: 'nodeposit' as const,
-      title: '75 TL Deneme Bonusu + 25 Free Spin',
-      amount: '75 TL + 25 FS',
-      wageringRequirement: '30x',
-      validUntil: '2025-03-31T23:59:59Z',
-      bonusCode: 'MOBILE75',
-      terms: [
-        'Minimum yaş: 18',
-        'Sadece ilk kayıt için',
-        'Free spinler Sweet Bonanza\'da kullanılabilir',
-        'Çekim limiti 400 TL'
-      ],
-      eligibility: [
-        'Türkiye\'den erişim',
-        'Email doğrulaması zorunlu',
-        'Kimlik doğrulaması gerekebilir'
-      ],
-      affiliateLink: 'https://mobilbahis.com'
-    },
-    {
-      id: '4',
-      casino: {
-        name: 'Casinometropol',
-        slug: 'casinometropol',
-        logo: '/logos/casinometropol-logo.png',
-        rating: 4.5
-      },
-      bonusType: 'nodeposit' as const,
-      title: '200 TL Yatırımsız Bonus',
-      amount: '200 TL',
-      wageringRequirement: '45x',
-      validUntil: '2025-03-31T23:59:59Z',
-      terms: [
-        '18+ oyuncular için',
-        'İlk üyelik bonusu',
-        '10 gün içinde çevrim tamamlanmalı',
-        'Maksimum çekim 1.000 TL'
-      ],
-      eligibility: [
-        'TR kullanıcılar için',
-        'Telefon doğrulaması',
-        'Hesap başına tek bonus'
-      ],
-      affiliateLink: 'https://casinometropol.com'
-    },
-    {
-      id: '5',
-      casino: {
-        name: 'Youwin',
-        slug: 'youwin',
-        logo: '/logos/youwin-logo.png',
-        rating: 4.4
-      },
-      bonusType: 'nodeposit' as const,
-      title: '50 TL Deneme + 30 Free Spin',
-      amount: '50 TL + 30 FS',
-      wageringRequirement: '25x',
-      validUntil: '2025-03-31T23:59:59Z',
-      bonusCode: 'WIN50',
-      terms: [
-        'Yasal yaş sınırı: 18+',
-        'Yeni üyelere özel',
-        'Free spinler Gates of Olympus\'ta',
-        'Maksimum kazanç 300 TL'
-      ],
-      eligibility: [
-        'Türkiye\'den kayıt',
-        'SMS doğrulama gerekli',
-        'İlk hesap olmalı'
-      ],
-      affiliateLink: 'https://youwin.com'
-    }
-  ];
+  });
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const howToSteps = [
     {
-      name: '1. Siteye Üye Olun',
-      text: 'İlk olarak deneme bonusu veren casino sitesine kayıt olun. Kayıt formunu eksiksiz doldurun.'
+      name: 'Siteye Kayıt Ol',
+      text: 'Bonus veren sitelerden birine giderek yeni üyelik oluşturun. Kişisel bilgilerinizi doğru ve eksiksiz doldurun.',
+      image: '/images/kayit-ol.jpg'
     },
     {
-      name: '2. Hesabınızı Doğrulayın',
-      text: 'Email veya SMS ile gönderilen doğrulama linkine tıklayarak hesabınızı aktif hale getirin.'
+      name: 'Bonus Kodunu Kullan',
+      text: 'Kayıt formunda veya hesap ayarlarında bonus kodu bölümüne ilgili kodu girin.',
+      image: '/images/bonus-kodu.jpg'
     },
     {
-      name: '3. Bonus Kodunu Girin',
-      text: 'Eğer bonus kodu gerekliyse (örn: DENEME100), hesap ayarlarından veya bonus bölümünden kodu girin.'
+      name: 'Hesabını Doğrula',
+      text: 'Email veya SMS ile gelen doğrulama linkine tıklayarak hesabınızı aktif edin.',
+      image: '/images/dogrulama.jpg'
     },
     {
-      name: '4. Bonusu Aktif Edin',
-      text: 'Bonus otomatik olarak hesabınıza tanımlanacaktır. Bonus & Kampanyalar bölümünden kontrol edin.'
-    },
-    {
-      name: '5. Çevrim Şartını Tamamlayın',
-      text: 'Bonusu para çekebilmek için belirlenen çevrim şartını (örn: 35x) slot oyunlarında tamamlayın.'
+      name: 'Bonusu Al ve Oyna',
+      text: 'Bonus hesabınıza otomatik yüklenecektir. Artık bonusunuzla oyunlara başlayabilirsiniz!',
+      image: '/images/bonus-al.jpg'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+    <>
       <SEO
-        title="Deneme Bonusu Veren Siteler 2025 - Güncel Liste"
-        description="2025'in en iyi deneme bonusu veren casino siteleri! 100 TL - 200 TL arası yatırımsız bonuslar. Çevrim şartları, bonus kodları ve detaylı rehber."
+        title="Deneme Bonusu Veren Siteler 2025 - Yatırımsız Bedava Bonus Kampanyaları"
+        description="2025'in en güncel deneme bonusu veren siteler listesi. Yatırımsız bedava bonus kampanyaları, çevrim şartları ve bonus kodları. %100 güvenilir siteler."
         keywords={[
           'deneme bonusu',
           'deneme bonusu veren siteler',
           'yatırımsız bonus',
-          'casino deneme bonusu',
           'bedava bonus',
-          'free spin bonus',
-          '2025 deneme bonusu'
+          'deneme bonusu 2025',
+          'çevrimsiz bonus',
+          'bonus kampanyaları',
+          'casino bonusları'
         ]}
-        canonical={`${window.location.origin}/deneme-bonusu`}
-        ogType="website"
+        ogImage="/og-deneme-bonusu.jpg"
+        canonical="https://casinoany.com/deneme-bonusu"
       />
-      
-      <GamblingSEOEnhancer
-        isMoneyPage={true}
-        authorName="Casino Bonus Uzmanları"
-        lastReviewed={new Date().toISOString()}
-      />
-      
+
       <Header />
-      
-      <main className="container mx-auto px-4 py-8">
+      <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20">
         <BonusPageTemplate
-          pageTitle="Deneme Bonusu Veren Siteler 2025"
-          pageDescription="Yatırım yapmadan casino deneyimi! En güncel deneme bonusu kampanyaları, çevrim şartları ve nasıl alınır rehberi. Tüm bonuslar doğrulanmış ve güncel."
-          bonusOffers={bonusOffers}
+          pageTitle="🎁 Deneme Bonusu Veren Siteler 2025"
+          pageDescription="En yüksek deneme bonusu kampanyalarını karşılaştırın. Yatırım yapmadan bedava bonus kazanın! Güncel bonus kodları ve çevrim şartları ile."
+          bonusOffers={bonusOffers || []}
           howToSteps={howToSteps}
         />
       </main>
-      
       <Footer />
-    </div>
+    </>
   );
 };
 
