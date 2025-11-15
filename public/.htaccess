@@ -5,11 +5,11 @@
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml
 </IfModule>
 
-# Leverage browser caching
+# Leverage browser caching with immutable cache for assets
 <IfModule mod_expires.c>
   ExpiresActive On
   
-  # Images
+  # Images - 1 year with immutable
   ExpiresByType image/jpeg "access plus 1 year"
   ExpiresByType image/jpg "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
@@ -17,25 +17,27 @@
   ExpiresByType image/webp "access plus 1 year"
   ExpiresByType image/svg+xml "access plus 1 year"
   
-  # CSS and JavaScript
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
-  ExpiresByType text/javascript "access plus 1 month"
+  # CSS and JavaScript - 1 year with immutable (hash in filename)
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
   
-  # Fonts
+  # Fonts - 1 year with immutable
   ExpiresByType font/woff2 "access plus 1 year"
   ExpiresByType font/woff "access plus 1 year"
   ExpiresByType font/ttf "access plus 1 year"
   
-  # HTML
+  # HTML - No cache
   ExpiresByType text/html "access plus 0 seconds"
 </IfModule>
 
-# Set cache control headers
+# Set cache control headers with immutable for better performance
 <IfModule mod_headers.c>
-  # Cache static assets
+  # Cache static assets aggressively with immutable flag
   <FilesMatch "\.(ico|jpg|jpeg|png|gif|webp|svg|css|js|woff2|woff|ttf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
+    Header unset ETag
+    FileETag None
   </FilesMatch>
   
   # Don't cache HTML
@@ -44,4 +46,19 @@
     Header set Pragma "no-cache"
     Header set Expires 0
   </FilesMatch>
+  
+  # Security headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  
+  # CORS for fonts
+  <FilesMatch "\.(woff|woff2|ttf|eot)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+# Enable keep-alive for better performance
+<IfModule mod_headers.c>
+  Header set Connection keep-alive
 </IfModule>

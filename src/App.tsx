@@ -98,8 +98,12 @@ const AppContent = () => {
   usePageTracking();
   
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <>
+      <OfflineIndicator />
+      <PWAInstallPrompt />
+      <OptimizedNotificationPopup />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -173,6 +177,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+    </>
   );
 };
 
@@ -186,9 +191,6 @@ const App = () => {
         <HelmetProvider>
           <AuthProvider>
             <TooltipProvider>
-              <OfflineIndicator />
-              <PWAInstallPrompt />
-              <OptimizedNotificationPopup />
               <Toaster />
               <Sonner />
               <BrowserRouter
