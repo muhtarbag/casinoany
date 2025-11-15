@@ -208,13 +208,14 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
         #{rank}
       </div>
       
-      <div className="w-24 h-24 flex-shrink-0 bg-background rounded-lg border-2 border-border p-2 flex items-center justify-center">
+      <div className="w-32 h-20 flex-shrink-0 bg-white rounded-lg border-2 border-border p-3 flex items-center justify-center">
         <OptimizedImage
           src={bonus.casino.logo}
           alt={bonus.casino.name}
-          width={88}
-          height={88}
-          className="rounded object-contain w-full h-full"
+          width={120}
+          height={60}
+          className="object-contain w-full h-full"
+          objectFit="contain"
           priority={rank <= 3}
         />
       </div>
