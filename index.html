@@ -26,6 +26,11 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/pwa-512x512.png" />
+    
     <!-- Preload Critical Images for LCP -->
     <link rel="preload" as="image" href="https://storage.googleapis.com/gpt-engineer-file-uploads/tSNROLHLVxYYMQDeVwzBGJY3V7j1/social-images/social-1763106431041-casinoanyOG.jpg" type="image/jpeg" fetchpriority="high">
     
@@ -68,15 +73,6 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {
-            // Silent fail
-          });
-        });
-      }
-    </script>
+    <!-- Service Worker is auto-registered by vite-plugin-pwa -->
   </body>
 </html>
