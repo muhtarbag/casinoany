@@ -55,7 +55,11 @@ serve(async (req) => {
 
     if (postsError) throw postsError;
 
-    const baseUrl = 'https://yourdomain.com'; // Replace with actual domain
+    // Get base URL from environment variable or request origin
+    const baseUrl = Deno.env.get('PRODUCTION_URL') || 
+      req.headers.get('origin') || 
+      req.headers.get('referer')?.split('?')[0].replace(/\/$/, '') ||
+      'https://cpaukwimbfoembwwtqhj.supabase.co';
 
     // Build XML sitemap
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
