@@ -33,55 +33,55 @@ export const MobileMenu = () => {
           </SheetTitle>
         </SheetHeader>
         
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-1">
           <NavLink
             to="/"
             onClick={handleNavClick}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
             activeClassName="text-primary bg-muted font-semibold"
           >
-            <Home className="w-5 h-5" />
-            <span>Ana Sayfa</span>
+            <Home className="w-6 h-6" />
+            <span className="text-base">Ana Sayfa</span>
           </NavLink>
 
           <NavLink
             to="/deneme-bonusu"
             onClick={handleNavClick}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
             activeClassName="text-primary bg-muted font-semibold"
           >
-            <Gift className="w-5 h-5" />
-            <span>Deneme Bonusu</span>
+            <Gift className="w-6 h-6" />
+            <span className="text-base">Deneme Bonusu</span>
           </NavLink>
 
           <NavLink
             to="/kategoriler"
             onClick={handleNavClick}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
             activeClassName="text-primary bg-muted font-semibold"
           >
-            <Folder className="w-5 h-5" />
-            <span>Kategoriler</span>
+            <Folder className="w-6 h-6" />
+            <span className="text-base">Kategoriler</span>
           </NavLink>
 
           <NavLink
             to="/blog"
             onClick={handleNavClick}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
             activeClassName="text-primary bg-muted font-semibold"
           >
-            <FileText className="w-5 h-5" />
-            <span>Blog</span>
+            <FileText className="w-6 h-6" />
+            <span className="text-base">Blog</span>
           </NavLink>
 
           <NavLink
             to="/about"
             onClick={handleNavClick}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+            className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
             activeClassName="text-primary bg-muted font-semibold"
           >
-            <Info className="w-5 h-5" />
-            <span>Hakkımızda</span>
+            <Info className="w-6 h-6" />
+            <span className="text-base">Hakkımızda</span>
           </NavLink>
 
           {user && (
@@ -92,11 +92,11 @@ export const MobileMenu = () => {
                 <NavLink
                   to="/admin"
                   onClick={handleNavClick}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
                   activeClassName="text-primary bg-muted font-semibold"
                 >
-                  <Shield className="w-5 h-5" />
-                  <span>Admin Panel</span>
+                  <Shield className="w-6 h-6" />
+                  <span className="text-base">Admin Panel</span>
                 </NavLink>
               )}
 
@@ -105,10 +105,10 @@ export const MobileMenu = () => {
                   signOut();
                   handleNavClick();
                 }}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all w-full text-left"
+                className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all w-full text-left touch-manipulation active:scale-98"
               >
-                <LogOut className="w-5 h-5" />
-                <span>Çıkış Yap</span>
+                <LogOut className="w-6 h-6" />
+                <span className="text-base">Çıkış Yap</span>
               </button>
             </>
           )}
