@@ -19,7 +19,8 @@ import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 const Index = lazyWithPreload(() => import("./pages/Index"));
 const Login = lazyWithPreload(() => import("./pages/Login"));
 const Signup = lazyWithPreload(() => import("./pages/Signup"));
-const AdminRoot = lazyWithPreload(() => import("./pages/admin"));
+// Critical admin component - directly imported to prevent React instance conflicts
+import AdminRoot from "./pages/admin";
 const AdminDashboard = lazyWithPreload(() => import("./pages/admin/Dashboard"));
 const AdminSiteManagement = lazyWithPreload(() => import("./pages/admin/sites/SiteManagement"));
 

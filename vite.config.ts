@@ -17,7 +17,8 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ['react', 'react-dom', 'react-router-dom', 'scheduler'],
+    // CRITICAL: Force single React instance across all modules
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-router', 'scheduler', '@tanstack/react-query'],
   },
   ssr: {
     noExternal: ['react', 'react-dom', 'react-router-dom'],
@@ -27,11 +28,11 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Keep React ecosystem COMPLETELY together - critical for hooks
+            // CRITICAL: Keep React ecosystem as single chunk to prevent dispatcher errors
             if (id.includes('react') || id.includes('react-dom') || 
                 id.includes('react-router') || id.includes('scheduler') ||
-                id.includes('@tanstack/react-query')) {
-              return undefined; // Let Vite handle React bundling
+                id.includes('@tanstack/react-query') || id.includes('three')) {
+              return 'vendor-react'; // Bundle all React-related in one chunk
             }
             // Only split truly independent heavy libraries
             if (id.includes('recharts') || id.includes('d3-')) {
@@ -51,21 +52,23 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
   },
-  // Optimize dependencies
+  // Optimize dependencies - CRITICAL for preventing multiple React instances
   optimizeDeps: {
     include: [
       'react', 
       'react-dom', 
       'react-router-dom',
+      'react-router',
       '@tanstack/react-query',
       'react-helmet-async',
       '@radix-ui/react-progress',
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-separator',
+      '@radix-ui/react-tooltip',
       'three'
     ],
     exclude: [],
-    force: false, // Only force when needed
+    force: true, // Force to ensure single React instance
     esbuildOptions: {
       target: 'es2020',
       plugins: []

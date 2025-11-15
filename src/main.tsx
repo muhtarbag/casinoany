@@ -8,12 +8,13 @@ import { initPerformanceObserver } from './lib/performanceMonitor';
 import { initPerformanceOptimizations, requestIdleCallback } from './utils/performanceOptimizations';
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 
-// CRITICAL FIX: Validate single React instance
-if (typeof window !== 'undefined' && window.React && window.React !== React) {
-  console.error('Multiple React instances detected! This will cause createContext errors.');
-}
+// CRITICAL FIX: Ensure single React instance globally
 if (typeof window !== 'undefined') {
+  if (window.React && window.React !== React) {
+    console.error('❌ Multiple React instances detected! Forcing single instance...');
+  }
   window.React = React;
+  window.ReactDOM = { ...window.ReactDOM }; // Preserve ReactDOM reference
 }
 
 // Initialize Performance Optimizations
