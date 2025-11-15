@@ -16,24 +16,9 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      'react': path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom'),
     },
-    // Dedupe React to prevent multiple instances
-    dedupe: [
-      'react', 
-      'react-dom', 
-      'react-router-dom',
-      '@tanstack/react-query',
-      'react-helmet-async',
-      'recharts',
-      'framer-motion',
-      'sonner',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-tabs',
-      '@radix-ui/react-switch',
-      '@radix-ui/react-select',
-      '@radix-ui/react-label',
-      '@radix-ui/react-slot'
-    ],
   },
     build: {
       rollupOptions: {
@@ -76,11 +61,9 @@ export default defineConfig(({ mode }) => ({
       'react-dom', 
       'react-router-dom',
       '@tanstack/react-query',
-      'recharts',
-      'framer-motion',
-      'sonner',
       'react-helmet-async'
     ],
     exclude: ['@tanstack/react-virtual'],
+    force: true
   },
 }));
