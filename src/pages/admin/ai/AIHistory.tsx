@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const AnalysisHistory = lazy(() => import('@/components/AnalysisHistory').then(m => ({ default: m.AnalysisHistory })));
+import { AnalysisHistory } from '@/components/AnalysisHistory';
 
 export default function AIHistory() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <AnalysisHistory />
-    </Suspense>
-  );
+  return <AnalysisHistory />;
 }

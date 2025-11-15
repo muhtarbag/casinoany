@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const RealtimeAnalyticsDashboard = lazy(() => import('@/components/RealtimeAnalyticsDashboard').then(m => ({ default: m.RealtimeAnalyticsDashboard })));
+import { RealtimeAnalyticsDashboard } from '@/components/RealtimeAnalyticsDashboard';
 
 export default function RealtimeAnalytics() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <RealtimeAnalyticsDashboard />
-    </Suspense>
-  );
+  return <RealtimeAnalyticsDashboard />;
 }
