@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +21,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Cache user roles to prevent duplicate requests
+  const rolesCache = useRef<{ userId: string; roles: string[]; timestamp: number } | null>(null);
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -52,12 +56,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const checkUserRoles = async (userId: string) => {
+    // Check cache first
+    if (rolesCache.current?.userId === userId) {
+      const cacheAge = Date.now() - rolesCache.current.timestamp;
+      if (cacheAge < CACHE_DURATION) {
+        const roles = rolesCache.current.roles;
+        setUserRoles(roles);
+        setIsAdmin(roles.includes('admin'));
+        return;
+      }
+    }
+
     const { data } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId);
     
     const roles = data?.map(r => r.role) || [];
+    
+    // Update cache
+    rolesCache.current = {
+      userId,
+      roles,
+      timestamp: Date.now()
+    };
+    
     setUserRoles(roles);
     setIsAdmin(roles.includes('admin'));
   };

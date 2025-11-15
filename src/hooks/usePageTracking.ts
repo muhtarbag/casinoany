@@ -32,9 +32,11 @@ export const usePageTracking = () => {
     // Reset scroll depth on route change
     scrollDepthRef.current = 0;
     
-    // Track page view on every route change
-    startTimeRef.current = Date.now();
-    trackPageView();
+    // Debounce page view tracking to prevent duplicates on quick route changes
+    const timeoutId = setTimeout(() => {
+      startTimeRef.current = Date.now();
+      trackPageView();
+    }, 100);
 
     // Throttled scroll depth tracking (500ms)
     const handleScroll = throttle(() => {
@@ -52,6 +54,7 @@ export const usePageTracking = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
   }, [location]);
