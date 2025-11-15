@@ -28,7 +28,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
           )
         `)
         .order("display_order")
-        .limit(4);
+        .limit(8);
 
       if (error) throw error;
       
@@ -80,7 +80,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     if (!allSites || allSites.length === 0) return [];
     
     const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 4);
+    return shuffled.slice(0, 8);
   }, [allSites]);
 
   if (isLoading) {
@@ -92,7 +92,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <Skeleton key={i} className="h-64 w-full" />
             ))}
           </div>
