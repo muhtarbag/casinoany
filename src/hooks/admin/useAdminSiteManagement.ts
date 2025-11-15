@@ -138,6 +138,8 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['betting-sites-active'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
       showSuccessToast('Site başarıyla eklendi!');
       setLogoFile(null);
       setLogoPreview(null);
@@ -196,6 +198,8 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
+      queryClient.invalidateQueries({ queryKey: ['betting-sites-active'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
       showSuccessToast('Site başarıyla güncellendi!');
       setEditingId(null);
       setLogoFile(null);
