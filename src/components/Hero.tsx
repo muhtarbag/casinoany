@@ -216,7 +216,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6 pt-4 md:pt-6">
             <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
               <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-primary flex-shrink-0" />
-              <div className="text-left"><div className="text-lg md:text-2xl font-bold">100</div><div className="text-xs md:text-sm text-muted-foreground">Bahis Sitesi</div></div>
+              <div className="text-left"><div className="text-lg md:text-2xl font-bold">100+</div><div className="text-xs md:text-sm text-muted-foreground">Bahis Sitesi</div></div>
             </div>
             <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
               <Shield className="w-4 h-4 md:w-6 md:h-6 text-secondary flex-shrink-0" />
