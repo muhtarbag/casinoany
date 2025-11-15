@@ -70,7 +70,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
       label: 'İçerik',
       items: [
         { id: 'manage', icon: Globe, label: 'Site Yönetimi', badge: null, route: '/admin/sites', roles: ['content_editor'] },
-        
+        { id: 'featured-sites', icon: Star, label: 'Öne Çıkan Siteler', badge: null, route: '/admin/sites/featured', roles: ['content_editor'] },
         { id: 'categories', icon: Folder, label: 'Kategori Yönetimi', badge: 'NEW', route: '/admin/content/categories', roles: ['content_editor'] },
         { id: 'casino-content', icon: Gamepad2, label: 'Casino İçerik', badge: null, route: '/admin/content/casino', roles: ['content_editor'] },
         { id: 'blog', icon: FileText, label: 'Blog', badge: null, route: '/admin/blog', roles: ['content_editor'] },
