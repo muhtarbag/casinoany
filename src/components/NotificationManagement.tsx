@@ -162,11 +162,11 @@ export function NotificationManagement() {
     if (notification_type === 'popup') {
       return (
         <div className={`mx-auto ${baseClasses} relative`} style={containerStyle}>
-          {/* Close button - positioned absolutely for better visibility */}
+          {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10"
+            className="absolute right-3 top-3 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10 transition-colors"
             onClick={() => setPreviewNotification(null)}
             style={{ color: text_color }}
           >
@@ -225,7 +225,7 @@ export function NotificationManagement() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm shrink-0"
+              className="h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm shrink-0 transition-colors"
               onClick={() => setPreviewNotification(null)}
               style={{ color: text_color }}
             >
@@ -240,11 +240,11 @@ export function NotificationManagement() {
       const formFields = previewNotification.form_fields;
       return (
         <div className={`mx-auto ${baseClasses} relative`} style={containerStyle}>
-          {/* Close button - positioned absolutely */}
+          {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10"
+            className="absolute right-3 top-3 h-8 w-8 rounded-full bg-black/10 hover:bg-black/20 backdrop-blur-sm z-10 transition-colors"
             onClick={() => setPreviewNotification(null)}
             style={{ color: text_color }}
           >
