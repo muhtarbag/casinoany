@@ -26,7 +26,13 @@ export default defineConfig(({ mode }) => ({
       'react-helmet-async',
       'recharts',
       'framer-motion',
-      'sonner'
+      'sonner',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-select',
+      '@radix-ui/react-label',
+      '@radix-ui/react-slot'
     ],
   },
   build: {
@@ -95,8 +101,12 @@ export default defineConfig(({ mode }) => ({
       'react', 
       'react-dom', 
       'react-router-dom',
-      '@tanstack/react-query'
+      '@tanstack/react-query',
+      'recharts',
+      'framer-motion',
+      'sonner',
+      'react-helmet-async'
     ],
-    exclude: ['@tanstack/react-virtual'], // Exclude if not used in initial load
+    exclude: ['@tanstack/react-virtual'],
   },
 }));
