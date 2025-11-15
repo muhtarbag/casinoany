@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ interface ReviewEditDialogProps {
   isSaving?: boolean;
 }
 
-export function ReviewEditDialog({ review, isOpen, onClose, onSave, isSaving = false }: ReviewEditDialogProps) {
+export const ReviewEditDialog = memo(function ReviewEditDialog({ review, isOpen, onClose, onSave, isSaving = false }: ReviewEditDialogProps) {
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
@@ -34,13 +34,13 @@ export function ReviewEditDialog({ review, isOpen, onClose, onSave, isSaving = f
     }
   }, [review]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (review) {
       onSave(review.id, { rating, title, comment });
     }
-  };
+  }, [review, rating, title, comment, onSave]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose();
     // Reset form after close
     setTimeout(() => {
@@ -48,7 +48,7 @@ export function ReviewEditDialog({ review, isOpen, onClose, onSave, isSaving = f
       setTitle("");
       setComment("");
     }, 300);
-  };
+  }, [onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -116,4 +116,4 @@ export function ReviewEditDialog({ review, isOpen, onClose, onSave, isSaving = f
       </DialogContent>
     </Dialog>
   );
-}
+});

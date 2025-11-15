@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Star } from "lucide-react";
 
@@ -15,8 +16,8 @@ interface SiteStatsGridProps {
   maxItems?: number;
 }
 
-export function SiteStatsGrid({ stats, maxItems = 6 }: SiteStatsGridProps) {
-  const displayStats = stats.slice(0, maxItems);
+export const SiteStatsGrid = memo(function SiteStatsGrid({ stats, maxItems = 6 }: SiteStatsGridProps) {
+  const displayStats = useMemo(() => stats.slice(0, maxItems), [stats, maxItems]);
 
   if (displayStats.length === 0) {
     return null;
@@ -62,4 +63,4 @@ export function SiteStatsGrid({ stats, maxItems = 6 }: SiteStatsGridProps) {
       </div>
     </div>
   );
-}
+});

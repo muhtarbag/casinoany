@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface ReviewDeleteDialogProps {
@@ -7,7 +8,7 @@ interface ReviewDeleteDialogProps {
   isDeleting?: boolean;
 }
 
-export function ReviewDeleteDialog({ isOpen, onClose, onConfirm, isDeleting = false }: ReviewDeleteDialogProps) {
+export const ReviewDeleteDialog = memo(function ReviewDeleteDialog({ isOpen, onClose, onConfirm, isDeleting = false }: ReviewDeleteDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -26,4 +27,4 @@ export function ReviewDeleteDialog({ isOpen, onClose, onConfirm, isDeleting = fa
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+});

@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,7 +47,7 @@ interface ReviewsTableProps {
   isLoading?: boolean;
 }
 
-export function ReviewsTable({
+export const ReviewsTable = memo(function ReviewsTable({
   reviews,
   selectedReviews,
   onToggleSelection,
@@ -59,7 +60,7 @@ export function ReviewsTable({
   getUserDisplayName,
   isLoading = false
 }: ReviewsTableProps) {
-  const renderStars = (rating: number) => {
+  const renderStars = useCallback((rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star
         key={i}
@@ -68,7 +69,12 @@ export function ReviewsTable({
         }`}
       />
     ));
-  };
+  }, []);
+
+  const allSelected = useMemo(
+    () => selectedReviews.size === reviews.length && reviews.length > 0,
+    [selectedReviews.size, reviews.length]
+  );
 
   if (isLoading) {
     return (
@@ -93,7 +99,7 @@ export function ReviewsTable({
           <TableRow>
             <TableHead className="w-12">
               <Checkbox
-                checked={selectedReviews.size === reviews.length && reviews.length > 0}
+                checked={allSelected}
                 onCheckedChange={onToggleSelectAll}
               />
             </TableHead>
@@ -192,4 +198,4 @@ export function ReviewsTable({
       </Table>
     </div>
   );
-}
+});
