@@ -224,7 +224,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             </div>
             <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
               <Award className="w-4 h-4 md:w-6 md:h-6 text-accent flex-shrink-0" />
-              <div className="text-left"><div className="text-lg md:text-2xl font-bold">1000+</div><div className="text-xs md:text-sm text-muted-foreground">Kullanıcı</div></div>
+              <div className="text-left"><div className="text-lg md:text-2xl font-bold">21.000+</div><div className="text-xs md:text-sm text-muted-foreground">Kullanıcı</div></div>
             </div>
           </div>
         </div>
