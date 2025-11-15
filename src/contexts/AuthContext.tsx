@@ -69,10 +69,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const { data } = await supabase
       .from('user_roles')
-      .select('role')
+      .select('role, status')
       .eq('user_id', userId);
     
-    const roles = data?.map(r => r.role) || [];
+    // Only set roles if user is approved
+    const approvedRoles = data?.filter(r => r.status === 'approved') || [];
+    const roles = approvedRoles.map(r => r.role);
     
     // Update cache
     rolesCache.current = {
@@ -98,11 +100,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return { error };
+    
+    if (error) return { error };
+    
+    // Check if user is approved
+    if (data.user) {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('status')
+        .eq('user_id', data.user.id)
+        .single();
+      
+      if (roleData?.status === 'pending') {
+        await supabase.auth.signOut();
+        return { error: { message: 'Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin.' } };
+      }
+      
+      if (roleData?.status === 'rejected') {
+        await supabase.auth.signOut();
+        return { error: { message: 'Hesabınız reddedildi. Destek ile iletişime geçin.' } };
+      }
+    }
+    
+    return { error: null };
   };
 
   const signOut = async () => {
