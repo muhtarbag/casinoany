@@ -77,8 +77,8 @@ export const AIChatbot = () => {
   };
 
   return (
-    <Card className="w-full h-[600px] flex flex-col">
-      <CardHeader className="border-b">
+    <Card className="w-full h-[600px] flex flex-col max-w-5xl mx-auto">
+      <CardHeader className="border-b px-6">
         <CardTitle className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-primary" />
           AI Asistan
@@ -86,7 +86,7 @@ export const AIChatbot = () => {
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea ref={scrollRef} className="flex-1 p-4">
+        <ScrollArea ref={scrollRef} className="flex-1 px-6 py-4">
           <div className="space-y-4">
             {messages.map((message, idx) => (
               <div
@@ -102,13 +102,13 @@ export const AIChatbot = () => {
                 )}
                 
                 <div
-                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                  className={`rounded-lg px-4 py-3 break-words ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground max-w-[70%]"
+                      : "bg-muted max-w-[85%]"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                 </div>
                 
                 {message.role === "user" && (
@@ -132,8 +132,8 @@ export const AIChatbot = () => {
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t">
-          <div className="flex gap-2">
+        <div className="p-4 border-t bg-background">
+          <div className="flex gap-2 max-w-5xl mx-auto">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
