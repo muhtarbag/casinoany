@@ -67,6 +67,8 @@ const Sitemap = lazy(() => import("./pages/Sitemap"));
 const SiteRedirect = lazy(() => import("./pages/SiteRedirect"));
 const AMPBlogPost = lazy(() => import("./pages/amp/AMPBlogPost"));
 const AMPSiteDetail = lazy(() => import("./pages/amp/AMPSiteDetail"));
+const Categories = lazy(() => import("./pages/Categories"));
+const CategoryDetail = lazy(() => import("./pages/CategoryDetail"));
 
 // SEO-optimized pages
 const DenemeBonusu = lazy(() => import("./pages/DenemeBonusuDynamic"));
@@ -146,6 +148,10 @@ const AppContent = () => {
           
           {/* SEO-optimized content pages */}
           <Route path="/deneme-bonusu" element={<DenemeBonusu />} />
+          
+          {/* Category pages */}
+          <Route path="/kategoriler" element={<Categories />} />
+          <Route path="/kategori/:slug" element={<CategoryDetail />} />
           
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
