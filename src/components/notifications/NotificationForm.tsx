@@ -82,6 +82,7 @@ export function NotificationForm({
             onChange={(e) => handleChange('title', e.target.value)}
             required
             placeholder="Örn: Hoş Geldin Bonusu!"
+            className="bg-white"
           />
         </div>
 
@@ -93,6 +94,7 @@ export function NotificationForm({
             onChange={(e) => handleChange('content', e.target.value)}
             placeholder="Bildirim içeriği..."
             rows={4}
+            className="bg-white"
           />
         </div>
 
@@ -269,6 +271,7 @@ export function NotificationForm({
                 value={(formData.trigger_conditions as any)?.timeSeconds || 5}
                 onChange={(e) => handleChange('trigger_conditions', { timeSeconds: parseInt(e.target.value) || 5 })}
                 placeholder="5"
+                className="bg-white"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Bildirim bu süre sonra gösterilecek
@@ -288,6 +291,7 @@ export function NotificationForm({
                 value={(formData.trigger_conditions as any)?.scrollPercentage || 50}
                 onChange={(e) => handleChange('trigger_conditions', { scrollPercentage: parseInt(e.target.value) || 50 })}
                 placeholder="50"
+                className="bg-white"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Sayfa bu kadar scroll edildiğinde bildirim gösterilecek
@@ -312,6 +316,7 @@ export function NotificationForm({
                 value={formData.form_fields?.email_label || ''}
                 onChange={(e) => handleFormFieldChange('email_label', e.target.value)}
                 placeholder="E-posta Adresiniz"
+                className="bg-white"
               />
             </div>
             <div>
@@ -321,6 +326,7 @@ export function NotificationForm({
                 value={formData.form_fields?.phone_label || ''}
                 onChange={(e) => handleFormFieldChange('phone_label', e.target.value)}
                 placeholder="Telefon Numaranız"
+                className="bg-white"
               />
             </div>
             <div>
@@ -330,6 +336,7 @@ export function NotificationForm({
                 value={formData.form_fields?.submit_text || ''}
                 onChange={(e) => handleFormFieldChange('submit_text', e.target.value)}
                 placeholder="Bonus Kodumu Gönder"
+                className="bg-white"
               />
             </div>
             <div>
@@ -339,6 +346,7 @@ export function NotificationForm({
                 value={formData.form_fields?.success_message || ''}
                 onChange={(e) => handleFormFieldChange('success_message', e.target.value)}
                 rows={2}
+                className="bg-white"
               />
             </div>
             <div>
@@ -348,6 +356,7 @@ export function NotificationForm({
                 value={formData.form_fields?.privacy_text || ''}
                 onChange={(e) => handleFormFieldChange('privacy_text', e.target.value)}
                 rows={2}
+                className="bg-white"
               />
             </div>
           </CollapsibleContent>
@@ -385,6 +394,7 @@ export function NotificationForm({
             type="datetime-local"
             value={formData.start_date}
             onChange={(e) => handleChange('start_date', e.target.value)}
+            className="bg-white"
           />
         </div>
         <div>
@@ -394,6 +404,7 @@ export function NotificationForm({
             type="datetime-local"
             value={formData.end_date}
             onChange={(e) => handleChange('end_date', e.target.value)}
+            className="bg-white"
           />
         </div>
       </div>
@@ -407,6 +418,7 @@ export function NotificationForm({
             type="color"
             value={formData.background_color}
             onChange={(e) => handleChange('background_color', e.target.value)}
+            className="bg-white"
           />
         </div>
         <div>
@@ -416,6 +428,7 @@ export function NotificationForm({
             type="color"
             value={formData.text_color}
             onChange={(e) => handleChange('text_color', e.target.value)}
+            className="bg-white"
           />
         </div>
       </div>
@@ -465,6 +478,7 @@ export function NotificationForm({
             max="100"
             value={formData.priority}
             onChange={(e) => handleChange('priority', parseInt(e.target.value) || 0)}
+            className="bg-white"
           />
         </div>
         <div className="flex items-center space-x-2 pt-6">
