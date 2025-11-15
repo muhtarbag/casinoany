@@ -83,7 +83,8 @@ export const useAdminStats = () => {
         totalRevenue,
       };
     },
-    refetchInterval: 60000, // Refetch every minute
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (was 1min - too aggressive)
   });
 
   // Daily page views (last 30 days)
@@ -105,6 +106,8 @@ export const useAdminStats = () => {
 
       return Object.entries(viewsByDate).map(([date, count]) => ({ date, count }));
     },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000, // Daily stats change slowly
   });
 
   // Device stats - Using page_views table
@@ -126,6 +129,8 @@ export const useAdminStats = () => {
 
       return Object.entries(deviceCounts).map(([name, value]) => ({ name, value }));
     },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000,
   });
 
   // Top pages - Using page_views table
@@ -150,6 +155,8 @@ export const useAdminStats = () => {
         .slice(0, 10)
         .map(([page, views]) => ({ page, views: views as number }));
     },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000,
   });
 
   // Weekly comparison - This week vs last week
@@ -235,6 +242,8 @@ export const useAdminStats = () => {
         }
       ];
     },
+    staleTime: 3 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000, // Weekly comparison
   });
 
   // Monthly trend - Last 30 days
@@ -272,6 +281,8 @@ export const useAdminStats = () => {
         .map(([date, data]) => ({ date, ...data }))
         .slice(-30);
     },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000, // Monthly trend
   });
 
   // Custom metrics
