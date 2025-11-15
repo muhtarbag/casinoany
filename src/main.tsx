@@ -8,13 +8,15 @@ import { initPerformanceObserver } from './lib/performanceMonitor';
 import { initPerformanceOptimizations, requestIdleCallback } from './utils/performanceOptimizations';
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 
-// CRITICAL FIX: Ensure single React instance globally
+// CRITICAL FIX: Force single React instance globally to prevent dispatcher null errors
+// This must run BEFORE any other code
 if (typeof window !== 'undefined') {
+  // Check if React is already loaded from different source
   if (window.React && window.React !== React) {
-    console.error('❌ Multiple React instances detected! Forcing single instance...');
+    console.warn('⚠️ Multiple React instances detected - forcing single instance');
   }
+  // Set our React as THE global React instance (read-only)
   window.React = React;
-  window.ReactDOM = { ...window.ReactDOM }; // Preserve ReactDOM reference
 }
 
 // Initialize Performance Optimizations

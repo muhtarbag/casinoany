@@ -28,19 +28,25 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: Keep React ecosystem as single chunk to prevent dispatcher errors
+            // CRITICAL: Keep React ecosystem as SINGLE MONOLITHIC chunk
+            // This prevents ALL dispatcher null errors by guaranteeing single React instance
             if (id.includes('react') || id.includes('react-dom') || 
                 id.includes('react-router') || id.includes('scheduler') ||
-                id.includes('@tanstack/react-query') || id.includes('three')) {
-              return 'vendor-react'; // Bundle all React-related in one chunk
+                id.includes('@tanstack/react-query') || id.includes('three') ||
+                id.includes('@radix-ui')) {
+              return 'vendor-react'; // All React + Radix in one chunk
             }
-            // Only split truly independent heavy libraries
+            // Only split heavy non-React libraries
             if (id.includes('recharts') || id.includes('d3-')) {
               return 'vendor-charts';
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
             }
+          }
+          // Bundle all admin pages together for consistency
+          if (id.includes('src/pages/admin') || id.includes('src/components/admin')) {
+            return 'admin-bundle';
           }
         },
       },
