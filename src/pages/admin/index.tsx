@@ -73,10 +73,13 @@ export default function AdminRoot() {
       'finance/bonus-requests': 'bonus-requests',
       'notifications': 'notifications',
       'news': 'news',
+      'system/domains': 'domains',
       'system/health': 'health',
       'system/logs': 'logs',
       'system/history': 'history',
       'system/performance': 'performance',
+      'system/roles': 'roles',
+      'system/build-health': 'build-health',
     };
     
     return routeToTabMap[path] || path;
@@ -108,11 +111,13 @@ export default function AdminRoot() {
       'bonus-requests': '/admin/finance/bonus-requests',
       'notifications': '/admin/notifications',
       'news': '/admin/news',
+      'domains': '/admin/system/domains',
       'health': '/admin/system/health',
       'logs': '/admin/system/logs',
       'history': '/admin/system/history',
       'performance': '/admin/system/performance',
       'roles': '/admin/system/roles',
+      'build-health': '/admin/system/build-health',
     };
     
     const route = tabToRouteMap[tabId] || `/admin/${tabId}`;
@@ -150,10 +155,14 @@ export default function AdminRoot() {
       'notifications': 'Bildirimler',
       'news': 'Haberler',
       'system': 'Sistem',
-      'health': 'Sağlık Durumu',
-      'logs': 'Loglar',
-      'performance': 'Performans',
+      'domains': 'Domain Yönetimi',
+      'health': 'Sistem Durumu',
+      'logs': 'Sistem Logları',
+      'performance': 'Performance İzleme',
       'roles': 'Rol Yönetimi',
+      'build-health': 'Build Sağlığı',
+      'categories': 'Kategoriler',
+      'banners': 'Banner Yönetimi',
     };
     
     const items = [];
