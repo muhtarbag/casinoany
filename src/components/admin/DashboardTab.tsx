@@ -202,7 +202,7 @@ export function DashboardTab({
       <QuickActionsBar actions={quickActions} />
 
       {/* 📊 SECONDARY METRICS (7 Compact Cards) */}
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <MetricCard
           variant="compact"
           title="Toplam Görüntüleme"
