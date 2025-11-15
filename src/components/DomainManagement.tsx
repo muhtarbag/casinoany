@@ -101,10 +101,30 @@ export const DomainManagement = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['alternative-domains'] });
-      toast.success(`Health check tamamlandı: ${data.summary.healthy}/${data.summary.total} domain aktif`);
+      
+      const { summary, primaryHealthy, primaryDomain } = data;
+      
+      if (summary && summary.total > 0) {
+        const healthPercentage = Math.round((summary.healthy / summary.total) * 100);
+        const avgTime = summary.avgResponseTime || 0;
+        
+        if (primaryHealthy) {
+          toast.success(
+            `✅ Tüm kontroller tamamlandı!\n${summary.healthy}/${summary.total} domain aktif (${healthPercentage}%) • Ortalama: ${avgTime}ms\nPrimary domain (${primaryDomain}) çalışıyor`,
+            { duration: 8000 }
+          );
+        } else {
+          toast.warning(
+            `⚠️ Primary domain problemi!\n${summary.healthy}/${summary.total} domain aktif (${healthPercentage}%)\nPrimary domain (${primaryDomain}) erişilemez durumda`,
+            { duration: 10000 }
+          );
+        }
+      } else {
+        toast.success('Health check tamamlandı');
+      }
     },
     onError: (error: any) => {
-      toast.error("Health check başarısız: " + error.message);
+      toast.error("Health check başarısız: " + error.message, { duration: 8000 });
     },
   });
 
