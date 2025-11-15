@@ -28,13 +28,15 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // CRITICAL: ALL React ecosystem and dependencies in ONE chunk
-            // This is the ONLY way to guarantee single React instance
+            // CRITICAL: Keep React ecosystem in ONE chunk WITHOUT recharts
             if (id.includes('react') || id.includes('scheduler') || 
-                id.includes('@radix-ui') || id.includes('recharts') ||
-                id.includes('d3-') || id.includes('@tanstack') ||
+                id.includes('@radix-ui') || id.includes('@tanstack') ||
                 id.includes('react-helmet-async') || id.includes('three')) {
-              return 'vendor-react'; // Everything React-related in one monolithic chunk
+              return 'vendor-react';
+            }
+            // Recharts gets its own separate chunk to prevent conflicts
+            if (id.includes('recharts') || id.includes('d3-')) {
+              return 'vendor-charts';
             }
             if (id.includes('react-quill') || id.includes('quill')) {
               return 'vendor-editor';
@@ -67,11 +69,10 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-separator',
       '@radix-ui/react-tooltip',
-      'three',
-      'recharts'
+      'three'
     ],
-    exclude: [],
-    force: true, // Force to ensure single React instance
+    exclude: ['recharts'], // Exclude recharts from pre-bundling
+    force: true,
     esbuildOptions: {
       target: 'es2020',
       plugins: []
