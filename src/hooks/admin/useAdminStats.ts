@@ -46,12 +46,24 @@ export const useAdminStats = () => {
       const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0';
       
       // Calculate total revenue from paid affiliate payments
-      const totalRevenue = paymentsData?.reduce((sum, payment) => {
+      // ✅ FIXED: Include estimated revenue from metrics
+      const confirmedRevenue = paymentsData?.reduce((sum, payment) => {
         if (payment.payment_status === 'paid' && payment.payment_amount) {
           return sum + parseFloat(String(payment.payment_amount));
         }
         return sum;
       }, 0) || 0;
+
+      // Fetch estimated revenue from affiliate_metrics
+      const { data: metricsData } = await supabase
+        .from('affiliate_metrics')
+        .select('estimated_revenue');
+      
+      const estimatedRevenue = metricsData?.reduce((sum, metric) => {
+        return sum + (parseFloat(String(metric.estimated_revenue)) || 0);
+      }, 0) || 0;
+
+      const totalRevenue = confirmedRevenue + (estimatedRevenue * 0.7); // Weight estimated at 70%
 
       return {
         totalSites: sitesCount || 0,

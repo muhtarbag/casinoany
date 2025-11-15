@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +27,23 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 export function AffiliateManagement() {
   const queryClient = useQueryClient();
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // ✅ NEW: Manual sync trigger
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      const { error } = await supabase.rpc('sync_daily_affiliate_metrics');
+      if (error) throw error;
+      
+      toast.success('Affiliate metrikleri başarıyla güncellendi!');
+      queryClient.invalidateQueries({ queryKey: ['affiliate-metrics'] });
+    } catch (error: any) {
+      toast.error('Sync hatası: ' + error.message);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // Fetch sites with affiliate contracts
   const { data: sites, isLoading: sitesLoading, error: sitesError, refetch } = useQuery({
@@ -118,8 +135,30 @@ export function AffiliateManagement() {
     },
   });
 
-  // Calculate totals
-  const totalRevenue = payments?.reduce((sum, p) => sum + Number(p.payment_amount), 0) || 0;
+  // ✅ FIXED: Comprehensive revenue calculation with breakdown
+  const revenueStats = useMemo(() => {
+    const confirmedRevenue = payments
+      ?.filter(p => p.payment_status === 'paid')
+      .reduce((sum, p) => sum + Number(p.payment_amount), 0) || 0;
+
+    const pendingRevenue = payments
+      ?.filter(p => p.payment_status === 'pending' || p.payment_status === 'processing')
+      .reduce((sum, p) => sum + Number(p.payment_amount), 0) || 0;
+
+    const estimatedRevenue = metrics
+      ?.reduce((sum, m) => sum + Number(m.estimated_revenue || 0), 0) || 0;
+
+    // Weighted total: confirmed + 70% pending + 30% estimated  
+    const totalRevenue = confirmedRevenue + (pendingRevenue * 0.7) + (estimatedRevenue * 0.3);
+
+    return {
+      confirmed: confirmedRevenue,
+      pending: pendingRevenue,
+      estimated: estimatedRevenue,
+      total: totalRevenue,
+    };
+  }, [payments, metrics]);
+
   const totalClicks = metrics?.reduce((sum, m) => sum + m.total_clicks, 0) || 0;
   const totalViews = metrics?.reduce((sum, m) => sum + m.total_views, 0) || 0;
   const totalConversions = metrics?.reduce((sum, m) => sum + m.total_conversions, 0) || 0;
@@ -161,9 +200,29 @@ export function AffiliateManagement() {
                 Affiliate anlaşmalarınızı, ödemelerinizi ve performansınızı takip edin
               </CardDescription>
             </div>
-            <Button onClick={() => refetch()} variant="outline" size="sm">
-              Yenile
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleManualSync} 
+                variant="outline" 
+                size="sm"
+                disabled={isSyncing}
+              >
+                {isSyncing ? (
+                  <>
+                    <TrendingUp className="w-4 h-4 mr-2 animate-spin" />
+                    Sync...
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Metrikleri Güncelle
+                  </>
+                )}
+              </Button>
+              <Button onClick={() => refetch()} variant="outline" size="sm">
+                Yenile
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -263,14 +322,31 @@ export function AffiliateManagement() {
 
                 {/* Performance Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Card>
+                  {/* Revenue Breakdown */}
+                  <Card className="border-green-500/30 bg-green-500/5">
                     <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                          <p className="text-2xl font-bold">{totalRevenue.toFixed(2)} TL</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-muted-foreground">Onaylanmış Gelir</p>
+                          <DollarSign className="w-5 h-5 text-green-500" />
                         </div>
-                        <DollarSign className="w-8 h-8 text-green-500" />
+                        <p className="text-2xl font-bold text-green-500">
+                          {revenueStats?.confirmed.toFixed(2) || '0.00'} TL
+                        </p>
+                        <div className="space-y-1 pt-2 border-t">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">Beklemede:</span>
+                            <span className="font-medium text-yellow-500">{revenueStats?.pending.toFixed(2) || '0.00'} TL</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">Tahmini:</span>
+                            <span className="font-medium text-blue-500">{revenueStats?.estimated.toFixed(2) || '0.00'} TL</span>
+                          </div>
+                          <div className="flex justify-between text-xs font-bold pt-1 border-t">
+                            <span>Toplam:</span>
+                            <span>{revenueStats?.total.toFixed(2) || '0.00'} TL</span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
