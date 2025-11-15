@@ -4,11 +4,12 @@ import { AdminSidebar } from './AdminSidebar';
 import { AdminErrorBoundary } from './AdminErrorBoundary';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Keyboard } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { showSuccessToast } from '@/lib/toastHelpers';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { ClearCacheDialog } from './ClearCacheDialog';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -18,9 +19,14 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ children, activeTab, onTabChange, username }: AdminLayoutProps) {
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const [cacheDialogOpen, setCacheDialogOpen] = useState(false);
+
+  const clearCache = () => {
+    queryClient.clear();
+    showSuccessToast('Cache temizlendi');
+  };
 
   // Global keyboard shortcuts
   useKeyboardShortcuts([
@@ -38,9 +44,9 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
       shift: true,
       handler: (e) => {
         e.preventDefault();
-        setCacheDialogOpen(true);
+        clearCache();
       },
-      description: 'Cache temizle (Dialog aç)',
+      description: 'Cache temizle',
     },
   ]);
 
@@ -79,7 +85,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
               <Button
                 variant="outline"
                 size={isMobile ? "icon" : "sm"}
-                onClick={() => setCacheDialogOpen(true)}
+                onClick={clearCache}
                 className="gap-2 shrink-0"
                 title="Cache Temizle"
               >
@@ -102,9 +108,6 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
 
       {/* Shortcuts Dialog */}
       <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
-      
-      {/* Cache Clear Dialog */}
-      <ClearCacheDialog open={cacheDialogOpen} onOpenChange={setCacheDialogOpen} />
     </SidebarProvider>
   );
 }
