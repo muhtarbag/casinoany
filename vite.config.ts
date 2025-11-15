@@ -143,54 +143,15 @@ export default defineConfig(({ mode }) => ({
           'vendor-charts': ['recharts'],
           'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
           'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge']
-        },
-        // Optimized asset naming for better caching
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name?.split('.');
-          const ext = info?.[info.length - 1];
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext || '')) {
-            return 'assets/img/[name]-[hash][extname]';
-          } else if (/woff|woff2|eot|ttf|otf/i.test(ext || '')) {
-            return 'assets/fonts/[name]-[hash][extname]';
-          }
-          return 'assets/[ext]/[name]-[hash][extname]';
-        },
+        }
       },
-      treeshake: {
-        preset: 'recommended',
-        moduleSideEffects: false,
-      }
     },
-    chunkSizeWarningLimit: 400,
+    chunkSizeWarningLimit: 1000,
     sourcemap: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.trace'],
-        passes: 3,
-        unsafe: true,
-        unsafe_comps: true,
-        unsafe_math: true,
-        unsafe_methods: true,
-        unsafe_proto: true,
-      },
-      mangle: {
-        safari10: true,
-        toplevel: true,
-      },
-      format: {
-        comments: false,
-        ecma: 2020,
-      },
-    },
+    minify: 'esbuild',
     target: 'es2020',
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
-    reportCompressedSize: false,
   },
   // Optimize dependencies - CRITICAL for preventing multiple React instances
   optimizeDeps: {

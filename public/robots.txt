@@ -10,7 +10,8 @@ Allow: /
 # =============================================================================
 # SITEMAP LOCATIONS
 # =============================================================================
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-xml
+Sitemap: https://www.casinoany.com/sitemap.xml
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/dynamic-sitemap
 
 # =============================================================================
 # CRAWL RATE OPTIMIZATION

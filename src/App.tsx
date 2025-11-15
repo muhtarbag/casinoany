@@ -17,8 +17,8 @@ import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 
 // Lazy load pages with preloading capability
-// CRITICAL: Index page must NOT be lazy loaded for FCP performance
-import Index from "./pages/Index";
+// Lazy load pages with preloading capability
+const Index = lazyWithPreload(() => import("./pages/Index"));
 const Login = lazyWithPreload(() => import("./pages/Login"));
 const Signup = lazyWithPreload(() => import("./pages/Signup"));
 
@@ -75,8 +75,6 @@ const Terms = lazyWithPreload(() => import("./pages/Terms"));
 const Cookies = lazyWithPreload(() => import("./pages/Cookies"));
 const KVKK = lazyWithPreload(() => import("./pages/KVKK"));
 const Sitemap = lazyWithPreload(() => import("./pages/Sitemap"));
-const SitemapXML = lazyWithPreload(() => import("./pages/SitemapXML"));
-const RobotsTXT = lazyWithPreload(() => import("./pages/RobotsTXT"));
 const SiteRedirect = lazyWithPreload(() => import("./pages/SiteRedirect"));
 const AMPBlogPost = lazyWithPreload(() => import("./pages/amp/AMPBlogPost"));
 const AMPSiteDetail = lazyWithPreload(() => import("./pages/amp/AMPSiteDetail"));
@@ -100,12 +98,8 @@ const AppContent = () => {
   usePageTracking();
   
   return (
-    <>
-      <OfflineIndicator />
-      <PWAInstallPrompt />
-      <OptimizedNotificationPopup />
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -153,9 +147,7 @@ const AppContent = () => {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
-          <Route path="/sitemap" element={<Sitemap />} />
-          <Route path="/sitemap.xml" element={<SitemapXML />} />
-          <Route path="/robots.txt" element={<RobotsTXT />} />
+          <Route path="/sitemap.xml" element={<Sitemap />} />
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
@@ -181,7 +173,6 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-    </>
   );
 };
 
@@ -195,6 +186,9 @@ const App = () => {
         <HelmetProvider>
           <AuthProvider>
             <TooltipProvider>
+              <OfflineIndicator />
+              <PWAInstallPrompt />
+              <OptimizedNotificationPopup />
               <Toaster />
               <Sonner />
               <BrowserRouter

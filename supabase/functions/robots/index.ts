@@ -29,10 +29,7 @@ Deno.serve(async (req) => {
 User-agent: *
 Allow: /
 
-# Ana sitemap - Edge function endpoint (Google Search Console için)
-Sitemap: ${supabaseUrl}/functions/v1/sitemap-xml
-
-# Alternatif sitemap - Domain bazlı
+# Ana sitemap
 Sitemap: https://${domain}/sitemap.xml
 
 # Crawl rate - Arama motorlarına optimize

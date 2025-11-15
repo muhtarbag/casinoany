@@ -85,16 +85,7 @@ export const NotificationPopup = () => {
   const [formPhone, setFormPhone] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isReady, setIsReady] = useState(false); // Delay for FCP
   const sessionId = getSessionId();
-
-  // Wait 3 seconds after mount before showing notifications (for FCP optimization)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Admin paneldeyse bildirimleri gösterme
   const isAdminPanel = location.pathname.startsWith('/admin');
@@ -207,7 +198,7 @@ export const NotificationPopup = () => {
   }, []);
 
   useEffect(() => {
-    if (!notifications || !viewedNotifications || !isReady) return;
+    if (!notifications || !viewedNotifications) return;
     // Zaten bir bildirim açıksa tekrar kontrol etme
     if (openNotificationId) return;
 
@@ -254,7 +245,7 @@ export const NotificationPopup = () => {
       setOpenNotificationId(notificationToShow.id);
       trackViewMutation.mutate(notificationToShow.id);
     }
-  }, [notifications, viewedNotifications, shouldShow, openNotificationId, isReady]);
+  }, [notifications, viewedNotifications, shouldShow, openNotificationId]);
 
   const checkTrigger = (notification: Notification) => {
     const { trigger_type, trigger_conditions } = notification;
