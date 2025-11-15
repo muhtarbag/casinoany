@@ -37,6 +37,7 @@ export const OptimizedImage = ({
   useEffect(() => {
     setImageSrc(src);
     setHasError(false);
+    setIsLoaded(false);
   }, [src]);
 
   const handleError = () => {
@@ -50,6 +51,11 @@ export const OptimizedImage = ({
   const handleLoad = () => {
     setIsLoaded(true);
   };
+
+  // If error and no fallback, return null
+  if (hasError && !fallback) {
+    return null;
+  }
 
   // Convert to WebP if not already
   const webpSrc = imageSrc.match(/\.(jpg|jpeg|png)$/i) 
