@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteFormSchema, SiteFormData, generateSlug } from '@/schemas/siteValidation';
@@ -33,6 +33,7 @@ export function SiteFormWrapper({
 }: SiteFormWrapperProps) {
   const editingSite = sites.find((s) => s.id === editingId);
   const updateCategoriesMutation = useUpdateSiteCategories();
+  const [isFormReady, setIsFormReady] = useState(false);
 
   const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
@@ -73,6 +74,8 @@ export function SiteFormWrapper({
 
   useEffect(() => {
     const loadSiteData = async () => {
+      setIsFormReady(false);
+      
       if (editingSite) {
         // Load site categories
         let categoryIds: string[] = [];
@@ -120,6 +123,9 @@ export function SiteFormWrapper({
         onLogoFileChange(null);
         onLogoPreviewChange(null);
       }
+      
+      // Mark form as ready after data is loaded
+      setTimeout(() => setIsFormReady(true), 100);
     };
 
     loadSiteData();
@@ -172,6 +178,18 @@ export function SiteFormWrapper({
   }, [form, onEditingIdChange, onLogoFileChange, onLogoPreviewChange]);
 
   const isLoading = createSiteMutation.isPending || updateSiteMutation.isPending;
+
+  // Don't render form until data is loaded (prevents validation errors on edit)
+  if (editingId && !isFormReady) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center space-y-2">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground">Form verileri yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
