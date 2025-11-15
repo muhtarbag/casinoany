@@ -81,7 +81,7 @@ export const MetricCard = memo(({
           </div>
         )}
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-1 break-words">{subtitle}</p>
         )}
       </CardContent>
     </Card>
