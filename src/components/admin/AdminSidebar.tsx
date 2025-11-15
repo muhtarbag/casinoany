@@ -152,7 +152,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
                           {!collapsed && <span>{item.label}</span>}
                         </div>
                         {!collapsed && item.badge && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning/20 text-warning font-semibold">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground font-semibold">
                             {item.badge}
                           </span>
                         )}
