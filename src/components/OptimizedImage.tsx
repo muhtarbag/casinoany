@@ -10,6 +10,8 @@ interface OptimizedImageProps {
   priority?: boolean;
   objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
   fallback?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
+  sizes?: string;
 }
 
 /**
@@ -28,7 +30,9 @@ export const OptimizedImage = ({
   height,
   priority = false,
   objectFit = 'contain',
-  fallback = '/placeholder.svg'
+  fallback = '/placeholder.svg',
+  fetchPriority = 'auto',
+  sizes
 }: OptimizedImageProps) => {
   const [imageSrc, setImageSrc] = useState(src);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -84,6 +88,8 @@ export const OptimizedImage = ({
         }}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
+        fetchPriority={priority ? 'high' : fetchPriority}
+        sizes={sizes}
         onLoad={handleLoad}
         onError={handleError}
         width={width}
