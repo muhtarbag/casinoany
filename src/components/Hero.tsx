@@ -173,9 +173,13 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     <div className="relative overflow-hidden bg-background touch-manipulation">
       <div className="container mx-auto px-4 py-8 md:py-12 lg:py-20">
         <div className="text-center space-y-4 md:space-y-6 lg:space-y-8 mb-8 md:mb-12 lg:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary/10 border border-primary/20">
-            <Award className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-            <span className="text-xs md:text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
+          <div className="relative inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary/10 border border-primary/20 overflow-hidden">
+            {/* Rotating gradient border effect */}
+            <div className="absolute inset-0 rounded-lg p-[2px] bg-gradient-to-r from-primary via-accent to-gold animate-border-spin -z-10" style={{ backgroundSize: '400% 400%' }} />
+            <div className="absolute inset-[2px] rounded-lg bg-card/95 backdrop-blur-sm -z-10" />
+            
+            <Award className="w-3 h-3 md:w-4 md:h-4 text-primary relative z-10" />
+            <span className="text-xs md:text-sm font-semibold relative z-10">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold leading-tight">
             <span className="text-primary">En İyi Bahis Siteleri</span><br />
