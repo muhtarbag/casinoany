@@ -69,7 +69,8 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-separator',
       '@radix-ui/react-tooltip',
-      'three'
+      'three',
+      'recharts'
     ],
     exclude: [],
     force: true, // Force to ensure single React instance
