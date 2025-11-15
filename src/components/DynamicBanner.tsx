@@ -7,6 +7,9 @@ interface DynamicBannerProps {
 }
 
 export const DynamicBanner = ({ imageUrl, mobileImageUrl, altText, targetUrl, title }: DynamicBannerProps) => {
+  // Use mobile image as fallback if desktop image is not provided
+  const desktopImage = imageUrl || mobileImageUrl || '';
+  
   const bannerContent = (
     <div className="relative w-full rounded-md sm:rounded-lg overflow-hidden shadow-md">
       <picture>
@@ -14,7 +17,7 @@ export const DynamicBanner = ({ imageUrl, mobileImageUrl, altText, targetUrl, ti
           <source media="(max-width: 768px)" srcSet={mobileImageUrl} />
         )}
         <img
-          src={imageUrl}
+          src={desktopImage}
           alt={altText || title}
           className="w-full h-auto object-cover object-center aspect-[16/9] sm:aspect-[20/9] md:aspect-[24/9]"
           loading="lazy"
