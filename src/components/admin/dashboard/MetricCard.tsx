@@ -56,7 +56,8 @@ export const MetricCard = memo(({
         borderColor,
         'hover:shadow-lg hover:scale-[1.02] transition-all duration-200',
         onClick && 'cursor-pointer',
-        variant === 'hero' && 'bg-gradient-to-br from-card to-card/50'
+        variant === 'hero' && 'bg-gradient-to-br from-card to-card/50',
+        'overflow-hidden'
       )}
       onClick={onClick}
     >
@@ -68,7 +69,7 @@ export const MetricCard = memo(({
         </CardTitle>
         <Icon className={cn(iconStyles[variant], iconColor)} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-hidden">
         <div className={cn(valueStyles[variant], 'font-bold text-primary')}>
           {value}
         </div>
@@ -81,7 +82,7 @@ export const MetricCard = memo(({
           </div>
         )}
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1 break-words">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-1 break-words overflow-hidden">{subtitle}</p>
         )}
       </CardContent>
     </Card>
