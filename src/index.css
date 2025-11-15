@@ -157,6 +157,7 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -167,6 +168,8 @@ All colors MUST be HSL.
     scroll-behavior: smooth;
     /* Prevent pull-to-refresh on mobile */
     overscroll-behavior-y: contain;
+    /* Better touch scrolling */
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Touch-friendly tap targets */
@@ -174,6 +177,15 @@ All colors MUST be HSL.
   a,
   [role="button"] {
     @apply min-h-[44px] min-w-[44px];
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Improved text selection on mobile */
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
   }
 
   /* Prevent text selection on buttons and interactive elements */
