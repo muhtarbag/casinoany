@@ -61,7 +61,8 @@ export default defineConfig(({ mode }) => ({
       'react-helmet-async',
       '@radix-ui/react-progress',
       '@radix-ui/react-alert-dialog',
-      '@radix-ui/react-separator'
+      '@radix-ui/react-separator',
+      'three'
     ],
     exclude: [],
     force: false, // Only force when needed
