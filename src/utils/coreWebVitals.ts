@@ -175,11 +175,29 @@ export const trackWebVitals = (onMetric: VitalHandler) => {
 };
 
 /**
- * Send vitals to database - Integrated with performance monitor
+ * Send vitals to database - Throttled to prevent excessive calls
  */
 import { trackWebVitals as recordWebVital } from '@/lib/performanceMonitor';
 
+// Throttle metrics per page - only send once per metric per page
+const sentMetrics = new Set<string>();
+let currentPage = '';
+
 export const sendVitalsToAnalytics = (metric: WebVitalMetric) => {
+  // Reset on page change
+  const pagePath = window.location.pathname;
+  if (pagePath !== currentPage) {
+    sentMetrics.clear();
+    currentPage = pagePath;
+  }
+
+  // Only send each metric once per page
+  const metricKey = `${metric.name}-${pagePath}`;
+  if (sentMetrics.has(metricKey)) {
+    return;
+  }
+  sentMetrics.add(metricKey);
+
   // Log for development only
   if (process.env.NODE_ENV === 'development') {
     console.log(`[Web Vitals] ${metric.name}:`, {
