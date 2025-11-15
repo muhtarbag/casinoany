@@ -34,7 +34,7 @@ export const MetricCard = memo(({
   const variantStyles = {
     hero: 'h-40 border-l-8',
     standard: 'h-32 border-l-4',
-    compact: 'h-24 border-l-2'
+    compact: 'h-28 border-l-2'
   };
 
   const valueStyles = {
