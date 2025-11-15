@@ -20,8 +20,15 @@ interface ShortcutsDialogProps {
 
 const shortcuts: Shortcut[] = [
   // Navigation
+  { key: '?', description: 'Bu pencereyi aç', category: 'Navigasyon' },
   { key: 'K', ctrl: true, description: 'Arama aç', category: 'Navigasyon' },
-  { key: 'N', ctrl: true, description: 'Yeni site ekle', category: 'Navigasyon' },
+  { key: 'N', ctrl: true, description: 'Yeni öğe ekle (bağlama göre)', category: 'Navigasyon' },
+  { key: 'g then d', description: 'Dashboard\'a git', category: 'Navigasyon' },
+  { key: 'g then s', description: 'Site Yönetimi\'ne git', category: 'Navigasyon' },
+  { key: 'g then r', description: 'Yorumlar\'a git', category: 'Navigasyon' },
+  { key: 'g then b', description: 'Blog\'a git', category: 'Navigasyon' },
+  { key: 'g then a', description: 'Affiliate\'e git', category: 'Navigasyon' },
+  { key: 'g then p', description: 'Performans\'a git', category: 'Navigasyon' },
   { key: 'Escape', description: 'Dialog/Modal kapat', category: 'Navigasyon' },
   
   // Actions
@@ -33,8 +40,7 @@ const shortcuts: Shortcut[] = [
   { key: 'Escape', description: 'Seçimi temizle', category: 'Seçim' },
   
   // Utility
-  { key: '/', description: 'Kısayolları göster', category: 'Yardımcı' },
-  { key: 'R', ctrl: true, shift: true, description: 'Cache temizle', category: 'Yardımcı' },
+  { key: 'R', ctrl: true, shift: true, description: 'Cache temizle ve yenile', category: 'Yardımcı' },
 ];
 
 export function ShortcutsDialog({ open, onOpenChange }: ShortcutsDialogProps) {
