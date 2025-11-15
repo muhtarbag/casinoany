@@ -12,8 +12,34 @@ interface RecommendedSitesProps {
 }
 
 const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: RecommendedSitesProps) => {
-  const { data: allSites, isLoading } = useQuery({
-    queryKey: ["recommended-sites-all", currentSiteId],
+  // 🎯 STEP 1: Check for admin-managed recommendations first
+  const { data: adminRecommendations, isLoading: adminLoading } = useQuery({
+    queryKey: ["admin-recommended-sites", currentSiteId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_recommended_sites")
+        .select(`
+          recommended_site_id,
+          betting_sites!site_recommended_sites_recommended_site_id_fkey (
+            id, name, logo_url, slug, rating, bonus, features, 
+            affiliate_link, email, whatsapp, telegram, twitter, 
+            instagram, facebook, youtube
+          )
+        `)
+        .eq("site_id", currentSiteId)
+        .order("display_order");
+
+      if (error) throw error;
+      
+      // Flatten the nested structure
+      return data?.map((item: any) => item.betting_sites).filter(Boolean) || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
+
+  // 🎯 STEP 2: Fallback to algorithmic recommendations if no admin ones exist
+  const { data: algorithmicSites, isLoading: algorithmicLoading } = useQuery({
+    queryKey: ["recommended-sites-algorithmic", currentSiteId],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("betting_sites")
@@ -21,7 +47,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
         .eq("is_active", true)
         .neq("id", currentSiteId)
         .order("rating", { ascending: false })
-        .limit(20); // Limit to top 20 sites instead of fetching all
+        .limit(20);
 
       if (error) throw error;
 
@@ -37,8 +63,14 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
 
       return data;
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes cache
+    staleTime: 10 * 60 * 1000,
+    enabled: !adminLoading && (!adminRecommendations || adminRecommendations.length === 0),
   });
+
+  const isLoading = adminLoading || algorithmicLoading;
+  const allSites = adminRecommendations && adminRecommendations.length > 0 
+    ? adminRecommendations 
+    : algorithmicSites;
 
   const { data: siteStats } = useSiteStats();
 

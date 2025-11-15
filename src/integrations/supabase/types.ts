@@ -1512,6 +1512,62 @@ export type Database = {
         }
         Relationships: []
       }
+      site_recommended_sites: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          recommended_site_id: string
+          site_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          recommended_site_id: string
+          site_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          recommended_site_id?: string
+          site_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_recommended_sites_recommended_site_id_fkey"
+            columns: ["recommended_site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_recommended_site_id_fkey"
+            columns: ["recommended_site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+        ]
+      }
       site_reviews: {
         Row: {
           comment: string

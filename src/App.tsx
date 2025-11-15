@@ -42,6 +42,7 @@ const AdminPerformance = lazyWithPreload(() => import("./pages/admin/system/Perf
 const AdminBuildHealth = lazyWithPreload(() => import("./pages/admin/system/BuildHealth"));
 const AdminFeaturedSites = lazyWithPreload(() => import("./pages/admin/sites/FeaturedSites"));
 const AdminBannerManagement = lazyWithPreload(() => import("./pages/admin/sites/BannerManagement"));
+const AdminRecommendedSites = lazyWithPreload(() => import("./pages/admin/sites/RecommendedSites"));
 const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteStats"));
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
@@ -105,6 +106,7 @@ const AppContent = () => {
             
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
             <Route path="sites/banners" element={<AdminBannerManagement />} />
+            <Route path="sites/recommended" element={<AdminRecommendedSites />} />
             <Route path="sites/stats" element={<AdminSiteStats />} />
             <Route path="blog" element={<AdminBlogManagement />} />
             <Route path="blog/stats" element={<AdminBlogStats />} />
