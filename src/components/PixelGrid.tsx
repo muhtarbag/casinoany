@@ -1,5 +1,6 @@
 import React from 'react';
-import { useHomepageData } from '@/hooks/useHomepageData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
@@ -8,16 +9,41 @@ import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 
 export const PixelGrid = () => {
-  const { data: homepageData, isLoading } = useHomepageData();
+  const { data: sites, isLoading } = useQuery({
+    queryKey: ['betting-sites-active'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('betting_sites')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
 
-  const sites = homepageData?.allSites || [];
-  const banners = homepageData?.banners || [];
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: banners } = useQuery({
+    queryKey: ['site-banners-home'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_banners')
+        .select('*')
+        .eq('is_active', true)
+        .contains('display_pages', ['home'])
+        .order('position', { ascending: true })
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   if (isLoading) {
     return <LoadingSpinner size="lg" text="Siteler yükleniyor..." fullScreen={false} className="py-20" />;
   }
 
-  if (sites.length === 0) {
+  if (!sites || sites.length === 0) {
     return (
       <EmptyState
         icon={Search}

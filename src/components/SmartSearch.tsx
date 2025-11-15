@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, TrendingUp, Flame } from 'lucide-react';
-import { useHomepageData } from '@/hooks/useHomepageData';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 
@@ -20,10 +20,34 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Get data from homepage hook
-  const { data: homepageData } = useHomepageData();
-  const allSites = homepageData?.allSites || [];
-  const popularSearches = homepageData?.searchHistory || [];
+  // Fetch all sites for suggestions
+  const { data: allSites } = useQuery({
+    queryKey: ['all-sites'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('betting_sites')
+        .select('id, name, slug, rating, bonus, features')
+        .eq('is_active', true)
+        .order('rating', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch popular searches
+  const { data: popularSearches } = useQuery({
+    queryKey: ['popular-searches'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('search_history')
+        .select('search_term, search_count')
+        .order('search_count', { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 
   // Fuzzy search algorithm
   const fuzzyMatch = (query: string, text: string): number => {

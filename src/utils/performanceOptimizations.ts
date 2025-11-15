@@ -5,11 +5,22 @@
 
 /**
  * Preload critical resources
- * Note: Fonts are now loaded via Google Fonts in index.html
  */
 export const preloadCriticalResources = () => {
-  // Font loading is handled by Google Fonts in index.html
-  // No need to preload local fonts
+  // Preload critical fonts
+  const fonts = [
+    '/fonts/inter-var.woff2',
+  ];
+  
+  fonts.forEach(font => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'font';
+    link.type = 'font/woff2';
+    link.href = font;
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  });
 };
 
 /**

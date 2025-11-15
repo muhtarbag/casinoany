@@ -1,9 +1,24 @@
-import { useHomepageData } from '@/hooks/useHomepageData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from './LoadingSpinner';
 
 export const FeaturedSitesSection = () => {
-  const { data: homepageData, isLoading } = useHomepageData();
+  const { data: featuredSites, isLoading } = useQuery({
+    queryKey: ['featured-sites-for-homepage'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('name, slug, logo_url, rating, bonus, review_count, avg_rating')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('rating', { ascending: false })
+        .limit(3);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   if (isLoading) {
     return (
@@ -13,9 +28,7 @@ export const FeaturedSitesSection = () => {
     );
   }
 
-  const featuredSites = homepageData?.featuredSites || [];
-
-  if (featuredSites.length === 0) {
+  if (!featuredSites || featuredSites.length === 0) {
     return null;
   }
 
