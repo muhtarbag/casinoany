@@ -66,6 +66,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "affiliate_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       affiliate_payments: {
@@ -118,6 +125,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "affiliate_payments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -259,6 +273,85 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      analytics_daily_summary: {
+        Row: {
+          affiliate_clicks: number | null
+          avg_duration_seconds: number | null
+          bounce_rate: number | null
+          conversion_rate: number | null
+          created_at: string | null
+          ctr: number | null
+          estimated_revenue: number | null
+          id: string
+          logged_in_users: number | null
+          metric_date: string
+          site_id: string
+          total_clicks: number | null
+          total_conversions: number | null
+          total_views: number | null
+          unique_sessions: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          affiliate_clicks?: number | null
+          avg_duration_seconds?: number | null
+          bounce_rate?: number | null
+          conversion_rate?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          estimated_revenue?: number | null
+          id?: string
+          logged_in_users?: number | null
+          metric_date: string
+          site_id: string
+          total_clicks?: number | null
+          total_conversions?: number | null
+          total_views?: number | null
+          unique_sessions?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          affiliate_clicks?: number | null
+          avg_duration_seconds?: number | null
+          bounce_rate?: number | null
+          conversion_rate?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          estimated_revenue?: number | null
+          id?: string
+          logged_in_users?: number | null
+          metric_date?: string
+          site_id?: string
+          total_clicks?: number | null
+          total_conversions?: number | null
+          total_views?: number | null
+          unique_sessions?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_daily_summary_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_daily_summary_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "analytics_daily_summary_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
+        ]
       }
       analytics_sessions: {
         Row: {
@@ -597,6 +690,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "blog_post_related_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       blog_posts: {
@@ -691,6 +791,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "blog_posts_primary_site_id_fkey"
+            columns: ["primary_site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       bonus_offers: {
@@ -752,6 +859,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "bonus_offers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -846,6 +960,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "casino_content_analytics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       casino_content_versions: {
@@ -913,6 +1034,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "casino_content_versions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -1116,6 +1244,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "conversions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -1336,6 +1471,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "recommended_sites_pool_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       search_history: {
@@ -1498,6 +1640,13 @@ export type Database = {
             referencedRelation: "daily_site_metrics"
             referencedColumns: ["site_id"]
           },
+          {
+            foreignKeyName: "site_categories_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
         ]
       }
       site_notifications: {
@@ -1643,6 +1792,13 @@ export type Database = {
             referencedColumns: ["site_id"]
           },
           {
+            foreignKeyName: "site_recommended_sites_recommended_site_id_fkey"
+            columns: ["recommended_site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
+            referencedColumns: ["site_id"]
+          },
+          {
             foreignKeyName: "site_recommended_sites_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
@@ -1654,6 +1810,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "site_recommended_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -1711,6 +1874,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "site_reviews_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -1777,6 +1947,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: true
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -1957,6 +2134,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_analytics_view: {
+        Row: {
+          affiliate_clicks: number | null
+          conversion_rate: number | null
+          ctr: number | null
+          estimated_revenue: number | null
+          is_active: boolean | null
+          last_7_days_clicks: number | null
+          last_7_days_views: number | null
+          logo_url: string | null
+          previous_7_days_views: number | null
+          rating: number | null
+          site_id: string | null
+          site_name: string | null
+          site_slug: string | null
+          total_clicks: number | null
+          total_conversions: number | null
+          total_views: number | null
+        }
+        Relationships: []
+      }
       site_stats_with_details: {
         Row: {
           clicks: number | null
@@ -1984,6 +2182,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: true
             referencedRelation: "daily_site_metrics"
+            referencedColumns: ["site_id"]
+          },
+          {
+            foreignKeyName: "site_stats_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "site_analytics_view"
             referencedColumns: ["site_id"]
           },
         ]
@@ -2122,6 +2327,10 @@ export type Database = {
       }
       trigger_affiliate_metrics_sync: { Args: never; Returns: undefined }
       undo_change: { Args: { p_change_id: string }; Returns: boolean }
+      update_analytics_daily_summary: {
+        Args: { target_date?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
