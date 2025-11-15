@@ -140,12 +140,14 @@ export const BonusManagement = () => {
   // Reorder mutation
   const reorderMutation = useMutation({
     mutationFn: async (items: BonusOffer[]) => {
-      const updates = items.map((item, index) => 
-        supabase
+      const updates = items.map(async (item, index) => {
+        const { error } = await supabase
           .from('bonus_offers')
           .update({ display_order: index })
-          .eq('id', item.id)
-      );
+          .eq('id', item.id);
+        if (error) throw error;
+        return true;
+      });
       await Promise.all(updates);
     },
     onSuccess: () => {
