@@ -189,16 +189,16 @@ export default function EnhancedReviewManagement() {
   }, [reviews]);
 
   // Type-safe helper functions
-  const getSiteName = (review: Review): string => {
+  const getSiteName = useCallback((review: Review): string => {
     return hasValidSiteInfo(review) ? review.betting_sites.name : "Bilinmeyen Site";
-  };
+  }, []);
 
-  const getUserDisplayName = (review: Review): string => {
+  const getUserDisplayName = useCallback((review: Review): string => {
     if (hasValidUserInfo(review)) {
       return review.profiles.username;
     }
     return review.name || "Anonim";
-  };
+  }, []);
 
   // Filter reviews with type-safe checks
   const filteredReviews = useMemo(() => {
@@ -301,37 +301,41 @@ export default function EnhancedReviewManagement() {
     }
   });
 
-  const handleEdit = (review: Review) => {
+  const handleEdit = useCallback((review: Review) => {
     setEditingReview(review);
-  };
+  }, []);
 
-  const handleSaveEdit = (reviewId: string, data: { rating: number; title: string; comment: string }) => {
+  const handleSaveEdit = useCallback((reviewId: string, data: { rating: number; title: string; comment: string }) => {
     updateMutation.mutate({
       id: reviewId,
       updates: data
     });
-  };
+  }, [updateMutation]);
 
   // Bulk actions handlers
-  const toggleReviewSelection = (reviewId: string) => {
-    const newSelection = new Set(selectedReviews);
-    if (newSelection.has(reviewId)) {
-      newSelection.delete(reviewId);
-    } else {
-      newSelection.add(reviewId);
-    }
-    setSelectedReviews(newSelection);
-  };
+  const toggleReviewSelection = useCallback((reviewId: string) => {
+    setSelectedReviews(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(reviewId)) {
+        newSelection.delete(reviewId);
+      } else {
+        newSelection.add(reviewId);
+      }
+      return newSelection;
+    });
+  }, []);
 
-  const toggleSelectAll = () => {
-    if (selectedReviews.size === filteredReviews.length) {
-      setSelectedReviews(new Set());
-    } else {
-      setSelectedReviews(new Set(filteredReviews.map(r => r.id)));
-    }
-  };
+  const toggleSelectAll = useCallback(() => {
+    setSelectedReviews(prev => {
+      if (prev.size === filteredReviews.length) {
+        return new Set();
+      } else {
+        return new Set(filteredReviews.map(r => r.id));
+      }
+    });
+  }, [filteredReviews]);
 
-  const handleBulkApprove = async () => {
+  const handleBulkApprove = useCallback(async () => {
     if (selectedReviews.size === 0) {
       toast.error("Lütfen onaylanacak yorumları seçin");
       return;
@@ -354,9 +358,9 @@ export default function EnhancedReviewManagement() {
     } finally {
       setIsBulkActionLoading(false);
     }
-  };
+  }, [selectedReviews, queryClient]);
 
-  const handleBulkReject = async () => {
+  const handleBulkReject = useCallback(async () => {
     if (selectedReviews.size === 0) {
       toast.error("Lütfen reddedilecek yorumları seçin");
       return;
@@ -379,9 +383,9 @@ export default function EnhancedReviewManagement() {
     } finally {
       setIsBulkActionLoading(false);
     }
-  };
+  }, [selectedReviews, queryClient]);
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = useCallback(async () => {
     if (selectedReviews.size === 0) {
       toast.error("Lütfen silinecek yorumları seçin");
       return;
@@ -408,7 +412,7 @@ export default function EnhancedReviewManagement() {
     } finally {
       setIsBulkActionLoading(false);
     }
-  };
+  }, [selectedReviews, queryClient]);
 
   // AI Generation Handler
   const handleAiGenerate = useCallback(async (params: {
@@ -475,7 +479,7 @@ export default function EnhancedReviewManagement() {
   }, [queryClient]);
 
   // Handle export
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     if (!filteredReviews.length) {
       toast.error("Dışa aktarılacak veri yok");
       return;
@@ -502,15 +506,33 @@ export default function EnhancedReviewManagement() {
     link.download = `yorumlar-${format(new Date(), "yyyy-MM-dd")}.csv`;
     link.click();
     toast.success("Yorumlar dışa aktarıldı");
-  };
+  }, [filteredReviews, getSiteName, getUserDisplayName]);
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchTerm("");
     setSelectedSite("all");
     setSelectedStatus("all");
     setSelectedRating("all");
-  };
+  }, []);
+
+  // Memoized callbacks for table actions
+  const handleApprove = useCallback((id: string) => {
+    approveMutation.mutate(id);
+  }, [approveMutation]);
+
+  const handleReject = useCallback((id: string) => {
+    rejectMutation.mutate(id);
+  }, [rejectMutation]);
+
+  const handleDelete = useCallback((id: string) => {
+    setDeleteReviewId(id);
+  }, []);
+
+  const handlePageSizeChange = useCallback((newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
+  }, []);
 
   if (isLoading) {
     return <div className="text-center py-8">Yükleniyor...</div>;
@@ -621,10 +643,10 @@ export default function EnhancedReviewManagement() {
             selectedReviews={selectedReviews}
             onToggleSelection={toggleReviewSelection}
             onToggleSelectAll={toggleSelectAll}
-            onApprove={(id) => approveMutation.mutate(id)}
-            onReject={(id) => rejectMutation.mutate(id)}
+            onApprove={handleApprove}
+            onReject={handleReject}
             onEdit={handleEdit}
-            onDelete={(id) => setDeleteReviewId(id)}
+            onDelete={handleDelete}
             getSiteName={getSiteName}
             getUserDisplayName={getUserDisplayName}
             isLoading={isLoading}
@@ -637,10 +659,7 @@ export default function EnhancedReviewManagement() {
             totalItems={totalCount}
             totalPages={Math.ceil(totalCount / pageSize)}
             onPageChange={setCurrentPage}
-            onPageSizeChange={(newSize) => {
-              setPageSize(newSize);
-              setCurrentPage(1);
-            }}
+            onPageSizeChange={handlePageSizeChange}
           />
         </CardContent>
       </Card>

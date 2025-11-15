@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,7 +26,7 @@ interface AIGenerationPanelProps {
   }) => void;
 }
 
-export function AIGenerationPanel({ sites, isLoading, onGenerate }: AIGenerationPanelProps) {
+export const AIGenerationPanel = memo(function AIGenerationPanel({ sites, isLoading, onGenerate }: AIGenerationPanelProps) {
   const [selectedSite, setSelectedSite] = useState<string>("");
   const [reviewCount, setReviewCount] = useState<string>("3");
   const [tone, setTone] = useState<"positive" | "negative" | "neutral">("neutral");
@@ -35,7 +35,7 @@ export function AIGenerationPanel({ sites, isLoading, onGenerate }: AIGeneration
   const [language, setLanguage] = useState<"tr" | "en">("tr");
   const [autoPublish, setAutoPublish] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     onGenerate({
       siteId: selectedSite,
       count: reviewCount,
@@ -45,7 +45,7 @@ export function AIGenerationPanel({ sites, isLoading, onGenerate }: AIGeneration
       language,
       autoPublish
     });
-  };
+  }, [selectedSite, reviewCount, tone, ratingMin, ratingMax, language, autoPublish, onGenerate]);
 
   return (
     <Card>
@@ -181,4 +181,4 @@ export function AIGenerationPanel({ sites, isLoading, onGenerate }: AIGeneration
       </CardContent>
     </Card>
   );
-}
+});
