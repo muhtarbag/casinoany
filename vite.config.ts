@@ -24,37 +24,15 @@ export default defineConfig(({ mode }) => ({
     build: {
       rollupOptions: {
         output: {
-          // Optimized manual chunking - React tek chunk'ta
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              // CRITICAL: React ekosistemi TEK chunk'ta kalmalı
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
-                return 'vendor-react';
-              }
-              // Supabase - ayrı chunk
-              if (id.includes('@supabase') || id.includes('supabase')) {
-                return 'vendor-supabase';
-              }
-              // UI libraries - ayrı chunk (Radix, Sonner, Recharts)
-              if (id.includes('@radix-ui') || id.includes('sonner') || id.includes('recharts') || id.includes('framer-motion')) {
-                return 'vendor-ui';
-              }
-              // Query & State - ayrı chunk
-              if (id.includes('@tanstack')) {
-                return 'vendor-query';
-              }
-              // Diğer vendor libs
-              return 'vendor';
-            }
-          },
+          manualChunks: undefined, // Disable manual chunking to prevent React splitting
         },
       },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
     cssCodeSplit: true,
-    assetsInlineLimit: 4096, // Inline assets < 4kb as base64
+    assetsInlineLimit: 4096,
   },
   // Optimize dependencies
   optimizeDeps: {
