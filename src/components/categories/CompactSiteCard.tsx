@@ -3,7 +3,7 @@ import { Star, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { OptimizedImage } from '@/components/OptimizedImage';
+import { useState } from 'react';
 
 interface CompactSiteCardProps {
   site: {
@@ -18,16 +18,21 @@ interface CompactSiteCardProps {
 }
 
 export function CompactSiteCard({ site }: CompactSiteCardProps) {
+  const [imageError, setImageError] = useState(false);
+  const showFallback = !site.logo_url || imageError;
+
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card/50 backdrop-blur">
       <CardHeader className="pb-3">
         {/* Logo */}
         <div className="flex items-center justify-center h-20 mb-3">
-          {site.logo_url ? (
-            <OptimizedImage
+          {!showFallback ? (
+            <img
               src={site.logo_url}
               alt={`${site.name} logo`}
               className="max-h-full max-w-full object-contain"
+              onError={() => setImageError(true)}
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-muted rounded flex items-center justify-center">
