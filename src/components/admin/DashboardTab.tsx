@@ -36,7 +36,7 @@ import {
   CartesianGrid, 
   Tooltip,
   ResponsiveContainer
-} from '@/components/LazyChart';
+} from 'recharts';
 
 interface DashboardStats {
   totalSites: number;
