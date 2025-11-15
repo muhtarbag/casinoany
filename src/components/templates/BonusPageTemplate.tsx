@@ -204,11 +204,7 @@ export const BonusPageTemplate = ({
 const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
   <div className="flex flex-col gap-4 p-4 md:p-6 border-2 rounded-xl hover:shadow-lg hover:border-primary/20 transition-all bg-card">
     {/* Mobile: Vertical Layout */}
-    <div className="flex items-start gap-3 md:hidden">
-      <div className="text-2xl font-bold text-primary w-8 flex-shrink-0 pt-1">
-        #{rank}
-      </div>
-      
+    <div className="flex items-start gap-4 md:hidden">
       <div className="w-24 h-16 flex-shrink-0 bg-gray-900 rounded-lg border-2 border-border p-2 flex items-center justify-center">
         <OptimizedImage
           src={bonus.casino.logo}
@@ -222,7 +218,7 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
       </div>
       
       <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-base mb-1 leading-tight">{bonus.casino.name}</h3>
+        <h3 className="font-bold text-lg mb-1.5 leading-tight">{bonus.casino.name}</h3>
         <Badge className={`${BONUS_TYPE_COLORS[bonus.bonusType]} text-white text-xs`}>
           {BONUS_TYPE_LABELS[bonus.bonusType]}
         </Badge>
@@ -231,10 +227,6 @@ const BonusCard = ({ bonus, rank }: { bonus: BonusOffer; rank: number }) => (
 
     {/* Desktop: Horizontal Layout */}
     <div className="hidden md:flex items-center gap-6 flex-1">
-      <div className="text-3xl font-bold text-primary w-10 flex-shrink-0">
-        #{rank}
-      </div>
-      
       <div className="w-32 h-20 flex-shrink-0 bg-gray-900 rounded-lg border-2 border-border p-3 flex items-center justify-center">
         <OptimizedImage
           src={bonus.casino.logo}
