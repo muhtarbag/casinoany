@@ -197,7 +197,7 @@ export const Footer = () => {
             </div>
 
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 justify-start items-center">
               <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Twitter/X">
