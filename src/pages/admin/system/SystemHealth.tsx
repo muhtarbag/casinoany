@@ -1,12 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { LoadingFallback } from '@/components/admin/LoadingFallback';
-
-const SystemHealthDashboard = lazy(() => import('@/components/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
+import { SystemHealthDashboard } from '@/components/SystemHealthDashboard';
 
 export default function SystemHealth() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SystemHealthDashboard />
-    </Suspense>
-  );
+  return <SystemHealthDashboard />;
 }
