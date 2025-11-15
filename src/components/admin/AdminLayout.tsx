@@ -10,6 +10,15 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutsDialog } from '@/components/shortcuts/ShortcutsDialog';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { queryKeys } from '@/lib/queryClient';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -23,9 +32,24 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
   const isMobile = useIsMobile();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
-  const clearCache = () => {
-    queryClient.clear();
-    showSuccessToast('Cache temizlendi');
+  const clearCache = (type?: 'all' | 'sites' | 'blog' | 'analytics') => {
+    switch (type) {
+      case 'sites':
+        queryClient.invalidateQueries({ queryKey: queryKeys.sites.all });
+        showSuccessToast('Site cache temizlendi');
+        break;
+      case 'blog':
+        queryClient.invalidateQueries({ queryKey: queryKeys.blog.all });
+        showSuccessToast('Blog cache temizlendi');
+        break;
+      case 'analytics':
+        queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
+        showSuccessToast('Analytics cache temizlendi');
+        break;
+      default:
+        queryClient.clear();
+        showSuccessToast('Tüm cache temizlendi');
+    }
   };
 
   // Global keyboard shortcuts
@@ -82,16 +106,40 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
                 {!isMobile && <span className="hidden lg:inline">Kısayollar</span>}
               </Button>
 
-              <Button
-                variant="outline"
-                size={isMobile ? "icon" : "sm"}
-                onClick={clearCache}
-                className="gap-2 shrink-0"
-                title="Cache Temizle"
-              >
-                <RefreshCw className="w-4 h-4" />
-                {!isMobile && <span className="hidden xl:inline">Cache</span>}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size={isMobile ? "icon" : "sm"}
+                    className="gap-2 shrink-0"
+                    title="Cache Yönetimi"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    {!isMobile && <span className="hidden xl:inline">Cache</span>}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
+                  <DropdownMenuLabel>Cache Yönetimi</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => clearCache('sites')} className="cursor-pointer">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <span>Site Cache Temizle</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => clearCache('blog')} className="cursor-pointer">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <span>Blog Cache Temizle</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => clearCache('analytics')} className="cursor-pointer">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <span>Analytics Cache Temizle</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => clearCache('all')} className="cursor-pointer font-semibold">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <span>Tüm Cache Temizle</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
