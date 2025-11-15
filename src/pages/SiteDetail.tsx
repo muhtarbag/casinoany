@@ -51,7 +51,7 @@ export default function SiteDetail() {
   const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   // Fetch site data by slug or id
-  const { data: site, isLoading: siteLoading } = useQuery({
+  const { data: site, isLoading: siteLoading, error: siteError } = useQuery({
     queryKey: ["betting-site", slug || id],
     queryFn: async (): Promise<any> => {
       if (slug) {
@@ -60,9 +60,12 @@ export default function SiteDetail() {
           .select("*")
           .eq("is_active", true)
           .eq("slug", slug)
-          .single();
+          .maybeSingle();
         
         if (error) throw error;
+        if (!data) {
+          throw new Error("Site not found");
+        }
         return data;
       } else if (id) {
         const { data, error } = await (supabase as any)
@@ -70,13 +73,17 @@ export default function SiteDetail() {
           .select("*")
           .eq("is_active", true)
           .eq("id", id)
-          .single();
+          .maybeSingle();
         
         if (error) throw error;
+        if (!data) {
+          throw new Error("Site not found");
+        }
         return data;
       }
       throw new Error("No slug or id provided");
     },
+    retry: false,
   });
 
   // Load logo from storage or use direct URL
