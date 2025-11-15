@@ -17,6 +17,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 
+
+// Type for review updates
+interface ReviewUpdate {
+  rating?: number;
+  title?: string;
+  comment?: string;
+  is_approved?: boolean;
+}
+
+// Database site type
+interface BettingSite {
+  id: string;
+  name: string;
+}
+
+// Database profile type
+interface Profile {
+  id: string;
+  username: string;
+}
+
+// Enhanced Review interface with proper typing
 interface Review {
   id: string;
   site_id: string;
@@ -28,8 +50,20 @@ interface Review {
   comment: string;
   is_approved: boolean;
   created_at: string;
-  betting_sites?: { name: string };
-  profiles?: { username: string };
+  updated_at?: string;
+  // Related data (loaded via joins)
+  betting_sites?: BettingSite | null;
+  profiles?: Profile | null;
+}
+
+// Type guard to check if review has site info
+function hasValidSiteInfo(review: Review): review is Review & { betting_sites: BettingSite } {
+  return !!review.betting_sites && !!review.betting_sites.name;
+}
+
+// Type guard to check if review has user info
+function hasValidUserInfo(review: Review): review is Review & { profiles: Profile } {
+  return !!review.profiles && !!review.profiles.username;
 }
 
 interface SiteStats {
@@ -141,7 +175,7 @@ export default function EnhancedReviewManagement() {
 
     reviews.forEach(review => {
       const siteId = review.site_id;
-      const siteName = review.betting_sites?.name || "Bilinmeyen Site";
+      const siteName = getSiteName(review);
 
       if (!statsMap.has(siteId)) {
         statsMap.set(siteId, {
@@ -173,16 +207,29 @@ export default function EnhancedReviewManagement() {
       .sort((a, b) => b.total_reviews - a.total_reviews);
   }, [reviews]);
 
-  // Filter reviews
+  // Type-safe helper functions
+  const getSiteName = (review: Review): string => {
+    return hasValidSiteInfo(review) ? review.betting_sites.name : "Bilinmeyen Site";
+  };
+
+  const getUserDisplayName = (review: Review): string => {
+    if (hasValidUserInfo(review)) {
+      return review.profiles.username;
+    }
+    return review.name || "Anonim";
+  };
+
+  // Filter reviews with type-safe checks
   const filteredReviews = useMemo(() => {
     if (!reviews) return [];
 
     return reviews.filter(review => {
+      const siteName = getSiteName(review);
       const matchesSearch = 
         searchTerm === "" ||
         review.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         review.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.betting_sites?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        siteName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (review.name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
 
       const matchesSite = selectedSite === "all" || review.site_id === selectedSite;
@@ -244,7 +291,7 @@ export default function EnhancedReviewManagement() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: ReviewUpdate }) => {
       const { error } = await supabase
         .from("site_reviews")
         .update(updates)
@@ -442,7 +489,8 @@ export default function EnhancedReviewManagement() {
     }
   };
 
-  const renderStars = (rating: number) => {
+  // Render star rating (type-safe)
+  const renderStars = (rating: number): JSX.Element[] => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star
         key={i}
@@ -749,10 +797,10 @@ export default function EnhancedReviewManagement() {
                         />
                       </TableCell>
                       <TableCell className="font-medium">
-                        {review.betting_sites?.name || "Bilinmeyen"}
+                        {getSiteName(review)}
                       </TableCell>
                       <TableCell>
-                        {review.profiles?.username || review.name || "Anonim"}
+                        {getUserDisplayName(review)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -838,7 +886,7 @@ export default function EnhancedReviewManagement() {
           <DialogHeader>
             <DialogTitle>Yorumu Düzenle</DialogTitle>
             <DialogDescription>
-              {editingReview?.betting_sites?.name} için yapılan yorumu düzenleyin
+              {editingReview ? getSiteName(editingReview) : 'Site'} için yapılan yorumu düzenleyin
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
