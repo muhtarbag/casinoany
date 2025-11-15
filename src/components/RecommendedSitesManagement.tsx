@@ -307,15 +307,21 @@ export const RecommendedSitesManagement = () => {
               <SelectTrigger className="h-11">
                 <SelectValue placeholder="Öneriler eklemek istediğiniz siteyi seçin..." />
               </SelectTrigger>
-              <SelectContent>
-                {allSites?.map((site) => (
-                  <SelectItem key={site.id} value={site.id}>
-                    <div className="flex items-center gap-2">
-                      <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
-                      {site.name}
-                    </div>
-                  </SelectItem>
-                ))}
+              <SelectContent className="z-50 bg-background">
+                {allSites?.length ? (
+                  allSites.map((site) => (
+                    <SelectItem key={site.id} value={site.id}>
+                      <div className="flex items-center gap-2">
+                        <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
+                        {site.name}
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="px-2 py-6 text-center text-sm text-muted-foreground">
+                    Site bulunamadı
+                  </div>
+                )}
               </SelectContent>
             </Select>
             {!selectedMainSite && (
@@ -357,15 +363,23 @@ export const RecommendedSitesManagement = () => {
                           : "Önerilecek siteyi seçin..."
                       } />
                     </SelectTrigger>
-                    <SelectContent>
-                      {availableSites?.map((site) => (
-                        <SelectItem key={site.id} value={site.id}>
-                          <div className="flex items-center gap-2">
-                            <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
-                            {site.name}
-                          </div>
-                        </SelectItem>
-                      ))}
+                    <SelectContent className="z-50 bg-background">
+                      {availableSites?.length ? (
+                        availableSites.map((site) => (
+                          <SelectItem key={site.id} value={site.id}>
+                            <div className="flex items-center gap-2">
+                              <img src={site.logo_url} alt={site.name} className="w-5 h-5 object-contain" />
+                              {site.name}
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="px-2 py-6 text-center text-sm text-muted-foreground">
+                          {localRecommendations?.length >= 4 
+                            ? "Maksimum 4 site eklenebilir" 
+                            : "Eklenebilecek site yok"}
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                   <Button
