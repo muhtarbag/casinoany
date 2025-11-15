@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Skeleton } from '@/components/ui/skeleton';
+
+const BulkCasinoContentGenerator = lazy(() => import('@/pages/admin/content/BulkCasinoContentGenerator'));
 
 export const CasinoContentManagement = () => {
   const { toast } = useToast();
@@ -264,6 +267,10 @@ export const CasinoContentManagement = () => {
 
   return (
     <div className="space-y-6">
+      <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+        <BulkCasinoContentGenerator />
+      </Suspense>
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
