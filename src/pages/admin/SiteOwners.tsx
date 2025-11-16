@@ -34,17 +34,44 @@ const SiteOwners = () => {
 
   const approveMutation = useMutation({
     mutationFn: async ({ ownerId, userId }: { ownerId: string; userId: string }) => {
+      const application = applications?.find(app => app.id === ownerId);
+      if (!application) throw new Error('Application not found');
+
+      let siteId = application.site_id;
+
+      // If new_site_name is provided, create a new site
+      if (application.new_site_name && !siteId) {
+        const slug = application.new_site_name.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+
+        const { data: newSite, error: siteError } = await (supabase as any)
+          .from('betting_sites')
+          .insert({
+            name: application.new_site_name,
+            slug: slug,
+            affiliate_link: 'https://example.com',
+            logo_url: application.logo_url,
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (siteError) throw siteError;
+        siteId = newSite.id;
+      }
+
       const { error: ownerError } = await (supabase as any)
         .from('site_owners')
         .update({ 
           status: 'approved',
           approved_at: new Date().toISOString(),
+          site_id: siteId
         })
         .eq('id', ownerId);
       
       if (ownerError) throw ownerError;
 
-      // Update user_roles status
       const { error: roleError } = await (supabase as any)
         .from('user_roles')
         .update({ status: 'approved' })

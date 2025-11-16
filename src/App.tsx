@@ -81,13 +81,14 @@ const CategoryDetail = lazyWithPreload(() => import("./pages/CategoryDetail"));
 const Favorites = lazyWithPreload(() => import("./pages/profile/Favorites"));
 const Memberships = lazyWithPreload(() => import("./pages/profile/Memberships"));
 
+// User panel pages
+const UserDashboard = lazyWithPreload(() => import("./pages/panel/Dashboard"));
+const SiteManagement = lazyWithPreload(() => import("./pages/panel/SiteManagement"));
+
 // Complaint pages
 const Complaints = lazyWithPreload(() => import("./pages/Complaints"));
 const ComplaintDetail = lazyWithPreload(() => import("./pages/ComplaintDetail"));
 const NewComplaint = lazyWithPreload(() => import("./pages/NewComplaint"));
-
-// B2B Panel pages
-const SiteManagement = lazyWithPreload(() => import("./pages/panel/SiteManagement"));
 
 // SEO-optimized pages
 const DenemeBonusu = lazyWithPreload(() => import("./pages/DenemeBonusuDynamic"));
@@ -143,8 +144,13 @@ const AppContent = () => {
             <Route path="site-owners" element={<AdminSiteOwners />} />
           </Route>
           
-          {/* B2B Panel Routes */}
-          <Route path="/panel" element={<SiteManagement />} />
+          {/* User Panel Routes */}
+          <Route path="/panel/dashboard" element={<UserDashboard />} />
+          <Route path="/panel/site-management" element={<SiteManagement />} />
+          
+          {/* Profile Routes */}
+          <Route path="/profile/favorites" element={<Favorites />} />
+          <Route path="/profile/memberships" element={<Memberships />} />
           
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
