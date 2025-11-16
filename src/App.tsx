@@ -27,7 +27,7 @@ const Signup = lazyWithPreload(() => import("./pages/Signup"));
 // These pages are essential and should not be lazy loaded
 import AdminRoot from "./pages/admin";
 import AdminDashboard from "./pages/admin/Dashboard";
-import AdminSiteManagement from "./pages/admin/sites/SiteManagement";
+import AdminSitesHub from "./pages/admin/sites/index";
 import AdminRoleManagement from "./pages/admin/system/RoleManagement";
 
 // Secondary admin pages can be lazy loaded safely
@@ -100,7 +100,7 @@ const AppContent = () => {
           <Route path="/admin" element={<AdminRoot />}>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="sites" element={<AdminSiteManagement />} />
+            <Route path="sites" element={<AdminSitesHub />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
             
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
