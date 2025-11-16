@@ -99,10 +99,11 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         title: "✅ Analiz Tamamlandı!",
         description: `${result.missing_topics.length} içerik fırsatı, ${result.keyword_opportunities.length} keyword fırsatı tespit edildi!`,
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "İçerik analizi yapılırken bir hata oluştu";
       toast({
         title: "Hata",
-        description: error.message || "İçerik analizi yapılırken bir hata oluştu",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

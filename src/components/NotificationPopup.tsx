@@ -8,6 +8,22 @@ import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { User } from '@supabase/supabase-js';
+
+interface TriggerConditions {
+  seconds?: number;
+  scroll_percentage?: number;
+  exit_intent?: boolean;
+}
+
+interface FormFields {
+  email_label?: string;
+  phone_label?: string;
+  privacy_text?: string;
+  button_color?: string;
+  submit_text?: string;
+  success_message?: string;
+}
 
 interface Notification {
   id: string;
@@ -23,8 +39,8 @@ interface Notification {
   background_color: string | null;
   text_color: string | null;
   trigger_type: string;
-  trigger_conditions: any;
-  form_fields?: any;
+  trigger_conditions: TriggerConditions | null;
+  form_fields?: FormFields | null;
 }
 
 // Oturum ID'si oluştur
@@ -38,7 +54,7 @@ const getSessionId = () => {
 };
 
 // Kullanıcı segmentini belirle
-const getUserSegment = (user: any): string => {
+const getUserSegment = (user: User | null): string => {
   // Kayıtlı kullanıcı mı?
   if (user) return 'registered';
   

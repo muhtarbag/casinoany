@@ -188,7 +188,7 @@ export const useAdminSiteManagement = () => {
       setLogoFile(null);
       setLogoPreview(null);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       showErrorToast(error, 'Site eklenirken bir hata oluştu');
     },
   });
@@ -209,13 +209,39 @@ export const useAdminSiteManagement = () => {
       }
 
       // Update all site data including social media and affiliate info
-      const updateData: any = {
+      const updateData: {
+        name: string;
+        slug: string;
+        affiliate_link: string;
+        bonus: string;
+        rating: number;
+        features: string[];
+        email: string | null;
+        whatsapp: string | null;
+        telegram: string | null;
+        twitter: string | null;
+        instagram: string | null;
+        facebook: string | null;
+        youtube: string | null;
+        affiliate_contract_date: string | null;
+        affiliate_contract_terms: string | null;
+        affiliate_has_monthly_payment: boolean;
+        affiliate_monthly_payment: number | null;
+        affiliate_commission_percentage: number | null;
+        affiliate_panel_url: string | null;
+        affiliate_panel_username: string | null;
+        affiliate_panel_password: string | null;
+        affiliate_notes: string | null;
+        logo_url?: string;
+      } = {
         name: formData.name,
         slug: formData.slug,
         affiliate_link: formData.affiliate_link,
         bonus: formData.bonus,
         rating: formData.rating,
-        features: (formData.features as string) ? (formData.features as string).split(',').map(f => f.trim()) : [],
+        features: typeof formData.features === 'string' 
+          ? formData.features.split(',').map(f => f.trim()) 
+          : formData.features || [],
         // Social media
         email: formData.email || null,
         whatsapp: formData.whatsapp || null,
@@ -240,7 +266,7 @@ export const useAdminSiteManagement = () => {
         updateData.logo_url = logoUrl;
       }
 
-      const { data: updatedData, error: siteError } = await (supabase as any)
+      const { data: updatedData, error: siteError } = await supabase
         .from('betting_sites')
         .update(updateData)
         .eq('id', id)
@@ -273,7 +299,7 @@ export const useAdminSiteManagement = () => {
       setLogoFile(null);
       setLogoPreview(null);
     },
-    onError: (error: any) => {
+    onError: (error) => {
       showErrorToast(error, 'Site güncellenirken bir hata oluştu');
     },
   });

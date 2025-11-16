@@ -20,7 +20,7 @@ export const ContentVersions = ({ siteId, onRestore }: ContentVersionsProps) => 
   const { data: versions, isLoading, refetch } = useQuery({
     queryKey: ['casino-content-versions', siteId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('casino_content_versions')
         .select('*')
         .eq('site_id', siteId)
@@ -36,7 +36,7 @@ export const ContentVersions = ({ siteId, onRestore }: ContentVersionsProps) => 
     setIsRestoring(true);
     try {
       // Update main table with version data
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('betting_sites')
         .update({
           pros: version.pros,
@@ -54,7 +54,7 @@ export const ContentVersions = ({ siteId, onRestore }: ContentVersionsProps) => 
       if (error) throw error;
 
       // Create a new version entry for the restore action
-      const { error: versionError } = await (supabase as any)
+      const { error: versionError } = await supabase
         .from('casino_content_versions')
         .insert({
           site_id: siteId,
