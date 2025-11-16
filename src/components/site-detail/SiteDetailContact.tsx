@@ -52,51 +52,45 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
           İletişim Bilgileri
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {site.email && (
-          <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-primary" />
+      <CardContent>
+        <div className="flex flex-wrap gap-4 items-center">
+          {site.email && (
             <a 
               href={`mailto:${site.email}`} 
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="transition-all hover:scale-110"
+              aria-label="Email"
               onClick={() => trackSocialClick(site.id, 'email')}
             >
-              {site.email}
+              <Mail className="w-7 h-7 text-[#EA4335]" />
             </a>
-          </div>
-        )}
-        
-        {site.whatsapp && (
-          <div className="flex items-center gap-3">
-            <FaWhatsapp className="w-6 h-6 text-[#25D366]" />
+          )}
+          
+          {site.whatsapp && (
             <a 
               href={`https://wa.me/${site.whatsapp}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="transition-all hover:scale-110"
+              aria-label="WhatsApp"
               onClick={() => trackSocialClick(site.id, 'whatsapp')}
             >
-              WhatsApp: {site.whatsapp}
+              <FaWhatsapp className="w-7 h-7 text-[#25D366]" />
             </a>
-          </div>
-        )}
-        
-        {site.telegram && (
-          <div className="flex items-center gap-3">
-            <FaTelegramPlane className="w-6 h-6 text-[#0088cc]" />
+          )}
+          
+          {site.telegram && (
             <a 
               href={`https://t.me/${site.telegram}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="transition-all hover:scale-110"
+              aria-label="Telegram"
               onClick={() => trackSocialClick(site.id, 'telegram')}
             >
-              Telegram: @{site.telegram}
+              <FaTelegramPlane className="w-7 h-7 text-[#0088cc]" />
             </a>
-          </div>
-        )}
-        
-        <div className="flex gap-4 pt-2">
+          )}
+          
           {site.twitter && (
             <a 
               href={site.twitter} 
@@ -109,6 +103,7 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               <FaTwitter className="w-7 h-7 text-[#1DA1F2]" />
             </a>
           )}
+          
           {site.instagram && (
             <a 
               href={site.instagram} 
@@ -121,6 +116,7 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               <FaInstagram className="w-7 h-7 text-[#E4405F]" />
             </a>
           )}
+          
           {site.facebook && (
             <a 
               href={site.facebook} 
@@ -133,6 +129,7 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               <FaFacebook className="w-7 h-7 text-[#1877F2]" />
             </a>
           )}
+          
           {site.youtube && (
             <a 
               href={site.youtube} 
