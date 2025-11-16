@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { TypedRPC } from '@/lib/supabase-extended';
 
 /**
  * LIGHTWEIGHT ANALYTICS - Performance Optimized
@@ -25,7 +25,7 @@ export const trackConversion = async (
   try {
     const sessionId = getSessionId();
     
-    await (supabase as any).rpc('track_conversion', {
+    await TypedRPC.trackConversion({
       p_conversion_type: conversionType,
       p_page_path: window.location.pathname,
       p_site_id: siteId,

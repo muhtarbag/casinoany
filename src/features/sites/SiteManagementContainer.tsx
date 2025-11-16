@@ -47,6 +47,15 @@ export function SiteManagementContainer() {
 
   const { data: siteStats } = useSiteStats();
 
+  // Transform stats array to Record for component compatibility
+  const statsRecord = useMemo(() => {
+    if (!siteStats) return {};
+    return siteStats.reduce((acc, stat) => {
+      acc[stat.site_id] = stat;
+      return acc;
+    }, {} as Record<string, any>);
+  }, [siteStats]);
+
   // Update ordered sites when sites data changes
   useMemo(() => {
     if (sites) {
@@ -149,7 +158,7 @@ export function SiteManagementContainer() {
         ) : (
           <EnhancedSiteList
             sites={orderedSites}
-            stats={siteStats || {}}
+            stats={statsRecord}
             selectedSites={selectedSites}
             editingId={editingId}
             onToggleSelect={handleToggleSelect}

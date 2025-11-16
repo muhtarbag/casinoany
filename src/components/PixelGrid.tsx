@@ -12,7 +12,7 @@ export const PixelGrid = () => {
   const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)

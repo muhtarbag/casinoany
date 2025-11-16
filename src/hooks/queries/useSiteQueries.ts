@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TypedDB } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
@@ -12,7 +13,7 @@ export const useSites = (filters?: {
   return useQuery({
     queryKey: queryKeys.sites.list(filters),
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('betting_sites')
         .select('*')
         .order('display_order', { ascending: true });
@@ -42,12 +43,7 @@ export const useSite = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.sites.detail(slug),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('sites_full_view')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_active', true)
-        .single();
+      const { data, error } = await TypedDB.bettingSiteBySlug(slug);
 
       if (error) throw error;
       return data;
@@ -62,7 +58,7 @@ export const useFeaturedSites = () => {
   return useQuery({
     queryKey: queryKeys.sites.featured(),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('*')
         .eq('is_active', true)
@@ -82,7 +78,7 @@ export const useSiteStats = () => {
   return useQuery({
     queryKey: queryKeys.sites.stats(),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_stats_with_details')
         .select('*')
         .order('views', { ascending: false });
@@ -107,7 +103,7 @@ export const useUpdateSiteStats = () => {
       type: 'view' | 'click';
     }) => {
       // Mevcut stats'ı al
-      const { data: existingStats } = await (supabase as any)
+      const { data: existingStats } = await supabase
         .from('site_stats')
         .select('*')
         .eq('site_id', siteId)
@@ -119,7 +115,7 @@ export const useUpdateSiteStats = () => {
           ? { views: existingStats.views + 1 }
           : { clicks: existingStats.clicks + 1 };
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('site_stats')
           .update(update)
           .eq('site_id', siteId);
@@ -133,7 +129,7 @@ export const useUpdateSiteStats = () => {
           clicks: type === 'click' ? 1 : 0,
         };
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('site_stats')
           .insert(insert);
 
