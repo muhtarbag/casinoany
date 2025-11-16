@@ -33,7 +33,14 @@ export class AdminErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Error tracking would go here in production
+    // Track error with centralized error tracking
+    if (typeof window !== 'undefined') {
+      import('@/lib/errorTracking').then(({ errorTracker }) => {
+        errorTracker.trackComponentError('AdminErrorBoundary', error, errorInfo);
+      });
+    }
+    
+    // Still log in development
     if (import.meta.env.DEV) {
       console.error('Admin Error Boundary caught an error:', error, errorInfo);
     }

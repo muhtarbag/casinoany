@@ -24,7 +24,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Error tracking would go here in production
+    // Track error with centralized error tracking
+    if (typeof window !== 'undefined') {
+      import('@/lib/errorTracking').then(({ errorTracker }) => {
+        errorTracker.trackComponentError('ErrorBoundary', error, errorInfo);
+      });
+    }
+    
+    // Still log in development
     if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
