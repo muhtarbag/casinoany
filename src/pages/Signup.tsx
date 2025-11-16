@@ -20,6 +20,9 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -109,7 +112,12 @@ const Signup = () => {
     e.preventDefault();
     
     if (!email || !password || !confirmPassword) {
-      toast({ title: 'Hata', description: 'Lütfen email ve şifre alanlarını doldurun', variant: 'destructive' });
+      toast({ title: 'Hata', description: 'Lütfen tüm zorunlu alanları doldurun', variant: 'destructive' });
+      return;
+    }
+    
+    if (userType === 'user' && (!firstName.trim() || !lastName.trim() || !phone.trim())) {
+      toast({ title: 'Hata', description: 'Lütfen ad, soyad ve telefon alanlarını doldurun', variant: 'destructive' });
       return;
     }
     if (password !== confirmPassword) {
@@ -141,7 +149,8 @@ const Signup = () => {
       finalSiteId = newSite.id;
     }
     
-    const result = await signUp(email, password, userType, finalSiteId);
+    const userData = userType === 'user' ? { firstName, lastName, phone } : undefined;
+    const result = await signUp(email, password, userType, finalSiteId, userData);
     if (result.error) {
       setLoading(false);
       toast({ title: 'Kayıt Başarısız', description: result.error.message, variant: 'destructive' });
@@ -207,14 +216,34 @@ const Signup = () => {
               </RadioGroup>
             </div>
 
+            {userType === 'user' && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Ad *</Label>
+                    <Input id="firstName" type="text" placeholder="Adınız" value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={loading} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Soyad *</Label>
+                    <Input id="lastName" type="text" placeholder="Soyadınız" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={loading} />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefon *</Label>
+                  <Input id="phone" type="tel" placeholder="+90 5XX XXX XX XX" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} />
+                </div>
+              </>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input id="email" type="email" placeholder="ornek@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+                <Label htmlFor="password">Şifre *</Label>
                 <div className="relative">
                   <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
@@ -223,7 +252,7 @@ const Signup = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Şifre Tekrar</Label>
+                <Label htmlFor="confirmPassword">Şifre Tekrar *</Label>
                 <div className="relative">
                   <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
