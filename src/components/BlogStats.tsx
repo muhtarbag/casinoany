@@ -11,7 +11,7 @@ export default function BlogStats() {
     queryKey: ["blog-stats"],
     queryFn: async () => {
       const { data: posts, error } = await supabase
-        .from("blog_posts" as any)
+        .from("blog_posts")
         .select("id, title, view_count, slug, category, published_at, is_published")
         .eq("is_published", true)
         .order("view_count", { ascending: false });
@@ -20,17 +20,23 @@ export default function BlogStats() {
 
       // Get comments count per post
       const { data: comments } = await supabase
-        .from("blog_comments" as any)
+        .from("blog_comments")
         .select("post_id")
         .eq("is_approved", true);
 
-      const commentsByPost = comments?.reduce((acc: any, comment: any) => {
+      const commentsByPost = comments?.reduce((acc: Record<string, number>, comment) => {
         acc[comment.post_id] = (acc[comment.post_id] || 0) + 1;
         return acc;
-      }, {});
+      }, {} as Record<string, number>);
 
-      return (posts as any[] || []).map((post: any) => ({
-        ...post,
+      return (posts || []).map((post) => ({
+        id: post.id,
+        title: post.title,
+        view_count: post.view_count,
+        slug: post.slug,
+        category: post.category,
+        published_at: post.published_at,
+        is_published: post.is_published,
         comments_count: commentsByPost?.[post.id] || 0,
       }));
     },
