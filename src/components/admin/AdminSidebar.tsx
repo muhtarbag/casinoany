@@ -83,7 +83,6 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       label: '⚙️ Sistem Hub',
       items: [
         { id: 'cache', icon: HardDrive, label: 'Cache Yönetimi', route: '/admin/system/cache', roles: [] },
-        { id: 'health', icon: AlertCircle, label: 'Sistem Sağlığı', route: '/admin/system/health', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
       ],
     },
