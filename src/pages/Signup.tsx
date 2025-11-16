@@ -14,7 +14,6 @@ import { useQuery } from '@tanstack/react-query';
 import { WizardProgress } from '@/components/wizard/WizardProgress';
 import { Step1Basic } from '@/components/wizard/Step1Basic';
 import { Step2ContactSocial } from '@/components/wizard/Step2ContactSocial';
-import { Step3Infrastructure } from '@/components/wizard/Step3Infrastructure';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -39,8 +38,6 @@ const Signup = () => {
     linkedin: '',
     youtube: '',
     logoUrl: '',
-    infrastructureProvider: '',
-    infrastructureNotes: '',
     contactName: '',
     contactEmail: '',
     contactTeams: '',
@@ -71,7 +68,7 @@ const Signup = () => {
     }
   }, [user, authLoading, navigate]);
 
-  const wizardSteps = ['Site ve Şirket', 'İletişim ve Sosyal Medya', 'Altyapı'];
+  const wizardSteps = ['Site ve Şirket', 'İletişim ve Sosyal Medya'];
 
   const validateStep = (step: number): boolean => {
     switch (step) {
@@ -182,7 +179,6 @@ const Signup = () => {
     switch (currentStep) {
       case 0: return <Step1Basic {...props} setSelectedSite={update('selectedSite')} setNewSiteName={update('newSiteName')} setCompanyName={update('companyName')} setDescription={update('description')} setLogoUrl={update('logoUrl')} />;
       case 1: return <Step2ContactSocial contactName={wizardData.contactName} setContactName={update('contactName')} contactEmail={wizardData.contactEmail} setContactEmail={update('contactEmail')} contactTeams={wizardData.contactTeams} setContactTeams={update('contactTeams')} contactTelegram={wizardData.contactTelegram} setContactTelegram={update('contactTelegram')} contactWhatsapp={wizardData.contactWhatsapp} setContactWhatsapp={update('contactWhatsapp')} facebook={wizardData.facebook} setFacebook={update('facebook')} twitter={wizardData.twitter} setTwitter={update('twitter')} instagram={wizardData.instagram} setInstagram={update('instagram')} linkedin={wizardData.linkedin} setLinkedin={update('linkedin')} youtube={wizardData.youtube} setYoutube={update('youtube')} disabled={loading} />;
-      case 2: return <Step3Infrastructure provider={wizardData.infrastructureProvider} setProvider={update('infrastructureProvider')} notes={wizardData.infrastructureNotes} setNotes={update('infrastructureNotes')} disabled={loading} />;
       default: return null;
     }
   };
