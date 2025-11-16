@@ -53,7 +53,7 @@ export default function ReviewManagement() {
   const { data: pendingReviews, isLoading: pendingLoading } = useQuery({
     queryKey: ["admin-reviews", "pending"],
     queryFn: async () => {
-      const { data: reviewsData, error: reviewsError } = await (supabase as any)
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from("site_reviews")
         .select("*")
         .eq("is_approved", false)
@@ -61,29 +61,29 @@ export default function ReviewManagement() {
 
       if (reviewsError) throw reviewsError;
 
-      const siteIds = reviewsData.map((r: any) => r.site_id);
+      const siteIds = reviewsData.map(r => r.site_id);
       const userIds = reviewsData
-        .map((r: any) => r.user_id)
-        .filter((id: string | null) => id !== null);
+        .map(r => r.user_id)
+        .filter((id): id is string => id !== null);
 
-      const { data: sites } = await (supabase as any)
+      const { data: sites } = await supabase
         .from("betting_sites")
         .select("id, name")
         .in("id", siteIds);
 
-      let profiles = [];
+      let profiles: any[] = [];
       if (userIds.length > 0) {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from("profiles")
           .select("id, username, avatar_url")
           .in("id", userIds);
         profiles = data || [];
       }
 
-      return reviewsData.map((review: any) => ({
+      return reviewsData.map(review => ({
         ...review,
-        betting_sites: sites?.find((s: any) => s.id === review.site_id),
-        profiles: profiles?.find((p: any) => p.id === review.user_id),
+        betting_sites: sites?.find(s => s.id === review.site_id),
+        profiles: profiles?.find(p => p.id === review.user_id),
       }));
     },
   });
@@ -92,7 +92,7 @@ export default function ReviewManagement() {
   const { data: approvedReviews, isLoading: approvedLoading } = useQuery({
     queryKey: ["admin-reviews", "approved"],
     queryFn: async () => {
-      const { data: reviewsData, error: reviewsError } = await (supabase as any)
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from("site_reviews")
         .select("*")
         .eq("is_approved", true)
@@ -101,36 +101,36 @@ export default function ReviewManagement() {
 
       if (reviewsError) throw reviewsError;
 
-      const siteIds = reviewsData.map((r: any) => r.site_id);
+      const siteIds = reviewsData.map(r => r.site_id);
       const userIds = reviewsData
-        .map((r: any) => r.user_id)
-        .filter((id: string | null) => id !== null);
+        .map(r => r.user_id)
+        .filter((id): id is string => id !== null);
 
-      const { data: sites } = await (supabase as any)
+      const { data: sites } = await supabase
         .from("betting_sites")
         .select("id, name")
         .in("id", siteIds);
 
-      let profiles = [];
+      let profiles: any[] = [];
       if (userIds.length > 0) {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from("profiles")
           .select("id, username, avatar_url")
           .in("id", userIds);
         profiles = data || [];
       }
 
-      return reviewsData.map((review: any) => ({
+      return reviewsData.map(review => ({
         ...review,
-        betting_sites: sites?.find((s: any) => s.id === review.site_id),
-        profiles: profiles?.find((p: any) => p.id === review.user_id),
+        betting_sites: sites?.find(s => s.id === review.site_id),
+        profiles: profiles?.find(p => p.id === review.user_id),
       }));
     },
   });
 
   const approveMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("site_reviews")
         .update({ is_approved: true })
         .eq("id", reviewId);
@@ -155,7 +155,7 @@ export default function ReviewManagement() {
 
   const rejectMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("site_reviews")
         .delete()
         .eq("id", reviewId);
@@ -180,7 +180,7 @@ export default function ReviewManagement() {
 
   const bulkApproveMutation = useMutation({
     mutationFn: async (reviewIds: string[]) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("site_reviews")
         .update({ is_approved: true })
         .in("id", reviewIds);
