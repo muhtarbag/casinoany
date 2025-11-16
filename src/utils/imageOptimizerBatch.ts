@@ -4,6 +4,7 @@
  */
 
 import { optimizeImage, OptimizationOptions, OptimizationResult } from './imageOptimizer';
+import { logger } from '@/lib/logger';
 
 export interface BatchOptimizationResult {
   results: OptimizationResult[];
@@ -32,7 +33,7 @@ export async function optimizeImageBatch(
       totalOriginalSize += result.originalSize;
       totalOptimizedSize += result.optimizedSize;
     } catch (error) {
-      console.error(`Failed to optimize ${file.name}:`, error);
+      logger.error(`Failed to optimize ${file.name}:`, error);
       failedFiles.push(file.name);
     }
   }
@@ -80,7 +81,7 @@ export async function generateResponsiveSizes(
       responsiveFiles.push(renamedFile);
       sizes.push(width);
     } catch (error) {
-      console.error(`Failed to generate ${width}w version:`, error);
+      logger.error(`Failed to generate ${width}w version:`, error);
     }
   }
 

@@ -198,7 +198,7 @@ export default function SiteDetail() {
           p_is_affiliate_click: false,
         });
       } catch (error) {
-        console.error('Error tracking casino analytics:', error);
+        // Silent fail - analytics tracking is non-critical
       }
 
       setViewTracked(true);
@@ -266,7 +266,7 @@ export default function SiteDetail() {
         // Track in new analytics system
         analytics.trackAffiliateClick(site.id, site.name);
       } catch (error) {
-        console.error('Error tracking affiliate click:', error);
+        // Silent fail - affiliate tracking is non-critical
       }
       
       window.open(site.affiliate_link, "_blank");
