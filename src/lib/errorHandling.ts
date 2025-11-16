@@ -30,7 +30,9 @@ export const handleError = (error: unknown, options: ErrorHandlerOptions = {}) =
     action,
   } = options;
 
-  console.error('Error:', error);
+  if (import.meta.env.DEV) {
+    console.error('Error:', error);
+  }
 
   let errorMessage = description || "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.";
 
@@ -120,12 +122,18 @@ export const handleLoading = (message: string, title = "Yükleniyor...") => {
 
 export const logger = {
   logError: (message: string, error?: Error | unknown) => {
-    console.error(`[ERROR] ${message}`, error);
+    if (import.meta.env.DEV) {
+      console.error(`[ERROR] ${message}`, error);
+    }
   },
   logWarning: (message: string, data?: unknown) => {
-    console.warn(`[WARNING] ${message}`, data);
+    if (import.meta.env.DEV) {
+      console.warn(`[WARNING] ${message}`, data);
+    }
   },
   logInfo: (message: string, data?: unknown) => {
-    console.info(`[INFO] ${message}`, data);
+    if (import.meta.env.DEV) {
+      console.info(`[INFO] ${message}`, data);
+    }
   }
 };
