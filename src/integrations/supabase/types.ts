@@ -1765,7 +1765,8 @@ export type Database = {
           infrastructure_notes: string | null
           infrastructure_provider: string | null
           logo_url: string | null
-          site_id: string
+          new_site_name: string | null
+          site_id: string | null
           social_facebook: string | null
           social_instagram: string | null
           social_linkedin: string | null
@@ -1789,7 +1790,8 @@ export type Database = {
           infrastructure_notes?: string | null
           infrastructure_provider?: string | null
           logo_url?: string | null
-          site_id: string
+          new_site_name?: string | null
+          site_id?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
@@ -1813,7 +1815,8 @@ export type Database = {
           infrastructure_notes?: string | null
           infrastructure_provider?: string | null
           logo_url?: string | null
-          site_id?: string
+          new_site_name?: string | null
+          site_id?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
