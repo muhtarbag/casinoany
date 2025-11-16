@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 // Helper function to generate consistent random number from site ID
 const getRandomBaseFromId = (id: string | undefined, min: number, max: number): number => {
@@ -81,13 +82,16 @@ const BettingSiteCardComponent = ({
     if (logo) {
       setIsLoading(true);
       setImageError(false);
+      
       // Eğer logo zaten tam bir URL ise direkt kullan
       if (logo.startsWith('http')) {
         setLogoUrl(logo);
+        setIsLoading(false);
       } else {
         // Değilse storage'dan al
         const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
         setLogoUrl(data.publicUrl);
+        setIsLoading(false);
       }
     } else {
       setIsLoading(false);
@@ -158,19 +162,18 @@ const BettingSiteCardComponent = ({
             )}
             
             {!showFallback ? (
-              <img 
-                src={logoUrl!} 
+              <OptimizedImage
+                src={logoUrl!}
                 alt={`${name} logo`}
                 className={`w-full h-full object-contain p-2 transition-opacity duration-300 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
                 }`}
-                onLoad={() => setIsLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setIsLoading(false);
-                }}
-                loading="lazy"
-                decoding="async"
+                width={96}
+                height={96}
+                objectFit="contain"
+                fetchPriority="auto"
+                responsive={false}
+                fallback="/placeholder.svg"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center animate-scale-in">

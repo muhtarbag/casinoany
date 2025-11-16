@@ -8,6 +8,8 @@ export interface OptimizationOptions {
   maxHeight?: number;
   quality?: number;
   format?: 'webp' | 'jpeg' | 'png';
+  generateResponsive?: boolean; // Generate multiple sizes for responsive images
+  breakpoints?: number[]; // Specific widths to generate
 }
 
 export interface OptimizationResult {
@@ -16,13 +18,16 @@ export interface OptimizationResult {
   optimizedSize: number;
   savings: number;
   format: string;
+  responsiveFiles?: File[]; // Additional responsive sizes
 }
 
 const DEFAULT_OPTIONS: OptimizationOptions = {
   maxWidth: 1920,
   maxHeight: 1080,
   quality: 0.85,
-  format: 'webp'
+  format: 'webp',
+  generateResponsive: false,
+  breakpoints: [320, 640, 768, 1024, 1280, 1920]
 };
 
 /**
