@@ -90,11 +90,11 @@ export const BlogManagement = () => {
     queryKey: ['admin-blog-posts'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_posts' as any)
+        .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data as unknown) as BlogPost[];
+      return data as BlogPost[];
     },
   });
 
@@ -170,7 +170,7 @@ export const BlogManagement = () => {
       };
       
       const { data: newPost, error } = await supabase
-        .from('blog_posts' as any)
+        .from('blog_posts')
         .insert([postData])
         .select()
         .single();
@@ -180,12 +180,12 @@ export const BlogManagement = () => {
       // Add related sites if any selected
       if (selectedSites.length > 0 && newPost) {
         const relatedSitesData = selectedSites.map((siteId, index) => ({
-          post_id: (newPost as any).id,
+          post_id: newPost.id,
           site_id: siteId,
           display_order: index,
         }));
         
-        const { error: relError } = await (supabase as any)
+        const { error: relError } = await supabase
           .from('blog_post_related_sites')
           .insert(relatedSitesData);
         
@@ -240,12 +240,12 @@ export const BlogManagement = () => {
         published_at: data.is_published ? new Date().toISOString() : null,
         primary_site_id: data.primary_site_id || null,
       };
-      const { error } = await supabase.from('blog_posts' as any).update(postData).eq('id', id);
+      const { error } = await supabase.from('blog_posts').update(postData).eq('id', id);
       if (error) throw error;
 
       // Update related sites
       // First delete existing relations
-      await (supabase as any)
+      await supabase
         .from('blog_post_related_sites')
         .delete()
         .eq('post_id', id);
@@ -258,7 +258,7 @@ export const BlogManagement = () => {
           display_order: index,
         }));
         
-        const { error: relError } = await (supabase as any)
+        const { error: relError } = await supabase
           .from('blog_post_related_sites')
           .insert(relatedSitesData);
         
@@ -278,7 +278,7 @@ export const BlogManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('blog_posts' as any).delete().eq('id', id);
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -412,14 +412,14 @@ export const BlogManagement = () => {
     setPrimarySiteId(post.primary_site_id || '');
     
     // Load related sites
-    const { data: relatedSites } = await (supabase as any)
+    const { data: relatedSites } = await supabase
       .from('blog_post_related_sites')
       .select('site_id')
       .eq('post_id', post.id)
       .order('display_order');
     
     if (relatedSites) {
-      setSelectedSites(relatedSites.map((r: any) => r.site_id));
+      setSelectedSites(relatedSites.map(r => r.site_id));
     }
     
     setEditingId(post.id);

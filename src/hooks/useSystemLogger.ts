@@ -18,7 +18,7 @@ interface LogEventParams {
 export const useSystemLogger = () => {
   const logEvent = async (params: LogEventParams) => {
     try {
-      const { error } = await (supabase as any).rpc('log_system_event', {
+      const { error } = await supabase.rpc('log_system_event', {
         p_log_type: params.logType,
         p_severity: params.severity,
         p_action: params.action,
@@ -104,7 +104,7 @@ export const useSystemLogger = () => {
     errorMessage?: string
   ) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('api_call_logs')
         .insert({
           function_name: functionName,
