@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SiteManagementContainer } from '@/features/sites/SiteManagementContainer';
+import { BannerManagement } from '@/components/BannerManagement';
 import { Globe, Star, Link2, Image, BarChart3 } from 'lucide-react';
 import { lazy, Suspense } from 'react';
 import { LoadingState } from '@/components/ui/loading-state';
@@ -63,9 +64,7 @@ export default function SitesHub() {
         </TabsContent>
 
         <TabsContent value="banners">
-          <div className="text-center py-12 text-muted-foreground">
-            Banner yönetimi (yakında)
-          </div>
+          <BannerManagement />
         </TabsContent>
       </Tabs>
     </div>
