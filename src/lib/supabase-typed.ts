@@ -33,16 +33,6 @@ export interface UserEvent {
   page_path: string | null;
 }
 
-export interface SystemHealthMetric {
-  id: string;
-  metric_type: string;
-  metric_name: string;
-  metric_value: number;
-  status: 'healthy' | 'warning' | 'critical';
-  recorded_at: string;
-  metadata: Record<string, unknown> | null;
-}
-
 export interface SystemLog {
   id: string;
   created_at: string;
@@ -91,9 +81,6 @@ export const TypedQueries = {
   
   // User events
   userEvents: (client: SupabaseTyped) => fromExtended<UserEvent>(client, 'user_events'),
-  
-  // System health
-  systemHealth: (client: SupabaseTyped) => fromExtended<SystemHealthMetric>(client, 'system_health_metrics'),
   
   // System logs
   systemLogs: (client: SupabaseTyped) => fromExtended<SystemLog>(client, 'system_logs'),

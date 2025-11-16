@@ -1919,36 +1919,6 @@ export type Database = {
           },
         ]
       }
-      system_health_metrics: {
-        Row: {
-          id: string
-          metadata: Json | null
-          metric_name: string
-          metric_type: string
-          metric_value: number
-          recorded_at: string | null
-          status: string
-        }
-        Insert: {
-          id?: string
-          metadata?: Json | null
-          metric_name: string
-          metric_type: string
-          metric_value: number
-          recorded_at?: string | null
-          status?: string
-        }
-        Update: {
-          id?: string
-          metadata?: Json | null
-          metric_name?: string
-          metric_type?: string
-          metric_value?: number
-          recorded_at?: string | null
-          status?: string
-        }
-        Relationships: []
-      }
       system_logs: {
         Row: {
           action: string
@@ -2167,23 +2137,6 @@ export type Database = {
     Functions: {
       can_view_site_stats: { Args: never; Returns: boolean }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
-      database_health_check: {
-        Args: never
-        Returns: {
-          metric_name: string
-          metric_value: string
-          status: string
-        }[]
-      }
-      detect_slow_queries: {
-        Args: { threshold_ms?: number }
-        Returns: {
-          calls: number
-          mean_time_ms: number
-          query_text: string
-          total_time_ms: number
-        }[]
-      }
       get_daily_site_metrics: {
         Args: { days_back?: number }
         Returns: {
@@ -2264,38 +2217,6 @@ export type Database = {
           p_severity: string
           p_status_code?: number
           p_user_id?: string
-        }
-        Returns: string
-      }
-      monitor_index_usage: {
-        Args: never
-        Returns: {
-          idx_scan: number
-          idx_tup_fetch: number
-          idx_tup_read: number
-          indexname: string
-          schemaname: string
-          tablename: string
-          usage_ratio: number
-        }[]
-      }
-      monitor_query_performance: {
-        Args: never
-        Returns: {
-          calls: number
-          max_time: number
-          mean_time: number
-          query_text: string
-          total_time: number
-        }[]
-      }
-      record_health_metric: {
-        Args: {
-          p_metadata?: Json
-          p_metric_name: string
-          p_metric_type: string
-          p_metric_value: number
-          p_status?: string
         }
         Returns: string
       }
