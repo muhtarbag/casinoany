@@ -24,7 +24,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const { data: allSites } = useQuery({
     queryKey: ['all-sites'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, slug, rating, bonus, features')
         .eq('is_active', true)
@@ -38,7 +38,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   const { data: popularSearches } = useQuery({
     queryKey: ['popular-searches'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('search_history')
         .select('search_term, search_count')
         .order('search_count', { ascending: false })
@@ -121,7 +121,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     if (!term.trim()) return;
     
     try {
-      await (supabase as any).rpc('track_search', { p_search_term: term });
+      await supabase.rpc('track_search', { p_search_term: term });
     } catch (error) {
       // Silent fail for analytics
     }
