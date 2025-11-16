@@ -13,6 +13,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 
@@ -177,6 +178,12 @@ const App = () => {
                 v7_relativeSplatPath: true,
               }}
             >
+              <SEOSnippets 
+                includeAnalytics={true}
+                includeGTM={false}
+                includeFacebookPixel={false}
+                includeSchemas={true}
+              />
               <OptimizedNotificationPopup />
               <ScrollToTop />
               <AppContent />
