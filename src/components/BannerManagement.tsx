@@ -171,30 +171,63 @@ export const BannerManagement = () => {
   };
 
   const uploadImage = async (file: File, isMobile: boolean = false) => {
-    const loadingToastId = showLoadingToast(`${isMobile ? 'Mobil' : 'Desktop'} görsel optimize ediliyor...`);
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      showErrorToast(new Error('Geçersiz dosya formatı'), 'Sadece JPG, PNG, WebP ve GIF dosyaları yükleyebilirsiniz');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      showErrorToast(new Error('Dosya çok büyük'), 'Maksimum dosya boyutu 10MB olabilir');
+      return;
+    }
+
+    const isGif = file.type === 'image/gif';
+    const loadingToastId = showLoadingToast(
+      isGif 
+        ? `${isMobile ? 'Mobil' : 'Desktop'} GIF yükleniyor...` 
+        : `${isMobile ? 'Mobil' : 'Desktop'} görsel optimize ediliyor...`
+    );
     
     try {
-      // Optimize image with different dimensions for mobile/desktop
-      const optimized = await optimizeImage(file, {
-        maxWidth: isMobile ? 768 : 1920,
-        maxHeight: isMobile ? 432 : 1080,
-        quality: 0.85,
-        format: 'webp'
-      });
+      let fileToUpload = file;
+      let fileName = `banner-${isMobile ? 'mobile-' : ''}${Date.now()}`;
+      let fileExtension = file.name.split('.').pop() || 'jpg';
 
-      updateToast(
-        loadingToastId,
-        'info',
-        `Optimizasyon tamamlandı: ${formatFileSize(optimized.originalSize)} → ${formatFileSize(optimized.optimizedSize)} (%${optimized.savings} tasarruf)`
-      );
+      // Skip optimization for GIFs to preserve animation
+      if (!isGif) {
+        const optimized = await optimizeImage(file, {
+          maxWidth: isMobile ? 768 : 1920,
+          maxHeight: isMobile ? 432 : 1080,
+          quality: 0.85,
+          format: 'webp'
+        });
 
-      // Upload optimized image
-      const fileName = `banner-${isMobile ? 'mobile-' : ''}${Date.now()}.${optimized.format}`;
+        updateToast(
+          loadingToastId,
+          'info',
+          `Optimizasyon tamamlandı: ${formatFileSize(optimized.originalSize)} → ${formatFileSize(optimized.optimizedSize)} (%${optimized.savings} tasarruf)`
+        );
+
+        fileToUpload = optimized.file;
+        fileExtension = optimized.format;
+      } else {
+        updateToast(
+          loadingToastId,
+          'info',
+          `GIF yükleniyor (${formatFileSize(file.size)})`
+        );
+      }
+
+      fileName = `${fileName}.${fileExtension}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('notification-images')
-        .upload(filePath, optimized.file);
+        .upload(filePath, fileToUpload);
 
       if (uploadError) throw uploadError;
 
@@ -208,7 +241,11 @@ export const BannerManagement = () => {
         setFormData({ ...formData, image_url: publicUrl });
       }
       
-      showSuccessToast(`${isMobile ? 'Mobil' : 'Desktop'} görsel başarıyla yüklendi!`);
+      showSuccessToast(
+        isGif 
+          ? `${isMobile ? 'Mobil' : 'Desktop'} GIF başarıyla yüklendi!`
+          : `${isMobile ? 'Mobil' : 'Desktop'} görsel başarıyla yüklendi!`
+      );
     } catch (error: any) {
       showErrorToast(error, 'Görsel yüklenirken bir hata oluştu');
     }
@@ -240,7 +277,8 @@ export const BannerManagement = () => {
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
       toast.error('Lütfen bir görsel dosyası yükleyin');
       return;
     }
@@ -309,12 +347,15 @@ export const BannerManagement = () => {
                     <input
                       id="image"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
                       onChange={(e) => handleImageUpload(e, false)}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <p className="text-xs text-muted-foreground mt-2">
-                      PNG, JPG, WEBP (Maks. 5MB)
+                      PNG, JPG, WebP, GIF (Maks. 10MB)
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      GIF dosyaları animasyonlu olarak yüklenecektir
                     </p>
                   </div>
                   {formData.image_url && (
@@ -353,12 +394,15 @@ export const BannerManagement = () => {
                     <input
                       id="mobile-image"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
                       onChange={(e) => handleImageUpload(e, true)}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <p className="text-xs text-muted-foreground mt-2">
-                      PNG, JPG, WEBP (Maks. 5MB)
+                      PNG, JPG, WebP, GIF (Maks. 10MB)
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      GIF dosyaları animasyonlu olarak yüklenecektir
                     </p>
                   </div>
                   {formData.mobile_image_url && (
