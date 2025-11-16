@@ -33,8 +33,7 @@ export const useNewsArticles = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.MEDIUM,
-    refetchInterval: REFETCH_INTERVALS.NORMAL,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 

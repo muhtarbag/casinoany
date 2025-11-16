@@ -33,8 +33,7 @@ export const useBlogPosts = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.MEDIUM,
-    refetchInterval: REFETCH_INTERVALS.NORMAL,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
@@ -136,8 +135,7 @@ export const useBlogStats = () => {
         comments_count: commentsByPost[post.id] || 0,
       }));
     },
-    staleTime: CACHE_TIMES.MEDIUM,
-    refetchInterval: REFETCH_INTERVALS.SLOW,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
