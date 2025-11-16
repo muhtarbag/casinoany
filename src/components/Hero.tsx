@@ -81,7 +81,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const { data: carouselSettings } = useQuery({
     queryKey: ['carousel-settings'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_settings')
         .select('setting_key, setting_value')
         .in('setting_key', ['carousel_animation_type', 'carousel_auto_scroll_duration']);

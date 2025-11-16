@@ -32,7 +32,7 @@ export const FeaturedSitesManagement = () => {
   const toggleFeaturedMutation = useMutation({
     mutationFn: async ({ id, isFeatured }: { id: string; isFeatured: boolean }) => {
       setUpdatingId(id);
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('betting_sites')
         .update({ is_featured: isFeatured })
         .eq('id', id);
