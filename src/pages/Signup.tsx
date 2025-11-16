@@ -155,14 +155,14 @@ const Signup = () => {
                 <div className="flex items-center space-x-2 border rounded-lg p-3">
                   <RadioGroupItem value="user" id="user" />
                   <Label htmlFor="user" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Kullanıcı (B2C)</div>
+                    <div className="font-semibold">Bireysel Kullanıcı Kaydı</div>
                     <div className="text-sm text-muted-foreground">Siteleri favorilere ekle, yorum yap, şikayet et</div>
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2 border rounded-lg p-3">
                   <RadioGroupItem value="site_owner" id="site_owner" />
                   <Label htmlFor="site_owner" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Site Sahibi (B2B)</div>
+                    <div className="font-semibold">Kurumsal Kullanıcı Kaydı</div>
                     <div className="text-sm text-muted-foreground">Kendi sitenizi yönetin, yorumları ve şikayetleri yanıtlayın</div>
                   </Label>
                 </div>
