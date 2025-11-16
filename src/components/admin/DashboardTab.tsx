@@ -11,12 +11,6 @@ interface DashboardStats {
 
 interface DashboardTabProps {
   dashboardStats: DashboardStats;
-  dailyPageViews?: any[];
-  deviceStats?: any[];
-  topPages?: any[];
-  weeklyComparison?: any[];
-  monthlyTrend?: any[];
-  customMetrics?: any;
   onNavigate?: (tab: string) => void;
 }
 

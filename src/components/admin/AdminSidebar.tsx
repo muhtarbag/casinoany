@@ -9,10 +9,8 @@ import {
   DollarSign,
   Mail,
   Shield,
-  AlertCircle,
   Folder,
-  Bell,
-  HardDrive
+  Bell
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -82,7 +80,6 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
     {
       label: '⚙️ Sistem Hub',
       items: [
-        { id: 'cache', icon: HardDrive, label: 'Cache Yönetimi', route: '/admin/system/cache', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
       ],
     },
