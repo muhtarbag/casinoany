@@ -21,6 +21,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState<'user' | 'site_owner'>('user');
   const [selectedSite, setSelectedSite] = useState('');
+  const [newSiteName, setNewSiteName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [description, setDescription] = useState('');
   const { signUp, user, loading: authLoading } = useAuth();
@@ -86,8 +87,45 @@ const Signup = () => {
       return;
     }
 
+    if (userType === 'site_owner' && selectedSite === 'new_site' && !newSiteName.trim()) {
+      toast({
+        title: 'Hata',
+        description: 'Lütfen site adını girin',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
-    const result = await signUp(email, password);
+    
+    // If new site, create it first
+    let finalSiteId = selectedSite;
+    if (userType === 'site_owner' && selectedSite === 'new_site') {
+      const { data: newSite, error: siteError } = await (supabase as any)
+        .from('betting_sites')
+        .insert({
+          name: newSiteName.trim(),
+          slug: newSiteName.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+          affiliate_link: '#',
+          is_active: false // Admin approval needed
+        })
+        .select()
+        .single();
+      
+      if (siteError) {
+        setLoading(false);
+        toast({
+          title: 'Hata',
+          description: 'Site oluşturulurken bir hata oluştu',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      finalSiteId = newSite.id;
+    }
+    
+    const result = await signUp(email, password, userType, finalSiteId !== 'new_site' ? finalSiteId : undefined);
 
     if (result.error) {
       setLoading(false);
@@ -103,20 +141,24 @@ const Signup = () => {
     const { data: { user: newUser } } = await supabase.auth.getUser();
 
     // If site owner, create ownership request
-    if (userType === 'site_owner' && newUser) {
+    if (userType === 'site_owner' && newUser && finalSiteId) {
       await (supabase as any)
         .from('site_owners')
         .insert({
           user_id: newUser.id,
-          site_id: selectedSite,
+          site_id: finalSiteId,
           company_name: companyName,
           description: description,
           status: 'pending'
         });
 
+      const siteMessage = selectedSite === 'new_site' 
+        ? 'Yeni site ve site sahipliği başvurunuz alındı.' 
+        : 'Site sahipliği başvurunuz alındı.';
+      
       toast({
         title: 'Başvuru Alındı!',
-        description: 'Site sahipliği başvurunuz alındı. Admin onayı bekleniyor. Onaylandığında size bildirilecek.',
+        description: `${siteMessage} Admin onayı bekleniyor. Onaylandığında size bildirilecek.`,
         duration: 6000,
       });
     } else {
@@ -212,17 +254,48 @@ const Signup = () => {
                   <Label htmlFor="site">Site Seçimi *</Label>
                   <Select value={selectedSite} onValueChange={setSelectedSite} disabled={loading}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sitenizi seçin" />
+                      <SelectValue placeholder="Sitenizi seçin veya yeni site ekleyin" />
                     </SelectTrigger>
                     <SelectContent>
-                      {sites?.map((site) => (
-                        <SelectItem key={site.id} value={site.id}>
-                          {site.name}
+                      <SelectItem value="new_site" className="font-semibold text-primary">
+                        ➕ Yeni Site Ekle
+                      </SelectItem>
+                      {sites && sites.length > 0 ? (
+                        sites.map((site) => (
+                          <SelectItem key={site.id} value={site.id}>
+                            {site.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no_sites" disabled>
+                          Sistemde kayıtlı site bulunmuyor
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
+                  {!sites || sites.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Sistemde henüz site yok. Yeni site ekleyebilirsiniz.
+                    </p>
+                  )}
                 </div>
+
+                {selectedSite === 'new_site' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="newSiteName">Yeni Site Adı *</Label>
+                    <Input
+                      id="newSiteName"
+                      type="text"
+                      placeholder="Örn: Sahabet, Betboo"
+                      value={newSiteName}
+                      onChange={(e) => setNewSiteName(e.target.value)}
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Site admin onayından sonra aktif hale gelecektir
+                    </p>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Şirket Adı (Opsiyonel)</Label>
