@@ -16,7 +16,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
   const { data: relatedSites, isLoading } = useQuery({
     queryKey: ['blog-related-sites', postId],
     queryFn: async () => {
-      const { data: relations, error: relError } = await (supabase as any)
+      const { data: relations, error: relError } = await supabase
         .from('blog_post_related_sites')
         .select('site_id, display_order')
         .eq('post_id', postId)
@@ -36,8 +36,8 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
 
       // Sort sites according to display_order
       const sortedSites = sites?.sort((a, b) => {
-        const orderA = (relations as any[]).find((r: any) => r.site_id === a.id)?.display_order || 0;
-        const orderB = (relations as any[]).find((r: any) => r.site_id === b.id)?.display_order || 0;
+        const orderA = relations.find(r => r.site_id === a.id)?.display_order || 0;
+        const orderB = relations.find(r => r.site_id === b.id)?.display_order || 0;
         return orderA - orderB;
       });
 

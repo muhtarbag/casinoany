@@ -35,7 +35,7 @@ export const CarouselSettings = () => {
   const { data: settings, isLoading } = useQuery({
     queryKey: ['carousel-settings'],
     queryFn: async () => {
-      const { data: animData, error: animError } = await (supabase as any)
+      const { data: animData, error: animError } = await supabase
         .from('site_settings')
         .select('*')
         .eq('setting_key', 'carousel_animation_type')
@@ -43,7 +43,7 @@ export const CarouselSettings = () => {
       
       if (animError) throw animError;
       
-      const { data: durationData, error: durationError } = await (supabase as any)
+      const { data: durationData, error: durationError } = await supabase
         .from('site_settings')
         .select('*')
         .eq('setting_key', 'carousel_auto_scroll_duration')
@@ -51,8 +51,8 @@ export const CarouselSettings = () => {
       
       if (durationError) throw durationError;
       
-      setSelectedAnimation((animData as any).setting_value);
-      setDuration(parseInt((durationData as any).setting_value));
+      setSelectedAnimation(animData.setting_value);
+      setDuration(parseInt(durationData.setting_value));
       
       return { animation: animData, duration: durationData };
     },
@@ -60,7 +60,7 @@ export const CarouselSettings = () => {
 
   const updateAnimationMutation = useMutation({
     mutationFn: async (animationType: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('site_settings')
         .update({ setting_value: animationType, updated_at: new Date().toISOString() })
         .eq('setting_key', 'carousel_animation_type');
@@ -85,7 +85,7 @@ export const CarouselSettings = () => {
 
   const updateDurationMutation = useMutation({
     mutationFn: async (newDuration: number) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('site_settings')
         .update({ setting_value: newDuration.toString(), updated_at: new Date().toISOString() })
         .eq('setting_key', 'carousel_auto_scroll_duration');

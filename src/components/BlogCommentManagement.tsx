@@ -17,7 +17,7 @@ export const BlogCommentManagement = () => {
     queryKey: ['admin-blog-comments'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .select(`
           *,
           blog_posts!inner(title),
@@ -33,7 +33,7 @@ export const BlogCommentManagement = () => {
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .update({ is_approved: true })
         .eq('id', id);
       if (error) throw error;
@@ -50,7 +50,7 @@ export const BlogCommentManagement = () => {
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .update({ is_approved: false })
         .eq('id', id);
       if (error) throw error;
@@ -67,7 +67,7 @@ export const BlogCommentManagement = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .delete()
         .eq('id', id);
       if (error) throw error;

@@ -26,7 +26,7 @@ export const BonusRequestsManagement = () => {
   const { data: requests, isLoading } = useQuery({
     queryKey: ['bonus-requests'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('bonus_requests')
         .select(`
           *,

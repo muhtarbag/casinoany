@@ -45,7 +45,7 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
 
   const createReviewMutation = useMutation({
     mutationFn: async (data: ReviewFormData) => {
-      const { error } = await supabase.from("site_reviews" as any).insert({
+      const { error } = await supabase.from("site_reviews").insert({
         site_id: siteId,
         user_id: user?.id || null,
         name: data.name,
