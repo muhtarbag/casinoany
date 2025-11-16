@@ -27,6 +27,7 @@ const Signup = lazyWithPreload(() => import("./pages/Signup"));
 import AdminRoot from "./pages/admin";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminSiteManagement from "./pages/admin/sites/SiteManagement";
+import AdminRoleManagement from "./pages/admin/system/RoleManagement";
 
 // Secondary admin pages can be lazy loaded safely
 const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/BlogManagement"));
@@ -48,7 +49,6 @@ const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteSta
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
-const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
 const BlogPost = lazyWithPreload(() => import("./pages/BlogPost"));
 const News = lazyWithPreload(() => import("./pages/News"));
