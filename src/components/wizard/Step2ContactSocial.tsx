@@ -1,8 +1,9 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube, Link2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+
 interface Step2ContactSocialProps {
   contactName: string;
   setContactName: (value: string) => void;
@@ -24,6 +25,14 @@ interface Step2ContactSocialProps {
   setLinkedin: (value: string) => void;
   youtube: string;
   setYoutube: (value: string) => void;
+  telegramChannel: string;
+  setTelegramChannel: (value: string) => void;
+  kick: string;
+  setKick: (value: string) => void;
+  discord: string;
+  setDiscord: (value: string) => void;
+  bioLink: string;
+  setBioLink: (value: string) => void;
   disabled?: boolean;
 }
 export const Step2ContactSocial = ({
@@ -47,6 +56,14 @@ export const Step2ContactSocial = ({
   setLinkedin,
   youtube,
   setYoutube,
+  telegramChannel,
+  setTelegramChannel,
+  kick,
+  setKick,
+  discord,
+  setDiscord,
+  bioLink,
+  setBioLink,
   disabled
 }: Step2ContactSocialProps) => {
   const hasAtLeastOneContact = contactEmail || contactTeams || contactTelegram || contactWhatsapp;
@@ -147,6 +164,38 @@ export const Step2ContactSocial = ({
               YouTube
             </Label>
             <Input id="youtube" type="url" placeholder="https://youtube.com/..." value={youtube} onChange={e => setYoutube(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="telegramChannel" className="flex items-center gap-2">
+              <Send className="w-4 h-4 text-sky-500" />
+              Telegram Kanalı
+            </Label>
+            <Input id="telegramChannel" type="url" placeholder="https://t.me/..." value={telegramChannel} onChange={e => setTelegramChannel(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="kick" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-green-600" />
+              Kick
+            </Label>
+            <Input id="kick" type="url" placeholder="https://kick.com/..." value={kick} onChange={e => setKick(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="discord" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-indigo-600" />
+              Discord
+            </Label>
+            <Input id="discord" type="url" placeholder="https://discord.gg/..." value={discord} onChange={e => setDiscord(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bioLink" className="flex items-center gap-2">
+              <Link2 className="w-4 h-4 text-purple-600" />
+              Bio/Link Sayfası
+            </Label>
+            <Input id="bioLink" type="url" placeholder="https://linktr.ee/... veya benzeri" value={bioLink} onChange={e => setBioLink(e.target.value)} disabled={disabled} />
           </div>
         </div>
       </div>
