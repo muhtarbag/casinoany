@@ -96,8 +96,100 @@
 </head>
 
   <body>
-    <div id="root"></div>
+    <!-- Noscript fallback for crawlers and users without JS -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: system-ui;">
+        <h1>CasinoAny - Güvenilir Casino Siteleri</h1>
+        <p>Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları.</p>
+        <p>Bu site JavaScript gerektirir. Lütfen JavaScript'i etkinleştirin.</p>
+      </div>
+    </noscript>
+    
+    <!-- Initial content for crawlers (hidden when React loads) -->
+    <div id="root">
+      <div id="initial-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: system-ui;">
+        <header style="margin-bottom: 40px;">
+          <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 16px;">
+            Güvenilir Casino Siteleri 2025 | %500 Bonus
+          </h1>
+          <p style="font-size: 18px; color: #666; line-height: 1.6;">
+            Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, 
+            hızlı para çekme garantisi. 50+ lisanslı casino incelemesi. Slot, rulet, canlı casino oyunları.
+          </p>
+        </header>
+        
+        <main>
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 20px;">
+              Öne Çıkan Casino Siteleri
+            </h2>
+            <div style="display: grid; gap: 20px;">
+              <article style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">Kingbetting</h3>
+                <p style="color: #666; margin-bottom: 12px;">25.000 TL Hoşgeldin Bonusu + 300 Free Spin</p>
+                <ul style="list-style: none; padding: 0; color: #666;">
+                  <li>✓ 6200+ Mega Koleksiyon</li>
+                  <li>✓ VIP Royalty Club</li>
+                  <li>✓ Express Çekim 2-6 Saat</li>
+                </ul>
+              </article>
+              
+              <article style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">KingRoyal</h3>
+                <p style="color: #666; margin-bottom: 12px;">1200 TL Deneme Bonusu</p>
+                <ul style="list-style: none; padding: 0; color: #666;">
+                  <li>✓ Spor Bahisleri</li>
+                  <li>✓ Canlı Casino</li>
+                  <li>✓ VIP Program</li>
+                </ul>
+              </article>
+              
+              <article style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">Meritking</h3>
+                <p style="color: #666; margin-bottom: 12px;">500 TL Hoş Geldin Bonusu</p>
+                <ul style="list-style: none; padding: 0; color: #666;">
+                  <li>✓ Casino & Canlı Casino</li>
+                  <li>✓ Slot Oyunları</li>
+                  <li>✓ Mobil Uygulama</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+          
+          <section style="margin-bottom: 40px;">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px;">
+              Casino Siteleri Hakkında
+            </h2>
+            <p style="color: #666; line-height: 1.8; margin-bottom: 12px;">
+              CasinoAny olarak Türkiye'deki en güvenilir casino ve bahis sitelerini bir araya getiriyoruz. 
+              Lisanslı, güvenilir ve yüksek bonus sunan 50+ casino sitesini detaylı olarak inceliyoruz.
+            </p>
+            <p style="color: #666; line-height: 1.8;">
+              Kullanıcı yorumları, bonus karşılaştırmaları ve detaylı site incelemeleri ile doğru seçimi 
+              yapmanıza yardımcı oluyoruz. Hızlı para çekme, canlı destek ve mobil uyumluluk gibi kriterleri 
+              değerlendiriyoruz.
+            </p>
+          </section>
+        </main>
+        
+        <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; text-align: center;">
+          <p>&copy; 2025 CasinoAny. Tüm hakları saklıdır.</p>
+        </footer>
+      </div>
+    </div>
+    
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Hide initial content after React loads -->
+    <script>
+      // This will run after React mounts and removes the static content
+      window.addEventListener('DOMContentLoaded', () => {
+        const initialContent = document.getElementById('initial-content');
+        if (initialContent && window.React) {
+          setTimeout(() => initialContent.remove(), 100);
+        }
+      });
+    </script>
     
     <!-- Service Worker is auto-registered by vite-plugin-pwa -->
   </body>
