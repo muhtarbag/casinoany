@@ -455,16 +455,6 @@ export default function SiteDetail() {
 
             {/* Contact Info */}
             <SiteDetailContact site={site} />
-
-            {/* Stats */}
-            {stats && (
-              <div className="border-t mt-6 pt-6">
-                <div className="flex gap-6 text-sm text-muted-foreground">
-                  <span>👁️ {(stats as any).views} görüntülenme</span>
-                  <span>🖱️ {(stats as any).clicks} tıklama</span>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
