@@ -198,17 +198,6 @@ export default function SiteDetail() {
           .insert({ site_id: site.id, views: 1, clicks: 0 });
       }
 
-      // Track casino analytics
-      try {
-        await TypedRPC.incrementCasinoAnalytics({
-          p_site_id: site.id,
-          p_block_name: undefined,
-          p_is_affiliate_click: false,
-        });
-      } catch (error) {
-        // Silent fail - analytics tracking is non-critical
-      }
-
       setViewTracked(true);
       // Only invalidate site-stats, not all queries
       queryClient.setQueryData(["site-stats", site.id], (old: any) => {
@@ -255,17 +244,17 @@ export default function SiteDetail() {
         const { error } = await supabase
           .from("site_stats")
           .update({ clicks: stats.clicks + 1 })
-          .eq("site_id", id);
+          .eq("site_id", site.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("site_stats")
-          .insert({ site_id: id, clicks: 1, views: 1 });
+          .insert({ site_id: site.id, clicks: 1, views: 1 });
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["site-stats", id] });
+      queryClient.invalidateQueries({ queryKey: ["site-stats", site?.id] });
     },
   });
 
@@ -273,15 +262,8 @@ export default function SiteDetail() {
     if (site?.affiliate_link && site?.id) {
       trackClickMutation.mutate();
       
-      // Track affiliate click in analytics
+      // Track in analytics system
       try {
-        await TypedRPC.incrementCasinoAnalytics({
-          p_site_id: site.id,
-          p_block_name: undefined,
-          p_is_affiliate_click: true,
-        });
-        
-        // Track in new analytics system
         analytics.trackAffiliateClick(site.id, site.name);
       } catch (error) {
         // Silent fail - affiliate tracking is non-critical

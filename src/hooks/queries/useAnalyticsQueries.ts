@@ -45,6 +45,13 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
 
       if (metricsError) throw metricsError;
 
+      // Fetch real-time data from site_stats (for today's data that may not be in affiliate_metrics yet)
+      const { data: siteStats, error: siteStatsError } = await supabase
+        .from('site_stats')
+        .select('site_id, views, clicks');
+
+      if (siteStatsError) throw siteStatsError;
+
       // Fetch conversion data (affiliate clicks)
       const { data: conversions, error: conversionsError } = await supabase
         .from('conversions')
@@ -72,6 +79,15 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
           affiliate_clicks: 0,
           trend_data: [],
         });
+      });
+
+      // Add real-time site_stats data (today's data)
+      siteStats?.forEach((stat: any) => {
+        const site = siteMap.get(stat.site_id);
+        if (site) {
+          site.views += stat.views || 0;
+          site.clicks += stat.clicks || 0;
+        }
       });
 
       // Add metrics data
