@@ -166,3 +166,67 @@ export const ReviewSchema = ({ reviews, itemName, itemType = 'Product' }: {
 
   return <StructuredData data={data} />;
 };
+
+// Casino Product Schema - Google Rich Results için özel schema
+export const CasinoProductSchema = ({ 
+  site,
+  logoUrl,
+  reviews
+}: {
+  site: {
+    name: string;
+    slug: string;
+    bonus?: string | null;
+    rating?: number | null;
+    avg_rating?: number | null;
+    review_count?: number | null;
+    features?: string[] | null;
+  };
+  logoUrl?: string;
+  reviews?: Array<{ rating: number }>;
+}) => {
+  const avgRating = site.avg_rating || site.rating || 
+    (reviews && reviews.length > 0 
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+      : 0);
+  
+  const reviewCount = site.review_count || reviews?.length || 0;
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: site.name,
+    image: logoUrl || `${window.location.origin}/logos/${site.slug}-logo.png`,
+    description: site.bonus || `${site.name} - Güvenilir online casino ve bahis sitesi`,
+    brand: {
+      '@type': 'Brand',
+      name: site.name
+    },
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/InStock',
+      price: '0',
+      priceCurrency: 'TRY',
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      url: `${window.location.origin}/site/${site.slug}`
+    },
+    ...(avgRating > 0 && reviewCount > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: reviewCount,
+        bestRating: 5,
+        worstRating: 1
+      }
+    }),
+    ...(site.features && site.features.length > 0 && {
+      additionalProperty: site.features.map(feature => ({
+        '@type': 'PropertyValue',
+        name: 'Özellik',
+        value: feature
+      }))
+    })
+  };
+
+  return <StructuredData data={data} />;
+};
