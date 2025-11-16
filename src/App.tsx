@@ -95,11 +95,12 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           
-          {/* Admin routes - nested */}
+          {/* Admin routes - AdminRoot provides internal Suspense for lazy pages */}
           <Route path="/admin" element={<AdminRoot />}>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="sites" element={<AdminSiteManagement />} />
+            <Route path="system/roles" element={<AdminRoleManagement />} />
             
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
             <Route path="sites/banners" element={<AdminBannerManagement />} />
@@ -120,7 +121,6 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
-            <Route path="system/roles" element={<AdminRoleManagement />} />
           </Route>
           
           <Route path="/about" element={<About />} />
