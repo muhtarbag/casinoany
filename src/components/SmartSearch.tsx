@@ -84,6 +84,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
   useEffect(() => {
     if (!localSearch.trim() || !allSites) {
       setSuggestions([]);
+      setShowSuggestions(false);
       return;
     }
 
@@ -101,6 +102,10 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
       .slice(0, 5);
 
     setSuggestions(searchResults);
+    if (searchResults.length > 0) {
+      setShowSuggestions(true);
+      setShowPopular(false);
+    }
   }, [localSearch, allSites]);
 
   // Close suggestions when clicking outside
@@ -174,7 +179,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
               setTimeout(() => {
                 setShowSuggestions(false);
                 setShowPopular(false);
-              }, 200);
+              }, 300);
             }}
             className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
