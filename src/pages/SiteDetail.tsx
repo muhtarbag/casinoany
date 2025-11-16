@@ -38,7 +38,7 @@ interface Review {
 import { SEO } from '@/components/SEO';
 import { SiteBlogSection } from '@/components/SiteBlogSection';
 import { CasinoReviewCoreContent } from '@/components/casino/CasinoReviewCoreContent';
-import { BreadcrumbSchema, FAQSchema, ReviewSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, FAQSchema, ReviewSchema, CasinoProductSchema } from '@/components/StructuredData';
 import { CasinoReviewSchema, ExpertReviewSchema } from '@/components/seo/GamblingSEOSchemas';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 
@@ -364,6 +364,13 @@ export default function SiteDetail() {
         license="Curacao eGaming"
         paymentMethods={['Papara', 'Cepbank', 'Kredi Kartı', 'Kripto']}
         gameProviders={['Pragmatic Play', 'Evolution Gaming', 'NetEnt']}
+      />
+      
+      {/* Casino Product Schema - Google Rich Results */}
+      <CasinoProductSchema
+        site={site}
+        logoUrl={logoUrl || undefined}
+        reviews={reviews || []}
       />
       
       {/* Expert Review Schema (E-E-A-T) */}

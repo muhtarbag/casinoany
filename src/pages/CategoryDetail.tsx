@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import NotFound from './NotFound';
+import { BreadcrumbSchema, ItemListSchema } from '@/components/StructuredData';
 
 export default function CategoryDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -43,6 +44,25 @@ export default function CategoryDetail() {
         description={seoDescription}
         canonical={`/kategori/${category.slug}`}
       />
+      
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema items={[
+        { name: 'Ana Sayfa', url: window.location.origin },
+        { name: 'Kategoriler', url: `${window.location.origin}/kategoriler` },
+        { name: category.name, url: `${window.location.origin}/kategori/${category.slug}` }
+      ]} />
+      
+      {/* ItemList Schema for sites in this category */}
+      {category.sites && category.sites.length > 0 && (
+        <ItemListSchema 
+          title={`${category.name} - En İyi Bahis Siteleri`}
+          items={category.sites.map((site: any) => ({
+            name: site.name,
+            url: `${window.location.origin}/site/${site.slug}`,
+            image: site.logo_url || undefined
+          }))}
+        />
+      )}
 
       <Header />
 
