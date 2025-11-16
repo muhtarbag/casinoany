@@ -12,6 +12,8 @@ interface OptimizedImageProps {
   fallback?: string;
   fetchPriority?: 'high' | 'low' | 'auto';
   sizes?: string;
+  responsive?: boolean; // Enable responsive images with srcset
+  breakpoints?: number[]; // Custom breakpoints for srcset
 }
 
 /**
@@ -32,7 +34,9 @@ export const OptimizedImage = ({
   objectFit = 'contain',
   fallback = '/placeholder.svg',
   fetchPriority = 'auto',
-  sizes
+  sizes,
+  responsive = false,
+  breakpoints = [320, 640, 768, 1024, 1280, 1920]
 }: OptimizedImageProps) => {
   const [imageSrc, setImageSrc] = useState(src);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -63,6 +67,77 @@ export const OptimizedImage = ({
     return null;
   }
 
+  // Generate WebP URL (assumes WebP version exists with .webp extension)
+  const getWebPUrl = (url: string) => {
+    if (!url) return url;
+    // If already webp, return as is
+    if (url.endsWith('.webp')) return url;
+    // Replace extension with .webp
+    return url.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  };
+
+  // Generate srcset for responsive images
+  const generateSrcSet = (url: string) => {
+    if (!responsive || !url) return undefined;
+    
+    const baseName = url.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+    const ext = url.match(/\.(jpg|jpeg|png|webp)$/i)?.[0] || '.webp';
+    
+    return breakpoints
+      .map(bp => `${baseName}-${bp}w${ext} ${bp}w`)
+      .join(', ');
+  };
+
+  const webpSrc = getWebPUrl(imageSrc);
+  const originalSrcSet = generateSrcSet(imageSrc);
+  const webpSrcSet = generateSrcSet(webpSrc);
+
+  // If responsive, use <picture> element for better format support
+  if (responsive) {
+    return (
+      <picture>
+        {/* WebP sources with srcset */}
+        {webpSrcSet && (
+          <source
+            type="image/webp"
+            srcSet={webpSrcSet}
+            sizes={sizes || '100vw'}
+          />
+        )}
+        {/* Fallback to original format with srcset */}
+        {originalSrcSet && (
+          <source
+            srcSet={originalSrcSet}
+            sizes={sizes || '100vw'}
+          />
+        )}
+        {/* Final fallback img */}
+        <img
+          src={imageSrc}
+          alt={alt}
+          className={cn(
+            'transition-opacity duration-300',
+            isLoaded ? 'opacity-100' : 'opacity-70',
+            className
+          )}
+          style={{
+            objectFit,
+            ...(width && { width: `${width}px` }),
+            ...(height && { height: `${height}px` })
+          }}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={priority ? 'high' : fetchPriority}
+          onLoad={handleLoad}
+          onError={handleError}
+          width={width}
+          height={height}
+        />
+      </picture>
+    );
+  }
+
+  // Standard img element (non-responsive)
   return (
     <img
       src={imageSrc}

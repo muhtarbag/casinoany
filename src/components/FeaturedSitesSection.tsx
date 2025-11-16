@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from './LoadingSpinner';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 export const FeaturedSitesSection = () => {
   const { data: featuredSites, isLoading } = useQuery({
@@ -42,10 +43,16 @@ export const FeaturedSitesSection = () => {
         >
           <div className="flex items-center gap-4 mb-4">
             {site.logo_url ? (
-              <img
+              <OptimizedImage
                 src={site.logo_url}
-                alt={site.name}
-                className="w-16 h-16 rounded-lg object-contain"
+                alt={`${site.name} logo`}
+                className="w-16 h-16 rounded-lg"
+                width={64}
+                height={64}
+                objectFit="contain"
+                fetchPriority="auto"
+                responsive={false}
+                fallback="/placeholder.svg"
               />
             ) : (
               <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
