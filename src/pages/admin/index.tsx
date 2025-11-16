@@ -73,6 +73,7 @@ export default function AdminRoot() {
       'system/health': 'health',
       'system/logs': 'logs',
       'system/history': 'history',
+      'system/users': 'users',
       'system/roles': 'roles',
       'system/build-health': 'build-health',
     };
@@ -106,6 +107,7 @@ export default function AdminRoot() {
       'health': '/admin/system/health',
       'logs': '/admin/system/logs',
       'history': '/admin/system/history',
+      'users': '/admin/system/users',
       'roles': '/admin/system/roles',
       'build-health': '/admin/system/build-health',
     };
@@ -150,6 +152,7 @@ export default function AdminRoot() {
       'logs': 'Sistem Logları',
       'performance': 'Performance İzleme',
       'roles': 'Rol Yönetimi',
+      'users': 'Kullanıcılar',
       'build-health': 'Build Sağlığı',
       'categories': 'Kategoriler',
       'banners': 'Banner Yönetimi',

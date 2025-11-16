@@ -80,6 +80,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
     {
       label: '⚙️ Sistem Hub',
       items: [
+        { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
       ],
     },
