@@ -102,17 +102,17 @@ const BettingSiteCardComponent = ({
     mutationFn: async () => {
       if (!id) return;
       const { data: stats } = await supabase
-        .from('site_stats' as any)
+        .from('site_stats')
         .select('*')
         .eq('site_id', id)
         .maybeSingle();
 
       if (stats) {
-        await supabase.from('site_stats' as any)
-          .update({ clicks: (stats as any).clicks + 1 })
+        await supabase.from('site_stats')
+          .update({ clicks: stats.clicks + 1 })
           .eq('site_id', id);
       } else {
-        await supabase.from('site_stats' as any)
+        await supabase.from('site_stats')
           .insert({ site_id: id, clicks: 1, views: 0 });
       }
     },
@@ -233,7 +233,8 @@ const BettingSiteCardComponent = ({
                   aria-label={link.label}
                   style={{ 
                     backgroundColor: 'hsl(var(--muted))',
-                    ['--brand-color' as any]: link.color,
+                    // @ts-ignore - CSS custom property
+                    '--brand-color': link.color,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = link.color;

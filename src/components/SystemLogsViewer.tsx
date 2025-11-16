@@ -20,7 +20,7 @@ export const SystemLogsViewer = () => {
   const { data: logs, isLoading } = useQuery({
     queryKey: ['system-logs', logType, severity],
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('system_logs')
         .select('*')
         .order('created_at', { ascending: false })
@@ -44,7 +44,7 @@ export const SystemLogsViewer = () => {
   const { data: apiLogs } = useQuery({
     queryKey: ['api-logs'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('api_call_logs')
         .select('*')
         .order('created_at', { ascending: false })

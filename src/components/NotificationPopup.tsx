@@ -24,14 +24,7 @@ interface Notification {
   text_color: string | null;
   trigger_type: string;
   trigger_conditions: any;
-  form_fields?: {
-    email_label: string;
-    phone_label: string;
-    submit_text: string;
-    success_message: string;
-    privacy_text: string;
-    button_color: string;
-  } | null;
+  form_fields?: any;
 }
 
 // Oturum ID'si oluştur
@@ -102,7 +95,7 @@ export const NotificationPopup = () => {
       
       const now = new Date().toISOString();
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_notifications')
         .select('*')
         .eq('is_active', true)
@@ -130,7 +123,7 @@ export const NotificationPopup = () => {
   const { data: viewedNotifications } = useQuery({
     queryKey: ['viewed-notifications', sessionId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('notification_views')
         .select('notification_id, viewed_at, dismissed')
         .eq('session_id', sessionId);
@@ -142,7 +135,7 @@ export const NotificationPopup = () => {
 
   const trackViewMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notification_views')
         .insert([{
           notification_id: notificationId,
@@ -162,7 +155,7 @@ export const NotificationPopup = () => {
 
   const trackClickMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notification_views')
         .update({ clicked: true, clicked_at: new Date().toISOString() })
         .eq('notification_id', notificationId)
@@ -174,7 +167,7 @@ export const NotificationPopup = () => {
 
   const trackDismissMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('notification_views')
         .update({ dismissed: true })
         .eq('notification_id', notificationId)
