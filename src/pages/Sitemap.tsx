@@ -29,8 +29,8 @@ export default function Sitemap() {
           setError('Sitemap yüklenirken bir hata oluştu.');
         }
       } catch (error) {
-        console.error('Error fetching sitemap:', error);
-        setError('Sitemap yüklenirken bir hata oluştu.');
+        const message = error instanceof Error ? error.message : 'Sitemap yüklenirken bir hata oluştu.';
+        setError(message);
       } finally {
         setLoading(false);
       }

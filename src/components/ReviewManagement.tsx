@@ -71,7 +71,7 @@ export default function ReviewManagement() {
         .select("id, name")
         .in("id", siteIds);
 
-      let profiles: any[] = [];
+      let profiles: Array<{ id: string; username: string | null; avatar_url: string | null }> = [];
       if (userIds.length > 0) {
         const { data } = await supabase
           .from("profiles")

@@ -26,7 +26,6 @@ export default function BulkCasinoContentGenerator() {
         if (error) throw error;
         setMissingSites(data || []);
       } catch (error) {
-        console.error('Error fetching missing sites:', error);
         toast.error('Casino içeriği eksik siteler yüklenemedi');
       } finally {
         setIsLoading(false);
@@ -65,7 +64,6 @@ export default function BulkCasinoContentGenerator() {
         });
 
         if (error) {
-          console.error(`Batch ${batchIndex + 1} error:`, error);
           toast.error(`Batch ${batchIndex + 1} için hata: ${error.message}`);
         } else {
           completedCount += batch.length;
@@ -85,7 +83,6 @@ export default function BulkCasinoContentGenerator() {
       }, 2000);
       
     } catch (error) {
-      console.error('Error generating content:', error);
       toast.error('İçerik oluşturulurken hata oluştu: ' + (error as Error).message);
     } finally {
       setIsGenerating(false);
