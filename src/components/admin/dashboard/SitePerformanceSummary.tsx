@@ -1,16 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSiteAnalytics } from '@/hooks/queries/useAnalyticsQueries';
 import { SiteAnalyticsDetailDialog } from '@/components/analytics/SiteAnalyticsDetailDialog';
-import { BarChart3, TrendingUp, Eye, MousePointer, ArrowRight } from 'lucide-react';
+import { BarChart3, TrendingUp, Eye, MousePointer } from 'lucide-react';
 import { subDays, startOfDay } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useNavigate } from 'react-router-dom';
 
 export function SitePerformanceSummary() {
-  const navigate = useNavigate();
   const [selectedSite, setSelectedSite] = useState<{
     id: string;
     name: string;
@@ -38,14 +35,14 @@ export function SitePerformanceSummary() {
 
   const { data: sites, isLoading } = useSiteAnalytics(dateRange);
 
-  // Get top 3 sites by different metrics
-  const topSites = useMemo(() => {
+  // Get all sites sorted by different metrics
+  const sortedSites = useMemo(() => {
     if (!sites) return { byViews: [], byClicks: [], byRevenue: [] };
 
     return {
-      byViews: [...sites].sort((a, b) => b.views - a.views).slice(0, 3),
-      byClicks: [...sites].sort((a, b) => b.clicks - a.clicks).slice(0, 3),
-      byRevenue: [...sites].sort((a, b) => b.revenue - a.revenue).slice(0, 3),
+      byViews: [...sites].sort((a, b) => b.views - a.views),
+      byClicks: [...sites].sort((a, b) => b.clicks - a.clicks),
+      byRevenue: [...sites].sort((a, b) => b.revenue - a.revenue),
     };
   }, [sites]);
 
@@ -85,23 +82,12 @@ export function SitePerformanceSummary() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              Site Performans Analizi
-            </CardTitle>
-            <CardDescription>Son 30 günlük performans özeti</CardDescription>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/admin/sites?tab=analytics')}
-            className="gap-2"
-          >
-            Tümünü Gör
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5" />
+            Site Performans Analizi
+          </CardTitle>
+          <CardDescription>Son 30 günlük tüm siteler - detaylı performans özeti</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -136,16 +122,16 @@ export function SitePerformanceSummary() {
           </div>
         </div>
 
-        {/* Top Performers */}
+        {/* All Sites by Metrics */}
         <div className="grid gap-4 md:grid-cols-3">
-          {/* Top by Views */}
+          {/* All Sites by Views */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4 text-primary" />
-              <h3 className="font-semibold text-sm">En Çok Görüntülenen</h3>
+              <h3 className="font-semibold text-sm">Görüntülenmeye Göre ({sortedSites.byViews.length})</h3>
             </div>
-            <div className="space-y-2">
-              {topSites.byViews.map((site, index) => (
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+              {sortedSites.byViews.map((site, index) => (
                 <div
                   key={site.site_id}
                   className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
@@ -178,14 +164,14 @@ export function SitePerformanceSummary() {
             </div>
           </div>
 
-          {/* Top by Clicks */}
+          {/* All Sites by Clicks */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <MousePointer className="w-4 h-4 text-primary" />
-              <h3 className="font-semibold text-sm">En Çok Tıklanan</h3>
+              <h3 className="font-semibold text-sm">Tıklamaya Göre ({sortedSites.byClicks.length})</h3>
             </div>
-            <div className="space-y-2">
-              {topSites.byClicks.map((site, index) => (
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+              {sortedSites.byClicks.map((site, index) => (
                 <div
                   key={site.site_id}
                   className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
@@ -218,14 +204,14 @@ export function SitePerformanceSummary() {
             </div>
           </div>
 
-          {/* Top by Revenue */}
+          {/* All Sites by Revenue */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <span className="text-sm">💰</span>
-              <h3 className="font-semibold text-sm">En Yüksek Gelir</h3>
+              <h3 className="font-semibold text-sm">Gelire Göre ({sortedSites.byRevenue.length})</h3>
             </div>
-            <div className="space-y-2">
-              {topSites.byRevenue.map((site, index) => (
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+              {sortedSites.byRevenue.map((site, index) => (
                 <div
                   key={site.site_id}
                   className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
