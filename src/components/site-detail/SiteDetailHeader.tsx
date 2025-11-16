@@ -21,7 +21,7 @@ export const SiteDetailHeader = ({
   return (
     <Card className="shadow-xl border-primary/20">
       <CardContent className="p-3 md:p-5">
-        <div className="flex flex-col items-center text-center gap-2">
+        <div className="flex flex-col items-center text-center gap-1">
           {logoUrl && (
             <div className="flex-shrink-0">
               <img 
