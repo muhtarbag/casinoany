@@ -104,6 +104,11 @@ const Login = () => {
                   )}
                 </Button>
               </div>
+              <div className="flex justify-end">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  Şifremi unuttum?
+                </Link>
+              </div>
             </div>
             <Button type="submit" className="w-full bg-gradient-primary" disabled={loading}>
               {loading ? (
