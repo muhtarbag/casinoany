@@ -187,9 +187,9 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
                 <span className="text-sm font-semibold text-foreground">Popüler Aramalar</span>
               </div>
               <div className="p-3 flex flex-wrap gap-2">
-                {popularSearches.map((search: any) => (
+                {popularSearches.map((search: any, index: number) => (
                   <button
-                    key={search.id}
+                    key={search.id || `popular-${index}`}
                     type="button"
                     onClick={() => handlePopularClick(search.search_term)}
                     className="group"
@@ -221,7 +221,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
               {suggestions.map((site, index) => (
                 <button
-                  key={site.id}
+                  key={site.id || `suggestion-${index}`}
                   type="button"
                   onClick={() => handleSuggestionClick(site.slug, site.name)}
                   className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors border-b border-border last:border-b-0 flex items-center gap-3"
