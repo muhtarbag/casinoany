@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -186,7 +186,14 @@ export default function AdminRoot() {
       username={userProfile?.username || 'Admin'}
     >
       <Breadcrumb items={getBreadcrumbItems()} />
-      <Outlet />
+      {/* Suspense boundary for lazy-loaded admin pages */}
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      }>
+        <Outlet />
+      </Suspense>
     </AdminLayout>
   );
 }
