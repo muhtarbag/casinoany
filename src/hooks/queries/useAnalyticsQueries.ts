@@ -51,8 +51,7 @@ export const useAnalyticsDashboard = (dateRange?: DateRange) => {
         sessions: sessionsRes.data || [],
       };
     },
-    staleTime: CACHE_TIMES.SHORT,
-    refetchInterval: REFETCH_INTERVALS.NORMAL,
+    staleTime: 15 * 60 * 1000, // 15 minutes
   });
 };
 

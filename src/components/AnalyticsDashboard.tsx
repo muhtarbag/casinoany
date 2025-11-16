@@ -38,8 +38,7 @@ export const AnalyticsDashboard = () => {
         sessions: sessionsRes.data || [],
       };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes (was 3min - optimized)
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (was 2min - too aggressive)
+    staleTime: 15 * 60 * 1000, // 15 minutes - analytics cached longer
   });
 
   // ✅ OPTIMIZED: Memoize expensive computations

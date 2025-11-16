@@ -33,8 +33,7 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.LONG,
-    refetchInterval: REFETCH_INTERVALS.SLOW,
+    staleTime: 30 * 60 * 1000, // 30 minutes - sites rarely change
   });
 };
 
@@ -91,8 +90,7 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.MEDIUM,
-    refetchInterval: REFETCH_INTERVALS.NORMAL,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
