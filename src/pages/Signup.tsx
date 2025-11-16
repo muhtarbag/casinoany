@@ -37,6 +37,10 @@ const Signup = () => {
     instagram: '',
     linkedin: '',
     youtube: '',
+    telegramChannel: '',
+    kick: '',
+    discord: '',
+    bioLink: '',
     logoUrl: '',
     contactName: '',
     contactEmail: '',
@@ -154,6 +158,10 @@ const Signup = () => {
         social_instagram: wizardData.instagram,
         social_linkedin: wizardData.linkedin,
         social_youtube: wizardData.youtube,
+        social_telegram_channel: wizardData.telegramChannel,
+        social_kick: wizardData.kick,
+        social_discord: wizardData.discord,
+        social_bio_link: wizardData.bioLink,
         status: 'pending'
       };
 
@@ -181,7 +189,37 @@ const Signup = () => {
     
     switch (currentStep) {
       case 0: return <Step1Basic {...props} setSelectedSite={update('selectedSite')} setNewSiteName={update('newSiteName')} setCompanyName={update('companyName')} setDescription={update('description')} setLogoUrl={update('logoUrl')} />;
-      case 1: return <Step2ContactSocial contactName={wizardData.contactName} setContactName={update('contactName')} contactEmail={wizardData.contactEmail} setContactEmail={update('contactEmail')} contactTeams={wizardData.contactTeams} setContactTeams={update('contactTeams')} contactTelegram={wizardData.contactTelegram} setContactTelegram={update('contactTelegram')} contactWhatsapp={wizardData.contactWhatsapp} setContactWhatsapp={update('contactWhatsapp')} facebook={wizardData.facebook} setFacebook={update('facebook')} twitter={wizardData.twitter} setTwitter={update('twitter')} instagram={wizardData.instagram} setInstagram={update('instagram')} linkedin={wizardData.linkedin} setLinkedin={update('linkedin')} youtube={wizardData.youtube} setYoutube={update('youtube')} disabled={loading} />;
+      case 1: return <Step2ContactSocial 
+        contactName={wizardData.contactName} 
+        setContactName={update('contactName')} 
+        contactEmail={wizardData.contactEmail} 
+        setContactEmail={update('contactEmail')} 
+        contactTeams={wizardData.contactTeams} 
+        setContactTeams={update('contactTeams')} 
+        contactTelegram={wizardData.contactTelegram} 
+        setContactTelegram={update('contactTelegram')} 
+        contactWhatsapp={wizardData.contactWhatsapp} 
+        setContactWhatsapp={update('contactWhatsapp')} 
+        facebook={wizardData.facebook} 
+        setFacebook={update('facebook')} 
+        twitter={wizardData.twitter} 
+        setTwitter={update('twitter')} 
+        instagram={wizardData.instagram} 
+        setInstagram={update('instagram')} 
+        linkedin={wizardData.linkedin} 
+        setLinkedin={update('linkedin')} 
+        youtube={wizardData.youtube} 
+        setYoutube={update('youtube')}
+        telegramChannel={wizardData.telegramChannel}
+        setTelegramChannel={update('telegramChannel')}
+        kick={wizardData.kick}
+        setKick={update('kick')}
+        discord={wizardData.discord}
+        setDiscord={update('discord')}
+        bioLink={wizardData.bioLink}
+        setBioLink={update('bioLink')}
+        disabled={loading} 
+      />;
       default: return null;
     }
   };

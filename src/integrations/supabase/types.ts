@@ -1767,9 +1767,13 @@ export type Database = {
           logo_url: string | null
           new_site_name: string | null
           site_id: string | null
+          social_bio_link: string | null
+          social_discord: string | null
           social_facebook: string | null
           social_instagram: string | null
+          social_kick: string | null
           social_linkedin: string | null
+          social_telegram_channel: string | null
           social_twitter: string | null
           social_youtube: string | null
           status: string | null
@@ -1792,9 +1796,13 @@ export type Database = {
           logo_url?: string | null
           new_site_name?: string | null
           site_id?: string | null
+          social_bio_link?: string | null
+          social_discord?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
+          social_kick?: string | null
           social_linkedin?: string | null
+          social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
           status?: string | null
@@ -1817,9 +1825,13 @@ export type Database = {
           logo_url?: string | null
           new_site_name?: string | null
           site_id?: string | null
+          social_bio_link?: string | null
+          social_discord?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
+          social_kick?: string | null
           social_linkedin?: string | null
+          social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
           status?: string | null
