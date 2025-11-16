@@ -238,7 +238,7 @@
     
     <!-- Initial content for crawlers (hidden when React loads) -->
     <div id="root">
-      <div id="initial-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: system-ui;">
+      <div id="initial-content" style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: system-ui; opacity: 1; transition: opacity 0.3s ease-out;">
         <header style="margin-bottom: 40px;">
           <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 16px;">
             Güvenilir Casino Siteleri 2025 | %500 Bonus
@@ -323,14 +323,24 @@
           
           // Check if React has actually rendered something
           if (root && root.children.length > 1 && initialContent) {
-            // React has rendered, safe to remove static content
-            initialContent.remove();
+            // Fade out smoothly before removing
+            initialContent.style.opacity = '0';
+            // Remove after fade completes
+            setTimeout(() => {
+              initialContent.remove();
+            }, 300);
           }
         };
         
         // Wait for full page load and give React time to render
         window.addEventListener('load', () => {
-          setTimeout(checkReactRendered, 500);
+          // Reduced delay for faster perceived load
+          setTimeout(checkReactRendered, 100);
+        });
+        
+        // Also check on DOMContentLoaded for faster transition
+        document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(checkReactRendered, 200);
         });
       }
     </script>
