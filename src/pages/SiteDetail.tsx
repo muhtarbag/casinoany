@@ -426,16 +426,18 @@ export default function SiteDetail() {
         </div>
 
         {/* Site Header */}
-        <SiteDetailHeader
-          site={site}
-          logoUrl={logoUrl}
-          averageRating={averageRating}
-          reviewCount={reviews?.length || 0}
-          onAffiliateClick={handleAffiliateClick}
-        />
+        <div className="mb-2">
+          <SiteDetailHeader
+            site={site}
+            logoUrl={logoUrl}
+            averageRating={averageRating}
+            reviewCount={reviews?.length || 0}
+            onAffiliateClick={handleAffiliateClick}
+          />
+        </div>
 
         {/* Site Info Card */}
-        <Card className="shadow-xl border-primary/20">
+        <Card className="shadow-xl border-primary/20 mb-2">
           <CardContent className="p-6 md:p-8">
             {/* Features */}
             {site.features && site.features.length > 0 && (
@@ -467,7 +469,7 @@ export default function SiteDetail() {
         </Card>
 
         {/* Casino Review Core Content */}
-        <div className="mb-8">
+        <div className="mb-2">
           <CasinoReviewCoreContent
             siteName={site.name}
             pros={site.pros}
@@ -483,7 +485,7 @@ export default function SiteDetail() {
 
         {/* Reviews Section */}
         {!reviewsLoading && reviews && (
-          <div className="mb-8">
+          <div className="mb-2">
             <SiteDetailReviews 
               site={site} 
               reviews={reviews} 
@@ -494,7 +496,7 @@ export default function SiteDetail() {
         )}
 
         {/* Site Blog Section */}
-        <div className="mb-8">
+        <div className="mb-2">
           <SiteBlogSection siteId={site.id} siteName={site.name} />
         </div>
 
