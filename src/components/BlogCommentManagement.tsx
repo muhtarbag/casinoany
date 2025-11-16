@@ -16,39 +16,17 @@ export const BlogCommentManagement = () => {
   const { data: comments, isLoading } = useQuery({
     queryKey: ['admin-blog-comments'],
     queryFn: async () => {
-      const { data: commentsData, error } = await supabase
+      const { data, error } = await supabase
         .from('blog_comments' as any)
         .select(`
           *,
-          blog_posts!inner(title)
+          blog_posts!inner(title),
+          profiles(id, username)
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      // Fetch profiles for authenticated users
-      const userIds = commentsData
-        .map((c: any) => c.user_id)
-        .filter((id: string | null) => id !== null);
-
-      let profilesData = [];
-      if (userIds.length > 0) {
-        const { data, error: profilesError } = await (supabase as any)
-          .from('profiles')
-          .select('id, username')
-          .in('id', userIds);
-
-        if (profilesError) throw profilesError;
-        profilesData = data || [];
-      }
-
-      return commentsData.map((comment: any) => {
-        const profile = profilesData?.find((p: any) => p.id === comment.user_id);
-        return {
-          ...comment,
-          profiles: profile ? { username: profile.username } : undefined,
-        };
-      });
+      return data;
     },
   });
 
