@@ -27,25 +27,32 @@ const Users = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Get all user_roles
+      const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select(`
-          id,
-          user_id,
-          role,
-          status,
-          profiles (
-            email,
-            first_name,
-            last_name,
-            username,
-            created_at
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (rolesError) throw rolesError;
+      if (!roles || roles.length === 0) return [];
+
+      // Get corresponding profiles
+      const userIds = roles.map(r => r.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+
+      // Merge data
+      return roles.map(role => {
+        const profile = profiles?.find(p => p.id === role.user_id);
+        return {
+          ...role,
+          profiles: profile || null
+        };
+      });
     },
     enabled: isAdmin,
   });
