@@ -22,6 +22,8 @@ import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 const Index = lazyWithPreload(() => import("./pages/Index"));
 const Login = lazyWithPreload(() => import("./pages/Login"));
 const Signup = lazyWithPreload(() => import("./pages/Signup"));
+const ForgotPassword = lazyWithPreload(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
 
 // CRITICAL: Core admin pages imported directly to prevent React dispatcher null errors
 // These pages are essential and should not be lazy loaded
@@ -106,9 +108,11 @@ const AppContent = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-          <Route path="/" element={<Index />} />
+        <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Admin routes - AdminRoot provides internal Suspense for lazy pages */}
           <Route path="/admin" element={<AdminRoot />}>
