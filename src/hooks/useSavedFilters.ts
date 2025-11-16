@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface SavedFilter {
   id: string;
@@ -23,7 +24,7 @@ export function useSavedFilters(context: string = 'default') {
         setSavedFilters(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('Failed to load saved filters:', error);
+      logger.error('Failed to load saved filters:', error);
     }
   };
 

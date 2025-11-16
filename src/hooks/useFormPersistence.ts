@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 interface FormPersistenceOptions {
   key: string;
@@ -22,7 +23,7 @@ export function useFormPersistence<T extends Record<string, any>>(
         return { ...initialValues, ...parsed };
       }
     } catch (error) {
-      console.error('Failed to load form draft:', error);
+      logger.error('Failed to load form draft:', error);
     }
     return initialValues;
   });
@@ -47,7 +48,7 @@ export function useFormPersistence<T extends Record<string, any>>(
 
         localStorage.setItem(storageKey, JSON.stringify(filtered));
       } catch (error) {
-        console.error('Failed to save form draft:', error);
+        logger.error('Failed to save form draft:', error);
       }
     }, debounceMs);
 
@@ -69,7 +70,7 @@ export function useFormPersistence<T extends Record<string, any>>(
       localStorage.removeItem(storageKey);
       setValues(initialValues);
     } catch (error) {
-      console.error('Failed to clear form draft:', error);
+      logger.error('Failed to clear form draft:', error);
     }
   }, [storageKey, initialValues]);
 
