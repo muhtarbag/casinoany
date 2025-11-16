@@ -1740,6 +1740,96 @@ export type Database = {
         }
         Relationships: []
       }
+      site_owners: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          company_name: string | null
+          contact_email: string | null
+          contact_person_name: string | null
+          contact_teams: string | null
+          contact_telegram: string | null
+          contact_whatsapp: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          infrastructure_notes: string | null
+          infrastructure_provider: string | null
+          logo_url: string | null
+          site_id: string
+          social_facebook: string | null
+          social_instagram: string | null
+          social_linkedin: string | null
+          social_twitter: string | null
+          social_youtube: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_person_name?: string | null
+          contact_teams?: string | null
+          contact_telegram?: string | null
+          contact_whatsapp?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          infrastructure_notes?: string | null
+          infrastructure_provider?: string | null
+          logo_url?: string | null
+          site_id: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_person_name?: string | null
+          contact_teams?: string | null
+          contact_telegram?: string | null
+          contact_whatsapp?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          infrastructure_notes?: string | null
+          infrastructure_provider?: string | null
+          logo_url?: string | null
+          site_id?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_owners_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_owners_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_recommended_sites: {
         Row: {
           created_at: string
