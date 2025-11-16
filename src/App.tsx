@@ -36,7 +36,6 @@ const AdminReviews = lazyWithPreload(() => import("./pages/admin/Reviews"));
 const AdminNotifications = lazyWithPreload(() => import("./pages/admin/Notifications"));
 const AdminNews = lazyWithPreload(() => import("./pages/admin/News"));
 const AdminAnalytics = lazyWithPreload(() => import("./pages/admin/analytics/AnalyticsDashboard"));
-const AdminRealtimeAnalytics = lazyWithPreload(() => import("./pages/admin/analytics/RealtimeAnalytics"));
 const AdminKeywords = lazyWithPreload(() => import("./pages/admin/analytics/KeywordPerformance"));
 const AdminCasinoContent = lazyWithPreload(() => import("./pages/admin/content/CasinoContent"));
 const AdminCategoryManagement = lazyWithPreload(() => import("./pages/admin/content/CategoryManagement"));
@@ -118,7 +117,6 @@ const AppContent = () => {
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="analytics/realtime" element={<AdminRealtimeAnalytics />} />
             <Route path="analytics/keywords" element={<AdminKeywords />} />
             <Route path="content/casino" element={<AdminCasinoContent />} />
             <Route path="content/categories" element={<AdminCategoryManagement />} />

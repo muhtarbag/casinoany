@@ -53,7 +53,6 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       label: '🏠 Dashboard',
       items: [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', route: '/admin/dashboard', roles: [], shortcut: 'g d' },
-        { id: 'realtime', icon: Activity, label: 'Canlı Takip', route: '/admin/analytics/realtime', roles: ['seo_manager'], shortcut: 'g l' },
       ],
     },
     {
