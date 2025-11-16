@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 interface Step3LogoProps {
   logoUrl: string;
   setLogoUrl: (value: string) => void;
-  userId: string;
+  userId?: string;
   disabled?: boolean;
 }
 
@@ -22,6 +22,16 @@ export const Step3Logo = ({ logoUrl, setLogoUrl, userId, disabled }: Step3LogoPr
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check if userId is available
+    if (!userId) {
+      toast({
+        title: 'Önce kayıt olmalısınız',
+        description: 'Logo yüklemek için önce kayıt işlemini tamamlayın',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
@@ -93,6 +103,15 @@ export const Step3Logo = ({ logoUrl, setLogoUrl, userId, disabled }: Step3LogoPr
 
   return (
     <div className="space-y-4">
+      {!userId && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Logo yükleme işlemi kayıt sonrasında yapılabilir. Bu adımı atlayabilirsiniz.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
@@ -107,7 +126,7 @@ export const Step3Logo = ({ logoUrl, setLogoUrl, userId, disabled }: Step3LogoPr
       </Alert>
 
       <div className="space-y-2">
-        <Label>Logo Yükle</Label>
+        <Label>Logo Yükle {!userId && '(İsteğe bağlı)'}</Label>
         {previewUrl ? (
           <div className="space-y-3">
             <div className="relative w-40 h-40 border-2 border-dashed rounded-lg p-4 flex items-center justify-center bg-muted/20">
