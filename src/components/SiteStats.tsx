@@ -10,28 +10,28 @@ export default function SiteStats() {
   const { data: statsData, isLoading } = useSiteStats();
 
   const topClicked = useMemo(() => 
-    [...((statsData as any[]) || [])]
-      .filter((stat: any) => stat.site_name) // Sadece site bilgisi olanları göster
-      .sort((a: any, b: any) => b.clicks - a.clicks)
+    [...(statsData || [])]
+      .filter((stat) => stat.site_name)
+      .sort((a, b) => b.clicks - a.clicks)
       .slice(0, 5),
     [statsData]
   );
   
   const topViewed = useMemo(() => 
-    [...((statsData as any[]) || [])]
-      .filter((stat: any) => stat.site_name)
-      .sort((a: any, b: any) => b.views - a.views)
+    [...(statsData || [])]
+      .filter((stat) => stat.site_name)
+      .sort((a, b) => b.views - a.views)
       .slice(0, 5),
     [statsData]
   );
 
   const totalClicks = useMemo(() => 
-    (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.clicks, 0),
+    (statsData || []).reduce((sum, stat) => sum + stat.clicks, 0),
     [statsData]
   );
   
   const totalViews = useMemo(() => 
-    (statsData as any[] || []).reduce((sum: number, stat: any) => sum + stat.views, 0),
+    (statsData || []).reduce((sum, stat) => sum + stat.views, 0),
     [statsData]
   );
   
@@ -58,9 +58,9 @@ export default function SiteStats() {
   );
 
   const ctrChartData = useMemo(() => 
-    [...((statsData as any[]) || [])]
-      .filter((stat: any) => stat.views > 0 && stat.site_name)
-      .map((stat: any) => ({
+    [...(statsData || [])]
+      .filter((stat) => stat.views > 0 && stat.site_name)
+      .map((stat) => ({
         name: stat.site_name,
         ctr: ((stat.clicks / stat.views) * 100).toFixed(2),
         clicks: stat.clicks,

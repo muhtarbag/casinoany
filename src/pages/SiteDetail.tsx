@@ -110,7 +110,7 @@ export default function SiteDetail() {
     queryFn: async () => {
       if (!site?.id) return null;
       const { data, error } = await supabase
-        .from("site_stats" as any)
+        .from("site_stats")
         .select("*")
         .eq("site_id", site.id)
         .maybeSingle();
@@ -127,7 +127,7 @@ export default function SiteDetail() {
     queryKey: ["site-reviews", site?.id],
     queryFn: async () => {
       if (!site?.id) return [];
-      const { data: reviewsData, error: reviewsError } = await (supabase as any)
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from("site_reviews")
         .select("*")
         .eq("site_id", site.id)
@@ -143,7 +143,7 @@ export default function SiteDetail() {
       
       let profilesData = [];
       if (userIds.length > 0) {
-        const { data, error: profilesError } = await (supabase as any)
+        const { data, error: profilesError } = await supabase
           .from("profiles")
           .select("id, username, avatar_url")
           .in("id", userIds);
@@ -174,15 +174,15 @@ export default function SiteDetail() {
     const trackView = async () => {
       // Track site_stats
       const { data: stats } = await supabase
-        .from('site_stats' as any)
+        .from('site_stats')
         .select('*')
         .eq('site_id', site.id)
         .maybeSingle();
 
       if (stats) {
         await supabase
-          .from("site_stats" as any)
-          .update({ views: (stats as any).views + 1 })
+          .from("site_stats")
+          .update({ views: stats.views + 1 })
           .eq("site_id", site.id);
       } else {
         await supabase
