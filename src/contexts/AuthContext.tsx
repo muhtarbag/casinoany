@@ -6,9 +6,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isSiteOwner: boolean;
+  ownedSites: string[];
   userRoles: string[];
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, accountType?: 'user' | 'site_owner', siteId?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -20,6 +22,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSiteOwner, setIsSiteOwner] = useState(false);
+  const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -54,6 +58,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           checkUserRoles(session.user.id);
         } else {
           setIsAdmin(false);
+          setIsSiteOwner(false);
+          setOwnedSites([]);
           setUserRoles([]);
         }
       }
@@ -95,17 +101,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     setUserRoles(roles);
     setIsAdmin(roles.includes('admin'));
+    setIsSiteOwner(roles.includes('site_owner' as any));
+    
+    // Check site ownership
+    if (roles.includes('site_owner' as any)) {
+      const { data: ownedSitesData } = await (supabase as any)
+        .from('site_owners')
+        .select('site_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+      
+      setOwnedSites(ownedSitesData?.map((s: any) => s.site_id) || []);
+    } else {
+      setOwnedSites([]);
+    }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, accountType: 'user' | 'site_owner' = 'user', siteId?: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl
       }
     });
+    
+    if (error) return { error };
+    
+    // Create user role and site ownership if needed
+    if (data.user) {
+      const role = accountType === 'site_owner' ? 'site_owner' : 'user';
+      
+      // Insert role (pending for site owners, approved for regular users)
+      await (supabase as any).from('user_roles').insert({
+        user_id: data.user.id,
+        role: role as any,
+        status: accountType === 'site_owner' ? 'pending' : 'approved'
+      });
+      
+      // If site owner, create site ownership record
+      if (accountType === 'site_owner' && siteId) {
+        await (supabase as any).from('site_owners').insert({
+          user_id: data.user.id,
+          site_id: siteId,
+          status: 'pending'
+        });
+      }
+    }
+    
     return { error };
   };
 
@@ -148,7 +192,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, userRoles, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      isAdmin,
+      isSiteOwner,
+      ownedSites,
+      userRoles, 
+      loading, 
+      signUp, 
+      signIn, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

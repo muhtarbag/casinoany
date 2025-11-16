@@ -6,7 +6,7 @@ import { MobileMenu } from '@/components/MobileMenu';
 import logo from '@/assets/casinodoo-logo.svg';
 
 export const Header = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isSiteOwner, signOut } = useAuth();
 
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -61,6 +61,14 @@ export const Header = () => {
                     <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
                       <Shield className="w-3 h-3 md:w-4 md:h-4" />
                       <span className="hidden sm:inline">Admin</span>
+                    </Button>
+                  </NavLink>
+                )}
+                {isSiteOwner && (
+                  <NavLink to="/panel">
+                    <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+                      <Shield className="w-3 h-3 md:w-4 md:h-4" />
+                      <span className="hidden sm:inline">Panel</span>
                     </Button>
                   </NavLink>
                 )}

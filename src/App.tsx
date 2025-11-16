@@ -50,6 +50,8 @@ const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteSta
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
+const AdminSiteOwners = lazyWithPreload(() => import("./pages/admin/SiteOwners"));
+
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
 const BlogPost = lazyWithPreload(() => import("./pages/BlogPost"));
 const News = lazyWithPreload(() => import("./pages/News"));
@@ -72,6 +74,18 @@ const AMPBlogPost = lazyWithPreload(() => import("./pages/amp/AMPBlogPost"));
 const AMPSiteDetail = lazyWithPreload(() => import("./pages/amp/AMPSiteDetail"));
 const Categories = lazyWithPreload(() => import("./pages/Categories"));
 const CategoryDetail = lazyWithPreload(() => import("./pages/CategoryDetail"));
+
+// User profile pages
+const Favorites = lazyWithPreload(() => import("./pages/profile/Favorites"));
+const Memberships = lazyWithPreload(() => import("./pages/profile/Memberships"));
+
+// Complaint pages
+const Complaints = lazyWithPreload(() => import("./pages/Complaints"));
+const ComplaintDetail = lazyWithPreload(() => import("./pages/ComplaintDetail"));
+const NewComplaint = lazyWithPreload(() => import("./pages/NewComplaint"));
+
+// B2B Panel pages
+const SiteManagement = lazyWithPreload(() => import("./pages/panel/SiteManagement"));
 
 // SEO-optimized pages
 const DenemeBonusu = lazyWithPreload(() => import("./pages/DenemeBonusuDynamic"));
@@ -122,7 +136,11 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
+            <Route path="site-owners" element={<AdminSiteOwners />} />
           </Route>
+          
+          {/* B2B Panel Routes */}
+          <Route path="/panel" element={<SiteManagement />} />
           
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
