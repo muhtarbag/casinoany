@@ -299,7 +299,6 @@ export default function ReviewManagement() {
       setAiSelectedSite("");
       setAiReviewCount("3");
     } catch (error) {
-      console.error('AI yorum oluşturma hatası:', error);
       toast({
         title: "Hata",
         description: error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu',

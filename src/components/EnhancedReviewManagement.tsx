@@ -471,7 +471,6 @@ export default function EnhancedReviewManagement() {
       toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
     } catch (error) {
-      console.error('AI yorum oluşturma hatası:', error);
       toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
     } finally {
       setIsAiLoading(false);

@@ -225,7 +225,6 @@ export function useNotificationManagement() {
       toast.success(currentStatus ? 'Bildirim pasif edildi' : 'Bildirim aktif edildi');
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     } catch (error: any) {
-      console.error('Error toggling notification:', error);
       toast.error('Durum güncellenemedi: ' + error.message);
     }
   }, [queryClient]);

@@ -33,7 +33,10 @@ export class AdminErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Admin Error Boundary caught an error:', error, errorInfo);
+    // Error tracking would go here in production
+    if (import.meta.env.DEV) {
+      console.error('Admin Error Boundary caught an error:', error, errorInfo);
+    }
     this.setState({
       error,
       errorInfo,

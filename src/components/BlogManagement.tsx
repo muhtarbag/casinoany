@@ -348,11 +348,6 @@ export const BlogManagement = () => {
           title: `✨ Profesyonel İçerik Oluşturuldu!`,
           description: `${blogData.word_count} kelime | ${blogData.read_time} dk okuma | SEO: ${seo.seo_score}/100 | Okunabilirlik: ${seo.readability_score}/100`,
         });
-        
-        // Log improvements for user to review
-        console.log('SEO İyileştirme Önerileri:', seo.improvements);
-        console.log('SEO Güçlü Yönler:', seo.strengths);
-        console.log('Keyword Research:', blogData.keywords_research);
       } else {
         toast({
           title: "Başarılı! ✅",
@@ -362,7 +357,6 @@ export const BlogManagement = () => {
 
       setAiTopic('');
     } catch (error: any) {
-      console.error('AI blog generation error:', error);
       toast({
         title: "Hata",
         description: error.message || "Blog oluşturulurken bir hata oluştu",

@@ -87,7 +87,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         .in('setting_key', ['carousel_animation_type', 'carousel_auto_scroll_duration']);
       
       if (error) {
-        console.error('Error fetching carousel settings:', error);
         return { animation: 'slide', duration: 2500 };
       }
       
@@ -111,8 +110,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         .in('setting_key', ['hero_title', 'hero_description']);
       
       if (error) {
-        console.error('Error fetching CMS content:', error);
-        return { 
+        return {
           hero_title: 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu', 
           hero_description: 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
         };

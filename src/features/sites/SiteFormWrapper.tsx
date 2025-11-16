@@ -89,7 +89,7 @@ export function SiteFormWrapper({
             categoryIds = siteCategories.map((sc: any) => sc.category_id);
           }
         } catch (error) {
-          console.error('Error loading site categories:', error);
+          // Silent fail
         }
 
         form.reset({
@@ -166,7 +166,7 @@ export function SiteFormWrapper({
         }
       }
     } catch (error) {
-      console.error('Error saving site:', error);
+      // Error will be handled by mutation onError
     }
   }, [editingId, logoFile, createSiteMutation, updateSiteMutation, updateCategoriesMutation]);
 

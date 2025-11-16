@@ -114,8 +114,7 @@ export const useIncrementNewsView = () => {
     },
     // View count için toast gösterme
     onError: () => {
-      // Sessizce başarısız ol
-      console.error('View count artırılamadı');
+      // Silent fail for analytics
     },
   });
 };

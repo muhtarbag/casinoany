@@ -331,7 +331,6 @@ export const NotificationPopup = () => {
       }, 3000);
       
     } catch (error: any) {
-      console.error('Form submission error:', error);
       alert('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsSubmitting(false);

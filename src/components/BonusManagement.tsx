@@ -55,10 +55,7 @@ export const BonusManagement = () => {
         .from('bonus_offers')
         .select('*, betting_sites!inner(name, logo_url, slug)')
         .order('display_order', { ascending: true });
-      if (error) {
-        console.error('Bonus offers fetch error:', error);
-        throw error;
-      }
+      if (error) throw error;
       return data;
     },
   });

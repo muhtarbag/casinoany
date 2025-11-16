@@ -92,7 +92,6 @@ export const KeywordPerformance = () => {
         description: `${data.data.updated_count} keyword güncellendi`,
       });
     } catch (error: any) {
-      console.error('Update rankings error:', error);
       toast({
         title: "Hata",
         description: error.message || "Ranking güncellenirken hata oluştu",

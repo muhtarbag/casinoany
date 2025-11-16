@@ -49,20 +49,13 @@ export function AffiliateManagement() {
   const { data: sites, isLoading: sitesLoading, error: sitesError, refetch } = useQuery({
     queryKey: ['affiliate-sites'],
     queryFn: async () => {
-      console.log('🔍 Affiliate sites query başlatılıyor...');
       const { data, error } = await supabase
         .from('betting_sites')
         .select('*')
         .not('affiliate_contract_date', 'is', null)
         .order('name');
       
-      if (error) {
-        console.error('❌ Affiliate sites query hatası:', error);
-        throw error;
-      }
-      
-      console.log('✅ Affiliate sites query başarılı. Site sayısı:', data?.length || 0);
-      console.log('📋 Siteler:', data?.map((s: any) => s.name).join(', '));
+      if (error) throw error;
       return data;
     },
     staleTime: 0,

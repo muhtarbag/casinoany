@@ -38,7 +38,6 @@ export function SmartFormExample() {
     saveDefaults(values);
     
     toast.success('Form başarıyla kaydedildi!');
-    console.log('Submitted:', values);
   };
 
   return (

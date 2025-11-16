@@ -132,7 +132,6 @@ export const CasinoContentManagement = () => {
         queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
       }
     } catch (error: any) {
-      console.error('Bulk AI generation error:', error);
       toast({
         title: "Hata",
         description: error.message || "İçerik oluşturulurken bir hata oluştu",
@@ -196,7 +195,6 @@ export const CasinoContentManagement = () => {
         queryClient.invalidateQueries({ queryKey: ['site-casino-content', selectedSiteId] });
       }
     } catch (error) {
-      console.error('AI generation error:', error);
       toast({
         title: "Hata",
         description: "İçerik oluşturulurken bir hata oluştu.",

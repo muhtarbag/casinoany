@@ -149,7 +149,7 @@ export const useIncrementBlogView = () => {
       if (error) throw error;
     },
     onError: () => {
-      console.error('View count artırılamadı');
+      // Silent fail for analytics
     },
   });
 };

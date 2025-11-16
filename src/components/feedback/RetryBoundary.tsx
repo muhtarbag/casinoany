@@ -36,7 +36,6 @@ export class RetryBoundary extends Component<RetryBoundaryProps, RetryBoundarySt
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logger.logError('RetryBoundary caught error:', error);
-    console.error('Error details:', errorInfo);
     
     this.props.onError?.(error, errorInfo);
   }

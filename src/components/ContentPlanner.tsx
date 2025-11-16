@@ -100,7 +100,6 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         description: `${result.missing_topics.length} içerik fırsatı, ${result.keyword_opportunities.length} keyword fırsatı tespit edildi!`,
       });
     } catch (error: any) {
-      console.error('Content gap analysis error:', error);
       toast({
         title: "Hata",
         description: error.message || "İçerik analizi yapılırken bir hata oluştu",
@@ -143,7 +142,6 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         description: `${result.topics.length} adet SEO-optimize konu önerisi oluşturuldu!`,
       });
     } catch (error: any) {
-      console.error('Topic suggestion error:', error);
       toast({
         title: "Hata",
         description: error.message || "Konu önerileri oluşturulurken bir hata oluştu",
@@ -197,7 +195,6 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         description: `${result.calendar.length} haftalık içerik planı oluşturuldu. Toplam ${result.success_metrics.target_posts} içerik hedefi belirlendi.`,
       });
     } catch (error: any) {
-      console.error('Calendar generation error:', error);
       toast({
         title: "Hata",
         description: error.message || "İçerik takvimi oluşturulurken bir hata oluştu",
@@ -303,7 +300,6 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
 
       onNavigateToBlog?.();
     } catch (error: any) {
-      console.error('Blog creation error:', error);
       toast({
         title: "Hata",
         description: error.message || "Blog oluşturulurken bir hata oluştu",
@@ -373,7 +369,6 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
 
       onNavigateToBlog?.();
     } catch (error: any) {
-      console.error('Blog creation error:', error);
       toast({
         title: "Hata",
         description: error.message || "Blog oluşturulurken bir hata oluştu",

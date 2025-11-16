@@ -71,7 +71,13 @@ export const ContentVersions = ({ siteId, onRestore }: ContentVersionsProps) => 
           metadata: { restored_from: version.id },
         });
 
-      if (versionError) console.error('Version save error:', versionError);
+      if (versionError) {
+        toast({
+          title: "Uyarı",
+          description: "Versiyon kaydedilemedi",
+          variant: "destructive"
+        });
+      }
 
       toast({
         title: "Başarılı!",
@@ -81,7 +87,6 @@ export const ContentVersions = ({ siteId, onRestore }: ContentVersionsProps) => 
       onRestore(version);
       refetch();
     } catch (error) {
-      console.error('Restore error:', error);
       toast({
         title: "Hata",
         description: "İçerik geri yüklenirken bir hata oluştu.",

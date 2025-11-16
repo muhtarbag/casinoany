@@ -153,7 +153,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
       }
       onSuccess();
     } catch (error) {
-      console.error('Form submission error:', error);
+      // Error handled by mutation
     }
   };
 

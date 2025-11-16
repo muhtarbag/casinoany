@@ -144,7 +144,7 @@ export const useUpdateSiteStats = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.stats() });
     },
     onError: () => {
-      console.error('Site stats güncellenemedi');
+      // Silent fail for analytics
     },
   });
 };
@@ -171,7 +171,7 @@ export const useIncrementCasinoAnalytics = () => {
       if (error) throw error;
     },
     onError: () => {
-      console.error('Casino analytics artırılamadı');
+      // Silent fail for analytics
     },
   });
 };
