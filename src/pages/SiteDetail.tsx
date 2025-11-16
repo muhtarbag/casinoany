@@ -14,9 +14,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from "lucide-react";
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { toast } from "sonner";
-import ReviewCard from "@/components/ReviewCard";
-import ReviewForm from "@/components/ReviewForm";
 import RecommendedSites from "@/components/RecommendedSites";
+import { SiteDetailHeader } from '@/components/site-detail/SiteDetailHeader';
+import { SiteDetailContact } from '@/components/site-detail/SiteDetailContact';
+import { SiteDetailReviews } from '@/components/site-detail/SiteDetailReviews';
 
 interface Profile {
   username: string;
@@ -424,72 +425,14 @@ export default function SiteDetail() {
           <span className="text-foreground">{site.name}</span>
         </div>
 
-        {/* Site Header Card */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex flex-col gap-6">
-              {/* Logo - Horizontal Layout */}
-              {logoUrl ? (
-                <div className="flex items-center justify-center w-full min-h-[80px] sm:min-h-[120px] bg-card/50 rounded-xl border border-border p-4 sm:p-6">
-                  <img
-                    src={logoUrl}
-                    alt={site.name}
-                    className="max-w-full max-h-[80px] sm:max-h-[120px] object-contain"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `<div class="text-3xl sm:text-5xl font-bold text-foreground">${site.name}</div>`;
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center w-full min-h-[80px] sm:min-h-[120px] bg-gradient-primary rounded-xl p-4 sm:p-6">
-                  <h2 className="text-3xl sm:text-5xl font-bold text-primary-foreground">{site.name}</h2>
-                </div>
-              )}
-              
-              <div className="space-y-4">
-                <CardTitle className="text-2xl sm:text-3xl mb-2">{site.name}</CardTitle>
-                <div className="flex items-center gap-2 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < Math.floor(site.rating || 0)
-                          ? "fill-gold text-gold"
-                          : "text-muted-foreground"
-                      }`}
-                    />
-                  ))}
-                  <span className="font-semibold ml-2">{site.rating}/5</span>
-                </div>
-                {site.bonus && (
-                  <div className="bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg p-4 mb-4">
-                    <p className="text-lg font-bold">{site.bonus}</p>
-                  </div>
-                )}
-                <Button
-                  size="lg"
-                  onClick={handleAffiliateClick}
-                  className="w-full md:w-auto relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0"
-                >
-                  {/* Animated shimmer overlay */}
-                  <div className="absolute inset-0 w-full h-full">
-                    <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
-                  </div>
-                  
-                  {/* Subtle pulse glow background */}
-                  <div className="absolute inset-0 bg-white/5 animate-glow" />
-                  
-                  {/* Button content */}
-                  <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
-                    Siteye Git
-                    <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
-                  </span>
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
+        {/* Site Header */}
+        <SiteDetailHeader
+          site={site}
+          logoUrl={logoUrl}
+          averageRating={averageRating}
+          reviewCount={reviews?.length || 0}
+          onAffiliateClick={handleAffiliateClick}
+        />
             {/* Features */}
             {site.features && site.features.length > 0 && (
               <div className="mb-6">
@@ -595,43 +538,16 @@ export default function SiteDetail() {
         </div>
 
         {/* Reviews Section */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Kullanıcı Yorumları</CardTitle>
-            <CardDescription>
-              Ortalama Puan: {averageRating} / 5.0 ({reviews?.length || 0} yorum)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {reviewsLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            ) : reviews && reviews.length > 0 ? (
-              <div className="space-y-4">
-                {reviews.map((review: any) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                Henüz yorum yapılmamış. İlk yorumu siz yapın!
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Review Form - Anonim */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Yorum Yap</CardTitle>
-            <CardDescription>Deneyimlerinizi diğer kullanıcılarla paylaşın (Üyelik gerektirmez)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ReviewForm siteId={site.id} />
-          </CardContent>
-        </Card>
+        {!reviewsLoading && reviews && (
+          <div className="mb-8">
+            <SiteDetailReviews 
+              site={site} 
+              reviews={reviews} 
+              user={user} 
+              averageRating={averageRating} 
+            />
+          </div>
+        )}
 
         {/* Site Blog Section */}
         <div className="mb-8">
