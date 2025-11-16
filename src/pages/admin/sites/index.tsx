@@ -1,6 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SiteManagementContainer } from '@/features/sites/SiteManagementContainer';
-import { Globe, Star, Link2, Image } from 'lucide-react';
+import { Globe, Star, Link2, Image, BarChart3 } from 'lucide-react';
+import { lazy, Suspense } from 'react';
+import { LoadingState } from '@/components/ui/loading-state';
+
+const SiteAnalytics = lazy(() => import('./SiteAnalytics'));
 
 export default function SitesHub() {
   return (
@@ -18,6 +22,10 @@ export default function SitesHub() {
             <Globe className="w-4 h-4" />
             Tüm Siteler
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Performans Analizi
+          </TabsTrigger>
           <TabsTrigger value="featured" className="gap-2">
             <Star className="w-4 h-4" />
             Öne Çıkanlar
@@ -34,6 +42,12 @@ export default function SitesHub() {
 
         <TabsContent value="all">
           <SiteManagementContainer />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <Suspense fallback={<LoadingState variant="skeleton" rows={6} />}>
+            <SiteAnalytics />
+          </Suspense>
         </TabsContent>
 
         <TabsContent value="featured">
