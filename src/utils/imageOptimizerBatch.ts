@@ -33,7 +33,7 @@ export async function optimizeImageBatch(
       totalOriginalSize += result.originalSize;
       totalOptimizedSize += result.optimizedSize;
     } catch (error) {
-      logger.error(`Failed to optimize ${file.name}:`, error);
+      logger.error('performance', `Failed to optimize ${file.name}`, error as Error);
       failedFiles.push(file.name);
     }
   }
@@ -81,7 +81,7 @@ export async function generateResponsiveSizes(
       responsiveFiles.push(renamedFile);
       sizes.push(width);
     } catch (error) {
-      logger.error(`Failed to generate ${width}w version:`, error);
+      logger.error('performance', `Failed to generate ${width}w version`, error as Error);
     }
   }
 

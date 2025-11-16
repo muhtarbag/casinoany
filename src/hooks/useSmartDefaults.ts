@@ -29,7 +29,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
         }, {} as Record<string, any>);
       }
     } catch (error) {
-      logger.error('Failed to load smart defaults:', error);
+      logger.error('system', 'Failed to load smart defaults', error as Error);
     }
     return {};
   };
@@ -45,7 +45,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
       const merged = { ...parsed, ...values };
       localStorage.setItem(key, JSON.stringify(merged));
     } catch (error) {
-      logger.error('Failed to save smart defaults:', error);
+      logger.error('system', 'Failed to save smart defaults', error as Error);
     }
   };
 
@@ -68,7 +68,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
         return mostUsed;
       }
     } catch (error) {
-      logger.error('Failed to get smart sort default:', error);
+      logger.error('system', 'Failed to get smart sort default', error as Error);
     }
     return availableFields[0];
   };
@@ -83,7 +83,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
       frequency[field] = (frequency[field] || 0) + 1;
       localStorage.setItem(key, JSON.stringify(frequency));
     } catch (error) {
-      logger.error('Failed to track sort usage:', error);
+      logger.error('system', 'Failed to track sort usage', error as Error);
     }
   };
 
@@ -98,7 +98,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
         return patterns.mostRecent || {};
       }
     } catch (error) {
-      logger.error('Failed to get smart filter defaults:', error);
+      logger.error('system', 'Failed to get smart filter defaults', error as Error);
     }
     return {};
   };
@@ -117,7 +117,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
       
       localStorage.setItem(key, JSON.stringify(patterns));
     } catch (error) {
-      logger.error('Failed to save filter pattern:', error);
+      logger.error('system', 'Failed to save filter pattern', error as Error);
     }
   };
 
@@ -128,7 +128,7 @@ export function useSmartDefaults(options: SmartDefaultsOptions = {}) {
       localStorage.removeItem(`sort-frequency-${context}`);
       localStorage.removeItem(`filter-patterns-${context}`);
     } catch (error) {
-      logger.error('Failed to clear smart defaults:', error);
+      logger.error('system', 'Failed to clear smart defaults', error as Error);
     }
   };
 
