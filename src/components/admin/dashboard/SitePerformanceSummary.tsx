@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSiteAnalytics } from '@/hooks/queries/useAnalyticsQueries';
+import { SiteAnalyticsDetailDialog } from '@/components/analytics/SiteAnalyticsDetailDialog';
 import { BarChart3, TrendingUp, Eye, MousePointer, ArrowRight } from 'lucide-react';
 import { subDays, startOfDay } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +11,12 @@ import { useNavigate } from 'react-router-dom';
 
 export function SitePerformanceSummary() {
   const navigate = useNavigate();
+  const [selectedSite, setSelectedSite] = useState<{
+    id: string;
+    name: string;
+    logo: string | null;
+    rating: number | null;
+  } | null>(null);
   
   const dateRange = useMemo(
     () => ({
@@ -18,6 +25,16 @@ export function SitePerformanceSummary() {
     }),
     []
   );
+
+  const handleSiteClick = (siteId: string, siteName: string, logoUrl: string | null, rating: number | null) => {
+    console.log('Site clicked:', siteId, siteName);
+    setSelectedSite({
+      id: siteId,
+      name: siteName,
+      logo: logoUrl,
+      rating: rating,
+    });
+  };
 
   const { data: sites, isLoading } = useSiteAnalytics(dateRange);
 
@@ -131,7 +148,8 @@ export function SitePerformanceSummary() {
               {topSites.byViews.map((site, index) => (
                 <div
                   key={site.site_id}
-                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                  onClick={() => handleSiteClick(site.site_id, site.site_name, site.logo_url, site.rating)}
                 >
                   <Badge variant="outline" className="w-6 h-6 flex items-center justify-center p-0">
                     {index + 1}
@@ -170,7 +188,8 @@ export function SitePerformanceSummary() {
               {topSites.byClicks.map((site, index) => (
                 <div
                   key={site.site_id}
-                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                  onClick={() => handleSiteClick(site.site_id, site.site_name, site.logo_url, site.rating)}
                 >
                   <Badge variant="outline" className="w-6 h-6 flex items-center justify-center p-0">
                     {index + 1}
@@ -209,7 +228,8 @@ export function SitePerformanceSummary() {
               {topSites.byRevenue.map((site, index) => (
                 <div
                   key={site.site_id}
-                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                  onClick={() => handleSiteClick(site.site_id, site.site_name, site.logo_url, site.rating)}
                 >
                   <Badge variant="outline" className="w-6 h-6 flex items-center justify-center p-0">
                     {index + 1}
@@ -239,6 +259,20 @@ export function SitePerformanceSummary() {
           </div>
         </div>
       </CardContent>
+
+      {/* Detail Dialog */}
+      <SiteAnalyticsDetailDialog
+        open={!!selectedSite}
+        onOpenChange={(open) => {
+          console.log('Dialog onOpenChange:', open);
+          if (!open) setSelectedSite(null);
+        }}
+        siteId={selectedSite?.id || null}
+        siteName={selectedSite?.name || ''}
+        logoUrl={selectedSite?.logo || null}
+        rating={selectedSite?.rating || null}
+        dateRange={dateRange}
+      />
     </Card>
   );
 }
