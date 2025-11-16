@@ -1,5 +1,5 @@
-import { Mail, MessageCircle } from 'lucide-react';
-import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { Mail } from 'lucide-react';
+import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -68,7 +68,7 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
         
         {site.whatsapp && (
           <div className="flex items-center gap-3">
-            <MessageCircle className="w-5 h-5 text-primary" />
+            <FaWhatsapp className="w-6 h-6 text-[#25D366]" />
             <a 
               href={`https://wa.me/${site.whatsapp}`} 
               target="_blank" 
@@ -83,7 +83,7 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
         
         {site.telegram && (
           <div className="flex items-center gap-3">
-            <MessageCircle className="w-5 h-5 text-primary" />
+            <FaTelegramPlane className="w-6 h-6 text-[#0088cc]" />
             <a 
               href={`https://t.me/${site.telegram}`} 
               target="_blank" 
@@ -96,17 +96,17 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
           </div>
         )}
         
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-4 pt-2">
           {site.twitter && (
             <a 
               href={site.twitter} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-all hover:scale-110"
+              className="transition-all hover:scale-110"
               aria-label="Twitter"
               onClick={() => trackSocialClick(site.id, 'twitter')}
             >
-              <FaTwitter className="w-6 h-6" />
+              <FaTwitter className="w-7 h-7 text-[#1DA1F2]" />
             </a>
           )}
           {site.instagram && (
@@ -114,11 +114,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.instagram} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-all hover:scale-110"
+              className="transition-all hover:scale-110"
               aria-label="Instagram"
               onClick={() => trackSocialClick(site.id, 'instagram')}
             >
-              <FaInstagram className="w-6 h-6" />
+              <FaInstagram className="w-7 h-7 text-[#E4405F]" />
             </a>
           )}
           {site.facebook && (
@@ -126,11 +126,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.facebook} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-all hover:scale-110"
+              className="transition-all hover:scale-110"
               aria-label="Facebook"
               onClick={() => trackSocialClick(site.id, 'facebook')}
             >
-              <FaFacebook className="w-6 h-6" />
+              <FaFacebook className="w-7 h-7 text-[#1877F2]" />
             </a>
           )}
           {site.youtube && (
@@ -138,11 +138,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.youtube} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-all hover:scale-110"
+              className="transition-all hover:scale-110"
               aria-label="YouTube"
               onClick={() => trackSocialClick(site.id, 'youtube')}
             >
-              <FaYoutube className="w-6 h-6" />
+              <FaYoutube className="w-7 h-7 text-[#FF0000]" />
             </a>
           )}
         </div>

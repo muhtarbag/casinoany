@@ -27,7 +27,7 @@ export const SiteDetailHeader = ({
               <img 
                 src={logoUrl} 
                 alt={`${site.name} logo`} 
-                className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg bg-card/50 p-2"
+                className="w-32 h-32 md:w-48 md:h-48 object-contain rounded-lg bg-card/50 p-3"
               />
             </div>
           )}
