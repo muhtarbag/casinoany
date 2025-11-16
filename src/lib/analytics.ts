@@ -35,7 +35,6 @@ export const trackConversion = async (
     });
   } catch (error) {
     // Silent fail - don't break user experience
-    console.error('Analytics error:', error);
   }
 };
 

@@ -31,10 +31,10 @@ export const useSystemLogger = () => {
       });
 
       if (error) {
-        console.error('Failed to log event:', error);
+        // Silent fail - development only logging
       }
     } catch (err) {
-      console.error('Logger error:', err);
+      // Silent fail in production
     }
   };
 
@@ -118,10 +118,10 @@ export const useSystemLogger = () => {
         });
 
       if (error) {
-        console.error('Failed to log API call:', error);
+        // Silent fail - development only logging
       }
     } catch (err) {
-      console.error('API logger error:', err);
+      // Silent fail in production
     }
   };
 
