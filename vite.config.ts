@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
-        navigateFallback: '/offline.html',
+        navigateFallback: null, // Don't use offline.html as fallback, let the app handle it
         navigateFallbackDenylist: [/^\/api/, /^\/admin/],
         runtimeCaching: [
           // API Calls - NetworkFirst (fresh data priority, fallback to cache)
