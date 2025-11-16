@@ -41,11 +41,9 @@ const AdminKeywords = lazyWithPreload(() => import("./pages/admin/analytics/Keyw
 const AdminCasinoContent = lazyWithPreload(() => import("./pages/admin/content/CasinoContent"));
 const AdminCategoryManagement = lazyWithPreload(() => import("./pages/admin/content/CategoryManagement"));
 const AdminSystemHealth = lazyWithPreload(() => import("./pages/admin/system/SystemHealth"));
-const AdminAI = lazyWithPreload(() => import("./pages/admin/AIAssistant"));
 const AdminBonusRequests = lazyWithPreload(() => import("./pages/admin/finance/BonusRequests"));
 const AdminContentPlanner = lazyWithPreload(() => import("./pages/admin/content/ContentPlanner"));
 const AdminChangeHistory = lazyWithPreload(() => import("./pages/admin/system/ChangeHistory"));
-const AdminPerformance = lazyWithPreload(() => import("./pages/admin/system/Performance"));
 const AdminBuildHealth = lazyWithPreload(() => import("./pages/admin/system/BuildHealth"));
 const AdminCacheManagement = lazyWithPreload(() => import("./pages/admin/system/CacheManagement"));
 const AdminFeaturedSites = lazyWithPreload(() => import("./pages/admin/sites/FeaturedSites"));
@@ -55,7 +53,6 @@ const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteSta
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
 const AdminCasinoAnalytics = lazyWithPreload(() => import("./pages/admin/content/CasinoAnalytics"));
-const AdminAIHistory = lazyWithPreload(() => import("./pages/admin/ai/AIHistory"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
 const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
@@ -132,14 +129,10 @@ const AppContent = () => {
             <Route path="finance/bonus-requests" element={<AdminBonusRequests />} />
             <Route path="system/health" element={<AdminSystemHealth />} />
             <Route path="system/history" element={<AdminChangeHistory />} />
-            <Route path="system/performance" element={<AdminPerformance />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/cache" element={<AdminCacheManagement />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
-            <Route path="ai" element={<AdminAI />} />
-            <Route path="ai/assistant" element={<AdminAI />} />
-            <Route path="ai/history" element={<AdminAIHistory />} />
           </Route>
           
           <Route path="/about" element={<About />} />
