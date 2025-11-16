@@ -172,6 +172,10 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // CRITICAL: Force single React instance - all packages must use the same React
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      "scheduler": path.resolve(__dirname, "./node_modules/scheduler"),
       // Force recharts to use lodash-es instead of lodash
       "lodash": "lodash-es"
     },
@@ -237,7 +241,13 @@ export default defineConfig(({ mode }) => ({
     force: true,
     esbuildOptions: {
       target: 'es2020',
-      plugins: []
+      // Force React to be external and use the same instance
+      external: [],
+      alias: {
+        'react': path.resolve(__dirname, './node_modules/react'),
+        'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+        'scheduler': path.resolve(__dirname, './node_modules/scheduler')
+      }
     }
   },
 }));
