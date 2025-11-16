@@ -23,7 +23,7 @@ export function useFormPersistence<T extends Record<string, any>>(
         return { ...initialValues, ...parsed };
       }
     } catch (error) {
-      logger.error('Failed to load form draft:', error);
+      logger.error('system', 'Failed to load form draft', error as Error);
     }
     return initialValues;
   });
@@ -48,7 +48,7 @@ export function useFormPersistence<T extends Record<string, any>>(
 
         localStorage.setItem(storageKey, JSON.stringify(filtered));
       } catch (error) {
-        logger.error('Failed to save form draft:', error);
+        logger.error('system', 'Failed to save form draft', error as Error);
       }
     }, debounceMs);
 
@@ -70,7 +70,7 @@ export function useFormPersistence<T extends Record<string, any>>(
       localStorage.removeItem(storageKey);
       setValues(initialValues);
     } catch (error) {
-      logger.error('Failed to clear form draft:', error);
+      logger.error('system', 'Failed to clear form draft', error as Error);
     }
   }, [storageKey, initialValues]);
 

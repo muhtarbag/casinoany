@@ -24,7 +24,7 @@ export function useSavedFilters(context: string = 'default') {
         setSavedFilters(JSON.parse(stored));
       }
     } catch (error) {
-      logger.error('Failed to load saved filters:', error);
+      logger.error('system', 'Failed to load saved filters', error as Error);
     }
   };
 
