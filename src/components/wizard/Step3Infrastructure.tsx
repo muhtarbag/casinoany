@@ -1,10 +1,9 @@
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Server } from 'lucide-react';
 
-interface Step4InfrastructureProps {
+interface Step3InfrastructureProps {
   provider: string;
   setProvider: (value: string) => void;
   notes: string;
@@ -12,18 +11,17 @@ interface Step4InfrastructureProps {
   disabled?: boolean;
 }
 
-export const Step4Infrastructure = ({
+export const Step3Infrastructure = ({
   provider,
   setProvider,
   notes,
   setNotes,
   disabled
-}: Step4InfrastructureProps) => {
+}: Step3InfrastructureProps) => {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground mb-4">
-        Sitenizin altyapı bilgilerini paylaşın (Opsiyonel)
-      </p>
+      <h3 className="font-semibold text-lg">Altyapı Bilgileri</h3>
+      <p className="text-sm text-muted-foreground">Sitenizin altyapı bilgilerini paylaşın (Opsiyonel)</p>
 
       <div className="space-y-2">
         <Label htmlFor="provider" className="flex items-center gap-2">
