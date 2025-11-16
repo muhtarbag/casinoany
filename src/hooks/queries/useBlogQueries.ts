@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TypedDB, TypedRPC } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
@@ -12,7 +13,7 @@ export const useBlogPosts = (filters?: {
   return useQuery({
     queryKey: queryKeys.blog.list(filters),
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('blog_posts')
         .select('*')
         .order('published_at', { ascending: false });
@@ -42,7 +43,7 @@ export const useBlogPost = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.blog.detail(slug),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
@@ -63,7 +64,7 @@ export const useBlogComments = (postId: string) => {
     queryKey: queryKeys.blog.comments(postId),
     queryFn: async () => {
       const { data: commentsData, error: commentsError } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .select('*')
         .eq('post_id', postId)
         .eq('is_approved', true)
@@ -78,7 +79,7 @@ export const useBlogComments = (postId: string) => {
 
       let profilesData = [];
       if (userIds.length > 0) {
-        const { data, error: profilesError } = await (supabase as any)
+        const { data, error: profilesError } = await supabase
           .from('profiles')
           .select('id, username')
           .in('id', userIds);
@@ -109,12 +110,12 @@ export const useBlogStats = () => {
     queryKey: queryKeys.blog.stats(),
     queryFn: async () => {
       const [postsRes, commentsRes] = await Promise.all([
-        (supabase as any)
+        supabase
           .from('blog_posts')
           .select('id, title, slug, view_count, created_at')
           .eq('is_published', true)
           .order('created_at', { ascending: false }),
-        (supabase as any)
+        supabase
           .from('blog_comments')
           .select('post_id')
           .eq('is_approved', true),
@@ -143,8 +144,7 @@ export const useBlogStats = () => {
 export const useIncrementBlogView = () => {
   return useMutation({
     mutationFn: async (postId: string) => {
-      const { error } = await (supabase as any)
-        .rpc('increment_blog_view_count', { post_id: postId });
+      const { error } = await TypedRPC.incrementBlogViewCount(postId);
       
       if (error) throw error;
     },
@@ -166,7 +166,7 @@ export const useAddBlogComment = () => {
       comment: string;
       user_id?: string;
     }) => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('blog_comments')
         .insert(comment)
         .select()

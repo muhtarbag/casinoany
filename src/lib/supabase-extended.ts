@@ -14,6 +14,24 @@ export const TypedDB = {
   // ===== SITES =====
   bettingSites: () => supabase.from('betting_sites').select('*'),
   
+  bettingSitesActive: () => 
+    supabase.from('betting_sites')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order'),
+  
+  bettingSitesFull: () => 
+    supabase.from('betting_sites_full')
+      .select('*')
+      .eq('is_active', true),
+  
+  bettingSiteBySlug: (slug: string) =>
+    supabase.from('betting_sites')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_active', true)
+      .single(),
+  
   bettingSiteWithStats: (siteId: string) =>
     supabase.from('betting_sites')
       .select(`
@@ -98,6 +116,35 @@ export const TypedDB = {
       .select('*')
       .eq('is_published', true)
       .order('published_at', { ascending: false }),
+  
+  newsArticleBySlug: (slug: string) =>
+    supabase.from('news_articles')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .single(),
+  
+  // ===== SITE STATS =====
+  siteStats: (siteIds: string[]) =>
+    supabase.from('site_stats')
+      .select('site_id, views, clicks')
+      .in('site_id', siteIds),
+  
+  // ===== RECOMMENDED SITES =====
+  recommendedSitesPool: () =>
+    supabase.from('recommended_sites_pool')
+      .select(`
+        *,
+        site:betting_sites(*)
+      `)
+      .order('display_order'),
+  
+  // ===== CASINO CONTENT =====
+  casinoContentVersions: (siteId: string) =>
+    supabase.from('casino_content_versions')
+      .select('*')
+      .eq('site_id', siteId)
+      .order('created_at', { ascending: false }),
 };
 
 /**
@@ -175,6 +222,27 @@ export const TypedMutations = {
 export const TypedRPC = {
   trackSearch: (searchTerm: string) =>
     supabase.rpc('track_search', { p_search_term: searchTerm }),
+  
+  trackConversion: (params: {
+    p_conversion_type: string;
+    p_page_path: string;
+    p_site_id?: string;
+    p_conversion_value?: number;
+    p_session_id?: string;
+    p_metadata?: Record<string, any>;
+  }) => supabase.rpc('track_conversion', params),
+  
+  incrementCasinoAnalytics: (params: {
+    p_site_id: string;
+    p_block_name?: string;
+    p_is_affiliate_click?: boolean;
+  }) => supabase.rpc('increment_casino_analytics', params),
+  
+  incrementBlogViewCount: (postId: string) =>
+    supabase.rpc('increment_blog_view_count', { post_id: postId }),
+  
+  incrementNewsViewCount: (articleId: string) =>
+    supabase.rpc('increment_news_view_count', { article_id: articleId }),
 };
 
 export default TypedDB;

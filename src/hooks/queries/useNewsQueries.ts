@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TypedDB, TypedRPC } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
@@ -12,7 +13,7 @@ export const useNewsArticles = (filters?: {
   return useQuery({
     queryKey: queryKeys.news.list(filters),
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('news_articles')
         .select('*')
         .order('published_at', { ascending: false });
@@ -42,12 +43,7 @@ export const useNewsArticle = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.news.detail(slug),
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('news_articles')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .single();
+      const { data, error } = await TypedDB.newsArticleBySlug(slug);
 
       if (error) throw error;
       return data;
@@ -63,7 +59,7 @@ export const useDeleteNews = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('news_articles')
         .delete()
         .eq('id', id);
@@ -86,7 +82,7 @@ export const useToggleNewsPublish = () => {
 
   return useMutation({
     mutationFn: async ({ id, isPublished }: { id: string; isPublished: boolean }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('news_articles')
         .update({ is_published: !isPublished })
         .eq('id', id);
@@ -107,8 +103,7 @@ export const useToggleNewsPublish = () => {
 export const useIncrementNewsView = () => {
   return useMutation({
     mutationFn: async (articleId: string) => {
-      const { error } = await (supabase as any)
-        .rpc('increment_news_view_count', { article_id: articleId });
+      const { error } = await TypedRPC.incrementNewsViewCount(articleId);
       
       if (error) throw error;
     },

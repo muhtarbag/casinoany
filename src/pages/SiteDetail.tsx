@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TypedRPC } from '@/lib/supabase-extended';
 import { useAuth } from "@/contexts/AuthContext";
 import { analytics } from "@/lib/analytics";
 import { Header } from "@/components/Header";
@@ -55,7 +56,7 @@ export default function SiteDetail() {
     queryKey: ["betting-site", slug || id],
     queryFn: async (): Promise<any> => {
       if (slug) {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("betting_sites")
           .select("*")
           .eq("is_active", true)
@@ -68,7 +69,7 @@ export default function SiteDetail() {
         }
         return data;
       } else if (id) {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("betting_sites")
           .select("*")
           .eq("is_active", true)
@@ -186,15 +187,15 @@ export default function SiteDetail() {
           .eq("site_id", site.id);
       } else {
         await supabase
-          .from("site_stats" as any)
+          .from("site_stats")
           .insert({ site_id: site.id, views: 1, clicks: 0 });
       }
 
       // Track casino analytics
       try {
-        await (supabase as any).rpc('increment_casino_analytics', {
+        await TypedRPC.incrementCasinoAnalytics({
           p_site_id: site.id,
-          p_block_name: null,
+          p_block_name: undefined,
           p_is_affiliate_click: false,
         });
       } catch (error) {
@@ -228,20 +229,20 @@ export default function SiteDetail() {
     mutationFn: async () => {
       if (!site?.id) return;
       const { data: stats } = await supabase
-        .from('site_stats' as any)
+        .from('site_stats')
         .select('*')
         .eq('site_id', site.id)
         .maybeSingle();
 
       if (stats) {
         const { error } = await supabase
-          .from("site_stats" as any)
-          .update({ clicks: (stats as any).clicks + 1 })
+          .from("site_stats")
+          .update({ clicks: stats.clicks + 1 })
           .eq("site_id", id);
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from("site_stats" as any)
+          .from("site_stats")
           .insert({ site_id: id, clicks: 1, views: 1 });
         if (error) throw error;
       }
@@ -257,9 +258,9 @@ export default function SiteDetail() {
       
       // Track affiliate click in analytics
       try {
-        await (supabase as any).rpc('increment_casino_analytics', {
+        await TypedRPC.incrementCasinoAnalytics({
           p_site_id: site.id,
-          p_block_name: null,
+          p_block_name: undefined,
           p_is_affiliate_click: true,
         });
         

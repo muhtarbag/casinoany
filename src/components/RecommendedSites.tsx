@@ -42,7 +42,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
   const { data: algorithmicSites, isLoading: algorithmicLoading } = useQuery({
     queryKey: ["recommended-sites-algorithmic", currentSiteId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("betting_sites")
         .select("id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube")
         .eq("is_active", true)
