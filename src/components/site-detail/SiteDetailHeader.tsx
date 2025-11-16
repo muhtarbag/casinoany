@@ -23,12 +23,13 @@ export const SiteDetailHeader = ({
       <CardContent className="p-3 md:p-5">
         <div className="flex flex-col items-center text-center gap-1">
           {logoUrl && (
-            <div className="flex-shrink-0 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-lg animate-shimmer" />
+            <div className="flex-shrink-0 relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-secondary/20 to-transparent rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-primary/5 rounded-lg animate-[pulse_4s_ease-in-out_infinite]" />
               <img 
                 src={logoUrl} 
                 alt={`${site.name} logo`} 
-                className="w-48 h-48 md:w-72 md:h-72 object-contain rounded-lg bg-card/50 p-4 relative z-10 transition-all duration-300"
+                className="w-48 h-48 md:w-72 md:h-72 object-contain rounded-lg bg-card/50 p-4 relative z-10 transition-all duration-500 group-hover:scale-105"
                 loading="eager"
               />
             </div>
@@ -56,8 +57,8 @@ export const SiteDetailHeader = ({
             </div>
             
             {/* Social Proof Badge */}
-            <div className="mb-2">
-              <Badge variant="outline" className="bg-primary/5 border-primary/20 animate-[pulse_3s_ease-in-out_infinite]">
+            <div className="mb-2 animate-[fade-in_0.6s_ease-out_0.3s_both]">
+              <Badge variant="outline" className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(234,179,8,0.2)]">
                 🔥 Son 24 saatte 50+ kişi tıkladı
               </Badge>
             </div>
@@ -75,11 +76,14 @@ export const SiteDetailHeader = ({
             
             <Button 
               size="lg" 
-              className="w-full md:w-auto bg-gradient-secondary hover:opacity-90 hover:scale-105 hover:shadow-2xl text-lg font-bold transition-all duration-300 relative overflow-hidden group"
+              className="w-full md:w-auto bg-gradient-secondary text-lg font-bold relative overflow-hidden group transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(234,179,8,0.4)]"
               onClick={onAffiliateClick}
-              style={{ boxShadow: '0 0 40px rgba(234, 179, 8, 0.3)' }}
             >
-              <span className="relative z-10">Bonusu Hemen Al <ExternalLink className="ml-2 w-5 h-5 inline" /></span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+              <span className="relative z-10 flex items-center gap-2">
+                Bonusu Hemen Al 
+                <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
             </Button>
           </div>
         </div>
