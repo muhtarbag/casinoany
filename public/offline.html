@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Çevrimdışı - CasinoAny</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, hsl(220, 20%, 8%), hsl(220, 18%, 10%));
+      color: hsl(0, 0%, 98%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .offline-container {
+      max-width: 500px;
+      padding: 2rem;
+      background: hsl(220, 18%, 11%);
+      border-radius: 1rem;
+      box-shadow: 0 8px 30px -6px hsl(0, 0%, 0% / 0.6);
+      border: 1px solid hsl(220, 15%, 18%);
+    }
+
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    h1 {
+      color: hsl(280, 98%, 69%);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: hsl(220, 8%, 65%);
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .button {
+      background: linear-gradient(135deg, hsl(280, 98%, 69%), hsl(260, 85%, 55%));
+      color: white;
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px hsl(280, 98%, 69% / 0.15);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px -6px hsl(280, 98%, 69% / 0.35);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .info {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: hsl(220, 15%, 15%);
+      border-radius: 0.5rem;
+      border-left: 4px solid hsl(195, 85%, 55%);
+    }
+
+    .info-title {
+      color: hsl(195, 85%, 55%);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-text {
+      color: hsl(220, 8%, 65%);
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .offline-container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      .icon {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="icon">🔌</div>
+    <h1>İnternet Bağlantısı Yok</h1>
+    <p>
+      Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.
+      Bazı önbelleğe alınmış içerikler hala kullanılabilir.
+    </p>
+    <button class="button" onclick="location.reload()">
+      🔄 Tekrar Dene
+    </button>
+    
+    <div class="info">
+      <div class="info-title">💡 İpucu</div>
+      <p class="info-text">
+        Daha önce ziyaret ettiğiniz sayfalar çevrimdışıyken de görüntülenebilir.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Auto-retry connection every 30 seconds
+    setInterval(() => {
+      if (navigator.onLine) {
+        location.reload();
+      }
+    }, 30000);
+
+    // Listen for online event
+    window.addEventListener('online', () => {
+      location.reload();
+    });
+  </script>
+</body>
+</html>

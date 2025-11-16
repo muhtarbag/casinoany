@@ -54,10 +54,43 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}'],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
-        navigateFallback: null,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        navigateFallback: '/offline.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/admin/],
         runtimeCaching: [
+          // API Calls - NetworkFirst (fresh data priority, fallback to cache)
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60 // 5 minutes
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              networkTimeoutSeconds: 10
+            }
+          },
+          // Supabase Storage Images - CacheFirst (long-term cache)
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'supabase-images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // Google Fonts Stylesheets - CacheFirst
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -72,13 +105,14 @@ export default defineConfig(({ mode }) => ({
               }
             }
           },
+          // Google Fonts Files (WOFF2) - CacheFirst
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'gstatic-fonts-cache',
               expiration: {
-                maxEntries: 10,
+                maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               },
               cacheableResponse: {
@@ -86,17 +120,45 @@ export default defineConfig(({ mode }) => ({
               }
             }
           },
+          // Static Images (WebP, PNG, JPG) - CacheFirst
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            urlPattern: /\.(?:png|jpg|jpeg|webp|svg|gif|ico)$/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'supabase-images-cache',
+              cacheName: 'static-images-cache',
               expiration: {
-                maxEntries: 50,
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 60 // 60 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // JS and CSS - CacheFirst with versioning
+          {
+            urlPattern: /\.(?:js|css)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-resources',
+              expiration: {
+                maxEntries: 60,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               },
               cacheableResponse: {
                 statuses: [0, 200]
+              }
+            }
+          },
+          // HTML Pages - StaleWhileRevalidate (show cached, update in background)
+          {
+            urlPattern: /\.html$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 // 1 day
               }
             }
           }
