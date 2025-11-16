@@ -124,7 +124,7 @@ export const OptimizedImage = ({
           }}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
-          fetchPriority={priority ? 'high' : fetchPriority}
+          {...{ fetchpriority: priority ? 'high' : fetchPriority }}
           onLoad={handleLoad}
           onError={handleError}
           width={width}
@@ -151,7 +151,7 @@ export const OptimizedImage = ({
       }}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
-      fetchPriority={priority ? 'high' : fetchPriority}
+      {...{ fetchpriority: priority ? 'high' : fetchPriority }}
       sizes={sizes}
       onLoad={handleLoad}
       onError={handleError}
