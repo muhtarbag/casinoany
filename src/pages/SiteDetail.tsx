@@ -43,6 +43,10 @@ import { BreadcrumbSchema, FAQSchema, ReviewSchema, CasinoProductSchema } from '
 import { CasinoReviewSchema, ExpertReviewSchema } from '@/components/seo/GamblingSEOSchemas';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 
+import { ScrollProgress } from '@/components/site-detail/ScrollProgress';
+
+import { CollapsibleFeatures } from '@/components/site-detail/CollapsibleFeatures';
+
 export default function SiteDetail() {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
@@ -51,6 +55,8 @@ export default function SiteDetail() {
   const [viewTracked, setViewTracked] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showStickyCTA, setShowStickyCTA] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading, error: siteError } = useQuery({
@@ -214,16 +220,26 @@ export default function SiteDetail() {
     trackView();
   }, [site?.id, viewTracked, queryClient]);
 
-  // Scroll tracking for sticky CTA
+  // Scroll tracking for sticky CTA with direction detection
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setShowStickyCTA(scrollPosition > 400);
+      
+      // Detect scroll direction
+      if (scrollPosition > lastScrollY) {
+        setScrollDirection('down');
+      } else if (scrollPosition < lastScrollY) {
+        setScrollDirection('up');
+      }
+      setLastScrollY(scrollPosition);
+      
+      // Show sticky CTA only when scrolling down and past 400px
+      setShowStickyCTA(scrollPosition > 400 && scrollDirection === 'down');
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY, scrollDirection]);
 
   // Track click mutation
   const trackClickMutation = useMutation({
@@ -308,6 +324,7 @@ export default function SiteDetail() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <ScrollProgress />
       <SEO
         title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
         description={`${site.name} bahis sitesi hakkında detaylı inceleme. ${site.bonus || 'Bonus kampanyaları'}, kullanıcı yorumları ve ${averageRating} puan değerlendirmesi. ${site.features?.slice(0, 3).join(', ')}`}
@@ -441,16 +458,7 @@ export default function SiteDetail() {
           <CardContent className="p-6 md:p-8">
             {/* Features */}
             {site.features && site.features.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3">Özellikler</h3>
-                <div className="flex flex-wrap gap-2">
-                  {site.features.map((feature, index) => (
-                    <Badge key={index} variant="secondary">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <CollapsibleFeatures features={site.features} />
             )}
 
             {/* Contact Info */}
@@ -519,26 +527,18 @@ export default function SiteDetail() {
                 </div>
               </div>
               
-              {/* CTA Button */}
-              <Button
-                size="lg"
-                onClick={handleAffiliateClick}
-                className="relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0 flex-shrink-0"
-              >
-                {/* Animated shimmer overlay */}
-                <div className="absolute inset-0 w-full h-full">
-                  <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
-                </div>
-                
-                {/* Subtle pulse glow background */}
-                <div className="absolute inset-0 bg-white/5 animate-glow" />
-                
-                {/* Button content */}
-                <span className="relative z-10 flex items-center gap-2 drop-shadow-lg whitespace-nowrap">
-                  Siteye Git
-                  <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
-                </span>
-              </Button>
+               {/* CTA Button */}
+               <Button
+                 size="lg"
+                 onClick={handleAffiliateClick}
+                 className="relative font-bold overflow-hidden group/cta transition-all duration-300 bg-gradient-secondary hover:scale-105 hover:shadow-2xl text-white border-0 flex-shrink-0"
+                 style={{ boxShadow: '0 0 40px rgba(234, 179, 8, 0.3)' }}
+               >
+                 <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+                   Bonusu Al
+                   <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
+                 </span>
+               </Button>
             </div>
           </div>
         </div>

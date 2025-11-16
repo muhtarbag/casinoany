@@ -53,41 +53,41 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center justify-center">
           {site.email && (
             <a 
               href={`mailto:${site.email}`} 
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-primary/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Email"
               onClick={() => trackSocialClick(site.id, 'email')}
             >
-              <Mail className="w-7 h-7 text-[#EA4335]" />
+              <Mail className="w-10 h-10 text-[#EA4335]" />
             </a>
           )}
           
           {site.whatsapp && (
             <a 
-              href={`https://wa.me/${site.whatsapp}`} 
+              href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#25D366]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="WhatsApp"
               onClick={() => trackSocialClick(site.id, 'whatsapp')}
             >
-              <FaWhatsapp className="w-7 h-7 text-[#25D366]" />
+              <FaWhatsapp className="w-10 h-10 text-[#25D366]" />
             </a>
           )}
           
           {site.telegram && (
             <a 
-              href={`https://t.me/${site.telegram}`} 
+              href={`https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#0088cc]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Telegram"
               onClick={() => trackSocialClick(site.id, 'telegram')}
             >
-              <FaTelegramPlane className="w-7 h-7 text-[#0088cc]" />
+              <FaTelegramPlane className="w-10 h-10 text-[#0088cc]" />
             </a>
           )}
           
@@ -96,11 +96,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.twitter} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#1DA1F2]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Twitter"
               onClick={() => trackSocialClick(site.id, 'twitter')}
             >
-              <FaTwitter className="w-7 h-7 text-[#1DA1F2]" />
+              <FaTwitter className="w-10 h-10 text-[#1DA1F2]" />
             </a>
           )}
           
@@ -109,11 +109,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.instagram} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#E4405F]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Instagram"
               onClick={() => trackSocialClick(site.id, 'instagram')}
             >
-              <FaInstagram className="w-7 h-7 text-[#E4405F]" />
+              <FaInstagram className="w-10 h-10 text-[#E4405F]" />
             </a>
           )}
           
@@ -122,11 +122,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.facebook} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#1877F2]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Facebook"
               onClick={() => trackSocialClick(site.id, 'facebook')}
             >
-              <FaFacebook className="w-7 h-7 text-[#1877F2]" />
+              <FaFacebook className="w-10 h-10 text-[#1877F2]" />
             </a>
           )}
           
@@ -135,11 +135,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.youtube} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all hover:scale-110"
+              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#FF0000]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="YouTube"
               onClick={() => trackSocialClick(site.id, 'youtube')}
             >
-              <FaYoutube className="w-7 h-7 text-[#FF0000]" />
+              <FaYoutube className="w-10 h-10 text-[#FF0000]" />
             </a>
           )}
         </div>
