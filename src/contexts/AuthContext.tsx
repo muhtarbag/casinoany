@@ -28,23 +28,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          setTimeout(() => {
-            checkUserRoles(session.user.id);
-          }, 0);
-        } else {
-          setIsAdmin(false);
-          setUserRoles([]);
-        }
-      }
-    );
-
+    let mounted = true;
+    
+    // Get initial session first
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -53,7 +42,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Then setup listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!mounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          checkUserRoles(session.user.id);
+        } else {
+          setIsAdmin(false);
+          setUserRoles([]);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const checkUserRoles = async (userId: string) => {

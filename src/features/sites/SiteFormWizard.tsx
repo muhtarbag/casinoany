@@ -107,7 +107,6 @@ export function SiteFormWizard({
           })
           .join(', ');
         
-        console.error('Validation errors:', errorMessages);
         toast.error(`Lütfen gerekli alanları kontrol edin: ${errorFields.join(', ')}`);
       }
       return;

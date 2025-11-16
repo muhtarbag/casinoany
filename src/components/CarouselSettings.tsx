@@ -80,7 +80,6 @@ export const CarouselSettings = () => {
         description: 'Ayar güncellenirken bir hata oluştu.',
         variant: 'destructive',
       });
-      console.error('Error updating carousel animation:', error);
     },
   });
 
@@ -106,7 +105,6 @@ export const CarouselSettings = () => {
         description: 'Ayar güncellenirken bir hata oluştu.',
         variant: 'destructive',
       });
-      console.error('Error updating carousel duration:', error);
     },
   });
 

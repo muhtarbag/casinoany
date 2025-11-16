@@ -42,7 +42,7 @@ export function NotificationCenter() {
       
       queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
     } catch (error) {
-      console.error('Failed to mark notification as read:', error);
+      // Silent fail
     }
   };
 
@@ -60,7 +60,7 @@ export function NotificationCenter() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
       showSuccessToast('Tüm bildirimler okundu işaretlendi');
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      // Silent fail
     }
   };
 

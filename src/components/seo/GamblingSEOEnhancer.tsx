@@ -161,12 +161,12 @@ export const GamblingSEOEnhancer = ({
       try {
         const observer = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            console.log('Performance:', entry.name, entry.startTime);
+            // Performance tracking
           }
         });
         observer.observe({ entryTypes: ['largest-contentful-paint', 'layout-shift'] });
       } catch (e) {
-        console.warn('Performance observer not supported');
+        // Performance observer not supported
       }
     }
   }, []);

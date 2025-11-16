@@ -123,7 +123,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     try {
       await (supabase as any).rpc('track_search', { p_search_term: term });
     } catch (error) {
-      console.error('Error tracking search:', error);
+      // Silent fail for analytics
     }
   };
 

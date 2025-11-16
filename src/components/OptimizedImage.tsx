@@ -49,8 +49,6 @@ export const OptimizedImage = ({
   }, [src]);
 
   const handleError = () => {
-    console.warn(`Image failed to load: ${imageSrc}`);
-    console.log('Image error details:', { src: imageSrc, hasError });
     if (!hasError) {
       setHasError(true);
       setImageSrc(fallback);
@@ -58,7 +56,6 @@ export const OptimizedImage = ({
   };
 
   const handleLoad = () => {
-    console.log('Image loaded successfully:', imageSrc);
     setIsLoaded(true);
   };
 

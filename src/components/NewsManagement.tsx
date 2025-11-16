@@ -47,7 +47,6 @@ export function NewsManagement() {
 
       queryClient.invalidateQueries({ queryKey: ['admin-news-articles'] });
     } catch (error) {
-      console.error('RSS processing error:', error);
       toast({
         title: 'Hata',
         description: 'RSS işleme sırasında bir hata oluştu',
