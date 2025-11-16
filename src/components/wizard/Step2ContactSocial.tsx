@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-
 interface Step2ContactSocialProps {
   contactName: string;
   setContactName: (value: string) => void;
@@ -27,7 +26,6 @@ interface Step2ContactSocialProps {
   setYoutube: (value: string) => void;
   disabled?: boolean;
 }
-
 export const Step2ContactSocial = ({
   contactName,
   setContactName,
@@ -52,9 +50,7 @@ export const Step2ContactSocial = ({
   disabled
 }: Step2ContactSocialProps) => {
   const hasAtLeastOneContact = contactEmail || contactTeams || contactTelegram || contactWhatsapp;
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div>
         <h3 className="font-semibold text-lg mb-4">İletişim Bilgileri</h3>
         <Alert variant={hasAtLeastOneContact ? "default" : "destructive"} className="mb-4">
@@ -67,14 +63,7 @@ export const Step2ContactSocial = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="contactName">Yetkili Kişi Adı *</Label>
-            <Input
-              id="contactName"
-              type="text"
-              placeholder="Ad Soyad"
-              value={contactName}
-              onChange={(e) => setContactName(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="contactName" type="text" placeholder="Ad Soyad" value={contactName} onChange={e => setContactName(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -83,14 +72,7 @@ export const Step2ContactSocial = ({
                 <Mail className="w-4 h-4" />
                 Email
               </Label>
-              <Input
-                id="contactEmail"
-                type="email"
-                placeholder="iletisim@site.com"
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                disabled={disabled}
-              />
+              <Input id="contactEmail" type="email" placeholder="iletisim@site.com" value={contactEmail} onChange={e => setContactEmail(e.target.value)} disabled={disabled} />
             </div>
 
             <div className="space-y-2">
@@ -98,14 +80,7 @@ export const Step2ContactSocial = ({
                 <MessageSquare className="w-4 h-4" />
                 Microsoft Teams
               </Label>
-              <Input
-                id="contactTeams"
-                type="text"
-                placeholder="Teams kullanıcı adı"
-                value={contactTeams}
-                onChange={(e) => setContactTeams(e.target.value)}
-                disabled={disabled}
-              />
+              <Input id="contactTeams" type="text" placeholder="Teams kullanıcı adı" value={contactTeams} onChange={e => setContactTeams(e.target.value)} disabled={disabled} />
             </div>
 
             <div className="space-y-2">
@@ -113,14 +88,7 @@ export const Step2ContactSocial = ({
                 <Send className="w-4 h-4" />
                 Telegram
               </Label>
-              <Input
-                id="contactTelegram"
-                type="text"
-                placeholder="@kullaniciadi"
-                value={contactTelegram}
-                onChange={(e) => setContactTelegram(e.target.value)}
-                disabled={disabled}
-              />
+              <Input id="contactTelegram" type="text" placeholder="@kullaniciadi" value={contactTelegram} onChange={e => setContactTelegram(e.target.value)} disabled={disabled} />
             </div>
 
             <div className="space-y-2">
@@ -128,14 +96,7 @@ export const Step2ContactSocial = ({
                 <Phone className="w-4 h-4" />
                 WhatsApp
               </Label>
-              <Input
-                id="contactWhatsapp"
-                type="tel"
-                placeholder="+90 5XX XXX XX XX"
-                value={contactWhatsapp}
-                onChange={(e) => setContactWhatsapp(e.target.value)}
-                disabled={disabled}
-              />
+              <Input id="contactWhatsapp" type="tel" placeholder="+90 5XX XXX XX XX" value={contactWhatsapp} onChange={e => setContactWhatsapp(e.target.value)} disabled={disabled} />
             </div>
           </div>
         </div>
@@ -144,7 +105,7 @@ export const Step2ContactSocial = ({
       <Separator />
 
       <div>
-        <h3 className="font-semibold text-lg mb-2">Sosyal Medya Hesapları</h3>
+        <h3 className="font-semibold text-lg mb-2">Şirket Sosyal Medya Hesapları</h3>
         <p className="text-sm text-muted-foreground mb-4">Opsiyonel - Sosyal medya hesaplarınızı ekleyebilirsiniz</p>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -153,14 +114,7 @@ export const Step2ContactSocial = ({
               <Facebook className="w-4 h-4 text-blue-600" />
               Facebook
             </Label>
-            <Input
-              id="facebook"
-              type="url"
-              placeholder="https://facebook.com/..."
-              value={facebook}
-              onChange={(e) => setFacebook(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="facebook" type="url" placeholder="https://facebook.com/..." value={facebook} onChange={e => setFacebook(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="space-y-2">
@@ -168,14 +122,7 @@ export const Step2ContactSocial = ({
               <Twitter className="w-4 h-4 text-sky-500" />
               Twitter / X
             </Label>
-            <Input
-              id="twitter"
-              type="url"
-              placeholder="https://twitter.com/..."
-              value={twitter}
-              onChange={(e) => setTwitter(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="twitter" type="url" placeholder="https://twitter.com/..." value={twitter} onChange={e => setTwitter(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="space-y-2">
@@ -183,14 +130,7 @@ export const Step2ContactSocial = ({
               <Instagram className="w-4 h-4 text-pink-600" />
               Instagram
             </Label>
-            <Input
-              id="instagram"
-              type="url"
-              placeholder="https://instagram.com/..."
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="instagram" type="url" placeholder="https://instagram.com/..." value={instagram} onChange={e => setInstagram(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="space-y-2">
@@ -198,14 +138,7 @@ export const Step2ContactSocial = ({
               <Linkedin className="w-4 h-4 text-blue-700" />
               LinkedIn
             </Label>
-            <Input
-              id="linkedin"
-              type="url"
-              placeholder="https://linkedin.com/..."
-              value={linkedin}
-              onChange={(e) => setLinkedin(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="linkedin" type="url" placeholder="https://linkedin.com/..." value={linkedin} onChange={e => setLinkedin(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="space-y-2 sm:col-span-2">
@@ -213,17 +146,9 @@ export const Step2ContactSocial = ({
               <Youtube className="w-4 h-4 text-red-600" />
               YouTube
             </Label>
-            <Input
-              id="youtube"
-              type="url"
-              placeholder="https://youtube.com/..."
-              value={youtube}
-              onChange={(e) => setYoutube(e.target.value)}
-              disabled={disabled}
-            />
+            <Input id="youtube" type="url" placeholder="https://youtube.com/..." value={youtube} onChange={e => setYoutube(e.target.value)} disabled={disabled} />
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
