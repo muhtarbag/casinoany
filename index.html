@@ -93,6 +93,137 @@
   <meta name="twitter:title" content="Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny" />
   <meta property="og:description" content="Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, hızlı para çekme garantisi. 50+ lisanslı casino incelemesi." />
   <meta name="twitter:description" content="Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, hızlı para çekme garantisi. 50+ lisanslı casino incelemesi." />
+  
+  <!-- Structured Data - Organization Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CasinoAny.com",
+    "url": "https://casinoany.com",
+    "logo": "https://casinoany.com/logos/casinodoo-logo.svg",
+    "description": "Türkiye'nin en güvenilir casino ve bahis siteleri karşılaştırma platformu. 50+ lisanslı site, yüksek bonuslar ve detaylı incelemeleri.",
+    "sameAs": [
+      "https://twitter.com/casinoany",
+      "https://facebook.com/casinoany",
+      "https://instagram.com/casinoany"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "info@casinoany.com",
+      "areaServed": "TR",
+      "availableLanguage": "Turkish"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "1000",
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  }
+  </script>
+  
+  <!-- Structured Data - WebSite Schema with Search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CasinoAny",
+    "url": "https://casinoany.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://casinoany.com/?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  
+  <!-- Structured Data - ItemList Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "En İyi Casino Siteleri 2025",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Kingbetting",
+        "url": "https://casinoany.com/site/kingbetting",
+        "description": "25.000 TL Hoşgeldin Bonusu + 300 Free Spin"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "KingRoyal",
+        "url": "https://casinoany.com/site/kingroyal",
+        "description": "1200 TL Deneme Bonusu"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Meritking",
+        "url": "https://casinoany.com/site/meritking",
+        "description": "500 TL Hoş Geldin Bonusu"
+      }
+    ]
+  }
+  </script>
+  
+  <!-- Structured Data - FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Türkiye'nin en güvenilir casino siteleri hangileri?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "CasinoAny.com'da lisanslı, yüksek güvenlik standartlarına sahip ve hızlı ödeme yapan 50+ casino sitesini inceleyebilirsiniz. Tüm siteler detaylı analizlerle değerlendirilmiştir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Casino bonusları nasıl kullanılır?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Casino bonusları genellikle ilk üyelikte hoş geldin bonusu olarak verilir. Bonus kullanmadan önce çevrim şartlarını mutlaka okuyun. %500'e varan bonuslarımızı karşılaştırabilirsiniz."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Deneme bonusu veren siteler güvenilir mi?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evet, CasinoAny.com'da listelenen tüm deneme bonusu veren siteler güvenilir lisanslara sahiptir. Her sitenin detaylı incelemesini yaparak kullanıcılarımıza sunuyoruz."
+        }
+      }
+    ]
+  }
+  </script>
+  
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": "https://casinoany.com"
+      }
+    ]
+  }
+  </script>
 </head>
 
   <body>
@@ -182,13 +313,26 @@
     
     <!-- Hide initial content after React loads -->
     <script>
-      // This will run after React mounts and removes the static content
-      window.addEventListener('DOMContentLoaded', () => {
-        const initialContent = document.getElementById('initial-content');
-        if (initialContent && window.React) {
-          setTimeout(() => initialContent.remove(), 100);
-        }
-      });
+      // Wait for React to fully render before removing static content
+      // This ensures Google PageSpeed can see the content
+      if (typeof window !== 'undefined') {
+        // Only remove after React is confirmed to be loaded AND rendered
+        const checkReactRendered = () => {
+          const root = document.getElementById('root');
+          const initialContent = document.getElementById('initial-content');
+          
+          // Check if React has actually rendered something
+          if (root && root.children.length > 1 && initialContent) {
+            // React has rendered, safe to remove static content
+            initialContent.remove();
+          }
+        };
+        
+        // Wait for full page load and give React time to render
+        window.addEventListener('load', () => {
+          setTimeout(checkReactRendered, 500);
+        });
+      }
     </script>
     
     <!-- Service Worker is auto-registered by vite-plugin-pwa -->
