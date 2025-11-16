@@ -57,11 +57,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
           {site.email && (
             <a 
               href={`mailto:${site.email}`} 
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-primary/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Email"
               onClick={() => trackSocialClick(site.id, 'email')}
             >
-              <Mail className="w-10 h-10 text-[#EA4335]" />
+              <div className="absolute inset-0 rounded-full bg-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#EA4335] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+              <Mail className="w-10 h-10 text-[#EA4335] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -70,11 +72,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#25D366]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="WhatsApp"
               onClick={() => trackSocialClick(site.id, 'whatsapp')}
             >
-              <FaWhatsapp className="w-10 h-10 text-[#25D366]" />
+              <div className="absolute inset-0 rounded-full bg-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaWhatsapp className="w-10 h-10 text-[#25D366] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -83,11 +87,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={`https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#0088cc]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Telegram"
               onClick={() => trackSocialClick(site.id, 'telegram')}
             >
-              <FaTelegramPlane className="w-10 h-10 text-[#0088cc]" />
+              <div className="absolute inset-0 rounded-full bg-[#0088cc] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#0088cc] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaTelegramPlane className="w-10 h-10 text-[#0088cc] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -96,11 +102,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.twitter} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#1DA1F2]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Twitter"
               onClick={() => trackSocialClick(site.id, 'twitter')}
             >
-              <FaTwitter className="w-10 h-10 text-[#1DA1F2]" />
+              <div className="absolute inset-0 rounded-full bg-[#1DA1F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#1DA1F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaTwitter className="w-10 h-10 text-[#1DA1F2] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -109,11 +117,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.instagram} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#E4405F]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Instagram"
               onClick={() => trackSocialClick(site.id, 'instagram')}
             >
-              <FaInstagram className="w-10 h-10 text-[#E4405F]" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaInstagram className="w-10 h-10 text-[#E1306C] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -122,11 +132,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.facebook} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#1877F2]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Facebook"
               onClick={() => trackSocialClick(site.id, 'facebook')}
             >
-              <FaFacebook className="w-10 h-10 text-[#1877F2]" />
+              <div className="absolute inset-0 rounded-full bg-[#1877F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#1877F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaFacebook className="w-10 h-10 text-[#1877F2] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
           
@@ -135,11 +147,13 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               href={site.youtube} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="transition-all duration-200 ease-out hover:scale-125 hover:-translate-y-1 p-2 rounded-full hover:bg-[#FF0000]/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="YouTube"
               onClick={() => trackSocialClick(site.id, 'youtube')}
             >
-              <FaYoutube className="w-10 h-10 text-[#FF0000]" />
+              <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+              <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <FaYoutube className="w-10 h-10 text-[#FF0000] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
         </div>
