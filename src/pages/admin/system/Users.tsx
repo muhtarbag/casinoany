@@ -24,17 +24,26 @@ const Users = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, error: queryError } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Get all user_roles
+      // Get all user_roles with proper ordering
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (rolesError) throw rolesError;
-      if (!roles || roles.length === 0) return [];
+      if (rolesError) {
+        console.error('Error fetching user_roles:', rolesError);
+        throw rolesError;
+      }
+      
+      if (!roles || roles.length === 0) {
+        console.log('No user roles found');
+        return [];
+      }
+
+      console.log('Found roles:', roles.length);
 
       // Get corresponding profiles
       const userIds = roles.map(r => r.user_id);
@@ -43,18 +52,33 @@ const Users = () => {
         .select('*')
         .in('id', userIds);
       
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      console.log('Found profiles:', profiles?.length || 0);
 
       // Merge data
-      return roles.map(role => {
+      const merged = roles.map(role => {
         const profile = profiles?.find(p => p.id === role.user_id);
         return {
           ...role,
-          profiles: profile || null
+          profiles: profile || {
+            email: 'Bilinmiyor',
+            first_name: null,
+            last_name: null,
+            username: null,
+            created_at: role.created_at
+          }
         };
       });
+
+      console.log('Merged users:', merged);
+      return merged;
     },
     enabled: isAdmin,
+    retry: 1,
   });
 
   const approveMutation = useMutation({
@@ -241,6 +265,12 @@ const Users = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
+        ) : queryError ? (
+          <Card>
+            <CardContent className="pt-6 text-center py-12">
+              <p className="text-destructive">Hata: {(queryError as Error).message}</p>
+            </CardContent>
+          </Card>
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full max-w-md grid-cols-2">
