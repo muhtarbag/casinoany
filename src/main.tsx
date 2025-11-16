@@ -8,24 +8,19 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/mobile-optimizations.css";
-import { initWebVitalsTracking } from './utils/coreWebVitals';
-import { initPerformanceObserver } from './lib/performanceMonitor';
-import { initPerformanceOptimizations, requestIdleCallback } from './utils/performanceOptimizations';
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 
-// Initialize Performance Optimizations
-initPerformanceOptimizations();
-
-// Initialize Route Preloading with polyfilled requestIdleCallback
-requestIdleCallback(() => {
-  setupRoutePreloading();
-}, { timeout: 2000 });
-
-// Initialize Core Web Vitals tracking for SEO
-initWebVitalsTracking();
-
-// Initialize Performance Monitoring
-initPerformanceObserver();
+// Initialize Route Preloading
+if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+  requestIdleCallback(() => {
+    setupRoutePreloading();
+  }, { timeout: 2000 });
+} else {
+  // Fallback for browsers without requestIdleCallback
+  setTimeout(() => {
+    setupRoutePreloading();
+  }, 100);
+}
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
