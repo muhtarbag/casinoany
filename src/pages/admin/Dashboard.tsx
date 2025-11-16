@@ -23,12 +23,6 @@ export default function Dashboard() {
         {dashboardStats && (
           <DashboardTab 
             dashboardStats={dashboardStats}
-            dailyPageViews={[]}
-            deviceStats={[]}
-            topPages={[]}
-            weeklyComparison={undefined}
-            monthlyTrend={undefined}
-            customMetrics={undefined}
             onNavigate={(tab) => {
               const routeMap: Record<string, string> = {
                 'manage': '/admin/sites',
