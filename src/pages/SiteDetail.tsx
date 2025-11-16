@@ -433,6 +433,10 @@ export default function SiteDetail() {
           reviewCount={reviews?.length || 0}
           onAffiliateClick={handleAffiliateClick}
         />
+
+        {/* Site Info Card */}
+        <Card className="shadow-xl border-primary/20">
+          <CardContent className="p-6 md:p-8">
             {/* Features */}
             {site.features && site.features.length > 0 && (
               <div className="mb-6">
@@ -447,68 +451,8 @@ export default function SiteDetail() {
               </div>
             )}
 
-            {/* Social Media Links */}
-            <div className="border-t pt-6">
-              <h3 className="font-semibold mb-3">İletişim</h3>
-              <div className="flex flex-wrap gap-3">
-                {site.email && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`mailto:${site.email}`} target="_blank" rel="noopener noreferrer">
-                      <Mail className="w-4 h-4 mr-2" style={{ color: '#6366f1' }} />
-                      Email
-                    </a>
-                  </Button>
-                )}
-                {site.whatsapp && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.whatsapp} target="_blank" rel="noopener noreferrer">
-                      <MessageCircle className="w-4 h-4 mr-2" style={{ color: '#25D366' }} />
-                      WhatsApp
-                    </a>
-                  </Button>
-                )}
-                {site.telegram && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.telegram} target="_blank" rel="noopener noreferrer">
-                      <Send className="w-4 h-4 mr-2" style={{ color: '#0088cc' }} />
-                      Telegram
-                    </a>
-                  </Button>
-                )}
-                {site.twitter && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.twitter} target="_blank" rel="noopener noreferrer">
-                      <FaTwitter className="w-4 h-4 mr-2" style={{ color: '#1DA1F2' }} />
-                      Twitter
-                    </a>
-                  </Button>
-                )}
-                {site.instagram && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.instagram} target="_blank" rel="noopener noreferrer">
-                      <FaInstagram className="w-4 h-4 mr-2" style={{ color: '#E4405F' }} />
-                      Instagram
-                    </a>
-                  </Button>
-                )}
-                {site.facebook && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.facebook} target="_blank" rel="noopener noreferrer">
-                      <FaFacebook className="w-4 h-4 mr-2" style={{ color: '#1877F2' }} />
-                      Facebook
-                    </a>
-                  </Button>
-                )}
-                {site.youtube && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={site.youtube} target="_blank" rel="noopener noreferrer">
-                      <FaYoutube className="w-4 h-4 mr-2" style={{ color: '#FF0000' }} />
-                      YouTube
-                    </a>
-                  </Button>
-                )}
-              </div>
-            </div>
+            {/* Contact Info */}
+            <SiteDetailContact site={site} />
 
             {/* Stats */}
             {stats && (
