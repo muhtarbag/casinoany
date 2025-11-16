@@ -1701,6 +1701,57 @@ export type Database = {
         }
         Relationships: []
       }
+      pagespeed_history: {
+        Row: {
+          cls: number | null
+          created_at: string | null
+          fcp: number | null
+          fetch_time: number | null
+          id: string
+          lcp: number | null
+          lighthouse_version: string | null
+          metadata: Json | null
+          performance_score: number | null
+          si: number | null
+          strategy: string | null
+          tbt: number | null
+          test_date: string | null
+          url: string
+        }
+        Insert: {
+          cls?: number | null
+          created_at?: string | null
+          fcp?: number | null
+          fetch_time?: number | null
+          id?: string
+          lcp?: number | null
+          lighthouse_version?: string | null
+          metadata?: Json | null
+          performance_score?: number | null
+          si?: number | null
+          strategy?: string | null
+          tbt?: number | null
+          test_date?: string | null
+          url: string
+        }
+        Update: {
+          cls?: number | null
+          created_at?: string | null
+          fcp?: number | null
+          fetch_time?: number | null
+          id?: string
+          lcp?: number | null
+          lighthouse_version?: string | null
+          metadata?: Json | null
+          performance_score?: number | null
+          si?: number | null
+          strategy?: string | null
+          tbt?: number | null
+          test_date?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
