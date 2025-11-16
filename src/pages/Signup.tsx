@@ -169,14 +169,13 @@ const Signup = () => {
   };
 
   const renderWizardStep = () => {
-    if (!user) return null;
-    const props = { ...wizardData, sites: sites || [], userId: user.id, disabled: loading };
+    const props = { ...wizardData, sites: sites || [], disabled: loading };
     const update = (field: string) => (value: string) => setWizardData({...wizardData, [field]: value});
     
     switch (currentStep) {
       case 0: return <Step1Basic {...props} setSelectedSite={update('selectedSite')} setNewSiteName={update('newSiteName')} setCompanyName={update('companyName')} setDescription={update('description')} />;
       case 1: return <Step2Social {...props} setFacebook={update('facebook')} setTwitter={update('twitter')} setInstagram={update('instagram')} setLinkedin={update('linkedin')} setYoutube={update('youtube')} />;
-      case 2: return <Step3Logo logoUrl={wizardData.logoUrl} setLogoUrl={update('logoUrl')} userId={user.id} disabled={loading} />;
+      case 2: return <Step3Logo logoUrl={wizardData.logoUrl} setLogoUrl={update('logoUrl')} disabled={loading} />;
       case 3: return <Step4Infrastructure provider={wizardData.infrastructureProvider} setProvider={update('infrastructureProvider')} notes={wizardData.infrastructureNotes} setNotes={update('infrastructureNotes')} disabled={loading} />;
       case 4: return <Step5Contact contactName={wizardData.contactName} setContactName={update('contactName')} email={wizardData.contactEmail} setEmail={update('contactEmail')} teams={wizardData.contactTeams} setTeams={update('contactTeams')} telegram={wizardData.contactTelegram} setTelegram={update('contactTelegram')} whatsapp={wizardData.contactWhatsapp} setWhatsapp={update('contactWhatsapp')} disabled={loading} />;
       default: return null;
@@ -238,7 +237,7 @@ const Signup = () => {
               </div>
             </div>
 
-            {userType === 'site_owner' && user && (
+            {userType === 'site_owner' && (
               <div className="border rounded-lg p-6 space-y-6">
                 <WizardProgress steps={wizardSteps} currentStep={currentStep} />
                 {renderWizardStep()}
