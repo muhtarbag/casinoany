@@ -1,7 +1,16 @@
 // CRITICAL FIX: Ensure single React instance globally BEFORE any imports
-import React from 'react';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+
+// Force single React instance globally
 if (typeof window !== 'undefined') {
-  window.React = React;
+  (window as any).React = React;
+  (window as any).ReactDOM = ReactDOM;
+  
+  // Ensure React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED is consistent
+  if (React && (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) {
+    (window as any).__REACT_INTERNALS__ = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+  }
 }
 
 import { createRoot } from "react-dom/client";
