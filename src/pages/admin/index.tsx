@@ -66,8 +66,6 @@ export default function AdminRoot() {
       'content/casino-analytics': 'casino-analytics',
       'content/planner': 'content-planner',
       'sites/banners': 'banners',
-      'ai': 'ai',
-      'ai/history': 'ai-history',
       'finance/affiliate': 'affiliate',
       'finance/bonus': 'bonus',
       'finance/bonus-requests': 'bonus-requests',
@@ -76,7 +74,6 @@ export default function AdminRoot() {
       'system/health': 'health',
       'system/logs': 'logs',
       'system/history': 'history',
-      'system/performance': 'performance',
       'system/roles': 'roles',
       'system/build-health': 'build-health',
     };
@@ -103,8 +100,6 @@ export default function AdminRoot() {
       'casino-analytics': '/admin/content/casino-analytics',
       'content-planner': '/admin/content/planner',
       'banners': '/admin/sites/banners',
-      'ai': '/admin/ai',
-      'ai-history': '/admin/ai/history',
       'affiliate': '/admin/finance/affiliate',
       'bonus': '/admin/finance/bonus',
       'bonus-requests': '/admin/finance/bonus-requests',
@@ -113,7 +108,6 @@ export default function AdminRoot() {
       'health': '/admin/system/health',
       'logs': '/admin/system/logs',
       'history': '/admin/system/history',
-      'performance': '/admin/system/performance',
       'roles': '/admin/system/roles',
       'build-health': '/admin/system/build-health',
     };
