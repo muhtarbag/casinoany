@@ -1881,26 +1881,47 @@ export type Database = {
         Row: {
           clicks: number | null
           created_at: string | null
+          email_clicks: number | null
+          facebook_clicks: number | null
           id: string
+          instagram_clicks: number | null
           site_id: string
+          telegram_clicks: number | null
+          twitter_clicks: number | null
           updated_at: string | null
           views: number | null
+          whatsapp_clicks: number | null
+          youtube_clicks: number | null
         }
         Insert: {
           clicks?: number | null
           created_at?: string | null
+          email_clicks?: number | null
+          facebook_clicks?: number | null
           id?: string
+          instagram_clicks?: number | null
           site_id: string
+          telegram_clicks?: number | null
+          twitter_clicks?: number | null
           updated_at?: string | null
           views?: number | null
+          whatsapp_clicks?: number | null
+          youtube_clicks?: number | null
         }
         Update: {
           clicks?: number | null
           created_at?: string | null
+          email_clicks?: number | null
+          facebook_clicks?: number | null
           id?: string
+          instagram_clicks?: number | null
           site_id?: string
+          telegram_clicks?: number | null
+          twitter_clicks?: number | null
           updated_at?: string | null
           views?: number | null
+          whatsapp_clicks?: number | null
+          youtube_clicks?: number | null
         }
         Relationships: [
           {
