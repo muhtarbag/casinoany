@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (error) return { error };
     
-    // Create user role and site ownership if needed
+    // Create user role if needed
     if (data.user) {
       const role = accountType === 'site_owner' ? 'site_owner' : 'user';
       
@@ -144,15 +144,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: role as any,
         status: accountType === 'site_owner' ? 'pending' : 'approved'
       });
-      
-      // If site owner, create site ownership record
-      if (accountType === 'site_owner' && siteId) {
-        await (supabase as any).from('site_owners').insert({
-          user_id: data.user.id,
-          site_id: siteId,
-          status: 'pending'
-        });
-      }
     }
     
     return { error };

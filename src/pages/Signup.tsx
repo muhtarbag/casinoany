@@ -129,25 +129,8 @@ const Signup = () => {
 
     setLoading(true);
     
-    let finalSiteId = wizardData.selectedSite;
-    if (userType === 'site_owner' && wizardData.selectedSite === 'new_site') {
-      const { data: newSite, error } = await (supabase as any).from('betting_sites').insert({
-        name: wizardData.newSiteName.trim(),
-        slug: wizardData.newSiteName.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        affiliate_link: '#',
-        is_active: false
-      }).select().single();
-      
-      if (error) {
-        setLoading(false);
-        toast({ title: 'Hata', description: 'Site oluşturulurken hata', variant: 'destructive' });
-        return;
-      }
-      finalSiteId = newSite.id;
-    }
-    
     const userData = userType === 'user' ? { firstName, lastName, phone } : undefined;
-    const result = await signUp(email, password, userType, finalSiteId, userData);
+    const result = await signUp(email, password, userType, wizardData.selectedSite !== 'new_site' ? wizardData.selectedSite : null, userData);
     if (result.error) {
       setLoading(false);
       toast({ title: 'Kayıt Başarısız', description: result.error.message, variant: 'destructive' });
@@ -155,13 +138,33 @@ const Signup = () => {
     }
 
     const { data: { user: newUser } } = await supabase.auth.getUser();
-    if (userType === 'site_owner' && newUser && finalSiteId) {
-      await (supabase as any).from('site_owners').insert({
+    if (userType === 'site_owner' && newUser) {
+      const ownerData: any = {
         user_id: newUser.id,
-        site_id: finalSiteId,
-        ...wizardData,
+        company_name: wizardData.companyName,
+        description: wizardData.description,
+        logo_url: wizardData.logoUrl,
+        contact_person_name: wizardData.contactName,
+        contact_email: wizardData.contactEmail,
+        contact_teams: wizardData.contactTeams,
+        contact_telegram: wizardData.contactTelegram,
+        contact_whatsapp: wizardData.contactWhatsapp,
+        social_facebook: wizardData.facebook,
+        social_twitter: wizardData.twitter,
+        social_instagram: wizardData.instagram,
+        social_linkedin: wizardData.linkedin,
+        social_youtube: wizardData.youtube,
         status: 'pending'
-      });
+      };
+
+      // If user wants to create a new site or selected existing site
+      if (wizardData.selectedSite === 'new_site') {
+        ownerData.new_site_name = wizardData.newSiteName;
+      } else {
+        ownerData.site_id = wizardData.selectedSite;
+      }
+
+      await (supabase as any).from('site_owners').insert(ownerData);
       toast({ title: 'Başvuru Alındı!', description: 'Admin onayı bekleniyor.', duration: 6000 });
     } else {
       analytics.trackSignup();
