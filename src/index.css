@@ -29,7 +29,7 @@ All colors MUST be HSL.
 
     /* Muted dark backgrounds - neutral */
     --muted: 220 15% 15%;
-    --muted-foreground: 220 8% 65%;
+    --muted-foreground: 220 8% 70%;
 
     /* Cyan/Blue for links and interactive elements */
     --accent: 195 85% 55%;
@@ -139,7 +139,7 @@ All colors MUST be HSL.
     --secondary-foreground: 0 0% 0%;
 
     --muted: 220 15% 15%;
-    --muted-foreground: 220 8% 65%;
+    --muted-foreground: 220 8% 70%;
 
     --accent: 195 85% 55%;
     --accent-foreground: 0 0% 100%;
