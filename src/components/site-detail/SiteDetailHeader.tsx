@@ -20,8 +20,8 @@ export const SiteDetailHeader = ({
 }: SiteDetailHeaderProps) => {
   return (
     <Card className="shadow-xl border-primary/20">
-      <CardContent className="p-6 md:p-8">
-        <div className="flex flex-col items-center text-center gap-6">
+      <CardContent className="p-4 md:p-6">
+        <div className="flex flex-col items-center text-center gap-4">
           {logoUrl && (
             <div className="flex-shrink-0">
               <img 
@@ -33,9 +33,9 @@ export const SiteDetailHeader = ({
           )}
           
           <div className="w-full">
-            <h1 className="text-2xl md:text-4xl font-bold mb-3 text-foreground">{site.name}</h1>
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 text-foreground">{site.name}</h1>
             
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-3">
               <div className="flex items-center gap-1.5">
                 <Star className="w-5 h-5 fill-gold text-gold" />
                 <span className="font-bold text-lg">{averageRating}</span>
@@ -52,12 +52,12 @@ export const SiteDetailHeader = ({
             </div>
             
             {site.bonus && (
-              <div className="bg-gradient-secondary/10 border border-secondary/30 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+              <div className="bg-gradient-secondary/10 border border-secondary/30 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
                 <div className="flex items-center justify-center gap-2 mb-1">
-                  <span className="text-2xl">🎁</span>
-                  <span className="font-bold text-lg">Hoş Geldin Bonusu</span>
+                  <span className="text-xl">🎁</span>
+                  <span className="font-bold text-base">Hoş Geldin Bonusu</span>
                 </div>
-                <p className="text-xl font-bold text-secondary">{site.bonus}</p>
+                <p className="text-lg font-bold text-secondary">{site.bonus}</p>
               </div>
             )}
             
