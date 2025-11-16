@@ -31,6 +31,7 @@ import AdminRoot from "./pages/admin";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminSitesHub from "./pages/admin/sites/index";
 import AdminRoleManagement from "./pages/admin/system/RoleManagement";
+import AdminUsers from "./pages/admin/system/Users";
 
 // Secondary admin pages can be lazy loaded safely
 const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/BlogManagement"));
@@ -120,6 +121,7 @@ const AppContent = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="sites" element={<AdminSitesHub />} />
+            <Route path="system/users" element={<AdminUsers />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
             
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
