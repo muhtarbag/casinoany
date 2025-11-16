@@ -5,7 +5,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { QUERY_DEFAULTS } from '@/lib/queryClient';
 import type { NotificationStats } from '../types';
 
 interface NotificationWithStats {
@@ -40,8 +39,11 @@ export function useNotificationStats(notificationId?: string) {
       };
     },
     enabled: !!notificationId,
-    // Use analytics pattern for stats
-    ...QUERY_DEFAULTS.analytics,
+    // Notification stats need more frequent updates
+    staleTime: 2 * 60 * 1000, // 2 dakika
+    gcTime: 15 * 60 * 1000, // 15 dakika
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 }
 
@@ -105,7 +107,11 @@ export function useAllNotificationStats() {
         byNotification: statsMap,
       };
     },
-    // Use analytics pattern
-    ...QUERY_DEFAULTS.analytics,
+    // Notification stats need more frequent updates than other analytics
+    staleTime: 2 * 60 * 1000, // 2 dakika (analytics default 15 dakika yerine)
+    gcTime: 15 * 60 * 1000, // 15 dakika
+    refetchOnWindowFocus: true, // Window'a dönüldüğünde yenile
+    refetchOnMount: true, // Mount'ta yenile
+    refetchInterval: 5 * 60 * 1000, // Her 5 dakikada otomatik yenile
   });
 }
