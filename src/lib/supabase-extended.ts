@@ -72,17 +72,6 @@ export const TypedDB = {
       .gte('expire_at', new Date().toISOString())
       .order('priority', { ascending: false }),
 
-  // ===== ANALYTICS =====
-  analyticsSummary: (siteId?: string) => {
-    const query = supabase.from('analytics_daily_summary').select('*');
-    return siteId ? query.eq('site_id', siteId) : query;
-  },
-
-  pageViews: (dateFrom?: string) => {
-    const query = supabase.from('page_views').select('*');
-    return dateFrom ? query.gte('created_at', dateFrom) : query;
-  },
-
   // ===== CATEGORIES =====
   activeCategories: () =>
     supabase.from('categories')

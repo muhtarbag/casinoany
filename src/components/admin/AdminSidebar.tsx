@@ -3,8 +3,6 @@ import {
   Globe, 
   FileText, 
   MessageSquare,
-  BarChart3,
-  Activity,
   Newspaper,
   Gamepad2,
   Gift,
@@ -84,7 +82,6 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
     {
       label: '⚙️ Sistem Hub',
       items: [
-        { id: 'analytics', icon: BarChart3, label: 'Analytics', route: '/admin/analytics', roles: ['seo_manager'], shortcut: 'g y' },
         { id: 'cache', icon: HardDrive, label: 'Cache Yönetimi', route: '/admin/system/cache', roles: [] },
         { id: 'health', icon: AlertCircle, label: 'Sistem Sağlığı', route: '/admin/system/health', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
