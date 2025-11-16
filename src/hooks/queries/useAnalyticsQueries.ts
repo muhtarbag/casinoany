@@ -20,6 +20,14 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
   return useQuery({
     queryKey: ['site-analytics', dateRange],
     queryFn: async () => {
+      // First, fetch all active sites
+      const { data: sites, error: sitesError } = await supabase
+        .from('betting_sites')
+        .select('id, name, logo_url, rating')
+        .eq('is_active', true);
+
+      if (sitesError) throw sitesError;
+
       // Fetch affiliate metrics for the date range
       const { data: metrics, error: metricsError } = await supabase
         .from('affiliate_metrics')
@@ -29,8 +37,7 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
           total_views,
           total_clicks,
           total_conversions,
-          estimated_revenue,
-          betting_sites!inner(name, logo_url, rating)
+          estimated_revenue
         `)
         .gte('metric_date', format(dateRange.start, 'yyyy-MM-dd'))
         .lte('metric_date', format(dateRange.end, 'yyyy-MM-dd'))
@@ -48,49 +55,50 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
 
       if (conversionsError) throw conversionsError;
 
-      // Group by site
+      // Initialize all sites with zero metrics
       const siteMap = new Map<string, SiteAnalytics>();
+      
+      sites?.forEach((site: any) => {
+        siteMap.set(site.id, {
+          site_id: site.id,
+          site_name: site.name,
+          logo_url: site.logo_url,
+          rating: site.rating,
+          views: 0,
+          clicks: 0,
+          ctr: 0,
+          revenue: 0,
+          conversions: 0,
+          affiliate_clicks: 0,
+          trend_data: [],
+        });
+      });
 
+      // Add metrics data
       metrics?.forEach((metric: any) => {
         const siteId = metric.site_id;
-        const siteName = metric.betting_sites?.name || 'Unknown';
-        const logoUrl = metric.betting_sites?.logo_url;
-        const rating = metric.betting_sites?.rating;
+        const site = siteMap.get(siteId);
+        
+        if (site) {
+          site.views += metric.total_views || 0;
+          site.clicks += metric.total_clicks || 0;
+          site.conversions += metric.total_conversions || 0;
+          site.revenue += metric.estimated_revenue || 0;
 
-        if (!siteMap.has(siteId)) {
-          siteMap.set(siteId, {
-            site_id: siteId,
-            site_name: siteName,
-            logo_url: logoUrl,
-            rating: rating,
-            views: 0,
-            clicks: 0,
-            ctr: 0,
-            revenue: 0,
-            conversions: 0,
-            affiliate_clicks: 0,
-            trend_data: [],
+          // Add to trend data
+          site.trend_data.push({
+            date: metric.metric_date,
+            views: metric.total_views || 0,
+            clicks: metric.total_clicks || 0,
           });
         }
-
-        const site = siteMap.get(siteId)!;
-        site.views += metric.total_views || 0;
-        site.clicks += metric.total_clicks || 0;
-        site.conversions += metric.total_conversions || 0;
-        site.revenue += metric.estimated_revenue || 0;
-
-        // Add to trend data
-        site.trend_data.push({
-          date: metric.metric_date,
-          views: metric.total_views || 0,
-          clicks: metric.total_clicks || 0,
-        });
       });
 
       // Add affiliate clicks from conversions
       conversions?.forEach((conv: any) => {
-        if (siteMap.has(conv.site_id)) {
-          siteMap.get(conv.site_id)!.affiliate_clicks += 1;
+        const site = siteMap.get(conv.site_id);
+        if (site) {
+          site.affiliate_clicks += 1;
         }
       });
 
