@@ -9,13 +9,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { 
     dashboardStats, 
-    isLoadingStats, 
-    dailyPageViews, 
-    deviceStats, 
-    topPages,
-    weeklyComparison,
-    monthlyTrend,
-    customMetrics
+    isLoadingStats
   } = useAdminStats();
 
   // Loading state
@@ -29,17 +23,16 @@ export default function Dashboard() {
         {dashboardStats && (
           <DashboardTab 
             dashboardStats={dashboardStats}
-            dailyPageViews={dailyPageViews || []}
-            deviceStats={deviceStats || []}
-            topPages={topPages || []}
-            weeklyComparison={weeklyComparison}
-            monthlyTrend={monthlyTrend}
-            customMetrics={customMetrics}
+            dailyPageViews={[]}
+            deviceStats={[]}
+            topPages={[]}
+            weeklyComparison={undefined}
+            monthlyTrend={undefined}
+            customMetrics={undefined}
             onNavigate={(tab) => {
               const routeMap: Record<string, string> = {
                 'manage': '/admin/sites',
                 'blog': '/admin/blog',
-                'analytics': '/admin/analytics',
                 'yorumlar': '/admin/reviews',
               };
               const route = routeMap[tab] || `/admin/${tab}`;

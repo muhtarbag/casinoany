@@ -35,8 +35,6 @@ const AdminBonusManagement = lazyWithPreload(() => import("./pages/admin/finance
 const AdminReviews = lazyWithPreload(() => import("./pages/admin/Reviews"));
 const AdminNotifications = lazyWithPreload(() => import("./pages/admin/Notifications"));
 const AdminNews = lazyWithPreload(() => import("./pages/admin/News"));
-const AdminAnalytics = lazyWithPreload(() => import("./pages/admin/analytics/AnalyticsDashboard"));
-const AdminKeywords = lazyWithPreload(() => import("./pages/admin/analytics/KeywordPerformance"));
 const AdminCasinoContent = lazyWithPreload(() => import("./pages/admin/content/CasinoContent"));
 const AdminCategoryManagement = lazyWithPreload(() => import("./pages/admin/content/CategoryManagement"));
 const AdminSystemHealth = lazyWithPreload(() => import("./pages/admin/system/SystemHealth"));
@@ -51,7 +49,6 @@ const AdminRecommendedSites = lazyWithPreload(() => import("./pages/admin/sites/
 const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteStats"));
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
-const AdminCasinoAnalytics = lazyWithPreload(() => import("./pages/admin/content/CasinoAnalytics"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
 const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
@@ -116,11 +113,8 @@ const AppContent = () => {
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="analytics/keywords" element={<AdminKeywords />} />
             <Route path="content/casino" element={<AdminCasinoContent />} />
             <Route path="content/categories" element={<AdminCategoryManagement />} />
-            <Route path="content/casino-analytics" element={<AdminCasinoAnalytics />} />
             <Route path="content/planner" element={<AdminContentPlanner />} />
             <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
             <Route path="finance/bonus" element={<AdminBonusManagement />} />
