@@ -52,7 +52,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // ✅ FIX: Proper async initialization with cancellation
     const initAuth = async () => {
       try {
+        console.log('🔐 AUTH: Starting initialization...');
         const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log('🔐 AUTH: Session result:', { hasSession: !!session, error });
         
         if (isCancelled) return;
         if (error) throw error;
@@ -61,16 +64,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('🔐 AUTH: Checking user roles...');
           await checkUserRoles(session.user.id);
         }
       } catch (error) {
         if (!isCancelled) {
+          console.error('🔐 AUTH ERROR:', error);
           prodLogger.error('Failed to initialize auth', error as Error, { 
             component: 'auth' 
           });
         }
       } finally {
         if (!isCancelled) {
+          console.log('🔐 AUTH: Initialization complete, setting loading=false');
           setLoading(false);
         }
       }
@@ -278,7 +284,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={authContextValue}>
-      {children}
+      {loading ? (
+        <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Yükleniyor...</p>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
