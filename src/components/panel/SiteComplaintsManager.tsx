@@ -106,11 +106,10 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
   // Filter complaints
   const filteredComplaints = complaints?.filter((complaint) => {
     const matchesSearch = 
-      complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
-    const matchesSeverity = severityFilter === 'all' || complaint.severity === severityFilter;
-    return matchesSearch && matchesStatus && matchesSeverity;
+      complaint.title.toLowerCase().includes(searchQuery.term.toLowerCase()) ||
+      complaint.description.toLowerCase().includes(searchQuery.term.toLowerCase());
+    const matchesStatus = !searchQuery.status || searchQuery.status === 'all' || complaint.status === searchQuery.status;
+    return matchesSearch && matchesStatus;
   });
 
   // Calculate stats
@@ -187,49 +186,32 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filtreler
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Şikayet ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Durum" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Durumlar</SelectItem>
-                <SelectItem value="pending">Beklemede</SelectItem>
-                <SelectItem value="in_progress">İnceleniyor</SelectItem>
-                <SelectItem value="resolved">Çözüldü</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={severityFilter} onValueChange={setSeverityFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Öncelik" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Öncelikler</SelectItem>
-                <SelectItem value="low">Düşük</SelectItem>
-                <SelectItem value="medium">Orta</SelectItem>
-                <SelectItem value="high">Yüksek</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search & Filters */}
+      <AdvancedSearch
+        onSearch={setSearchQuery}
+        placeholder="Şikayet başlığı veya açıklama ara..."
+        filters={[
+          {
+            key: 'status',
+            label: 'Durum',
+            options: [
+              { value: 'all', label: 'Tümü' },
+              { value: 'pending', label: 'Beklemede' },
+              { value: 'in_progress', label: 'İnceleniyor' },
+              { value: 'resolved', label: 'Çözüldü' },
+            ],
+          },
+          {
+            key: 'sortBy',
+            label: 'Sırala',
+            options: [
+              { value: 'newest', label: 'En yeni' },
+              { value: 'oldest', label: 'En eski' },
+              { value: 'priority', label: 'Öncelik' },
+            ],
+          },
+        ]}
+      />
 
       {/* Complaints List */}
       <div className="space-y-4">
@@ -391,7 +373,7 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
             <CardContent className="py-12 text-center">
               <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground">
-                {searchTerm || statusFilter !== 'all' || severityFilter !== 'all'
+                {searchQuery.term || searchQuery.status !== 'all'
                   ? 'Filtrelere uygun şikayet bulunamadı'
                   : 'Henüz şikayet bulunmuyor'}
               </p>
