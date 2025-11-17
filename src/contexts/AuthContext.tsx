@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prodLogger } from '@/lib/productionLogger';
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signUp = async (
+  const signUp = useCallback(async (
     email: string, 
     password: string, 
     accountType: 'user' | 'site_owner' = 'user', 
@@ -182,9 +182,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // handle_new_user() trigger'ı user_roles'e otomatik insert yapıyor
     
     return { error };
-  };
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -223,11 +223,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     return { error: null };
-  };
+  }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
+  const signOut = useCallback(async () => {
+    try {
+      // Clear local state first (optimistic update)
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      setIsSiteOwner(false);
+      setOwnedSites([]);
+      setUserRoles([]);
+      
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        prodLogger.error('Failed to sign out', error, { 
+          component: 'auth' 
+        });
+      }
+      
+      // Redirect to home page after logout
+      window.location.href = '/';
+    } catch (error) {
+      prodLogger.error('Unexpected error during sign out', error as Error, { 
+        component: 'auth' 
+      });
+      // Even if there's an error, redirect to home
+      window.location.href = '/';
+    }
+  }, []);
 
   // ✅ FIX: Memoize context value AFTER function definitions
   const authContextValue = useMemo<AuthContextType>(
