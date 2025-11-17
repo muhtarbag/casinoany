@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useReducer, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { blogManagementReducer, createInitialState } from '@/reducers/blogManagementReducer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,30 +62,80 @@ export const BlogManagement = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: categories } = useCategories({ isActive: true });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedSites, setSelectedSites] = useState<string[]>([]);
-  const [primarySiteId, setPrimarySiteId] = useState<string>('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiTopic, setAiTopic] = useState('');
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [formData, setFormData] = useState<BlogFormData>({
-    title: '',
-    slug: '',
-    excerpt: '',
-    content: '',
-    meta_title: '',
-    meta_description: '',
-    meta_keywords: '',
-    category: '',
-    tags: '',
-    read_time: '5',
-    is_published: false,
-    primary_site_id: '',
-    category_id: '',
-  });
+  
+  const [state, dispatch] = useReducer(blogManagementReducer, createInitialState());
+  
+  // Destructure state for easier access
+  const {
+    isEditing,
+    editingId,
+    imageFile,
+    imagePreview,
+    selectedSites,
+    primarySiteId,
+    isAiLoading,
+    aiTopic,
+    isPreviewOpen,
+    formData,
+  } = state;
+
+  // Helper functions to maintain existing API
+  const setIsEditing = useCallback((value: boolean) => {
+    dispatch({ type: 'SET_EDITING', isEditing: value, editingId: value ? editingId : null });
+  }, [editingId]);
+
+  const setEditingId = useCallback((id: string | null) => {
+    dispatch({ type: 'SET_EDITING', isEditing: !!id, editingId: id });
+  }, []);
+
+  const setImageFile = useCallback((file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        dispatch({ type: 'SET_IMAGE', file, preview: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      dispatch({ type: 'CLEAR_IMAGE' });
+    }
+  }, []);
+
+  const setImagePreview = useCallback((preview: string | null) => {
+    if (preview && imageFile) {
+      dispatch({ type: 'SET_IMAGE', file: imageFile, preview });
+    } else if (!preview) {
+      dispatch({ type: 'CLEAR_IMAGE' });
+    }
+  }, [imageFile]);
+
+  const setSelectedSites = useCallback((sites: string[] | ((prev: string[]) => string[])) => {
+    const newSites = typeof sites === 'function' ? sites(selectedSites) : sites;
+    dispatch({ type: 'SET_SELECTED_SITES', sites: newSites });
+  }, [selectedSites]);
+
+  const setPrimarySiteId = useCallback((siteId: string) => {
+    dispatch({ type: 'SET_PRIMARY_SITE', siteId });
+  }, []);
+
+  const setIsAiLoading = useCallback((loading: boolean) => {
+    dispatch({ type: 'SET_AI_LOADING', loading });
+  }, []);
+
+  const setAiTopic = useCallback((topic: string) => {
+    dispatch({ type: 'SET_AI_TOPIC', topic });
+  }, []);
+
+  const setIsPreviewOpen = useCallback((open: boolean) => {
+    dispatch({ type: 'SET_PREVIEW_OPEN', open });
+  }, []);
+
+  const setFormData = useCallback((data: Partial<BlogFormData> | ((prev: BlogFormData) => BlogFormData)) => {
+    if (typeof data === 'function') {
+      dispatch({ type: 'SET_FORM_DATA', data: data(formData) });
+    } else {
+      dispatch({ type: 'SET_FORM_DATA', data });
+    }
+  }, [formData]);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['admin-blog-posts'],
@@ -367,50 +418,11 @@ export const BlogManagement = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      slug: '',
-      excerpt: '',
-      content: '',
-      meta_title: '',
-      meta_description: '',
-      meta_keywords: '',
-      category: '',
-      tags: '',
-      read_time: '5',
-      is_published: false,
-      primary_site_id: '',
-      category_id: '',
-    });
-    setImageFile(null);
-    setImagePreview(null);
-    setSelectedSites([]);
-    setPrimarySiteId('');
-    setIsEditing(false);
-    setEditingId(null);
-  };
+  const resetForm = useCallback(() => {
+    dispatch({ type: 'RESET_FORM' });
+  }, []);
 
-  const handleEdit = async (post: BlogPost) => {
-    setFormData({
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt,
-      content: post.content,
-      meta_title: post.meta_title || '',
-      meta_description: post.meta_description || '',
-      meta_keywords: post.meta_keywords?.join(', ') || '',
-      category: post.category || '',
-      tags: post.tags?.join(', ') || '',
-      read_time: post.read_time?.toString() || '5',
-      is_published: post.is_published,
-      primary_site_id: post.primary_site_id || '',
-      category_id: post.category_id || '',
-    });
-    setImagePreview(post.featured_image || null);
-    setImageFile(null);
-    setPrimarySiteId(post.primary_site_id || '');
-    
+  const handleEdit = useCallback(async (post: BlogPost) => {
     // Load related sites
     const { data: relatedSites } = await supabase
       .from('blog_post_related_sites')
@@ -418,13 +430,11 @@ export const BlogManagement = () => {
       .eq('post_id', post.id)
       .order('display_order');
     
-    if (relatedSites) {
-      setSelectedSites(relatedSites.map(r => r.site_id));
-    }
+    const relatedSiteIds = relatedSites?.map((rs: any) => rs.site_id) || [];
     
-    setEditingId(post.id);
-    setIsEditing(true);
-  };
+    dispatch({ type: 'LOAD_POST_DATA', post, relatedSiteIds });
+    dispatch({ type: 'SET_EDITING', isEditing: true, editingId: post.id });
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
