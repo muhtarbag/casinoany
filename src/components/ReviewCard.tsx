@@ -35,21 +35,38 @@ const ReviewCard = memo(({ review }: ReviewCardProps) => {
   });
 
   return (
-    <Card className="bg-card border-border hover:border-primary/30 transition-colors">
+    <Card 
+      className="bg-card border-border hover:border-primary/30 transition-colors"
+      role="article"
+      aria-label={`${username} tarafından ${review.rating} yıldız ile yapılan yorum`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center flex-shrink-0">
+            <div 
+              className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center flex-shrink-0"
+              aria-hidden="true"
+            >
               <span className="text-sm font-bold text-foreground">{getInitials(username)}</span>
             </div>
             <div>
               <p className="font-semibold text-foreground">{username}</p>
-              <p className="text-xs text-muted-foreground">{date}</p>
+              <time className="text-xs text-muted-foreground" dateTime={review.created_at}>
+                {date}
+              </time>
             </div>
           </div>
-          <div className="flex items-center gap-0.5 flex-shrink-0">
+          <div 
+            className="flex items-center gap-0.5 flex-shrink-0"
+            role="img"
+            aria-label={`${review.rating} üzerinden 5 yıldız`}
+          >
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className={`w-4 h-4 ${i < review.rating ? "fill-gold text-gold" : "fill-muted text-muted"}`} />
+              <Star 
+                key={i} 
+                className={`w-4 h-4 ${i < review.rating ? "fill-gold text-gold" : "fill-muted text-muted"}`}
+                aria-hidden="true"
+              />
             ))}
           </div>
         </div>

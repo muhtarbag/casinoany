@@ -170,6 +170,8 @@ const BettingSiteCardComponent = ({
     <Card 
       className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer"
       onClick={handleCardClick}
+      role="article"
+      aria-label={`${name} - Bahis sitesi kartı`}
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
@@ -215,12 +217,14 @@ const BettingSiteCardComponent = ({
               )}
               onClick={handleFavoriteClick}
               disabled={isToggling}
+              aria-label={isFavorite ? `${name} favorilerden çıkar` : `${name} favorilere ekle`}
             >
               <Heart 
                 className={cn(
                   "h-5 w-5 transition-all",
                   isFavorite && "fill-current"
                 )} 
+                aria-hidden="true"
               />
             </Button>
             
