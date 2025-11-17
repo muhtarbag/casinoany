@@ -28,8 +28,31 @@ const NewComplaint = () => {
   const [category, setCategory] = useState('');
   const [severity, setSeverity] = useState('normal');
   const [isPublic, setIsPublic] = useState('true');
-  const [anonymousName, setAnonymousName] = useState('');
-  const [anonymousEmail, setAnonymousEmail] = useState('');
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return (
+      <>
+        <SEO title="Giriş Gerekli" description="Şikayet oluşturmak için giriş yapmalısınız" />
+        <Header />
+        <div className="min-h-screen bg-gradient-dark">
+          <div className="container mx-auto px-4 py-8 max-w-3xl">
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <p className="text-muted-foreground mb-4 text-lg">
+                  Şikayet oluşturmak için giriş yapmalısınız
+                </p>
+                <Button asChild>
+                  <Link to="/login">Giriş Yap</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const { data: sites } = useQuery({
     queryKey: ['betting-sites-for-complaint'],
@@ -46,25 +69,17 @@ const NewComplaint = () => {
 
   const createComplaintMutation = useMutation({
     mutationFn: async () => {
-      const complaintData: any = {
-        site_id: siteId,
-        title,
-        description,
-        category,
-        severity,
-        is_public: isPublic === 'true',
-      };
-
-      if (user) {
-        complaintData.user_id = user.id;
-      } else {
-        complaintData.anonymous_name = anonymousName;
-        complaintData.anonymous_email = anonymousEmail;
-      }
-
       const { data, error } = await supabase
         .from('site_complaints')
-        .insert(complaintData)
+        .insert({
+          site_id: siteId,
+          user_id: user!.id,
+          title,
+          description,
+          category,
+          severity,
+          is_public: isPublic === 'true',
+        })
         .select()
         .single();
       
@@ -94,15 +109,6 @@ const NewComplaint = () => {
       toast({
         title: 'Hata',
         description: 'Lütfen tüm gerekli alanları doldurun',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!user && (!anonymousName || !anonymousEmail)) {
-      toast({
-        title: 'Hata',
-        description: 'Anonim şikayet için ad ve email gereklidir',
         variant: 'destructive',
       });
       return;
@@ -228,37 +234,6 @@ const NewComplaint = () => {
                   </div>
                 </RadioGroup>
               </div>
-
-              {!user && (
-                <>
-                  <div className="pt-4 border-t">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Giriş yapmadınız. Anonim şikayet oluşturabilirsiniz:
-                    </p>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="anonymousName">Adınız *</Label>
-                        <Input
-                          id="anonymousName"
-                          value={anonymousName}
-                          onChange={(e) => setAnonymousName(e.target.value)}
-                          placeholder="Ad Soyad"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="anonymousEmail">Email *</Label>
-                        <Input
-                          id="anonymousEmail"
-                          type="email"
-                          value={anonymousEmail}
-                          onChange={(e) => setAnonymousEmail(e.target.value)}
-                          placeholder="email@ornek.com"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
 
               <Button
                 type="submit"
