@@ -8,10 +8,48 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+
+// Türkiye İlleri
+const TURKISH_CITIES = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan', 'Artvin',
+  'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur',
+  'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ', 'Erzincan',
+  'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta', 'İstanbul',
+  'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kilis', 'Kırıkkale', 'Kırklareli',
+  'Kırşehir', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla', 'Muş',
+  'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Şanlıurfa', 'Siirt', 'Sinop',
+  'Sivas', 'Şırnak', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
+];
+
+// Süper Lig Takımları
+const SUPER_LEAGUE_TEAMS = [
+  'Adana Demirspor', 'Alanyaspor', 'Antalyaspor', 'Beşiktaş', 'Bodrum FK', 'Çaykur Rizespor',
+  'Fenerbahçe', 'Galatasaray', 'Gaziantep FK', 'Göztepe', 'Hatayspor', 'İstanbul Başakşehir',
+  'Kasımpaşa', 'Kayserispor', 'Konyaspor', 'Samsunspor', 'Sivasspor', 'Trabzonspor'
+];
+
+// İlgi Alanları
+const INTERESTS = [
+  'Spor Bahisleri',
+  'Casino',
+  'Slot Oyunları',
+  'Esports',
+  'Poker'
+];
+
+// Oyun Sağlayıcıları
+const GAME_PROVIDERS = [
+  'Pragmatic Play', 'Evolution Gaming', 'EGT', 'Amusnet (EGT Interactive)', 'NetEnt', 'Microgaming',
+  'Play\'n GO', 'Yggdrasil', 'Red Tiger', 'Playtech', 'Endorphina', 'BGaming', 'Spinomenal',
+  'Hacksaw Gaming', 'Push Gaming', 'NoLimit City', 'Quickspin', 'Thunderkick', 'Blueprint Gaming',
+  'Big Time Gaming', 'Relax Gaming', 'iSoftBet', 'Wazdan', 'Booming Games', 'Tom Horn Gaming'
+];
 
 export default function Settings() {
   const { user } = useAuth();
@@ -21,7 +59,12 @@ export default function Settings() {
   const [profileData, setProfileData] = useState({
     first_name: '',
     last_name: '',
-    phone: ''
+    phone: '',
+    city: '',
+    district: '',
+    favorite_team: '',
+    interests: [] as string[],
+    favorite_game_providers: [] as string[]
   });
 
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -41,7 +84,12 @@ export default function Settings() {
         setProfileData({
           first_name: data.first_name || '',
           last_name: data.last_name || '',
-          phone: data.phone || ''
+          phone: data.phone || '',
+          city: data.city || '',
+          district: data.district || '',
+          favorite_team: data.favorite_team || '',
+          interests: data.interests || [],
+          favorite_game_providers: data.favorite_game_providers || []
         });
       }
       
@@ -175,6 +223,122 @@ export default function Settings() {
                   placeholder="+90 5XX XXX XX XX"
                 />
               </div>
+
+              <Separator />
+
+              <div>
+                <Label>İl</Label>
+                <Select
+                  value={profileData.city}
+                  onValueChange={(value) => setProfileData({ ...profileData, city: value, district: '' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="İl seçiniz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TURKISH_CITIES.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>İlçe</Label>
+                <Input
+                  value={profileData.district}
+                  onChange={(e) => setProfileData({ ...profileData, district: e.target.value })}
+                  placeholder="İlçe giriniz"
+                />
+              </div>
+
+              <div>
+                <Label>Tuttuğunuz Takım</Label>
+                <Select
+                  value={profileData.favorite_team}
+                  onValueChange={(value) => setProfileData({ ...profileData, favorite_team: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Takım seçiniz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SUPER_LEAGUE_TEAMS.map((team) => (
+                      <SelectItem key={team} value={team}>
+                        {team}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>İlgi Alanları</Label>
+                <div className="space-y-3 mt-2">
+                  {INTERESTS.map((interest) => (
+                    <div key={interest} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={interest}
+                        checked={profileData.interests.includes(interest)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setProfileData({
+                              ...profileData,
+                              interests: [...profileData.interests, interest]
+                            });
+                          } else {
+                            setProfileData({
+                              ...profileData,
+                              interests: profileData.interests.filter((i) => i !== interest)
+                            });
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={interest}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {interest}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label>En Sevdiğiniz Oyun Sağlayıcılar</Label>
+                <div className="space-y-3 mt-2 max-h-64 overflow-y-auto">
+                  {GAME_PROVIDERS.map((provider) => (
+                    <div key={provider} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={provider}
+                        checked={profileData.favorite_game_providers.includes(provider)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setProfileData({
+                              ...profileData,
+                              favorite_game_providers: [...profileData.favorite_game_providers, provider]
+                            });
+                          } else {
+                            setProfileData({
+                              ...profileData,
+                              favorite_game_providers: profileData.favorite_game_providers.filter((p) => p !== provider)
+                            });
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={provider}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {provider}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <Button
                 onClick={() => updateProfileMutation.mutate(profileData)}
                 disabled={updateProfileMutation.isPending}

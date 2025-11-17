@@ -1464,6 +1464,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string | null
           company_address: string | null
           company_authorized_person: string | null
           company_email: string | null
@@ -1473,9 +1474,13 @@ export type Database = {
           company_type: string | null
           company_website: string | null
           created_at: string | null
+          district: string | null
           email: string | null
+          favorite_game_providers: string[] | null
+          favorite_team: string | null
           first_name: string | null
           id: string
+          interests: string[] | null
           is_verified: boolean | null
           last_name: string | null
           phone: string | null
@@ -1485,6 +1490,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          city?: string | null
           company_address?: string | null
           company_authorized_person?: string | null
           company_email?: string | null
@@ -1494,9 +1500,13 @@ export type Database = {
           company_type?: string | null
           company_website?: string | null
           created_at?: string | null
+          district?: string | null
           email?: string | null
+          favorite_game_providers?: string[] | null
+          favorite_team?: string | null
           first_name?: string | null
           id: string
+          interests?: string[] | null
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
@@ -1506,6 +1516,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          city?: string | null
           company_address?: string | null
           company_authorized_person?: string | null
           company_email?: string | null
@@ -1515,9 +1526,13 @@ export type Database = {
           company_type?: string | null
           company_website?: string | null
           created_at?: string | null
+          district?: string | null
           email?: string | null
+          favorite_game_providers?: string[] | null
+          favorite_team?: string | null
           first_name?: string | null
           id?: string
+          interests?: string[] | null
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
