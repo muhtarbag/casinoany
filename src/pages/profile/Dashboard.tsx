@@ -126,16 +126,7 @@ export default function Dashboard() {
       borderColor: 'border-orange-500/20',
     },
     {
-      title: 'Bildirimlerim',
-      icon: Bell,
-      count: undefined,
-      href: '/profile/settings',
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-500/10',
-      borderColor: 'border-purple-500/20',
-    },
-    {
-      title: 'Profilim',
+      title: 'Hesap Ayarlarım',
       icon: Settings,
       count: undefined,
       href: '/profile/settings',
