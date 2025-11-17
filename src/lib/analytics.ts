@@ -34,7 +34,10 @@ export const trackConversion = async (
       p_metadata: {},
     });
   } catch (error) {
-    // Silent fail - don't break user experience
+    // ✅ FIX: Log errors for debugging but don't break UX
+    if (import.meta.env.DEV) {
+      console.warn('[Analytics] Failed to track conversion:', error);
+    }
   }
 };
 

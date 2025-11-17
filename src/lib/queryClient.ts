@@ -179,14 +179,17 @@ export const createAppQueryClient = () => {
         // Cache'de kalma süresi: 10 dakika
         gcTime: 10 * 60 * 1000,
         
-        // Otomatik refetch: Window focus'ta
-        refetchOnWindowFocus: true,
+        // ✅ FIX: Disable unnecessary refetch on window focus (reduces network load)
+        refetchOnWindowFocus: false,
         
         // Network reconnect'te refetch
         refetchOnReconnect: true,
         
         // Mount olduğunda refetch (false = sadece cache kullan)
         refetchOnMount: false,
+        
+        // ✅ FIX: Enable structural sharing to prevent unnecessary re-renders
+        structuralSharing: true,
         
         // Retry stratejisi
         retry: (failureCount, error: any) => {
@@ -203,8 +206,8 @@ export const createAppQueryClient = () => {
       },
       
       mutations: {
-        // Mutation retry yok
-        retry: false,
+        // ✅ FIX: Critical mutations should retry once
+        retry: 1,
         
         // Network mode
         networkMode: 'online',

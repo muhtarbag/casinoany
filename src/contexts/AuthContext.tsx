@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prodLogger } from '@/lib/productionLogger';
@@ -45,6 +45,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // ✅ FIX: Prevent unnecessary re-renders with memoized context value
+  const authContextValue = useMemo<AuthContextType>(
+    () => ({
+      user,
+      session,
+      isAdmin,
+      isSiteOwner,
+      ownedSites,
+      userRoles,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+    }),
+    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading]
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -230,18 +247,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      isAdmin,
-      isSiteOwner,
-      ownedSites,
-      userRoles, 
-      loading, 
-      signUp, 
-      signIn, 
-      signOut 
-    }}>
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

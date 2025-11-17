@@ -1,10 +1,12 @@
 /**
  * Lazy Component Wrapper with Loading State
  * Provides consistent loading UI for lazy-loaded components
+ * ✅ FIX: Added ErrorBoundary to catch lazy component load failures
  */
 
 import { Suspense, ComponentType, lazy as reactLazy } from 'react';
 import { LoadingState } from '@/components/ui/loading-state';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface LazyComponentProps {
   component: ComponentType<any>;
@@ -14,6 +16,7 @@ interface LazyComponentProps {
 
 /**
  * Wrapper for lazy-loaded components with fallback UI
+ * ✅ FIX: Wrapped with ErrorBoundary to catch chunk load failures
  */
 export function LazyComponent({ 
   component: Component, 
@@ -21,9 +24,11 @@ export function LazyComponent({
   ...props 
 }: LazyComponentProps) {
   return (
-    <Suspense fallback={fallback || <LoadingState variant="skeleton" rows={5} />}>
-      <Component {...props} />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={fallback || <LoadingState variant="skeleton" rows={5} />}>
+        <Component {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
