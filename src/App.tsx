@@ -169,6 +169,12 @@ const AppContent = () => {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
+          
+          {/* Complaint Routes */}
+          <Route path="/sikayetler" element={<Complaints />} />
+          <Route path="/sikayetler/yeni" element={<NewComplaint />} />
+          <Route path="/sikayetler/:id" element={<ComplaintDetail />} />
+          
           <Route path="/sitemap.xml" element={<Sitemap />} />
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/privacy" element={<Privacy />} />

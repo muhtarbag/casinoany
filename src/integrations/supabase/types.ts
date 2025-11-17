@@ -1106,6 +1106,47 @@ export type Database = {
         }
         Relationships: []
       }
+      complaint_responses: {
+        Row: {
+          complaint_id: string
+          created_at: string | null
+          id: string
+          is_official: boolean | null
+          is_site_owner_response: boolean | null
+          response_text: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string | null
+          id?: string
+          is_official?: boolean | null
+          is_site_owner_response?: boolean | null
+          response_text: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string | null
+          id?: string
+          is_official?: boolean | null
+          is_site_owner_response?: boolean | null
+          response_text?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_responses_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "site_complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_optimization_suggestions: {
         Row: {
           applied_at: string | null
@@ -1640,6 +1681,78 @@ export type Database = {
           },
           {
             foreignKeyName: "site_categories_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_complaints: {
+        Row: {
+          anonymous_email: string | null
+          anonymous_name: string | null
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          is_public: boolean | null
+          resolved_at: string | null
+          response_count: number | null
+          severity: string
+          site_id: string
+          status: string
+          title: string
+          updated_at: string | null
+          upvotes: number | null
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_email?: string | null
+          anonymous_name?: string | null
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          is_public?: boolean | null
+          resolved_at?: string | null
+          response_count?: number | null
+          severity?: string
+          site_id: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_email?: string | null
+          anonymous_name?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_public?: boolean | null
+          resolved_at?: string | null
+          response_count?: number | null
+          severity?: string
+          site_id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_complaints_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_complaints_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites_full"

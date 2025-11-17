@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { ThumbsUp, MessageSquare, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ThumbsUp, MessageSquare, ArrowLeft, CheckCircle, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
@@ -15,7 +16,7 @@ import { useState } from 'react';
 
 const ComplaintDetail = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, isSiteOwner, ownedSites, isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [responseText, setResponseText] = useState('');
@@ -23,7 +24,7 @@ const ComplaintDetail = () => {
   const { data: complaint, isLoading } = useQuery({
     queryKey: ['complaint', id],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_complaints')
         .select(`
           *,
@@ -40,11 +41,11 @@ const ComplaintDetail = () => {
   const { data: responses } = useQuery({
     queryKey: ['complaint-responses', id],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('complaint_responses')
         .select(`
           *,
-          profiles (username, email)
+          profiles (username, email, first_name, last_name)
         `)
         .eq('complaint_id', id)
         .order('created_at', { ascending: true });
@@ -54,9 +55,11 @@ const ComplaintDetail = () => {
     },
   });
 
+  const isOwnerOfThisSite = complaint && isSiteOwner && ownedSites.includes(complaint.site_id);
+
   const upvoteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('site_complaints')
         .update({ upvotes: (complaint?.upvotes || 0) + 1 })
         .eq('id', id);
@@ -70,12 +73,15 @@ const ComplaintDetail = () => {
   const addResponseMutation = useMutation({
     mutationFn: async (text: string) => {
       if (!user) throw new Error('Giriş yapmalısınız');
-      const { error } = await (supabase as any)
+      
+      const { error } = await supabase
         .from('complaint_responses')
         .insert({
           complaint_id: id,
           user_id: user.id,
           response_text: text,
+          is_site_owner_response: isOwnerOfThisSite || false,
+          is_official: isOwnerOfThisSite || false,
         });
       if (error) throw error;
     },
@@ -85,6 +91,33 @@ const ComplaintDetail = () => {
       toast({
         title: 'Başarılı',
         description: 'Cevabınız eklendi',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Cevap eklenirken bir hata oluştu',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async (newStatus: string) => {
+      const { error } = await supabase
+        .from('site_complaints')
+        .update({ 
+          status: newStatus,
+          resolved_at: newStatus === 'resolved' ? new Date().toISOString() : null
+        })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet durumu güncellendi',
       });
     },
   });
@@ -105,12 +138,29 @@ const ComplaintDetail = () => {
     closed: 'Kapalı',
   };
 
+  const severityLabels: Record<string, string> = {
+    low: 'Düşük',
+    normal: 'Normal',
+    high: 'Yüksek',
+    critical: 'Kritik',
+  };
+
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'open': return 'destructive';
       case 'in_review': return 'default';
       case 'resolved': return 'secondary';
       case 'closed': return 'outline';
+      default: return 'default';
+    }
+  };
+
+  const getSeverityVariant = (severity: string) => {
+    switch (severity) {
+      case 'low': return 'secondary';
+      case 'normal': return 'default';
+      case 'high': return 'destructive';
+      case 'critical': return 'destructive';
       default: return 'default';
     }
   };
@@ -139,6 +189,8 @@ const ComplaintDetail = () => {
     );
   }
 
+  const canManageComplaint = isAdmin || isOwnerOfThisSite;
+
   return (
     <>
       <SEO 
@@ -164,25 +216,43 @@ const ComplaintDetail = () => {
                 />
               )}
               <div className="flex-1">
-                <CardTitle className="text-2xl mb-2">{complaint.title}</CardTitle>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link to={`/sites/${complaint.betting_sites?.slug}`}>
-                    <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                      {complaint.betting_sites?.name}
-                    </Badge>
-                  </Link>
-                  <Badge variant="outline">
-                    {categoryLabels[complaint.category]}
-                  </Badge>
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <CardTitle className="text-2xl mb-2">{complaint.title}</CardTitle>
+                    <Link
+                      to={`/site/${complaint.betting_sites.slug}`}
+                      className="text-primary hover:underline font-semibold"
+                    >
+                      {complaint.betting_sites.name}
+                    </Link>
+                  </div>
+                  {canManageComplaint && (
+                    <Select
+                      value={complaint.status}
+                      onValueChange={(value) => updateStatusMutation.mutate(value)}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="open">Açık</SelectItem>
+                        <SelectItem value="in_review">İnceleniyor</SelectItem>
+                        <SelectItem value="resolved">Çözüldü</SelectItem>
+                        <SelectItem value="closed">Kapalı</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
                   <Badge variant={getStatusVariant(complaint.status)}>
                     {statusLabels[complaint.status]}
                   </Badge>
-                  {complaint.severity !== 'normal' && (
-                    <Badge variant="destructive">
-                      {complaint.severity === 'high' ? 'Yüksek Öncelik' : 
-                       complaint.severity === 'critical' ? 'Kritik' : 'Düşük'}
-                    </Badge>
-                  )}
+                  <Badge variant="outline">
+                    {categoryLabels[complaint.category]}
+                  </Badge>
+                  <Badge variant={getSeverityVariant(complaint.severity)}>
+                    {severityLabels[complaint.severity]}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -192,16 +262,14 @@ const ComplaintDetail = () => {
               {complaint.description}
             </p>
 
-            {complaint.status === 'resolved' && complaint.resolution_comment && (
-              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-900 rounded-lg p-4 mb-4">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+            {complaint.status === 'resolved' && complaint.resolved_at && (
+              <div className="bg-success/10 border border-success/20 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-success mt-0.5" />
                   <div>
-                    <p className="font-semibold text-green-900 dark:text-green-100 mb-1">
-                      Şikayet Çözüldü
-                    </p>
-                    <p className="text-sm text-green-800 dark:text-green-200">
-                      {complaint.resolution_comment}
+                    <p className="font-semibold text-success">Şikayet Çözüldü</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {format(new Date(complaint.resolved_at), 'dd MMMM yyyy, HH:mm', { locale: tr })}
                     </p>
                   </div>
                 </div>
@@ -220,9 +288,11 @@ const ComplaintDetail = () => {
               </Button>
               <span className="text-sm text-muted-foreground">
                 <MessageSquare className="w-4 h-4 inline mr-1" />
-                {responses?.length || 0} cevap
+                {complaint.response_count} cevap
               </span>
               <span className="text-sm text-muted-foreground ml-auto">
+                {complaint.user_id ? 'Kullanıcı' : complaint.anonymous_name}
+                {' • '}
                 {format(new Date(complaint.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
               </span>
             </div>
@@ -231,24 +301,34 @@ const ComplaintDetail = () => {
 
         {responses && responses.length > 0 && (
           <div className="space-y-4 mb-6">
-            <h2 className="text-xl font-semibold">Cevaplar</h2>
+            <h2 className="text-xl font-semibold">Cevaplar ({responses.length})</h2>
             {responses.map((response: any) => (
-              <Card key={response.id}>
+              <Card key={response.id} className={response.is_official ? 'border-primary' : ''}>
                 <CardContent className="pt-6">
-                  {response.is_official && (
-                    <Badge variant="default" className="mb-2">
-                      Resmi Cevap
-                    </Badge>
-                  )}
-                  <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      {response.is_official && (
+                        <Badge className="bg-primary">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Resmi Yanıt
+                        </Badge>
+                      )}
+                      {response.is_site_owner_response && !response.is_official && (
+                        <Badge variant="secondary">
+                          Site Yetkilisi
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm mb-3 whitespace-pre-wrap">
                     {response.response_text}
                   </p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
-                      {response.profiles?.username || 'Anonim'}
+                      {response.profiles?.first_name || response.profiles?.username || response.profiles?.email}
                     </span>
                     <span>
-                      {format(new Date(response.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}
+                      {format(new Date(response.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
                     </span>
                   </div>
                 </CardContent>
@@ -263,6 +343,14 @@ const ComplaintDetail = () => {
               <CardTitle>Cevap Yaz</CardTitle>
             </CardHeader>
             <CardContent>
+              {isOwnerOfThisSite && (
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
+                  <p className="text-sm flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
+                    Bu sitenin yetkilisi olarak resmi yanıt vereceksiniz
+                  </p>
+                </div>
+              )}
               <Textarea
                 placeholder="Cevabınızı yazın..."
                 value={responseText}
@@ -274,7 +362,7 @@ const ComplaintDetail = () => {
                 onClick={() => addResponseMutation.mutate(responseText)}
                 disabled={!responseText.trim() || addResponseMutation.isPending}
               >
-                Cevap Gönder
+                {addResponseMutation.isPending ? 'Gönderiliyor...' : 'Cevap Gönder'}
               </Button>
             </CardContent>
           </Card>
