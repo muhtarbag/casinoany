@@ -27,13 +27,12 @@ const Signup = lazyWithPreload(() => import("./pages/Signup"));
 const ForgotPassword = lazyWithPreload(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
 
-// CRITICAL: Core admin pages imported directly to prevent React dispatcher null errors
-// These pages are essential and should not be lazy loaded
-import AdminRoot from "./pages/admin";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminSitesHub from "./pages/admin/sites/index";
-import AdminRoleManagement from "./pages/admin/system/RoleManagement";
-import AdminUsers from "./pages/admin/system/Users";
+// Admin pages - all lazy loaded for better performance
+const AdminRoot = lazyWithPreload(() => import("./pages/admin"));
+const AdminDashboard = lazyWithPreload(() => import("./pages/admin/Dashboard"));
+const AdminSitesHub = lazyWithPreload(() => import("./pages/admin/sites/index"));
+const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
+const AdminUsers = lazyWithPreload(() => import("./pages/admin/system/Users"));
 
 // Secondary admin pages can be lazy loaded safely
 const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/BlogManagement"));

@@ -179,10 +179,13 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             }}
             onBlur={() => {
               // Delay to allow click events to fire first
-              setTimeout(() => {
+              const timeoutId = setTimeout(() => {
                 setShowSuggestions(false);
                 setShowPopular(false);
               }, 300);
+              
+              // Cleanup timeout on next focus
+              return () => clearTimeout(timeoutId);
             }}
             className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
