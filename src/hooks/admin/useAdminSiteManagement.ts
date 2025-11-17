@@ -407,13 +407,18 @@ export const useAdminSiteManagement = () => {
     },
   });
 
-  // Update display order
+  // Update display order - FIX RACE CONDITION
   const updateOrderMutation = useMutation({
     mutationFn: async (sites: any[]) => {
-      const updates = sites.map((site, index) =>
-        supabase.from('betting_sites').update({ display_order: index }).eq('id', site.id)
-      );
-      await Promise.all(updates);
+      // Serial execution to prevent race conditions
+      for (let index = 0; index < sites.length; index++) {
+        const { error } = await supabase
+          .from('betting_sites')
+          .update({ display_order: index })
+          .eq('id', sites[index].id);
+        
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });

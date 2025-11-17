@@ -206,7 +206,7 @@ export default function ReviewManagement() {
 
   const bulkRejectMutation = useMutation({
     mutationFn: async (reviewIds: string[]) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("site_reviews")
         .delete()
         .in("id", reviewIds);
@@ -284,7 +284,7 @@ export default function ReviewManagement() {
         email: null
       }));
 
-      const { error: insertError } = await (supabase as any)
+      const { error: insertError } = await supabase
         .from('site_reviews')
         .insert(reviewsToInsert);
 

@@ -275,7 +275,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         .replace(/-+/g, '-');
 
       // Save to database
-      const { error: insertError } = await (supabase as any)
+      const { error: insertError } = await supabase
         .from('blog_posts')
         .insert({
           title: topic.title,
@@ -344,7 +344,7 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
         .replace(/-+/g, '-');
 
       // Save to database
-      const { error: insertError } = await (supabase as any)
+      const { error: insertError } = await supabase
         .from('blog_posts')
         .insert({
           title: item.title,
