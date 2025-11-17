@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +19,10 @@ import { SiteComparisonCard } from './dashboard/SiteComparisonCard';
 import { QuickActionsToolbar } from './dashboard/QuickActionsToolbar';
 import { CriticalAlerts } from './dashboard/CriticalAlerts';
 import { ActionableKPICard } from './dashboard/ActionableKPICard';
+import { DashboardFilters, FilterState } from './filters/DashboardFilters';
+import { ExportDialog } from './filters/ExportDialog';
+import { useSavedFilters } from '@/hooks/useSavedFilters';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SiteOwnerDashboardProps {
   siteId: string;
@@ -28,6 +32,15 @@ interface SiteOwnerDashboardProps {
 }
 
 export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: SiteOwnerDashboardProps) => {
+  const isMobile = useIsMobile();
+  const { savedFilters, saveFilter } = useSavedFilters();
+  const [activeFilters, setActiveFilters] = useState<FilterState>({});
+
+  const handleFilterChange = (filters: FilterState) => {
+    setActiveFilters(filters);
+    // Apply filters to data queries - implement filtering logic as needed
+  };
+
   // Fetch detailed analytics
   const { data: analytics } = useQuery({
     queryKey: ['site-analytics', siteId],
@@ -224,10 +237,20 @@ export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: S
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{siteName}</h1>
-        <p className="text-muted-foreground">Site performansınızı takip edin ve yönetin</p>
+      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{siteName}</h1>
+          <p className="text-muted-foreground">Site performansınızı takip edin ve yönetin</p>
+        </div>
+        <ExportDialog siteId={siteId} siteName={siteName} />
       </div>
+
+      {/* Filters */}
+      <DashboardFilters
+        onFilterChange={handleFilterChange}
+        onSaveFilter={saveFilter}
+        savedFilters={savedFilters}
+      />
 
       {/* Critical Alerts */}
       {criticalAlerts.length > 0 && (
