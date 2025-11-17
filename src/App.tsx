@@ -56,6 +56,7 @@ const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteSta
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
+const AdminErrorMonitoring = lazyWithPreload(() => import("./pages/admin/system/ErrorMonitoring"));
 const AdminSiteOwners = lazyWithPreload(() => import("./pages/admin/SiteOwners"));
 
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
@@ -155,6 +156,7 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
+            <Route path="system/errors" element={<AdminErrorMonitoring />} />
             <Route path="site-owners" element={<AdminSiteOwners />} />
           </Route>
           
