@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -159,7 +159,11 @@ const Users = () => {
       <TableBody>
         {individualUsers.length > 0 ? (
           individualUsers.map((user: any) => (
-            <TableRow key={user.id}>
+            <TableRow 
+              key={user.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => setSelectedUser(user)}
+            >
               <TableCell>{user.profile?.email || '-'}</TableCell>
               <TableCell>
                 {user.profile?.first_name && user.profile?.last_name
@@ -196,7 +200,7 @@ const Users = () => {
                   : '-'}
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                   {user.status === 'pending' && (
                     <>
                       <Button
@@ -257,7 +261,11 @@ const Users = () => {
       <TableBody>
         {corporateUsers.length > 0 ? (
           corporateUsers.map((user: any) => (
-            <TableRow key={user.id}>
+            <TableRow 
+              key={user.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => setSelectedUser(user)}
+            >
               <TableCell className="font-medium">{user.profile?.company_name || '-'}</TableCell>
               <TableCell>{user.profile?.company_tax_number || '-'}</TableCell>
               <TableCell>{user.profile?.company_authorized_person || '-'}</TableCell>
@@ -292,14 +300,7 @@ const Users = () => {
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSelectedUser(user)}
-                  >
-                    Detay
-                  </Button>
+                <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                   {!user.profile?.is_verified && (
                     <Button
                       size="sm"
