@@ -257,7 +257,7 @@ const BettingSiteCardComponent = ({
             <h4 className="text-sm font-semibold text-muted-foreground">Özellikler</h4>
             <div className="flex flex-wrap gap-2">
               {features.slice(0, 3).map((feature, idx) => (
-                <Badge key={idx} variant="success" className="text-xs">
+                <Badge key={`feature-${id}-${feature}-${idx}`} variant="success" className="text-xs">
                   {feature}
                 </Badge>
               ))}
@@ -272,7 +272,7 @@ const BettingSiteCardComponent = ({
             {socialLinks.map((link, idx) => {
               const Icon = link.icon;
               return (
-                <a key={idx} href={link.href} target="_blank" rel="noopener noreferrer"
+                <a key={`social-${id}-${link.label}-${idx}`} href={link.href} target="_blank" rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                   className="flex items-center justify-center p-2 rounded-lg transition-all duration-300 group/social relative overflow-hidden"
                   aria-label={link.label}

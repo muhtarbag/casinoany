@@ -24,7 +24,7 @@ export const ProsConsBlock = ({ pros, cons }: ProsConsBlockProps) => {
               </h3>
               <ul className="space-y-2">
                 {pros.map((pro, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
+                  <li key={`pro-${pro.slice(0, 20)}-${index}`} className="flex items-start gap-2 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                     <span>{pro}</span>
                   </li>
@@ -41,7 +41,7 @@ export const ProsConsBlock = ({ pros, cons }: ProsConsBlockProps) => {
               </h3>
               <ul className="space-y-2">
                 {cons.map((con, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
+                  <li key={`con-${con.slice(0, 20)}-${index}`} className="flex items-start gap-2 text-sm">
                     <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <span>{con}</span>
                   </li>
