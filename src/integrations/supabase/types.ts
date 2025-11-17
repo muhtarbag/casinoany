@@ -2697,6 +2697,14 @@ export type Database = {
         Returns: string
       }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
+      get_current_user_roles: {
+        Args: never
+        Returns: {
+          owned_sites: string[]
+          role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["user_status"]
+        }[]
+      }
       get_daily_site_metrics: {
         Args: { days_back?: number }
         Returns: {
@@ -2771,6 +2779,8 @@ export type Database = {
         Args: { p_metric_type?: string; p_site_id: string }
         Returns: undefined
       }
+      is_admin_user: { Args: never; Returns: boolean }
+      is_site_owner_user: { Args: never; Returns: boolean }
       log_change: {
         Args: {
           p_action_type: string
@@ -2842,6 +2852,7 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      user_owns_site: { Args: { site_id_param: string }; Returns: boolean }
     }
     Enums: {
       app_role:
