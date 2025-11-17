@@ -1,10 +1,18 @@
 import { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   LayoutDashboard,
   Heart,
@@ -13,7 +21,10 @@ import {
   AlertTriangle,
   Gift,
   Settings,
-  User
+  User,
+  Home,
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -35,6 +46,12 @@ interface MenuItem {
 export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
 
   // Fetch notification badges
   const { data: badges, refetch: refetchBadges } = useQuery({
@@ -79,6 +96,11 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
   };
 
   const menuItems: MenuItem[] = [
+    {
+      icon: Home,
+      label: 'Ana Sayfa',
+      href: '/'
+    },
     {
       icon: LayoutDashboard,
       label: 'Genel Bakış',
@@ -132,6 +154,52 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between px-4">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-lg">B</span>
+            </div>
+            <span className="font-bold text-xl hidden sm:inline-block">BahisDoo</span>
+          </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.user_metadata?.avatar_url} />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline-block font-medium">
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Kullanıcı'}
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="px-2 py-1.5 text-sm">
+                <p className="font-medium">{user?.user_metadata?.full_name || 'Kullanıcı'}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/profile/settings" className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Ayarlar
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                Çıkış Yap
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* Desktop Sidebar */}

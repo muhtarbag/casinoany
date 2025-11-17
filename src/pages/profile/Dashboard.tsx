@@ -1,12 +1,14 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Heart, Star, MessageSquare, AlertTriangle, Gift, User, Settings } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -57,24 +59,24 @@ export default function Dashboard() {
 
   const quickActions = [
     {
+      title: 'Aktif Bonuslarım',
+      description: 'Takip ettiğiniz aktif bonuslar',
+      icon: Gift,
+      count: stats?.activeBonuses,
+      href: '/profile/bonus-tracking',
+      color: 'text-primary'
+    },
+    {
       title: 'Favorilerim',
-      description: 'Favori sitelerinizi görüntüleyin',
+      description: 'Favori bahis siteleriniz',
       icon: Heart,
       count: stats?.favorites,
       href: '/profile/favorites',
       color: 'text-red-500'
     },
     {
-      title: 'Üyeliklerim',
-      description: 'Kayıt olduğunuz siteleri yönetin',
-      icon: User,
-      count: stats?.memberships,
-      href: '/profile/memberships',
-      color: 'text-blue-500'
-    },
-    {
       title: 'Yorumlarım',
-      description: 'Site yorumlarınızı görüntüleyin',
+      description: 'Yazdığınız yorumlar',
       icon: MessageSquare,
       count: stats?.reviews,
       href: '/profile/reviews',
@@ -82,26 +84,11 @@ export default function Dashboard() {
     },
     {
       title: 'Şikayetlerim',
-      description: 'Şikayetlerinizi takip edin',
+      description: 'Aktif şikayetleriniz',
       icon: AlertTriangle,
       count: stats?.complaints,
       href: '/profile/complaints',
       color: 'text-orange-500'
-    },
-    {
-      title: 'Bonus Takibi',
-      description: 'Aktif bonuslarınızı takip edin',
-      icon: Gift,
-      count: stats?.activeBonuses,
-      href: '/profile/bonus-tracking',
-      color: 'text-purple-500'
-    },
-    {
-      title: 'Ayarlar',
-      description: 'Hesap ayarlarınızı düzenleyin',
-      icon: Settings,
-      href: '/profile/settings',
-      color: 'text-gray-500'
     }
   ];
 
@@ -112,50 +99,76 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Hoş Geldiniz 👋</h1>
-            <p className="text-muted-foreground">{user.email}</p>
+        <div className="space-y-6">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="p-4 text-center">
+                <Gift className="h-8 w-8 mx-auto mb-2 text-primary" />
+                <p className="text-2xl font-bold">{stats?.activeBonuses || 0}</p>
+                <p className="text-xs text-muted-foreground">Aktif Bonus</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
+              <CardContent className="p-4 text-center">
+                <Heart className="h-8 w-8 mx-auto mb-2 text-red-500" />
+                <p className="text-2xl font-bold">{stats?.favorites || 0}</p>
+                <p className="text-xs text-muted-foreground">Favori</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+              <CardContent className="p-4 text-center">
+                <MessageSquare className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                <p className="text-2xl font-bold">{stats?.reviews || 0}</p>
+                <p className="text-xs text-muted-foreground">Yorum</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20">
+              <CardContent className="p-4 text-center">
+                <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-orange-500" />
+                <p className="text-2xl font-bold">{stats?.complaints || 0}</p>
+                <p className="text-xs text-muted-foreground">Şikayet</p>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Quick Actions Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quickActions.map((action) => (
-              <Card 
+              <Link
                 key={action.href}
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105"
-                onClick={() => navigate(action.href)}
+                to={action.href}
+                className="group"
               >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <action.icon className={`w-8 h-8 ${action.color}`} />
-                    {action.count !== undefined && (
-                      <span className="text-2xl font-bold">{action.count}</span>
-                    )}
-                  </div>
-                  <CardTitle className="mt-4">{action.title}</CardTitle>
-                  <CardDescription>{action.description}</CardDescription>
-                </CardHeader>
-              </Card>
+                <Card className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] hover:border-primary/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "h-12 w-12 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
+                        action.color === 'text-primary' && "bg-primary/10",
+                        action.color === 'text-red-500' && "bg-red-500/10",
+                        action.color === 'text-green-500' && "bg-green-500/10",
+                        action.color === 'text-orange-500' && "bg-orange-500/10"
+                      )}>
+                        <action.icon className={cn("h-6 w-6", action.color)} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">{action.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {action.description}
+                        </p>
+                      </div>
+                      {action.count !== undefined && (
+                        <Badge variant="secondary" className="text-lg px-3">
+                          {action.count}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
-
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Hızlı Erişim</CardTitle>
-              <CardDescription>Sık kullandığınız sayfalara hızlıca ulaşın</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={() => navigate('/')}>
-                Ana Sayfa
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/kategoriler')}>
-                Kategoriler
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/blog')}>
-                Blog
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </ProfileLayout>
     </>
