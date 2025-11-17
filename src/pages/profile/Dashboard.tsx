@@ -242,7 +242,7 @@ export default function Dashboard() {
           </Link>
 
           {/* Secondary Stats Grid - Mobile: 2x2, Desktop: 4 columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {secondaryActions.map((action) => (
               <Link key={action.href} to={action.href}>
                 <Card className={cn(
