@@ -59,22 +59,47 @@ serve(async (req) => {
       throw new Error('User not found')
     }
 
-    // Generate a magic link for the target user
+    // Generate tokens using magiclink
     const { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
       type: 'magiclink',
       email: userData.user.email!,
     })
 
-    if (linkError) throw linkError
+    if (linkError) {
+      console.error('Link generation error:', linkError)
+      throw new Error(`Link generation failed: ${linkError.message}`)
+    }
 
-    // Extract the tokens from the magic link
-    const url = new URL(linkData.properties.action_link)
-    const access_token = url.searchParams.get('access_token')
-    const refresh_token = url.searchParams.get('refresh_token')
+    console.log('Link data properties:', linkData.properties)
+
+    // Extract the tokens from the action link
+    const actionLink = linkData.properties.action_link
+    console.log('Action link:', actionLink)
+    
+    const url = new URL(actionLink)
+    
+    // Try to get tokens from URL params first
+    let access_token = url.searchParams.get('access_token')
+    let refresh_token = url.searchParams.get('refresh_token')
+    
+    // If not in query params, try from hash fragment
+    if (!access_token || !refresh_token) {
+      const hash = url.hash.substring(1) // Remove leading #
+      if (hash) {
+        const hashParams = new URLSearchParams(hash)
+        access_token = hashParams.get('access_token')
+        refresh_token = hashParams.get('refresh_token')
+      }
+    }
 
     if (!access_token || !refresh_token) {
-      throw new Error('Failed to generate tokens')
+      console.error('Failed to extract tokens. URL:', actionLink)
+      console.error('Query params:', Object.fromEntries(url.searchParams))
+      console.error('Hash:', url.hash)
+      throw new Error('Failed to generate tokens - tokens not found in response')
     }
+
+    console.log('Tokens generated successfully for user:', user_id)
 
     return new Response(
       JSON.stringify({
