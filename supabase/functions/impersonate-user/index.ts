@@ -59,9 +59,9 @@ serve(async (req) => {
       throw new Error('User not found')
     }
 
-    // Generate tokens using magiclink
+    // Generate recovery link (contains actual tokens)
     const { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
-      type: 'magiclink',
+      type: 'recovery',
       email: userData.user.email!,
     })
 
@@ -70,34 +70,47 @@ serve(async (req) => {
       throw new Error(`Link generation failed: ${linkError.message}`)
     }
 
-    console.log('Link data properties:', linkData.properties)
+    console.log('Recovery link generated')
 
-    // Extract the tokens from the action link
+    // Extract tokens from recovery link - they're in the URL fragment
     const actionLink = linkData.properties.action_link
     console.log('Action link:', actionLink)
     
-    const url = new URL(actionLink)
+    // Recovery links have tokens in the hash fragment after redirect
+    // Format: https://project.supabase.co/auth/v1/verify?...#access_token=...&refresh_token=...
     
-    // Try to get tokens from URL params first
-    let access_token = url.searchParams.get('access_token')
-    let refresh_token = url.searchParams.get('refresh_token')
+    // Parse the URL to get the verification URL first
+    const verifyUrl = new URL(actionLink)
     
-    // If not in query params, try from hash fragment
-    if (!access_token || !refresh_token) {
-      const hash = url.hash.substring(1) // Remove leading #
-      if (hash) {
-        const hashParams = new URLSearchParams(hash)
-        access_token = hashParams.get('access_token')
-        refresh_token = hashParams.get('refresh_token')
-      }
+    // For recovery type, we need to follow the redirect or parse hashed_token
+    // Better approach: Use the hashed_token to exchange for session
+    const hashedToken = linkData.properties.hashed_token
+    
+    if (!hashedToken) {
+      console.error('No hashed token in response')
+      throw new Error('Failed to generate recovery token')
     }
 
-    if (!access_token || !refresh_token) {
-      console.error('Failed to extract tokens. URL:', actionLink)
-      console.error('Query params:', Object.fromEntries(url.searchParams))
-      console.error('Hash:', url.hash)
-      throw new Error('Failed to generate tokens - tokens not found in response')
+    console.log('Got hashed token, exchanging for session...')
+
+    // Exchange the hashed token for an actual session
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.verifyOtp({
+      token_hash: hashedToken,
+      type: 'recovery',
+    })
+
+    if (sessionError) {
+      console.error('Session exchange error:', sessionError)
+      throw new Error(`Session exchange failed: ${sessionError.message}`)
     }
+
+    if (!sessionData.session) {
+      console.error('No session in response')
+      throw new Error('Failed to create session')
+    }
+
+    const access_token = sessionData.session.access_token
+    const refresh_token = sessionData.session.refresh_token
 
     console.log('Tokens generated successfully for user:', user_id)
 
