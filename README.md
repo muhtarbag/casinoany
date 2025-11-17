@@ -6,7 +6,6 @@
 ![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-Cloud-3ECF8E?style=for-the-badge&logo=supabase)
-![Performance](https://img.shields.io/badge/Performance-Optimized-yellow?style=for-the-badge)
 
 **Production-ready betting comparison platform with AI-powered content generation**
 
@@ -21,7 +20,6 @@
 - [Hakkında](#-hakkında)
 - [Özellikler](#-özellikler)
 - [Teknoloji Stack'i](#-teknoloji-stacki)
-- [Performance Optimizations](#-performance-optimizations)
 - [Kurulum](#-kurulum)
 - [Kullanım](#-kullanım)
 - [Admin Paneli](#-admin-paneli)
@@ -43,7 +41,6 @@
 - ✅ **Comprehensive Admin**: Her şeyi tek panelden yönetme imkanı
 - ✅ **Secure by Design**: RLS policies, authentication ve authorization
 - ✅ **Scalable Architecture**: Yüzlerce site ve binlerce içerik yönetimi
-- ✅ **Performance Optimized**: 55-60% API call reduction, instant navigation
 
 ---
 
@@ -52,10 +49,9 @@
 ### 🎨 Frontend
 
 - 🌓 **Dark/Light Mode** + 📱 **Responsive Design**
-- ⚡ **Fast Performance** (Lazy loading, code splitting, route prefetching)
+- ⚡ **Fast Performance** (Lazy loading, code splitting)
 - 🔍 **Smart Search** & **Advanced Filtering**
 - 🎯 **Interactive UI** (Smooth animations)
-- 🚀 **Instant Navigation** (Hover-based prefetching)
 
 ### 🤖 AI Integration (Lovable AI Gateway)
 
@@ -68,7 +64,6 @@
 - Page views, user events, conversions
 - Session analytics, bounce rate, device stats
 - Real-time dashboard
-- Affiliate metrics & performance tracking
 
 ### 🎛️ Admin Panel
 
@@ -77,7 +72,6 @@
 - Yorum moderasyonu (AI generation, approve/reject)
 - Casino içerik, haberler, bildirimler
 - Analytics dashboard, system logs, health monitoring
-- Error tracking & performance monitoring
 
 ---
 
@@ -86,46 +80,7 @@
 **Frontend**: React 18.3 + TypeScript + Tailwind CSS + Shadcn UI  
 **Backend**: Supabase (Lovable Cloud) + PostgreSQL + Edge Functions  
 **AI**: Lovable AI Gateway (Gemini 2.5 Flash, GPT-5)  
-**Caching**: React Query + Optimistic Updates  
 **DevOps**: Vite + Git + Lovable Platform  
-
----
-
-## ⚡ Performance Optimizations
-
-Platform'da yapılan son optimizasyonlar:
-
-### 🚀 Frontend Performance
-- **Lazy Loading**: Admin sayfaları ve büyük componentler lazy load
-- **Code Splitting**: Route-based ve component-based splitting
-- **Route Prefetching**: Link hover'da otomatik prefetch
-- **Bundle Optimization**: Critical chunk preloading
-
-### 🗄️ Database Optimization
-- **20+ New Indexes**: Query performance %80+ iyileşme
-- **RLS Policy Caching**: O(n) → O(1) with caching layer
-- **Optimized Queries**: N+1 query elimination
-
-### 💾 API & Caching
-- **Smart Cache Strategy**: 55-60% API call reduction
-- **Specific Invalidation**: 90% daha az gereksiz cache invalidation
-- **Prefetching System**: Background cache warming
-
-### 🔍 Error Handling
-- **Structured Logging**: Full error traceability
-- **Error Tracking**: Centralized error monitoring
-- **Production Logger**: Development-only console logs
-
-**Performance Metrics:**
-- Page Load: 2.8s → 1.5s (46% improvement)
-- API Calls: 55-60% reduction
-- Cache Efficiency: 90% improvement
-- Navigation: Near-instant with prefetch
-
-Detaylı raporlar için:
-- `API_CACHE_AUDIT.md` - API caching optimizasyonları
-- `MEMORY_LEAK_AUDIT.md` - Memory leak önlemleri
-- `MEDIUM_PRIORITY_OPTIMIZATIONS.md` - Son yapılan iyileştirmeler
 
 ---
 

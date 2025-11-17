@@ -9,31 +9,19 @@ import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 
 export const PixelGrid = () => {
-  const { data: sites, isLoading, error } = useQuery({
+  const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
-      console.log('🔥 PixelGrid: Starting fetch...');
       const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      if (error) {
-        console.error('❌ PixelGrid fetch error:', error);
-        throw error;
-      }
-      console.log('✅ PixelGrid fetched:', data?.length, 'sites');
+      if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 min
-    gcTime: 10 * 60 * 1000, // 10 min
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    enabled: true, // ✅ FIX: Force enable
   });
-
-  console.log('📊 PixelGrid state:', { isLoading, hasData: !!sites, count: sites?.length, error });
 
   const { data: banners } = useQuery({
     queryKey: ['site-banners-home'],
@@ -49,11 +37,6 @@ export const PixelGrid = () => {
       if (error) throw error;
       return data;
     },
-    // ✅ BALANCE: Cache but allow initial load
-    staleTime: 60 * 60 * 1000, // 1 hour
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // CRITICAL: Must fetch on first mount
   });
 
   if (isLoading) {

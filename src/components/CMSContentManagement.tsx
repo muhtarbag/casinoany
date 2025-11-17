@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cmsContentUpdateSchema, emailSchema, urlSchema } from '@/schemas/cmsValidation';
 
 export const CMSContentManagement = () => {
   const { toast } = useToast();
@@ -82,33 +81,11 @@ export const CMSContentManagement = () => {
 
   const handleSaveSection = (section: string) => {
     const sectionKeys = contentKeys.filter(c => c.section === section);
-    const updates: { key: string; value: string }[] = sectionKeys.map(c => ({
+    const updates = sectionKeys.map(c => ({
       key: c.key,
-      value: (contents[c.key] || '').toString(),
+      value: contents[c.key] || '',
     }));
-    
-    // ✅ VALIDATION FIX: Validate content before updating
-    try {
-      cmsContentUpdateSchema.parse(updates);
-      
-      // Additional validation for email and URL fields
-      updates.forEach(update => {
-        if (update.key.includes('email')) {
-          emailSchema.parse(update.value);
-        }
-        if (update.key.includes('url') || update.key.includes('link')) {
-          urlSchema.parse(update.value);
-        }
-      });
-      
-      updateMutation.mutate(updates);
-    } catch (error: any) {
-      toast({
-        title: 'Validasyon Hatası',
-        description: error.errors?.[0]?.message || 'Geçersiz içerik',
-        variant: 'destructive',
-      });
-    }
+    updateMutation.mutate(updates);
   };
 
   if (isLoading) {

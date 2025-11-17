@@ -14,15 +14,6 @@ export const MobileMenu = () => {
     setOpen(false);
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      handleNavClick();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -130,7 +121,10 @@ export const MobileMenu = () => {
               )}
 
               <button
-                onClick={handleSignOut}
+                onClick={() => {
+                  signOut();
+                  handleNavClick();
+                }}
                 className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all w-full text-left touch-manipulation active:scale-98"
               >
                 <LogOut className="w-6 h-6" />

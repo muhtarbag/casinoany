@@ -220,37 +220,6 @@ export const TypedMutations = {
  * Type-safe RPC helpers
  */
 export const TypedRPC = {
-  // ✅ SECURITY: Server-side role verification (CRITICAL FIX)
-  getCurrentUserRoles: async () => {
-    const { data, error } = await supabase.rpc('get_current_user_roles');
-    if (error) throw error;
-    return data as Array<{
-      role: 'admin' | 'site_owner' | 'user';
-      status: 'pending' | 'approved' | 'rejected';
-      owned_sites: string[];
-    }>;
-  },
-
-  isAdminUser: async () => {
-    const { data, error } = await supabase.rpc('is_admin_user');
-    if (error) throw error;
-    return data as boolean;
-  },
-
-  isSiteOwnerUser: async () => {
-    const { data, error } = await supabase.rpc('is_site_owner_user');
-    if (error) throw error;
-    return data as boolean;
-  },
-
-  userOwnsSite: async (siteId: string) => {
-    const { data, error } = await supabase.rpc('user_owns_site', {
-      site_id_param: siteId
-    });
-    if (error) throw error;
-    return data as boolean;
-  },
-
   trackSearch: (searchTerm: string) =>
     supabase.rpc('track_search', { p_search_term: searchTerm }),
   

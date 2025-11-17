@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { memo, useState, useEffect, useCallback, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,8 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/hooks/useFavorites';
-import { usePrefetchSiteDetail } from '@/hooks/usePrefetchRoute';
-import { devLogger } from '@/lib/devLogger';
 import { cn } from '@/lib/utils';
 
 // Helper function to generate consistent random number from site ID
@@ -77,47 +75,41 @@ const BettingSiteCardComponent = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user, isAdmin } = useAuth();
   const { isFavorite: checkFavorite, toggleFavorite, isToggling } = useFavorites();
-  
-  // ✅ FIX: Race condition prevention for stats tracking
-  const [isTracking, setIsTracking] = useState(false);
-  const trackingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const showFallback = !logo || !logoUrl || imageError;
 
   // ✅ OPTIMIZE EDİLDİ: O(1) lookup - kart başına query yok
   const isFavorite = checkFavorite(id);
 
-  // ✅ FIXED: useMemo instead of useEffect to prevent unnecessary re-renders
-  const logoUrl = useMemo(() => {
-    if (!logo) return null;
-    
-    // Null safety check
-    if (typeof logo !== 'string') return null;
-    
-    // If logo is already a full URL, use it directly
-    if (logo.startsWith('http://') || logo.startsWith('https://')) {
-      return logo;
-    }
-    
-    // Otherwise, get from storage
-    try {
-      const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Error getting logo URL:', error);
-      return null;
+
+  useEffect(() => {
+    if (logo) {
+      setIsLoading(true);
+      setImageError(false);
+      
+      // Eğer logo zaten tam bir URL ise direkt kullan
+      if (logo.startsWith('http')) {
+        setLogoUrl(logo);
+        setIsLoading(false);
+      } else {
+        // Değilse storage'dan al
+        const { data } = supabase.storage.from('site-logos').getPublicUrl(logo);
+        setLogoUrl(data.publicUrl);
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
     }
   }, [logo]);
-  
-  const showFallback = !logo || !logoUrl || imageError;
 
-  // ✅ FIXED: Debounced mutation with request deduplication
+  // ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
   const trackClickMutation = useMutation({
     mutationFn: async () => {
-      if (!id || isTracking) return;
-      
-      setIsTracking(true);
+      if (!id) return;
       
       const { error } = await supabase.rpc('increment_site_stats', {
         p_site_id: id,
@@ -127,21 +119,10 @@ const BettingSiteCardComponent = ({
       if (error) throw error;
     },
     onSuccess: () => {
-      devLogger.log('Site stats tracked successfully', { siteId: id });
-      // ✅ OPTIMIZED: Specific cache invalidation
-      if (id) {
-        queryClient.invalidateQueries({ queryKey: ['site-stats', id] });
-      }
-      // Only invalidate lists that show click counts
-      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: ['site-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
     },
-    onError: (error) => {
-      devLogger.error('Failed to track site stats:', error);
-    },
-    onSettled: () => {
-      // Reset tracking flag after 300ms to prevent rapid clicks
-      setTimeout(() => setIsTracking(false), 300);
-    }
   });
 
   // ✅ OPTIMIZE EDİLDİ: Global favorites hook kullanıyor
@@ -156,18 +137,6 @@ const BettingSiteCardComponent = ({
     toggleFavorite({ siteId: id, isFavorite });
   };
 
-  // ✅ MEDIUM #3: Route-based prefetching on hover
-  const { prefetch: prefetchSiteDetail, cancelPrefetch } = usePrefetchSiteDetail(slug);
-  
-  // ✅ Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (trackingTimeoutRef.current) {
-        clearTimeout(trackingTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     handleToggleFavorite();
@@ -180,16 +149,6 @@ const BettingSiteCardComponent = ({
       navigate(`/site/${id}`);
     }
   }, [slug, id, navigate]);
-
-  const handleCardHover = useCallback(() => {
-    // Prefetch site detail when user hovers over card
-    prefetchSiteDetail();
-  }, [prefetchSiteDetail]);
-
-  const handleCardLeave = useCallback(() => {
-    // Cancel prefetch if user leaves before delay
-    cancelPrefetch();
-  }, [cancelPrefetch]);
 
   const handleAffiliateClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -211,19 +170,24 @@ const BettingSiteCardComponent = ({
     <Card 
       className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer"
       onClick={handleCardClick}
-      onMouseEnter={handleCardHover}
-      onMouseLeave={handleCardLeave}
       role="article"
       aria-label={`${name} - Bahis sitesi kartı`}
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm relative">
+            {/* Loading Skeleton */}
+            {isLoading && !showFallback && (
+              <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse" />
+            )}
+            
             {!showFallback ? (
               <OptimizedImage
                 src={logoUrl!}
                 alt={`${name} logo`}
-                className="w-full h-full object-contain p-2"
+                className={`w-full h-full object-contain p-2 transition-opacity duration-300 ${
+                  isLoading ? 'opacity-0' : 'opacity-100'
+                }`}
                 width={96}
                 height={96}
                 objectFit="contain"

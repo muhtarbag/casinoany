@@ -22,7 +22,6 @@ import {
 } from './ui/alert-dialog';
 import { useNewsArticles, useDeleteNews, useToggleNewsPublish } from '@/hooks/queries/useNewsQueries';
 import { VirtualList } from '@/components/VirtualList';
-import { sanitizeHtmlContent } from '@/schemas/newsValidation';
 
 export function NewsManagement() {
   const { toast } = useToast();
@@ -60,17 +59,10 @@ export function NewsManagement() {
 
   const filteredArticles = useMemo(() => {
     if (!articles) return [];
-    // ✅ SECURITY FIX: Sanitize article data to prevent XSS
-    return articles
-      .map((article: any) => ({
-        ...article,
-        title: sanitizeHtmlContent(article.title || ''),
-        category: sanitizeHtmlContent(article.category || ''),
-      }))
-      .filter((article: any) =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.category?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    return articles.filter((article: any) =>
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   }, [articles, searchTerm]);
 
   const renderArticleItem = useCallback((article: any) => (

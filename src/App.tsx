@@ -27,12 +27,13 @@ const Signup = lazyWithPreload(() => import("./pages/Signup"));
 const ForgotPassword = lazyWithPreload(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
 
-// Admin pages - all lazy loaded for better performance
-const AdminRoot = lazyWithPreload(() => import("./pages/admin"));
-const AdminDashboard = lazyWithPreload(() => import("./pages/admin/Dashboard"));
-const AdminSitesHub = lazyWithPreload(() => import("./pages/admin/sites/index"));
-const AdminRoleManagement = lazyWithPreload(() => import("./pages/admin/system/RoleManagement"));
-const AdminUsers = lazyWithPreload(() => import("./pages/admin/system/Users"));
+// CRITICAL: Core admin pages imported directly to prevent React dispatcher null errors
+// These pages are essential and should not be lazy loaded
+import AdminRoot from "./pages/admin";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminSitesHub from "./pages/admin/sites/index";
+import AdminRoleManagement from "./pages/admin/system/RoleManagement";
+import AdminUsers from "./pages/admin/system/Users";
 
 // Secondary admin pages can be lazy loaded safely
 const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/BlogManagement"));
@@ -55,7 +56,6 @@ const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteSta
 const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
 const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
 const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
-const AdminErrorMonitoring = lazyWithPreload(() => import("./pages/admin/system/ErrorMonitoring"));
 const AdminSiteOwners = lazyWithPreload(() => import("./pages/admin/SiteOwners"));
 
 const Blog = lazyWithPreload(() => import("./pages/Blog"));
@@ -155,7 +155,6 @@ const AppContent = () => {
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
-            <Route path="system/errors" element={<AdminErrorMonitoring />} />
             <Route path="site-owners" element={<AdminSiteOwners />} />
           </Route>
           
@@ -217,21 +216,7 @@ const AppContent = () => {
 
 const App = () => {
   // CRITICAL: Create queryClient inside component with useMemo to ensure React is initialized
-  const queryClient = useMemo(() => {
-    const client = createAppQueryClient();
-    
-    // Warm up cache with critical data in background
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      requestIdleCallback(async () => {
-        const { warmUpCache } = await import('@/utils/queryPrefetching');
-        warmUpCache(client).catch(() => {
-          // Silent fail - cache warming is not critical
-        });
-      }, { timeout: 3000 });
-    }
-    
-    return client;
-  }, []);
+  const queryClient = useMemo(() => createAppQueryClient(), []);
   
   return (
     <ErrorTrackingProvider>

@@ -6,7 +6,6 @@ import { TypedRPC } from '@/lib/supabase-extended';
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from '@/hooks/useFavorites';
 import { analytics } from "@/lib/analytics";
-import { devLogger } from '@/lib/devLogger';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,7 +204,7 @@ export default function SiteDetail() {
       });
 
       if (error) {
-        devLogger.error('View tracking failed:', error);
+        console.error('View tracking failed:', error);
         return;
       }
 

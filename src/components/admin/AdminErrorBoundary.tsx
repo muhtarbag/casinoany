@@ -2,7 +2,6 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { devLogger } from '@/lib/devLogger';
 
 interface Props {
   children: ReactNode;
@@ -42,7 +41,9 @@ export class AdminErrorBoundary extends Component<Props, State> {
     }
     
     // Still log in development
-    devLogger.error('Admin Error Boundary caught an error:', error, errorInfo);
+    if (import.meta.env.DEV) {
+      console.error('Admin Error Boundary caught an error:', error, errorInfo);
+    }
     this.setState({
       error,
       errorInfo,

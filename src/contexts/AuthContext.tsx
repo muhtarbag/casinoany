@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prodLogger } from '@/lib/productionLogger';
@@ -44,46 +44,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isSiteOwner, setIsSiteOwner] = useState(false);
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false); // ✅ FIX: Start as false to prevent blocking
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isCancelled = false;
+    let mounted = true;
     
-    // ✅ FIX: Non-blocking async initialization
-    const initAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (isCancelled) return;
-        if (error) throw error;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await checkUserRoles(session.user.id);
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          prodLogger.error('Failed to initialize auth', error as Error, { 
-            component: 'auth' 
-          });
-        }
+    // Get initial session first
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRoles(session.user.id);
       }
-    };
-
-    initAuth();
+      setLoading(false);
+    });
 
     // Then setup listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (isCancelled) return;
+      (event, session) => {
+        if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkUserRoles(session.user.id);
+          checkUserRoles(session.user.id);
         } else {
           setIsAdmin(false);
           setIsSiteOwner(false);
@@ -94,16 +81,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => {
-      isCancelled = true;
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, []); // ✅ Correct: Empty deps, cleanup handled properly
+  }, []);
 
   const checkUserRoles = async (userId: string) => {
     try {
-      // ✅ SECURITY FIX: Use server-side RPC function instead of direct query
-      // This prevents client-side manipulation of role checks
-      const { data, error } = await supabase.rpc('get_current_user_roles');
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', userId);
       
       if (error) {
         prodLogger.error('Failed to fetch user roles', error, { 
@@ -113,9 +101,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       
-      // Data is already filtered by approved status on server-side
-      const roles = data?.map(r => r.role) || [];
-      const sites = data?.[0]?.owned_sites || [];
+      // Only set roles if user is approved
+      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
+      const roles = approvedRoles.map(r => r.role);
+      
+      // Check site ownership independently from roles
+      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
+        .from('site_owners')
+        .select('site_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+      
+      if (ownershipError) {
+        prodLogger.error('Failed to fetch site ownership', ownershipError, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+      }
+      
+      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
       
       setUserRoles(roles);
       setIsAdmin(roles.includes('admin'));
@@ -129,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signUp = useCallback(async (
+  const signUp = async (
     email: string, 
     password: string, 
     accountType: 'user' | 'site_owner' = 'user', 
@@ -178,9 +182,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // handle_new_user() trigger'ı user_roles'e otomatik insert yapıyor
     
     return { error };
-  }, []);
+  };
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -218,42 +222,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     
-    // ✅ CRITICAL FIX: Must redirect after successful login
-    // onAuthStateChange doesn't trigger redirect immediately
-    window.location.href = '/';
-    
     return { error: null };
-  }, []);
+  };
 
-  const signOut = useCallback(async () => {
-    try {
-      // Clear local state first (optimistic update)
-      setUser(null);
-      setSession(null);
-      setIsAdmin(false);
-      setIsSiteOwner(false);
-      setOwnedSites([]);
-      setUserRoles([]);
-      
-      // Then sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        prodLogger.error('Failed to sign out', error, { 
-          component: 'auth' 
-        });
-      }
-      
-      // ✅ FIX: Redirect to homepage (public) after logout
-      window.location.href = '/';
-    } catch (error) {
-      prodLogger.error('Unexpected error during sign out', error as Error, { 
-        component: 'auth' 
-      });
-      // Even if there's an error, redirect to homepage
-      window.location.href = '/';
-    }
-  }, []);
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   // ✅ FIX: Memoize context value AFTER function definitions
   const authContextValue = useMemo<AuthContextType>(

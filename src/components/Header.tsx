@@ -9,14 +9,6 @@ import logo from '@/assets/casinodoo-logo.svg';
 export const Header = () => {
   const { user, isAdmin, isSiteOwner, signOut } = useAuth();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   return (
     <>
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -99,7 +91,7 @@ export const Header = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={handleSignOut}
+                    onClick={signOut}
                     className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3"
                   >
                     <LogOut className="w-3 h-3 md:w-4 md:h-4" />

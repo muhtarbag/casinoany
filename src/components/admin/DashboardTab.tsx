@@ -96,6 +96,15 @@ export function DashboardTab({
         </Card>
       </div>
 
+      {/* Performance Notice */}
+      <Card className="bg-muted/50">
+        <CardContent className="pt-6">
+          <p className="text-sm text-muted-foreground text-center">
+            ✅ Detaylı analytics performans optimizasyonu için devre dışı bırakıldı. 
+            Sadece kritik metrikler gösteriliyor.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

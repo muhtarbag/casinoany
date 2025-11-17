@@ -4,7 +4,7 @@ import { TypedDB } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-// Sites listesi - Optimized caching
+// Sites listesi
 export const useSites = (filters?: {
   isActive?: boolean;
   isFeatured?: boolean;
@@ -34,10 +34,7 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
+    staleTime: 30 * 60 * 1000, // 30 minutes - sites rarely change
   });
 };
 
@@ -52,42 +49,31 @@ export const useSite = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.VERY_LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false, // Site detail rarely changes
     enabled: !!slug,
   });
 };
 
-// Featured sites - Centralized with flexible options
-export const useFeaturedSites = (options?: {
-  limit?: number;
-  select?: string;
-}) => {
-  const limit = options?.limit || 6;
-  const select = options?.select || '*';
-  
+// Featured sites
+export const useFeaturedSites = () => {
   return useQuery({
-    queryKey: queryKeys.sites.featured(limit),
+    queryKey: queryKeys.sites.featured(),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select(select)
+        .select('*')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
-        .limit(limit);
+        .limit(6);
 
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
+    staleTime: CACHE_TIMES.VERY_LONG,
   });
 };
 
-// Site stats - Optimized for analytics
+// Site stats
 export const useSiteStats = () => {
   return useQuery({
     queryKey: queryKeys.sites.stats(),
@@ -100,10 +86,7 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 

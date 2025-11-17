@@ -1,12 +1,24 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from './LoadingSpinner';
 import { OptimizedImage } from '@/components/OptimizedImage';
-import { useFeaturedSites } from '@/hooks/queries/useSiteQueries';
 
 export const FeaturedSitesSection = () => {
-  const { data: featuredSites, isLoading } = useFeaturedSites({
-    limit: 3,
-    select: 'name, slug, logo_url, rating, bonus, review_count, avg_rating'
+  const { data: featuredSites, isLoading } = useQuery({
+    queryKey: ['featured-sites-for-homepage'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('name, slug, logo_url, rating, bonus, review_count, avg_rating')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('rating', { ascending: false })
+        .limit(3);
+      
+      if (error) throw error;
+      return data;
+    },
   });
 
   if (isLoading) {
@@ -23,7 +35,7 @@ export const FeaturedSitesSection = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      {featuredSites.map((site: any) => (
+      {featuredSites.map((site) => (
         <Link 
           key={site.slug}
           to={`/site/${site.slug}`}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -206,38 +206,6 @@ export const NotificationPopup = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ INFINITE RE-RENDER FIX: useCallback to stabilize function reference
-  const checkTrigger = useCallback((notification: Notification) => {
-    const { trigger_type, trigger_conditions } = notification;
-
-    switch (trigger_type) {
-      case 'instant':
-        setShouldShow(true);
-        return true;
-      
-      case 'time_on_page':
-        const requiredTime = trigger_conditions?.seconds || 10;
-        if (timeOnPage >= requiredTime) {
-          setShouldShow(true);
-          return true;
-        }
-        return false;
-      
-      case 'scroll_depth':
-        // Can be implemented with scroll tracking
-        return false;
-      
-      case 'exit_intent':
-        // Can be implemented with mouse tracking
-        return false;
-      
-      default:
-        setShouldShow(true);
-        return true;
-    }
-  }, [timeOnPage]);
-
-  // ✅ INFINITE RE-RENDER FIX: Memoize notification logic  
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
     // Zaten bir bildirim açıksa tekrar kontrol etme
@@ -286,7 +254,37 @@ export const NotificationPopup = () => {
       setOpenNotificationId(notificationToShow.id);
       trackViewMutation.mutate(notificationToShow.id);
     }
-  }, [notifications, viewedNotifications, shouldShow, openNotificationId, checkTrigger, trackViewMutation]);
+  }, [notifications, viewedNotifications, shouldShow, openNotificationId]);
+
+  const checkTrigger = (notification: Notification) => {
+    const { trigger_type, trigger_conditions } = notification;
+
+    switch (trigger_type) {
+      case 'instant':
+        setShouldShow(true);
+        return true;
+      
+      case 'time_on_page':
+        const requiredTime = trigger_conditions?.seconds || 10;
+        if (timeOnPage >= requiredTime) {
+          setShouldShow(true);
+          return true;
+        }
+        return false;
+      
+      case 'scroll_depth':
+        // Can be implemented with scroll tracking
+        return false;
+      
+      case 'exit_intent':
+        // Can be implemented with mouse tracking
+        return false;
+      
+      default:
+        setShouldShow(true);
+        return true;
+    }
+  };
 
   const handleClose = () => {
     if (openNotificationId) {

@@ -4,7 +4,7 @@ import { TypedDB, TypedRPC } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-// Blog posts listesi - Optimized caching
+// Blog posts listesi
 export const useBlogPosts = (filters?: {
   isPublished?: boolean;
   category?: string;
@@ -34,10 +34,7 @@ export const useBlogPosts = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.LONG, // 15 minutes - blog content rarely changes
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
@@ -58,13 +55,11 @@ export const useBlogPost = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false, // Blog content rarely changes
     enabled: !!slug,
   });
 };
 
-// Blog yorumları (profiller dahil) - Optimized
+// Blog yorumları (profiller dahil)
 export const useBlogComments = (postId: string) => {
   return useQuery({
     queryKey: queryKeys.blog.comments(postId),
@@ -105,9 +100,7 @@ export const useBlogComments = (postId: string) => {
 
       return commentsWithProfiles;
     },
-    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes - comments change moderately
-    gcTime: CACHE_TIMES.LONG, // 15 minutes
-    refetchOnWindowFocus: false,
+    staleTime: CACHE_TIMES.SHORT,
     enabled: !!postId,
   });
 };
@@ -145,7 +138,6 @@ export const useBlogStats = () => {
       }));
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 20 * 60 * 1000, // 20 minutes
   });
 };
 

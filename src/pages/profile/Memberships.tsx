@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { devLogger } from '@/lib/devLogger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -115,7 +114,7 @@ const Memberships = () => {
       });
     },
     onError: (error: any) => {
-      devLogger.error('Add membership error:', error);
+      console.error('Add membership error:', error);
       toast({
         title: 'Hata',
         description: error.message || 'Site eklenirken bir hata oluştu',

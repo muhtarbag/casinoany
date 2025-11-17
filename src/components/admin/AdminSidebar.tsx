@@ -11,8 +11,7 @@ import {
   Shield,
   Folder,
   Bell,
-  AlertTriangle,
-  Activity
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -85,7 +84,6 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
-        { id: 'errors', icon: Activity, label: 'Error Monitoring', route: '/admin/system/errors', roles: [] },
       ],
     },
   ].map(group => ({

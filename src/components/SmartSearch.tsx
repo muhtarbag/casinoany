@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -80,13 +80,15 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     return score;
   };
 
-  // ✅ OPTIMIZE: useMemo for filtered suggestions to prevent recalculation
-  const filteredSuggestions = useMemo(() => {
+  // Update suggestions based on search
+  useEffect(() => {
     if (!localSearch.trim() || !allSites) {
-      return [];
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
     }
 
-    return allSites
+    const searchResults = allSites
       .map((site: any) => ({
         ...site,
         score: Math.max(
@@ -98,18 +100,13 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
       .filter(site => site.score > 20)
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
-  }, [localSearch, allSites]);
 
-  // Update suggestions based on filtered results
-  useEffect(() => {
-    setSuggestions(filteredSuggestions);
-    if (filteredSuggestions.length > 0) {
+    setSuggestions(searchResults);
+    if (searchResults.length > 0) {
       setShowSuggestions(true);
       setShowPopular(false);
-    } else {
-      setShowSuggestions(false);
     }
-  }, [filteredSuggestions]);
+  }, [localSearch, allSites]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -179,13 +176,10 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
             }}
             onBlur={() => {
               // Delay to allow click events to fire first
-              const timeoutId = setTimeout(() => {
+              setTimeout(() => {
                 setShowSuggestions(false);
                 setShowPopular(false);
               }, 300);
-              
-              // Cleanup timeout on next focus
-              return () => clearTimeout(timeoutId);
             }}
             className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
