@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 
 /**
  * Hook for detecting online/offline status
+ * ✅ FIX: Graceful recovery without destroying app state
  */
 export function useOfflineDetection() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [wasOffline, setWasOffline] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       
       if (wasOffline) {
+        // ✅ FIX: Invalidate queries instead of hard reload
+        queryClient.invalidateQueries();
+        
         toast({
           title: 'İnternet Bağlantısı Yeniden Kuruldu',
-          description: 'Sayfa güncellenecek...',
+          description: 'Veriler güncelleniyor...',
           variant: 'default'
         });
-        
-        // Reload after 2 seconds to sync data
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       }
       
       setWasOffline(false);

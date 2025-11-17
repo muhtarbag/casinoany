@@ -37,15 +37,17 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
+  // ✅ FIX: Soft reset preserves session and cache
   private handleReset = () => {
     this.setState({ hasError: false, error: null });
-    window.location.reload();
+    // Let React Query refetch naturally - no hard reload
   };
 
   private handleGoHome = () => {
     this.setState({ hasError: false, error: null });
-    // Use replace to avoid back button loop
-    window.location.replace('/');
+    // ✅ FIX: Use history API instead of hard replace
+    window.history.pushState({}, '', '/');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   public render() {

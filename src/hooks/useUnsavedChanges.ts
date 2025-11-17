@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useBeforeUnload } from 'react-router-dom';
 
 interface UseUnsavedChangesOptions {
@@ -14,7 +14,8 @@ export function useUnsavedChanges({
 }: UseUnsavedChangesOptions) {
   const confirmedRef = useRef(false);
 
-  // Browser navigation (refresh, close tab)
+  // ✅ FIX: Use only useBeforeUnload - no duplicate event listeners
+  // This hook already handles both browser and SPA navigation
   useBeforeUnload(
     useCallback(
       (event) => {
@@ -27,23 +28,6 @@ export function useUnsavedChanges({
     ),
     { capture: true }
   );
-
-  // SPA navigation (react-router)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty && !confirmedRef.current) {
-        e.preventDefault();
-        e.returnValue = message;
-        return message;
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isDirty, message]);
 
   const confirmLeave = useCallback(() => {
     if (!isDirty) return true;
