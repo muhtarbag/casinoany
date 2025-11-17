@@ -44,12 +44,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isSiteOwner, setIsSiteOwner] = useState(false);
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // ✅ FIX: Start as false to prevent blocking
 
   useEffect(() => {
     let isCancelled = false;
     
-    // ✅ FIX: Proper async initialization with cancellation
+    // ✅ FIX: Non-blocking async initialization
     const initAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -68,10 +68,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           prodLogger.error('Failed to initialize auth', error as Error, { 
             component: 'auth' 
           });
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
         }
       }
     };
