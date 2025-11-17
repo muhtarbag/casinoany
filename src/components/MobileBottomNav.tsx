@@ -29,15 +29,14 @@ export const MobileBottomNav = () => {
       label: 'Kategoriler',
       path: '/categories',
     },
-    {
+    ...(user ? [{
       icon: Heart,
       label: 'Favoriler',
       path: '/profile/favorites',
-      requireAuth: true,
-    },
+    }] : []),
     {
       icon: User,
-      label: 'Profil',
+      label: user ? 'Profil' : 'Giriş',
       path: user ? '/profile/dashboard' : '/login',
     },
   ];
@@ -54,12 +53,10 @@ export const MobileBottomNav = () => {
     <>
       {/* Bottom Navigation Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
-        <div className="grid grid-cols-5 h-16">
+        <div className={cn("grid h-16", user ? "grid-cols-5" : "grid-cols-4")}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-
-            if (item.requireAuth && !user) return null;
 
             return (
               <Link
