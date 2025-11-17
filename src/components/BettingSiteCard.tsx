@@ -1,5 +1,5 @@
 import { memo, useState, useEffect, useCallback, useMemo } from 'react';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
+import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
 
 // Helper function to generate consistent random number from site ID
@@ -78,25 +79,11 @@ const BettingSiteCardComponent = ({
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user, isAdmin } = useAuth();
+  const { isFavorite: checkFavorite, toggleFavorite, isToggling } = useFavorites();
   const showFallback = !logo || !logoUrl || imageError;
 
-  // Check if site is in favorites
-  const { data: isFavorite, isLoading: isFavoriteLoading } = useQuery({
-    queryKey: ['is-favorite', id, user?.id],
-    queryFn: async () => {
-      if (!user || !id) return false;
-      const { data, error } = await supabase
-        .from('user_favorite_sites')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('site_id', id)
-        .maybeSingle();
-      
-      if (error) return false;
-      return !!data;
-    },
-    enabled: !!user && !!id,
-  });
+  // ✅ OPTIMIZE EDİLDİ: O(1) lookup - kart başına query yok
+  const isFavorite = checkFavorite(id);
 
 
   useEffect(() => {
@@ -132,64 +119,28 @@ const BettingSiteCardComponent = ({
       if (error) throw error;
     },
     onSuccess: () => {
-      // Invalidate all site-related queries (stats, featured, lists, etc.)
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       queryClient.invalidateQueries({ queryKey: ['site-stats'] });
       queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
     },
   });
 
-  const toggleFavoriteMutation = useMutation({
-    mutationFn: async () => {
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-      
-      if (!id) return;
-
-      if (isFavorite) {
-        // Remove from favorites
-        const { error } = await supabase
-          .from('user_favorite_sites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('site_id', id);
-        
-        if (error) throw error;
-      } else {
-        // Add to favorites
-        const { error } = await supabase
-          .from('user_favorite_sites')
-          .insert({
-            user_id: user.id,
-            site_id: id,
-          });
-        
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['is-favorite', id, user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
-      toast({
-        title: isFavorite ? 'Favorilerden çıkarıldı' : 'Favorilere eklendi',
-        description: isFavorite ? `${name} favorilerden kaldırıldı` : `${name} favorilere eklendi`,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Hata',
-        description: error.message || 'Bir hata oluştu',
-        variant: 'destructive',
-      });
-    },
-  });
+  // ✅ OPTIMIZE EDİLDİ: Global favorites hook kullanıyor
+  const handleToggleFavorite = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!id) return;
+    
+    toggleFavorite({ siteId: id, isFavorite });
+  };
 
   const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleFavoriteMutation.mutate();
-  }, [toggleFavoriteMutation]);
+    handleToggleFavorite();
+  }, [handleToggleFavorite]);
 
   const handleCardClick = useCallback(() => {
     if (slug) {
@@ -263,7 +214,7 @@ const BettingSiteCardComponent = ({
                   : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
               )}
               onClick={handleFavoriteClick}
-              disabled={toggleFavoriteMutation.isPending || isFavoriteLoading}
+              disabled={isToggling}
             >
               <Heart 
                 className={cn(
