@@ -1,18 +1,15 @@
-import { useState } from 'react';
+import { useReducer, useCallback } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { SiteFormData, validateLogoFile } from '@/schemas/siteValidation';
 import { useLogChange } from '@/hooks/useChangeHistory';
+import { adminSiteManagementReducer, createInitialState } from '@/reducers/adminSiteManagementReducer';
 
 export const useAdminSiteManagement = () => {
   const queryClient = useQueryClient();
   const logChange = useLogChange();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [selectedSites, setSelectedSites] = useState<string[]>([]);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(adminSiteManagementReducer, createInitialState());
 
   // Logo optimization
   const optimizeLogo = (file: File): Promise<File> => {
@@ -185,8 +182,7 @@ export const useAdminSiteManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
       queryClient.invalidateQueries({ queryKey: ['change-history'] });
       showSuccessToast('Site başarıyla eklendi!');
-      setLogoFile(null);
-      setLogoPreview(null);
+      dispatch({ type: 'CLEAR_LOGO' });
     },
     onError: (error) => {
       showErrorToast(error, 'Site eklenirken bir hata oluştu');
@@ -295,9 +291,7 @@ export const useAdminSiteManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
       queryClient.invalidateQueries({ queryKey: ['change-history'] });
       showSuccessToast('Site başarıyla güncellendi!');
-      setEditingId(null);
-      setLogoFile(null);
-      setLogoPreview(null);
+      dispatch({ type: 'RESET_FORM' });
     },
     onError: (error) => {
       showErrorToast(error, 'Site güncellenirken bir hata oluştu');
@@ -307,7 +301,7 @@ export const useAdminSiteManagement = () => {
   // Delete site mutation
   const deleteSiteMutation = useMutation({
     mutationFn: async (id: string) => {
-      setDeletingId(id);
+      dispatch({ type: 'SET_DELETING_ID', id });
       
       // Get site data before deleting for undo
       const { data: siteData } = await supabase
@@ -346,11 +340,11 @@ export const useAdminSiteManagement = () => {
         undoLabel: 'Geçmişi Gör',
       });
       
-      setDeletingId(null);
+      dispatch({ type: 'SET_DELETING_ID', id: null });
     },
     onError: (error: any) => {
       showErrorToast(error, 'Site silinirken bir hata oluştu');
-      setDeletingId(null);
+      dispatch({ type: 'SET_DELETING_ID', id: null });
     },
   });
 
@@ -383,7 +377,7 @@ export const useAdminSiteManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
       queryClient.invalidateQueries({ queryKey: ['change-history'] });
       
-      showSuccessToast(`${selectedSites.length} site silindi`, {
+      showSuccessToast(`${state.selectedSites.length} site silindi`, {
         duration: 10000,
         onUndo: () => {
           window.open('#history', '_blank');
@@ -391,7 +385,7 @@ export const useAdminSiteManagement = () => {
         undoLabel: 'Geçmişi Gör',
       });
       
-      setSelectedSites([]);
+      dispatch({ type: 'CLEAR_SELECTIONS' });
     },
     onError: (error: any) => {
       showErrorToast(error, 'Siteler silinirken bir hata oluştu');
@@ -405,8 +399,8 @@ export const useAdminSiteManagement = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['betting-sites'] });
-      showSuccessToast(`${selectedSites.length} site ${variables.isActive ? 'aktif' : 'pasif'} yapıldı`);
-      setSelectedSites([]);
+      showSuccessToast(`${state.selectedSites.length} site ${variables.isActive ? 'aktif' : 'pasif'} yapıldı`);
+      dispatch({ type: 'CLEAR_SELECTIONS' });
     },
     onError: (error: any) => {
       showErrorToast(error, 'İşlem sırasında bir hata oluştu');
@@ -427,15 +421,46 @@ export const useAdminSiteManagement = () => {
     },
   });
 
+  // Wrapper functions to maintain API compatibility
+  const setEditingId = useCallback((id: string | null) => {
+    dispatch({ type: 'SET_EDITING_ID', id });
+  }, []);
+
+  const setSelectedSites = useCallback((ids: string[] | ((prev: string[]) => string[])) => {
+    if (typeof ids === 'function') {
+      dispatch({ type: 'SET_SELECTED_SITES', ids: ids(state.selectedSites) });
+    } else {
+      dispatch({ type: 'SET_SELECTED_SITES', ids });
+    }
+  }, [state.selectedSites]);
+
+  const setLogoFile = useCallback((file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      dispatch({ type: 'CLEAR_LOGO' });
+    }
+  }, []);
+
+  const setLogoPreview = useCallback((preview: string | null) => {
+    if (preview && state.logoFile) {
+      dispatch({ type: 'SET_LOGO', file: state.logoFile, preview });
+    }
+  }, [state.logoFile]);
+
   return {
-    editingId,
+    editingId: state.editingId,
     setEditingId,
-    deletingId,
-    selectedSites,
+    deletingId: state.deletingId,
+    selectedSites: state.selectedSites,
     setSelectedSites,
-    logoFile,
+    logoFile: state.logoFile,
     setLogoFile,
-    logoPreview,
+    logoPreview: state.logoPreview,
     setLogoPreview,
     createSiteMutation,
     updateSiteMutation,
