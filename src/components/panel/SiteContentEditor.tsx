@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save, Eye, FileText, HelpCircle, Gamepad2, LogIn, Wallet, Award } from 'lucide-react';
 import { CasinoContentEditor } from '@/components/CasinoContentEditor';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AdvancedContentEditor } from './content/AdvancedContentEditor';
 
 interface SiteContentEditorProps {
   siteId: string;
@@ -24,6 +25,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
   const [loginGuide, setLoginGuide] = useState('');
   const [withdrawalGuide, setWithdrawalGuide] = useState('');
   const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>([]);
+  const [blockStyles, setBlockStyles] = useState<any>({});
   const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch site content
@@ -32,7 +34,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('pros, cons, verdict, expert_review, game_categories, login_guide, withdrawal_guide, faq')
+        .select('pros, cons, verdict, expert_review, game_categories, login_guide, withdrawal_guide, faq, block_styles')
         .eq('id', siteId)
         .single();
       
@@ -53,13 +55,14 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
       setLoginGuide((siteContent.login_guide as string) || '');
       setWithdrawalGuide((siteContent.withdrawal_guide as string) || '');
       setFaq((siteContent.faq as Array<{ question: string; answer: string }>) || []);
+      setBlockStyles((siteContent.block_styles as any) || {});
     }
   }, [siteContent]);
 
   // Track changes
   useEffect(() => {
     setHasChanges(true);
-  }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq]);
+  }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq, blockStyles]);
 
   // Save mutation
   const saveMutation = useMutation({
@@ -75,6 +78,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
           login_guide: loginGuide,
           withdrawal_guide: withdrawalGuide,
           faq,
+          block_styles: blockStyles,
           updated_at: new Date().toISOString(),
         })
         .eq('id', siteId);
@@ -361,12 +365,10 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
             </TabsContent>
 
             <TabsContent value="advanced" className="space-y-4">
-              <Alert>
-                <FileText className="h-4 w-4" />
-                <AlertDescription>
-                  Gelişmiş içerik düzenleme araçları yakında eklenecek. Block stilleri, özel tasarım ve daha fazlası...
-                </AlertDescription>
-              </Alert>
+              <AdvancedContentEditor
+                blockStyles={blockStyles}
+                onStylesChange={setBlockStyles}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>
