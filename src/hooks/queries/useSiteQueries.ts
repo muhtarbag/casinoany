@@ -34,10 +34,10 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
     gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
   });
 };
 
@@ -80,10 +80,10 @@ export const useFeaturedSites = (options?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
     gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
   });
 };
 
@@ -100,10 +100,10 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - cache for long
     gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // ✅ CRITICAL FIX: Must fetch on first load
   });
 };
 
