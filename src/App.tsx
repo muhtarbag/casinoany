@@ -81,6 +81,11 @@ const CategoryDetail = lazyWithPreload(() => import("./pages/CategoryDetail"));
 // User profile pages
 const Favorites = lazyWithPreload(() => import("./pages/profile/Favorites"));
 const Memberships = lazyWithPreload(() => import("./pages/profile/Memberships"));
+const ProfileDashboard = lazyWithPreload(() => import("./pages/profile/Dashboard"));
+const ProfileReviews = lazyWithPreload(() => import("./pages/profile/Reviews"));
+const ProfileComplaints = lazyWithPreload(() => import("./pages/profile/Complaints"));
+const BonusTracking = lazyWithPreload(() => import("./pages/profile/BonusTracking"));
+const ProfileSettings = lazyWithPreload(() => import("./pages/profile/Settings"));
 
 // User panel pages
 const UserDashboard = lazyWithPreload(() => import("./pages/panel/Dashboard"));
@@ -151,8 +156,13 @@ const AppContent = () => {
           <Route path="/panel/site-management" element={<SiteManagement />} />
           
           {/* Profile Routes */}
+          <Route path="/profile/dashboard" element={<ProfileDashboard />} />
           <Route path="/profile/favorites" element={<Favorites />} />
           <Route path="/profile/memberships" element={<Memberships />} />
+          <Route path="/profile/reviews" element={<ProfileReviews />} />
+          <Route path="/profile/complaints" element={<ProfileComplaints />} />
+          <Route path="/profile/bonus-tracking" element={<BonusTracking />} />
+          <Route path="/profile/settings" element={<ProfileSettings />} />
           
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />

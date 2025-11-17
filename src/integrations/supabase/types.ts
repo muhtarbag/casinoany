@@ -2111,6 +2111,123 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bonus_tracking: {
+        Row: {
+          bonus_amount: number
+          bonus_type: string
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          notes: string | null
+          received_date: string
+          site_id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+          wagering_requirement: string | null
+        }
+        Insert: {
+          bonus_amount: number
+          bonus_type: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          notes?: string | null
+          received_date: string
+          site_id: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+          wagering_requirement?: string | null
+        }
+        Update: {
+          bonus_amount?: number
+          bonus_type?: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          notes?: string | null
+          received_date?: string
+          site_id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          wagering_requirement?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_bonus_tracking_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_bonus_tracking_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_complaints: {
+        Row: {
+          admin_response: string | null
+          complaint_type: string
+          created_at: string | null
+          description: string
+          id: string
+          resolved_at: string | null
+          site_id: string
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          complaint_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          resolved_at?: string | null
+          site_id: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          complaint_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          resolved_at?: string | null
+          site_id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_complaints_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_complaints_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_events: {
         Row: {
           created_at: string
@@ -2153,6 +2270,78 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorite_sites: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          site_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          site_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          site_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorite_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_favorite_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_notification_preferences: {
+        Row: {
+          bonus_alerts: boolean | null
+          complaint_updates: boolean | null
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          site_updates: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bonus_alerts?: boolean | null
+          complaint_updates?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          site_updates?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bonus_alerts?: boolean | null
+          complaint_updates?: boolean | null
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          site_updates?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           approved_at: string | null
@@ -2182,6 +2371,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_site_memberships: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          registration_date: string | null
+          site_id: string
+          updated_at: string | null
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          registration_date?: string | null
+          site_id: string
+          updated_at?: string | null
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          registration_date?: string | null
+          site_id?: string
+          updated_at?: string | null
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_site_memberships_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_site_memberships_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
