@@ -242,7 +242,7 @@ export default function Dashboard() {
           </Link>
 
           {/* Secondary Stats Grid - Mobile: 2x2, Desktop: 4 columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {secondaryActions.map((action) => (
               <Link key={action.href} to={action.href}>
                 <Card className={cn(
@@ -268,9 +268,9 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Actions List - Better for Mobile Scrolling */}
-          <div className="space-y-3 md:hidden">
+          <div className="space-y-4 md:hidden">
             <h2 className="text-base font-semibold px-1">Hızlı Erişim</h2>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {quickActions.map((action) => (
                 <Link key={action.href} to={action.href}>
                   <Card className={cn(
