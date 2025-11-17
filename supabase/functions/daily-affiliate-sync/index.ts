@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+import { handleError, logError, createSuccessResponse } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,8 +42,17 @@ Deno.cron("Daily Affiliate Metrics Sync", "0 2 * * *", async () => {
     });
     
   } catch (error) {
-    console.error('❌ Cron job error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    
+    // Structured error logging
+    await logError(supabaseAdmin, err, {
+      functionName: 'daily-affiliate-sync',
+      operation: 'cron',
+      metadata: { 
+        cronSchedule: '0 2 * * *',
+        timestamp: new Date().toISOString()
+      }
+    });
     
     // Log error metric
     await supabaseAdmin.rpc('record_health_metric', {
@@ -52,7 +62,7 @@ Deno.cron("Daily Affiliate Metrics Sync", "0 2 * * *", async () => {
       p_status: 'error',
       p_metadata: { 
         timestamp: new Date().toISOString(),
-        error: errorMessage 
+        error: err.message 
       }
     });
   }
@@ -82,20 +92,22 @@ Deno.serve(async (req) => {
     
     if (error) throw error;
     
-    return new Response(
-      JSON.stringify({ success: true, message: 'Affiliate metrics synced successfully' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    return createSuccessResponse(
+      { message: 'Affiliate metrics synced successfully' },
+      corsHeaders
     );
     
   } catch (error) {
-    console.error('❌ Manual sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    
+    return handleError(supabaseAdmin, err, {
+      functionName: 'daily-affiliate-sync',
+      operation: 'manual-trigger',
+    }, corsHeaders);
   }
 });

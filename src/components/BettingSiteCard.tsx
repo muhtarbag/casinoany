@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/hooks/useFavorites';
+import { usePrefetchSiteDetail } from '@/hooks/usePrefetchRoute';
 import { cn } from '@/lib/utils';
 
 // Helper function to generate consistent random number from site ID
@@ -121,9 +122,12 @@ const BettingSiteCardComponent = ({
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
-      queryClient.invalidateQueries({ queryKey: ['site-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['featured-sites'] });
+      // ✅ OPTIMIZED: Specific cache invalidation
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: ['site-stats', id] });
+      }
+      // Only invalidate lists that show click counts
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
     },
   });
 
@@ -139,6 +143,9 @@ const BettingSiteCardComponent = ({
     toggleFavorite({ siteId: id, isFavorite });
   };
 
+  // ✅ MEDIUM #3: Route-based prefetching on hover
+  const { prefetch: prefetchSiteDetail, cancelPrefetch } = usePrefetchSiteDetail(slug);
+
   const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     handleToggleFavorite();
@@ -151,6 +158,16 @@ const BettingSiteCardComponent = ({
       navigate(`/site/${id}`);
     }
   }, [slug, id, navigate]);
+
+  const handleCardHover = useCallback(() => {
+    // Prefetch site detail when user hovers over card
+    prefetchSiteDetail();
+  }, [prefetchSiteDetail]);
+
+  const handleCardLeave = useCallback(() => {
+    // Cancel prefetch if user leaves before delay
+    cancelPrefetch();
+  }, [cancelPrefetch]);
 
   const handleAffiliateClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -172,6 +189,8 @@ const BettingSiteCardComponent = ({
     <Card 
       className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer"
       onClick={handleCardClick}
+      onMouseEnter={handleCardHover}
+      onMouseLeave={handleCardLeave}
       role="article"
       aria-label={`${name} - Bahis sitesi kartı`}
     >
