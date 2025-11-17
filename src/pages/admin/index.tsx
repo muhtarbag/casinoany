@@ -13,10 +13,10 @@ export default function AdminRoot() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Auth check
+  // Auth check with proper redirect
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
-      navigate('/');
+      navigate('/', { replace: true });
       showErrorToast(new Error('Unauthorized'), 'Bu sayfaya erişim yetkiniz yok.');
     }
   }, [user, isAdmin, authLoading, navigate]);
