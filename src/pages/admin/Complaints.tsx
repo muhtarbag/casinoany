@@ -128,11 +128,16 @@ export default function AdminComplaints() {
 
   const addResponseMutation = useMutation({
     mutationFn: async (text: string) => {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error('Oturum bilgisi alınamadı');
+      if (!user) throw new Error('Oturum açmanız gerekiyor');
+      
       const { error } = await supabase
         .from('complaint_responses')
         .insert({
           complaint_id: selectedComplaint.id,
-          user_id: (await supabase.auth.getUser()).data.user!.id,
+          user_id: user.id,
           response_text: text,
           is_official: true,
         });

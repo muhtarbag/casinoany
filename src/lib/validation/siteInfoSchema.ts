@@ -1,25 +1,15 @@
 import { z } from 'zod';
-
-// URL validation helper
-const urlSchema = z.string().url({ message: 'Geçerli bir URL giriniz' }).or(z.literal(''));
+import { createSocialUrlSchema, safeTextSchema } from './common';
 
 // Social media URL validation with domain check
-const socialUrlSchema = (domain: string) => 
-  z.string()
-    .optional()
-    .refine(
-      (val) => !val || val === '' || val.includes(domain) || !val.includes('http'),
-      { message: `Geçerli bir ${domain} linki giriniz` }
-    );
+const socialUrlSchema = (platform: string, domain: string) => createSocialUrlSchema(platform, domain);
 
 export const siteBasicInfoSchema = z.object({
-  bonus: z.string()
-    .trim()
-    .min(1, { message: 'Bonus bilgisi gereklidir' })
-    .max(500, { message: 'Bonus bilgisi en fazla 500 karakter olabilir' }),
+  bonus: safeTextSchema(1, 500, 'Bonus bilgisi'),
   
-  features: z.array(z.string().trim().max(100, { message: 'Özellik en fazla 100 karakter olabilir' }))
-    .max(20, { message: 'En fazla 20 özellik ekleyebilirsiniz' }),
+  features: z.array(
+    safeTextSchema(1, 100, 'Özellik')
+  ).max(20, { message: 'En fazla 20 özellik ekleyebilirsiniz' }),
   
   email: z.string()
     .trim()
@@ -34,16 +24,16 @@ export const siteBasicInfoSchema = z.object({
     .optional()
     .or(z.literal('')),
   
-  telegram: socialUrlSchema('t.me'),
+  telegram: socialUrlSchema('Telegram', 't.me'),
   
-  twitter: socialUrlSchema('twitter.com')
-    .or(socialUrlSchema('x.com')),
+  twitter: socialUrlSchema('Twitter/X', 'twitter.com')
+    .or(socialUrlSchema('Twitter/X', 'x.com')),
   
-  instagram: socialUrlSchema('instagram.com'),
+  instagram: socialUrlSchema('Instagram', 'instagram.com'),
   
-  facebook: socialUrlSchema('facebook.com'),
+  facebook: socialUrlSchema('Facebook', 'facebook.com'),
   
-  youtube: socialUrlSchema('youtube.com'),
+  youtube: socialUrlSchema('YouTube', 'youtube.com'),
 });
 
 export type SiteBasicInfoFormData = z.infer<typeof siteBasicInfoSchema>;

@@ -107,7 +107,10 @@ export function RoleManagement() {
   // Approve user mutation
   const approveUserMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error('Oturum bilgisi alınamadı');
+      if (!user) throw new Error('Oturum açmanız gerekiyor');
       
       const { error } = await supabase
         .from('user_roles')
@@ -115,7 +118,7 @@ export function RoleManagement() {
           status: 'approved',
           role: role as any,
           approved_at: new Date().toISOString(),
-          approved_by: user?.id
+          approved_by: user.id
         })
         .eq('user_id', userId);
       
@@ -135,14 +138,17 @@ export function RoleManagement() {
   // Reject user mutation
   const rejectUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error('Oturum bilgisi alınamadı');
+      if (!user) throw new Error('Oturum açmanız gerekiyor');
       
       const { error } = await supabase
         .from('user_roles')
         .update({ 
           status: 'rejected',
           approved_at: new Date().toISOString(),
-          approved_by: user?.id
+          approved_by: user.id
         })
         .eq('user_id', userId);
       

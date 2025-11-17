@@ -153,7 +153,14 @@ const Signup = () => {
       return;
     }
 
-    const { data: { user: newUser } } = await supabase.auth.getUser();
+    const { data: { user: newUser }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      toast({ title: 'Hata', description: 'Kullanıcı bilgisi alınamadı', variant: 'destructive' });
+      setLoading(false);
+      return;
+    }
+    
     if (userType === 'site_owner' && newUser) {
       const ownerData: any = {
         user_id: newUser.id,
