@@ -271,23 +271,21 @@ export default function Complaints() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground mb-4">{complaint.description}</p>
-                    {complaint.response_count > 0 && (
-                      <div className="bg-muted/50 p-4 rounded-lg mb-4">
-                        <p className="font-semibold mb-2">
-                          {complaint.response_count} cevap var
-                        </p>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => navigate(`/sikayetler/${complaint.id}`)}
-                        >
-                          Cevapları Görüntüle
-                        </Button>
-                      </div>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(complaint.created_at), 'dd MMMM yyyy, HH:mm', { locale: tr })}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(complaint.created_at), 'dd MMMM yyyy, HH:mm', { locale: tr })}
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate(`/sikayetler/${complaint.id}`)}
+                      >
+                        {complaint.response_count > 0 
+                          ? `${complaint.response_count} Cevap Görüntüle` 
+                          : 'Detayları Görüntüle'
+                        }
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
