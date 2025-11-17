@@ -9,16 +9,21 @@ import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 
 export const PixelGrid = () => {
-  const { data: sites, isLoading } = useQuery({
+  const { data: sites, isLoading, error, isFetching } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
+      console.log('🔥 FETCHING betting-sites-active...');
       const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ ERROR fetching sites:', error);
+        throw error;
+      }
+      console.log('✅ FETCHED sites:', data?.length, 'sites');
       return data;
     },
     // ✅ BALANCE: Cache but allow initial load
@@ -27,6 +32,8 @@ export const PixelGrid = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: true, // CRITICAL: Must fetch on first mount
   });
+
+  console.log('🔍 PixelGrid status:', { isLoading, isFetching, hasData: !!sites, sitesCount: sites?.length, error });
 
   const { data: banners } = useQuery({
     queryKey: ['site-banners-home'],
