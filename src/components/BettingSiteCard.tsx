@@ -1,14 +1,16 @@
 import { memo, useState, useEffect, useCallback, useMemo } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from 'lucide-react';
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Heart } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { OptimizedImage } from '@/components/OptimizedImage';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 // Helper function to generate consistent random number from site ID
 const getRandomBaseFromId = (id: string | undefined, min: number, max: number): number => {
@@ -71,11 +73,30 @@ const BettingSiteCardComponent = ({
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const showFallback = !logo || !logoUrl || imageError;
+
+  // Check if site is in favorites
+  const { data: isFavorite, isLoading: isFavoriteLoading } = useQuery({
+    queryKey: ['is-favorite', id, user?.id],
+    queryFn: async () => {
+      if (!user || !id) return false;
+      const { data, error } = await supabase
+        .from('user_favorite_sites')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('site_id', id)
+        .maybeSingle();
+      
+      if (error) return false;
+      return !!data;
+    },
+    enabled: !!user && !!id,
+  });
 
 
   useEffect(() => {
@@ -124,6 +145,58 @@ const BettingSiteCardComponent = ({
     },
   });
 
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      
+      if (!id) return;
+
+      if (isFavorite) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from('user_favorite_sites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('site_id', id);
+        
+        if (error) throw error;
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from('user_favorite_sites')
+          .insert({
+            user_id: user.id,
+            site_id: id,
+          });
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['is-favorite', id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
+      toast({
+        title: isFavorite ? 'Favorilerden çıkarıldı' : 'Favorilere eklendi',
+        description: isFavorite ? `${name} favorilerden kaldırıldı` : `${name} favorilere eklendi`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Bir hata oluştu',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavoriteMutation.mutate();
+  }, [toggleFavoriteMutation]);
+
   const handleCardClick = useCallback(() => {
     if (slug) {
       navigate(`/${slug}`);
@@ -153,7 +226,29 @@ const BettingSiteCardComponent = ({
       className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer"
       onClick={handleCardClick}
     >
-      <CardHeader className="space-y-4 p-6">
+      <CardHeader className="space-y-4 p-6 relative">
+        {/* Favorite Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "absolute top-4 right-4 z-10 rounded-full transition-all duration-200",
+            "hover:scale-110 active:scale-95",
+            isFavorite 
+              ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" 
+              : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+          )}
+          onClick={handleFavoriteClick}
+          disabled={toggleFavoriteMutation.isPending || isFavoriteLoading}
+        >
+          <Heart 
+            className={cn(
+              "h-5 w-5 transition-all",
+              isFavorite && "fill-current"
+            )} 
+          />
+        </Button>
+
         <div className="flex items-start justify-between gap-4">
           <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm relative">
             {/* Loading Skeleton */}
