@@ -21,6 +21,11 @@ export const PixelGrid = () => {
       if (error) throw error;
       return data;
     },
+    // ✅ FIX: Add cache settings to prevent unnecessary refetches
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const { data: banners } = useQuery({
@@ -37,6 +42,11 @@ export const PixelGrid = () => {
       if (error) throw error;
       return data;
     },
+    // ✅ FIX: Add cache settings for banners
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   if (isLoading) {
