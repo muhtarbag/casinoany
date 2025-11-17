@@ -9,10 +9,18 @@ import { SEO } from '@/components/SEO';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, isSiteOwner } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect site owners to their management panel
+  useEffect(() => {
+    if (isSiteOwner) {
+      navigate('/panel/site-management', { replace: true });
+    }
+  }, [isSiteOwner, navigate]);
 
   // Fetch user stats
   const { data: stats } = useQuery({
