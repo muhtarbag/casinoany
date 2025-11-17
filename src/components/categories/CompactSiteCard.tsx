@@ -1,8 +1,8 @@
+import { memo, useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Gift, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CompactSiteCardProps {
@@ -19,10 +19,25 @@ interface CompactSiteCardProps {
   };
 }
 
-export function CompactSiteCard({ site }: CompactSiteCardProps) {
+export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
   const showFallback = !site.logo_url || imageError;
+  
+  const handleImageLoad = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+  
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+    setIsLoading(false);
+  }, []);
+  
+  const displayRating = useMemo(() => 
+    (site.avg_rating || site.rating || 0).toFixed(1),
+    [site.avg_rating, site.rating]
+  );
 
   return (
     <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 active:scale-95">
@@ -45,11 +60,8 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
                 "max-h-full max-w-full object-contain transition-opacity duration-300",
                 isLoading ? "opacity-0" : "opacity-100 animate-fade-in"
               )}
-              onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setImageError(true);
-                setIsLoading(false);
-              }}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
               loading="lazy"
             />
           ) : (
@@ -73,7 +85,7 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
               <div className="flex items-center gap-1.5 text-primary">
                 <Star className="w-4 h-4 sm:w-3.5 sm:h-3.5 fill-primary" />
                 <span className="font-bold text-base sm:text-sm">
-                  {(site.avg_rating || site.rating).toFixed(1)}
+                  {displayRating}
                 </span>
               </div>
               {site.review_count > 0 && (
@@ -122,4 +134,6 @@ export function CompactSiteCard({ site }: CompactSiteCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
+
+CompactSiteCard.displayName = 'CompactSiteCard';
