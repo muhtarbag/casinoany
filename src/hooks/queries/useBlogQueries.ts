@@ -48,9 +48,10 @@ export const useBlogPost = (slug: string) => {
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
-        .single();
+        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
 
       if (error) throw error;
+      if (!data) throw new Error('Blog post not found');
       return data;
     },
     staleTime: CACHE_TIMES.LONG,

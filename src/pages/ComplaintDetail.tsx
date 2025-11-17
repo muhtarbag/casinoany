@@ -35,9 +35,10 @@ const ComplaintDetail = () => {
           betting_sites (name, slug, logo_url)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
       
       if (error) throw error;
+      if (!data) throw new Error('Complaint not found');
       return data;
     },
   });

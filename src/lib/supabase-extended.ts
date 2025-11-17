@@ -30,7 +30,7 @@ export const TypedDB = {
       .select('*')
       .eq('slug', slug)
       .eq('is_active', true)
-      .single(),
+      .maybeSingle(), // ✅ FIX: Use maybeSingle to prevent crash
   
   bettingSiteWithStats: (siteId: string) =>
     supabase.from('betting_sites')
@@ -41,7 +41,7 @@ export const TypedDB = {
         social:betting_sites_social(*)
       `)
       .eq('id', siteId)
-      .single(),
+      .maybeSingle(), // ✅ FIX: Use maybeSingle
 
   // ===== BLOG =====
   blogPosts: () => supabase.from('blog_posts').select('*'),
@@ -58,7 +58,7 @@ export const TypedDB = {
         category:categories(*)
       `)
       .eq('id', postId)
-      .single(),
+      .maybeSingle(), // ✅ FIX: Use maybeSingle
   
   blogComments: (postId: string) =>
     supabase.from('blog_comments')
@@ -122,7 +122,7 @@ export const TypedDB = {
       .select('*')
       .eq('slug', slug)
       .eq('is_published', true)
-      .single(),
+      .maybeSingle(), // ✅ FIX: Use maybeSingle
   
   // ===== SITE STATS =====
   siteStats: (siteIds: string[]) =>
