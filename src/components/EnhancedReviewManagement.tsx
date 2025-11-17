@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Check, X, Trash2 } from "lucide-react";
 import { EnhancedTablePagination } from "@/components/table/EnhancedTablePagination";
 import { EnhancedTableToolbar } from "@/components/table/EnhancedTableToolbar";
-import { AIGenerationPanel } from "@/components/reviews/AIGenerationPanel";
+
 import { SiteStatsGrid } from "@/components/reviews/SiteStatsGrid";
 import { ReviewEditDialog } from "@/components/reviews/ReviewEditDialog";
 import { ReviewDeleteDialog } from "@/components/reviews/ReviewDeleteDialog";
@@ -88,8 +88,6 @@ export default function EnhancedReviewManagement() {
   const [pageSize, setPageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
   
-  // AI Generation States
-  const [isAiLoading, setIsAiLoading] = useState(false);
   
   // Bulk actions
   const [selectedReviews, setSelectedReviews] = useState<Set<string>>(new Set());
@@ -414,68 +412,6 @@ export default function EnhancedReviewManagement() {
     }
   }, [selectedReviews, queryClient]);
 
-  // AI Generation Handler
-  const handleAiGenerate = useCallback(async (params: {
-    siteId: string;
-    count: string;
-    tone: "positive" | "negative" | "neutral";
-    ratingMin: string;
-    ratingMax: string;
-    language: "tr" | "en";
-    autoPublish: boolean;
-  }) => {
-    if (!params.siteId) {
-      toast.error("Lütfen bir site seçin");
-      return;
-    }
-
-    setIsAiLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-reviews-info', {
-        body: {
-          siteId: params.siteId,
-          count: parseInt(params.count),
-          tone: params.tone,
-          ratingRange: { min: parseInt(params.ratingMin), max: parseInt(params.ratingMax) },
-          language: params.language
-        }
-      });
-
-      if (error) throw error;
-
-      const reviews = data.reviews;
-      if (!reviews || reviews.length === 0) {
-        throw new Error('AI yorumlar oluşturulamadı');
-      }
-
-      const reviewsToInsert = reviews.map((review: any) => ({
-        site_id: params.siteId,
-        name: review.name,
-        rating: review.rating,
-        title: review.title,
-        comment: review.comment,
-        is_approved: params.autoPublish,
-        user_id: null,
-        email: null
-      }));
-
-      const { error: insertError } = await supabase
-        .from('site_reviews')
-        .insert(reviewsToInsert);
-
-      if (insertError) throw insertError;
-
-      const message = params.autoPublish 
-        ? `${reviews.length} yorum başarıyla oluşturuldu ve yayınlandı`
-        : `${reviews.length} yorum başarıyla oluşturuldu ve onay için eklendi`;
-      toast.success(message);
-      queryClient.invalidateQueries({ queryKey: ["enhanced-reviews"] });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Yorumlar oluşturulurken hata oluştu');
-    } finally {
-      setIsAiLoading(false);
-    }
-  }, [queryClient]);
 
   // Handle export
   const handleExport = useCallback(() => {
@@ -539,13 +475,6 @@ export default function EnhancedReviewManagement() {
 
   return (
     <div className="space-y-6">
-      {/* AI Review Generation Section */}
-      <AIGenerationPanel
-        sites={sites}
-        isLoading={isAiLoading}
-        onGenerate={handleAiGenerate}
-      />
-
       {/* Site Statistics */}
       <SiteStatsGrid stats={siteStats} maxItems={6} />
 
