@@ -125,6 +125,7 @@ const SiteManagement = () => {
             siteId={siteData.id}
             siteName={siteData.name}
             siteData={siteData}
+            onNavigate={setActiveTab}
           />
         );
       case 'site-info':
@@ -156,6 +157,7 @@ const SiteManagement = () => {
             siteId={siteData.id}
             siteName={siteData.name}
             siteData={siteData}
+            onNavigate={setActiveTab}
           />
         );
     }
