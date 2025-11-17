@@ -1,4 +1,4 @@
-import { ExternalLink, Star } from 'lucide-react';
+import { ExternalLink, Star, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,9 @@ interface SiteDetailHeaderProps {
   averageRating: string;
   reviewCount: number;
   onAffiliateClick: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  favoriteLoading?: boolean;
 }
 
 export const SiteDetailHeader = ({
@@ -16,7 +19,10 @@ export const SiteDetailHeader = ({
   logoUrl,
   averageRating,
   reviewCount,
-  onAffiliateClick
+  onAffiliateClick,
+  isFavorite = false,
+  onToggleFavorite,
+  favoriteLoading = false
 }: SiteDetailHeaderProps) => {
   return (
     <Card className="shadow-xl border-primary/20">
@@ -74,17 +80,38 @@ export const SiteDetailHeader = ({
               </div>
             )}
             
-            <Button 
-              size="lg" 
-              className="w-full md:w-auto bg-gradient-secondary text-lg font-bold relative overflow-hidden group transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(234,179,8,0.4)]"
-              onClick={onAffiliateClick}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-              <span className="relative z-10 flex items-center gap-2">
-                Bonusu Hemen Al 
-                <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </span>
-            </Button>
+            <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+              <Button 
+                size="lg" 
+                className="flex-1 md:flex-none bg-gradient-secondary text-lg font-bold relative overflow-hidden group transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(234,179,8,0.4)]"
+                onClick={onAffiliateClick}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                <span className="relative z-10 flex items-center gap-2">
+                  Bonusu Hemen Al 
+                  <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
+              </Button>
+              
+              {onToggleFavorite && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full md:w-auto border-2 hover:border-primary transition-all duration-300"
+                  onClick={onToggleFavorite}
+                  disabled={favoriteLoading}
+                >
+                  <Heart 
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      isFavorite 
+                        ? 'fill-red-500 text-red-500' 
+                        : 'text-foreground/70 hover:text-red-500'
+                    }`}
+                  />
+                  <span className="ml-2">{isFavorite ? 'Favorilerde' : 'Favoriye Ekle'}</span>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
