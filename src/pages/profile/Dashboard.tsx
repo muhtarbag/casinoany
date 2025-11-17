@@ -12,15 +12,15 @@ import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const { user, isSiteOwner } = useAuth();
+  const { user, isSiteOwner, loading } = useAuth();
   const navigate = useNavigate();
 
   // Redirect site owners to their management panel
   useEffect(() => {
-    if (isSiteOwner) {
+    if (!loading && isSiteOwner) {
       navigate('/panel/site-management', { replace: true });
     }
-  }, [isSiteOwner, navigate]);
+  }, [isSiteOwner, loading, navigate]);
 
   // Fetch user stats
   const { data: stats } = useQuery({
@@ -46,6 +46,19 @@ export default function Dashboard() {
     },
     enabled: !!user
   });
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">Yükleniyor...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

@@ -103,6 +103,17 @@ const Users = () => {
         .eq('id', userId)
         .eq('user_type', 'corporate');
       if (profileError) throw profileError;
+
+      // site_owners tablosundaki kaydı da onayla
+      const { error: siteOwnerError } = await (supabase as any)
+        .from('site_owners')
+        .update({ 
+          status: 'approved',
+          approved_at: new Date().toISOString(),
+          approved_by: (await supabase.auth.getUser()).data.user?.id
+        })
+        .eq('user_id', userId);
+      if (siteOwnerError) throw siteOwnerError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
