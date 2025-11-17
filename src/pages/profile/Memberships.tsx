@@ -38,9 +38,8 @@ const Memberships = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSiteId, setSelectedSiteId] = useState('');
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [notes, setNotes] = useState('');
-  const [registeredAt, setRegisteredAt] = useState(new Date().toISOString().split('T')[0]);
+  const [registrationDate, setRegistrationDate] = useState(new Date().toISOString().split('T')[0]);
 
   const { data: memberships, isLoading } = useQuery({
     queryKey: ['user-memberships', user?.id],
@@ -58,7 +57,7 @@ const Memberships = () => {
           )
         `)
         .eq('user_id', user.id)
-        .order('registered_at', { ascending: false });
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data;
@@ -83,8 +82,8 @@ const Memberships = () => {
 
   const addMembershipMutation = useMutation({
     mutationFn: async () => {
-      if (!user || !selectedSiteId) {
-        throw new Error('Kullanıcı veya site seçilmedi');
+      if (!user || !selectedSiteId || !username.trim()) {
+        throw new Error('Kullanıcı, site veya kullanıcı adı eksik');
       }
 
       const { error } = await (supabase as any)
@@ -92,10 +91,9 @@ const Memberships = () => {
         .insert({
           user_id: user.id,
           site_id: selectedSiteId,
-          username: username || null,
-          password: password || null,
-          notes: notes || null,
-          registered_at: registeredAt,
+          username: username.trim(),
+          notes: notes.trim() || null,
+          registration_date: registrationDate,
           is_active: true,
         });
       
@@ -106,18 +104,18 @@ const Memberships = () => {
       setIsDialogOpen(false);
       setSelectedSiteId('');
       setUsername('');
-      setPassword('');
       setNotes('');
-      setRegisteredAt(new Date().toISOString().split('T')[0]);
+      setRegistrationDate(new Date().toISOString().split('T')[0]);
       toast({
         title: 'Başarılı',
         description: 'Site kaydınız eklendi',
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Add membership error:', error);
       toast({
         title: 'Hata',
-        description: 'Site eklenirken bir hata oluştu',
+        description: error.message || 'Site eklenirken bir hata oluştu',
         variant: 'destructive',
       });
     },
@@ -226,33 +224,23 @@ const Memberships = () => {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="username">Kullanıcı Adı</Label>
+                  <Label htmlFor="username">Kullanıcı Adı *</Label>
                   <Input
                     id="username"
-                    placeholder="Opsiyonel"
+                    placeholder="Sitedeki kullanıcı adınız"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    required
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Şifre</Label>
+                  <Label htmlFor="registration-date">Kayıt Tarihi</Label>
                   <Input
-                    id="password"
-                    type="password"
-                    placeholder="Opsiyonel"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="registered-at">Kayıt Tarihi</Label>
-                  <Input
-                    id="registered-at"
+                    id="registration-date"
                     type="date"
-                    value={registeredAt}
-                    onChange={(e) => setRegisteredAt(e.target.value)}
+                    value={registrationDate}
+                    onChange={(e) => setRegistrationDate(e.target.value)}
                   />
                 </div>
 
@@ -278,7 +266,7 @@ const Memberships = () => {
                 </Button>
                 <Button
                   onClick={() => addMembershipMutation.mutate()}
-                  disabled={!selectedSiteId || addMembershipMutation.isPending}
+                  disabled={!selectedSiteId || !username.trim() || addMembershipMutation.isPending}
                 >
                   {addMembershipMutation.isPending ? 'Ekleniyor...' : 'Kaydet'}
                 </Button>
@@ -328,7 +316,7 @@ const Memberships = () => {
                       </div>
                       
                       <p className="text-sm text-muted-foreground mb-3">
-                        Kayıt tarihi: {format(new Date(membership.registered_at), 'dd MMMM yyyy', { locale: tr })}
+                        Kayıt tarihi: {membership.registration_date ? format(new Date(membership.registration_date), 'dd MMMM yyyy', { locale: tr }) : 'Belirtilmemiş'}
                       </p>
 
                       {membership.notes && (
