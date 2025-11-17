@@ -11,6 +11,8 @@ import { SiteContentEditor } from '@/components/panel/SiteContentEditor';
 import { SiteComplaintsManager } from '@/components/panel/SiteComplaintsManager';
 import { SiteBasicInfoEditor } from '@/components/panel/SiteBasicInfoEditor';
 import { SiteReportsExport } from '@/components/panel/SiteReportsExport';
+import { NotificationCenter } from '@/components/panel/NotificationCenter';
+import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
 
 const SiteManagement = () => {
   const { user, isSiteOwner, ownedSites } = useAuth();
@@ -194,7 +196,7 @@ const SiteManagement = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
             <TabsTrigger value="settings">Site Yönetimi</TabsTrigger>
             <TabsTrigger value="content">İçerik Düzenleme</TabsTrigger>
@@ -202,6 +204,8 @@ const SiteManagement = () => {
               Şikayetler {siteData.complaintsCount > 0 && `(${siteData.complaintsCount})`}
             </TabsTrigger>
             <TabsTrigger value="stats">İstatistikler</TabsTrigger>
+            <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
+            <TabsTrigger value="feedback">Geri Bildirimler</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -233,6 +237,14 @@ const SiteManagement = () => {
               siteName={siteData.name}
               siteData={siteData}
             />
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-4">
+            <NotificationCenter siteId={siteData.id} />
+          </TabsContent>
+
+          <TabsContent value="feedback" className="space-y-4">
+            <UserFeedbackManager siteId={siteData.id} />
           </TabsContent>
         </Tabs>
       </div>
