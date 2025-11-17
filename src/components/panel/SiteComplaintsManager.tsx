@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, MessageSquare, Send, Filter, Search, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Loader2, MessageSquare, Send, Filter, Search, AlertCircle, CheckCircle2, Clock, Inbox } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import {
@@ -20,6 +20,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AdvancedSearch, SearchQuery } from './filters/AdvancedSearch';
+import { EnhancedEmptyState } from './EnhancedEmptyState';
+import { LoadingState } from '@/components/admin/LoadingState';
 
 interface SiteComplaintsManagerProps {
   siteId: string;
@@ -95,14 +97,6 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
-
   // Filter complaints
   const filteredComplaints = complaints?.filter((complaint) => {
     const matchesSearch = 
@@ -111,6 +105,21 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
     const matchesStatus = !searchQuery.status || searchQuery.status === 'all' || complaint.status === searchQuery.status;
     return matchesSearch && matchesStatus;
   });
+
+  if (isLoading) {
+    return <LoadingState variant="spinner" text="Şikayetler yükleniyor..." />;
+  }
+
+  if (!filteredComplaints || filteredComplaints.length === 0) {
+    return (
+      <EnhancedEmptyState
+        icon={Inbox}
+        title="Henüz şikayet yok"
+        description="Siteniz hakkında henüz şikayet bulunmuyor. Müşteri memnuniyeti için çalışmaya devam edin!"
+        variant="centered"
+      />
+    );
+  }
 
   // Calculate stats
   const stats = {
