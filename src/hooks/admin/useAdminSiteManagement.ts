@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
@@ -10,10 +10,26 @@ export const useAdminSiteManagement = () => {
   const queryClient = useQueryClient();
   const logChange = useLogChange();
   const [state, dispatch] = useReducer(adminSiteManagementReducer, createInitialState());
+  
+  // ✅ FIX: Cancellation flag to prevent memory leaks on unmount
+  const isCancelledRef = useRef(false);
+  
+  // ✅ Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isCancelledRef.current = true;
+    };
+  }, []);
 
-  // Logo optimization
+  // ✅ FIXED: Memory leak prevention with cancellation support
   const optimizeLogo = (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
+      // Early cancellation check
+      if (isCancelledRef.current) {
+        reject(new Error('Operation cancelled'));
+        return;
+      }
+      
       const validation = validateLogoFile(file);
       if (validation) {
         reject(new Error(validation));
@@ -27,14 +43,33 @@ export const useAdminSiteManagement = () => {
 
       const objectUrl = URL.createObjectURL(file);
       const img = new Image();
+      let canvas: HTMLCanvasElement | null = null;
+      
+      const cleanup = () => {
+        URL.revokeObjectURL(objectUrl);
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+          canvas.width = 0;
+          canvas.height = 0;
+          canvas = null;
+        }
+      };
       
       img.onload = () => {
-        // 🔧 Memory leak fix: cleanup object URL
-        URL.revokeObjectURL(objectUrl);
+        // Check cancellation before processing
+        if (isCancelledRef.current) {
+          cleanup();
+          reject(new Error('Operation cancelled'));
+          return;
+        }
 
-        const canvas = document.createElement('canvas');
+        canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
+          cleanup();
           reject(new Error('Canvas context alınamadı'));
           return;
         }
@@ -55,21 +90,29 @@ export const useAdminSiteManagement = () => {
         ctx.drawImage(img, 0, 0, width, height);
 
         canvas.toBlob((blob) => {
+          // Final cancellation check before resolve
+          if (isCancelledRef.current) {
+            cleanup();
+            reject(new Error('Operation cancelled'));
+            return;
+          }
+          
           if (blob) {
             const optimizedFile = new File([blob], file.name, {
               type: 'image/webp',
               lastModified: Date.now(),
             });
+            cleanup();
             resolve(optimizedFile);
           } else {
+            cleanup();
             reject(new Error('Blob oluşturulamadı'));
           }
         }, 'image/webp', 0.85);
       };
       
       img.onerror = () => {
-        // 🔧 Memory leak fix: cleanup on error too
-        URL.revokeObjectURL(objectUrl);
+        cleanup();
         reject(new Error('Resim yüklenemedi'));
       };
       
