@@ -68,11 +68,7 @@ const SiteManagement = () => {
       if (siteResult.error) throw siteResult.error;
       if (!siteResult.data) throw new Error('Site not found');
       
-      if (favoriteResult.error) console.error('Favorite count error:', favoriteResult.error);
-      if (complaintsResult.error) console.error('Complaints count error:', complaintsResult.error);
-      if (statsResult.error && statsResult.error.code !== 'PGRST116') {
-        console.error('Stats error:', statsResult.error);
-      }
+      // Errors are handled silently as these are optional supplementary data
 
       return {
         ...siteResult.data,

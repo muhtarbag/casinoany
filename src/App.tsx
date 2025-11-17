@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ErrorTrackingProvider } from "@/components/ErrorTrackingProvider";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -218,37 +219,39 @@ const App = () => {
   const queryClient = useMemo(() => createAppQueryClient(), []);
   
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <OfflineIndicator />
-            <PWAInstallPrompt />
-            <Toaster />
-            <Sonner />
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-              }}
-            >
-              <SEOSnippets 
-                includeAnalytics={true}
-                includeGTM={false}
-                includeFacebookPixel={false}
-                includeSchemas={true}
-              />
-              <OptimizedNotificationPopup />
-              <ScrollToTop />
-              <AppContent />
-              <MobileBottomNav />
-            </BrowserRouter>
-            </TooltipProvider>
-          </AuthProvider>
-        </HelmetProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <ErrorTrackingProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <HelmetProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <OfflineIndicator />
+              <PWAInstallPrompt />
+              <Toaster />
+              <Sonner />
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <SEOSnippets 
+                  includeAnalytics={true}
+                  includeGTM={false}
+                  includeFacebookPixel={false}
+                  includeSchemas={true}
+                />
+                <OptimizedNotificationPopup />
+                <ScrollToTop />
+                <AppContent />
+                <MobileBottomNav />
+              </BrowserRouter>
+              </TooltipProvider>
+            </AuthProvider>
+          </HelmetProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </ErrorTrackingProvider>
   );
 };
 

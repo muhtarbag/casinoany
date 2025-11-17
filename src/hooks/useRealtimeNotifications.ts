@@ -36,7 +36,7 @@ export function useRealtimeNotifications({
         (payload) => {
           if (!mounted) return; // ✅ Prevent state update on unmounted component
           
-          console.log('New complaint:', payload);
+          // Realtime complaint notification
           
           queryClientRef.invalidateQueries({ queryKey: ['site-complaints', siteId] });
           queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
@@ -66,7 +66,7 @@ export function useRealtimeNotifications({
         (payload) => {
           if (!mounted) return; // ✅ Prevent state update on unmounted component
           
-          console.log('New review:', payload);
+          // Realtime review notification
           
           queryClientRef.invalidateQueries({ queryKey: ['site-reviews', siteId] });
           queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
@@ -95,7 +95,7 @@ export function useRealtimeNotifications({
         (payload) => {
           if (!mounted) return; // ✅ Prevent state update on unmounted component
           
-          console.log('New complaint response:', payload);
+          // Realtime complaint response notification
           queryClientRef.invalidateQueries({ queryKey: ['site-complaints', siteId] });
         }
       )

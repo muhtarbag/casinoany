@@ -34,7 +34,7 @@ const trackSocialClick = async (siteId: string, platform: string) => {
         });
     }
   } catch (error) {
-    console.error('Error tracking social click:', error);
+    // Silent fail for analytics tracking
   }
 };
 

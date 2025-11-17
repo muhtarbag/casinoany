@@ -24,7 +24,6 @@ export function SitePerformanceSummary() {
   );
 
   const handleSiteClick = (siteId: string, siteName: string, logoUrl: string | null, rating: number | null) => {
-    console.log('Site clicked:', siteId, siteName);
     setSelectedSite({
       id: siteId,
       name: siteName,
@@ -250,7 +249,6 @@ export function SitePerformanceSummary() {
       <SiteAnalyticsDetailDialog
         open={!!selectedSite}
         onOpenChange={(open) => {
-          console.log('Dialog onOpenChange:', open);
           if (!open) setSelectedSite(null);
         }}
         siteId={selectedSite?.id || null}
