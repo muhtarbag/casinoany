@@ -152,7 +152,7 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {menuItems.map((item) => (
             <Link key={item.href} to={item.href}>
               <Card className={cn(
