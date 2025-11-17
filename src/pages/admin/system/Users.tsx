@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -17,69 +17,73 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const Users = () => {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
-  const [isCreatingSiteOwners, setIsCreatingSiteOwners] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
-  const { data: users, isLoading, error: queryError } = useQuery({
+  const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Get all user_roles with proper ordering
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (rolesError) {
-        console.error('Error fetching user_roles:', rolesError);
-        throw rolesError;
-      }
-      
-      if (!roles || roles.length === 0) {
-        console.log('No user roles found');
-        return [];
-      }
+      if (rolesError) throw rolesError;
+      if (!roles || roles.length === 0) return [];
 
-      console.log('Found roles:', roles.length);
-
-      // Get corresponding profiles
       const userIds = roles.map(r => r.user_id);
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .in('id', userIds);
       
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        throw profilesError;
-      }
+      if (profilesError) throw profilesError;
 
-      console.log('Found profiles:', profiles?.length || 0);
-
-      // Merge data
-      const merged = roles.map(role => {
+      return roles.map(role => {
         const profile = profiles?.find(p => p.id === role.user_id);
         return {
           ...role,
-          profiles: profile || {
+          profile: profile || {
             email: 'Bilinmiyor',
+            user_type: 'individual' as const,
             first_name: null,
             last_name: null,
             username: null,
-            created_at: role.created_at
+            created_at: role.created_at,
+            is_verified: false
           }
         };
       });
-
-      console.log('Merged users:', merged);
-      return merged;
     },
     enabled: isAdmin,
-    retry: 1,
+  });
+
+  const verifyMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_verified: true })
+        .eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setSelectedUser(null);
+      toast({ title: 'Başarılı', description: 'Kurumsal kullanıcı doğrulandı' });
+    },
   });
 
   const approveMutation = useMutation({
@@ -88,22 +92,11 @@ const Users = () => {
         .from('user_roles')
         .update({ status: 'approved' })
         .eq('user_id', userId);
-      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({
-        title: 'Başarılı',
-        description: 'Kullanıcı onaylandı',
-      });
-    },
-    onError: () => {
-      toast({
-        title: 'Hata',
-        description: 'İşlem sırasında bir hata oluştu',
-        variant: 'destructive',
-      });
+      toast({ title: 'Başarılı', description: 'Kullanıcı onaylandı' });
     },
   });
 
@@ -113,15 +106,11 @@ const Users = () => {
         .from('user_roles')
         .update({ status: 'rejected' })
         .eq('user_id', userId);
-      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({
-        title: 'Başarılı',
-        description: 'Kullanıcı reddedildi',
-      });
+      toast({ title: 'Başarılı', description: 'Kullanıcı reddedildi' });
     },
   });
 
@@ -131,45 +120,13 @@ const Users = () => {
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
-      
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({
-        title: 'Başarılı',
-        description: 'Kullanıcı silindi',
-      });
+      toast({ title: 'Başarılı', description: 'Kullanıcı silindi' });
     },
   });
-
-  const createSiteOwners = async () => {
-    setIsCreatingSiteOwners(true);
-    try {
-      const response = await supabase.functions.invoke('create-site-owners', {
-        method: 'POST'
-      });
-
-      if (response.error) throw response.error;
-
-      const result = response.data;
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      
-      toast({
-        title: 'Başarılı',
-        description: `${result.successCount} kurumsal kullanıcı oluşturuldu`,
-      });
-    } catch (error) {
-      console.error('Error creating site owners:', error);
-      toast({
-        title: 'Hata',
-        description: 'Kurumsal kullanıcılar oluşturulurken hata oluştu',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsCreatingSiteOwners(false);
-    }
-  };
 
   if (!isAdmin) {
     return (
@@ -183,32 +140,38 @@ const Users = () => {
     );
   }
 
-  const individualUsers = users?.filter(u => u.role === 'user') || [];
-  const corporateUsers = users?.filter(u => u.role !== 'user' && u.role !== 'admin') || [];
+  const individualUsers = users?.filter(u => u.profile && u.profile.user_type === 'individual') || [];
+  const corporateUsers = users?.filter(u => u.profile && u.profile.user_type === 'corporate') || [];
 
-  const renderUserTable = (userList: typeof users) => (
+  const renderIndividualTable = () => (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Email</TableHead>
           <TableHead>Ad Soyad</TableHead>
           <TableHead>Kullanıcı Adı</TableHead>
+          <TableHead>Rol</TableHead>
           <TableHead>Durum</TableHead>
           <TableHead>Kayıt Tarihi</TableHead>
           <TableHead className="text-right">İşlemler</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {userList && userList.length > 0 ? (
-          userList.map((user: any) => (
+        {individualUsers.length > 0 ? (
+          individualUsers.map((user: any) => (
             <TableRow key={user.id}>
-              <TableCell>{user.profiles?.email || '-'}</TableCell>
+              <TableCell>{user.profile?.email || '-'}</TableCell>
               <TableCell>
-                {user.profiles?.first_name && user.profiles?.last_name
-                  ? `${user.profiles.first_name} ${user.profiles.last_name}`
+                {user.profile?.first_name && user.profile?.last_name
+                  ? `${user.profile.first_name} ${user.profile.last_name}`
                   : '-'}
               </TableCell>
-              <TableCell>{user.profiles?.username || '-'}</TableCell>
+              <TableCell>{user.profile?.username || '-'}</TableCell>
+              <TableCell>
+                <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                  {user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderatör' : 'Kullanıcı'}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <Badge
                   variant={
@@ -227,8 +190,8 @@ const Users = () => {
                 </Badge>
               </TableCell>
               <TableCell>
-                {user.profiles?.created_at
-                  ? new Date(user.profiles.created_at).toLocaleDateString('tr-TR')
+                {user.profile?.created_at
+                  ? new Date(user.profile.created_at).toLocaleDateString('tr-TR')
                   : '-'}
               </TableCell>
               <TableCell className="text-right">
@@ -267,8 +230,122 @@ const Users = () => {
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-              Henüz kullanıcı bulunmuyor
+            <TableCell colSpan={7} className="text-center text-muted-foreground">
+              Henüz bireysel kullanıcı bulunmuyor
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+
+  const renderCorporateTable = () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Şirket Adı</TableHead>
+          <TableHead>Vergi No</TableHead>
+          <TableHead>Yetkili Kişi</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Telefon</TableHead>
+          <TableHead>Doğrulama</TableHead>
+          <TableHead>Durum</TableHead>
+          <TableHead className="text-right">İşlemler</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {corporateUsers.length > 0 ? (
+          corporateUsers.map((user: any) => (
+            <TableRow key={user.id}>
+              <TableCell className="font-medium">{user.profile?.company_name || '-'}</TableCell>
+              <TableCell>{user.profile?.company_tax_number || '-'}</TableCell>
+              <TableCell>{user.profile?.company_authorized_person || '-'}</TableCell>
+              <TableCell>{user.profile?.company_email || user.profile?.email || '-'}</TableCell>
+              <TableCell>{user.profile?.company_phone || '-'}</TableCell>
+              <TableCell>
+                <Badge variant={user.profile?.is_verified ? 'default' : 'secondary'}>
+                  {user.profile?.is_verified ? (
+                    <span className="flex items-center gap-1">
+                      <Shield className="w-3 h-3" /> Doğrulandı
+                    </span>
+                  ) : (
+                    'Doğrulanmadı'
+                  )}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge
+                  variant={
+                    user.status === 'approved'
+                      ? 'default'
+                      : user.status === 'rejected'
+                      ? 'destructive'
+                      : 'secondary'
+                  }
+                >
+                  {user.status === 'approved'
+                    ? 'Onaylandı'
+                    : user.status === 'rejected'
+                    ? 'Reddedildi'
+                    : 'Bekliyor'}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    Detay
+                  </Button>
+                  {!user.profile?.is_verified && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => verifyMutation.mutate(user.user_id)}
+                      disabled={verifyMutation.isPending}
+                      title="Kurumsal Kullanıcıyı Doğrula"
+                    >
+                      <Shield className="w-4 h-4" />
+                    </Button>
+                  )}
+                  {user.status === 'pending' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => approveMutation.mutate(user.user_id)}
+                        disabled={approveMutation.isPending}
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => rejectMutation.mutate(user.user_id)}
+                        disabled={rejectMutation.isPending}
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => deleteMutation.mutate(user.user_id)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={8} className="text-center text-muted-foreground">
+              Henüz kurumsal kullanıcı bulunmuyor
             </TableCell>
           </TableRow>
         )}
@@ -279,76 +356,203 @@ const Users = () => {
   return (
     <>
       <SEO 
-        title="Kullanıcı Yönetimi"
-        description="Bireysel ve kurumsal kullanıcıları yönetin"
+        title="Kullanıcı Yönetimi" 
+        description="Sistem kullanıcılarını yönetin"
       />
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Kullanıcı Yönetimi</h1>
-            <p className="text-muted-foreground">
-              Bireysel ve kurumsal kullanıcıları yönetin
-            </p>
-          </div>
-          <Button
-            onClick={createSiteOwners}
-            disabled={isCreatingSiteOwners}
-            variant="default"
-          >
-            {isCreatingSiteOwners ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Oluşturuluyor...
-              </>
-            ) : (
-              'Tüm Siteler İçin Kullanıcı Oluştur'
-            )}
-          </Button>
+
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Kullanıcı Yönetimi</h1>
+          <p className="text-muted-foreground mt-2">
+            Bireysel ve kurumsal kullanıcıları yönetin
+          </p>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        ) : queryError ? (
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-destructive">Hata: {(queryError as Error).message}</p>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Kullanıcı</CardTitle>
+              <User className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{users?.length || 0}</div>
             </CardContent>
           </Card>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="individual">
-                Bireysel Kullanıcılar ({individualUsers.length})
-              </TabsTrigger>
-              <TabsTrigger value="corporate">
-                Kurumsal Kullanıcılar ({corporateUsers.length})
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="individual" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bireysel Kullanıcılar</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {renderUserTable(individualUsers)}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="corporate" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Kurumsal Kullanıcılar (Site Sahipleri)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {renderUserTable(corporateUsers)}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        )}
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Bireysel</CardTitle>
+              <User className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{individualUsers.length}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Kurumsal</CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{corporateUsers.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {corporateUsers.filter(u => u.profile && 'is_verified' in u.profile && u.profile.is_verified).length} doğrulandı
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="individual" className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Bireysel Kullanıcılar
+                    <Badge variant="secondary" className="ml-2">
+                      {individualUsers.length}
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="corporate" className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    Kurumsal Kullanıcılar
+                    <Badge variant="secondary" className="ml-2">
+                      {corporateUsers.length}
+                    </Badge>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="individual" className="mt-6">
+                  {renderIndividualTable()}
+                </TabsContent>
+
+                <TabsContent value="corporate" className="mt-6">
+                  {renderCorporateTable()}
+                </TabsContent>
+              </Tabs>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Corporate User Detail Dialog */}
+      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Kurumsal Kullanıcı Detayları</DialogTitle>
+            <DialogDescription>
+              {selectedUser?.profile?.company_name}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Şirket Adı</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_name || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Vergi Numarası</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_tax_number || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Şirket Tipi</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_type || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Yetkili Kişi</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_authorized_person || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_email || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Telefon</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_phone || '-'}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <label className="text-sm font-medium">Adres</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_address || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Website</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.company_website || '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Kayıt Tarihi</label>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedUser.profile?.created_at 
+                      ? new Date(selectedUser.profile.created_at).toLocaleDateString('tr-TR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                      : '-'}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Doğrulama Durumu</label>
+                  <Badge variant={selectedUser.profile?.is_verified ? 'default' : 'secondary'} className="mt-1">
+                    {selectedUser.profile?.is_verified ? (
+                      <span className="flex items-center gap-1">
+                        <Shield className="w-3 h-3" /> Doğrulandı
+                      </span>
+                    ) : (
+                      'Doğrulanmadı'
+                    )}
+                  </Badge>
+                </div>
+              </div>
+
+              {!selectedUser.profile?.is_verified && (
+                <div className="pt-4 border-t">
+                  <Button
+                    onClick={() => verifyMutation.mutate(selectedUser.user_id)}
+                    disabled={verifyMutation.isPending}
+                    className="w-full"
+                  >
+                    {verifyMutation.isPending ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Doğrulanıyor...</>
+                    ) : (
+                      <><Shield className="w-4 h-4 mr-2" /> Kurumsal Kullanıcıyı Doğrula</>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedUser(null)}>
+              Kapat
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
