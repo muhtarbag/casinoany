@@ -23,6 +23,7 @@ const Users = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
+  const [isCreatingSiteOwners, setIsCreatingSiteOwners] = useState(false);
 
   const { data: users, isLoading, error: queryError } = useQuery({
     queryKey: ['admin-users'],
@@ -142,6 +143,34 @@ const Users = () => {
     },
   });
 
+  const createSiteOwners = async () => {
+    setIsCreatingSiteOwners(true);
+    try {
+      const response = await supabase.functions.invoke('create-site-owners', {
+        method: 'POST'
+      });
+
+      if (response.error) throw response.error;
+
+      const result = response.data;
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      
+      toast({
+        title: 'Başarılı',
+        description: `${result.successCount} kurumsal kullanıcı oluşturuldu`,
+      });
+    } catch (error) {
+      console.error('Error creating site owners:', error);
+      toast({
+        title: 'Hata',
+        description: 'Kurumsal kullanıcılar oluşturulurken hata oluştu',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingSiteOwners(false);
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -254,11 +283,27 @@ const Users = () => {
         description="Bireysel ve kurumsal kullanıcıları yönetin"
       />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Kullanıcı Yönetimi</h1>
-          <p className="text-muted-foreground">
-            Bireysel ve kurumsal kullanıcıları yönetin
-          </p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Kullanıcı Yönetimi</h1>
+            <p className="text-muted-foreground">
+              Bireysel ve kurumsal kullanıcıları yönetin
+            </p>
+          </div>
+          <Button
+            onClick={createSiteOwners}
+            disabled={isCreatingSiteOwners}
+            variant="default"
+          >
+            {isCreatingSiteOwners ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Oluşturuluyor...
+              </>
+            ) : (
+              'Tüm Siteler İçin Kullanıcı Oluştur'
+            )}
+          </Button>
         </div>
 
         {isLoading ? (
