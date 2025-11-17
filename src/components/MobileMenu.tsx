@@ -88,6 +88,16 @@ export const MobileMenu = () => {
             <>
               <div className="my-2 border-t border-border" />
               
+              <NavLink
+                to="/profile/dashboard"
+                onClick={handleNavClick}
+                className="flex items-center gap-3 px-4 py-4 min-h-[48px] rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all touch-manipulation active:scale-98"
+                activeClassName="text-primary bg-muted font-semibold"
+              >
+                <Shield className="w-6 h-6" />
+                <span className="text-base">Hesabım</span>
+              </NavLink>
+              
               {isAdmin && (
                 <NavLink
                   to="/admin"
