@@ -15,47 +15,79 @@ const Favorites = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: favorites, isLoading } = useQuery({
+  const { data: favorites, isLoading, error: queryError } = useQuery({
     queryKey: ['user-favorites', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await (supabase as any)
+      
+      console.log('🔍 Fetching favorites for user:', user.id);
+      
+      const { data, error } = await supabase
         .from('user_favorite_sites')
         .select(`
-          *,
+          id,
+          site_id,
+          created_at,
+          notes,
           betting_sites (
             id,
             name,
             slug,
             logo_url,
             rating,
-            bonus
+            bonus,
+            is_active
           )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      console.log('📊 Favorites query result:', { data, error, count: data?.length });
+      
+      if (error) {
+        console.error('❌ Favorites query error:', error);
+        throw error;
+      }
+      
+      // Filter out favorites where betting_sites is null (inactive sites)
+      const validFavorites = data?.filter(fav => fav.betting_sites) || [];
+      console.log('✅ Valid favorites (with active sites):', validFavorites.length);
+      
+      return validFavorites;
     },
     enabled: !!user,
   });
 
+  // Log query error if exists
+  if (queryError) {
+    console.error('❌ Query Error:', queryError);
+  }
+
   const removeFavoriteMutation = useMutation({
     mutationFn: async (favoriteId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_favorite_sites')
         .delete()
-        .eq('id', favoriteId);
+        .eq('id', favoriteId)
+        .eq('user_id', user?.id || ''); // Extra security check
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] }); // Also refresh stats
       toast({
         title: 'Başarılı',
         description: 'Site favorilerden kaldırıldı',
       });
     },
+    onError: (error) => {
+      console.error('❌ Remove favorite error:', error);
+      toast({
+        title: 'Hata',
+        description: 'Site favorilerden kaldırılırken bir hata oluştu',
+        variant: 'destructive'
+      });
+    }
   });
 
   if (!user) {
@@ -79,6 +111,20 @@ const Favorites = () => {
       <ProfileLayout>
         {isLoading ? (
           <ProfileSkeleton />
+        ) : queryError ? (
+          <Card>
+            <CardContent className="pt-6 text-center py-12">
+              <p className="text-destructive mb-4">
+                Favoriler yüklenirken bir hata oluştu
+              </p>
+              <pre className="text-xs text-left bg-muted p-4 rounded mb-4 overflow-auto">
+                {JSON.stringify(queryError, null, 2)}
+              </pre>
+              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['user-favorites'] })}>
+                Tekrar Dene
+              </Button>
+            </CardContent>
+          </Card>
         ) : favorites && favorites.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav: any) => (
