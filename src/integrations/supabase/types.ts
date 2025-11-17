@@ -339,6 +339,7 @@ export type Database = {
           login_guide: string | null
           logo_url: string | null
           name: string
+          owner_id: string | null
           pros: string[] | null
           rating: number | null
           review_count: number | null
@@ -381,6 +382,7 @@ export type Database = {
           login_guide?: string | null
           logo_url?: string | null
           name: string
+          owner_id?: string | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
@@ -423,6 +425,7 @@ export type Database = {
           login_guide?: string | null
           logo_url?: string | null
           name?: string
+          owner_id?: string | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
@@ -1906,6 +1909,57 @@ export type Database = {
         }
         Relationships: []
       }
+      site_owner_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          site_id: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          site_id: string
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          site_id?: string
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_owner_notifications_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_owner_notifications_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_owners: {
         Row: {
           approved_at: string | null
@@ -2611,6 +2665,16 @@ export type Database = {
     }
     Functions: {
       can_view_site_stats: { Args: never; Returns: boolean }
+      create_site_notification: {
+        Args: {
+          p_action_url?: string
+          p_message: string
+          p_site_id: string
+          p_title: string
+          p_type: string
+        }
+        Returns: string
+      }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
       get_daily_site_metrics: {
         Args: { days_back?: number }

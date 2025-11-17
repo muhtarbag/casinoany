@@ -21,7 +21,9 @@ import { CriticalAlerts } from './dashboard/CriticalAlerts';
 import { ActionableKPICard } from './dashboard/ActionableKPICard';
 import { DashboardFilters, FilterState } from './filters/DashboardFilters';
 import { ExportDialog } from './filters/ExportDialog';
+import { ActivityFeed } from './notifications/ActivityFeed';
 import { useSavedFilters } from '@/hooks/useSavedFilters';
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SiteOwnerDashboardProps {
@@ -36,9 +38,11 @@ export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: S
   const { savedFilters, saveFilter } = useSavedFilters();
   const [activeFilters, setActiveFilters] = useState<FilterState>({});
 
+  // Enable real-time notifications
+  useRealtimeNotifications({ siteId, enabled: true });
+
   const handleFilterChange = (filters: FilterState) => {
     setActiveFilters(filters);
-    // Apply filters to data queries - implement filtering logic as needed
   };
 
   // Fetch detailed analytics
@@ -360,10 +364,13 @@ export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: S
         />
       </div>
 
-      {/* Week Comparison */}
-      {comparison && (
-        <SiteComparisonCard comparison={comparison} />
-      )}
+      {/* Week Comparison & Activity Feed */}
+      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
+        {comparison && (
+          <SiteComparisonCard comparison={comparison} />
+        )}
+        <ActivityFeed siteId={siteId} limit={10} />
+      </div>
 
       {/* Detailed Tabs */}
       <Card>
