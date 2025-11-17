@@ -36,34 +36,33 @@ const Users = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (rolesError) throw rolesError;
-      if (!roles || roles.length === 0) return [];
-
-      const userIds = roles.map(r => r.user_id);
+      // Önce tüm profilleri çek (email artık profiles'da)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
-        .in('id', userIds);
+        .order('created_at', { ascending: false });
       
       if (profilesError) throw profilesError;
+      if (!profiles) return [];
 
-      return roles.map(role => {
-        const profile = profiles?.find(p => p.id === role.user_id);
+      // Tüm rolleri çek
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      // Her profile için role bilgisini ekle
+      return profiles.map(profile => {
+        const role = roles?.find(r => r.user_id === profile.id);
+        
         return {
-          ...role,
-          profile: profile || {
-            email: 'Bilinmiyor',
-            user_type: 'individual' as const,
-            first_name: null,
-            last_name: null,
-            username: null,
-            created_at: role.created_at,
-            is_verified: false
+          id: role?.id || `profile-${profile.id}`,
+          user_id: profile.id,
+          role: role?.role || null,
+          status: role?.status || 'pending',
+          created_at: role?.created_at || profile.created_at,
+          profile: {
+            ...profile,
+            email: profile.email || 'Email bilgisi yok'
           }
         };
       });
