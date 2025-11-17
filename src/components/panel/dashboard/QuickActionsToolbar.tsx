@@ -8,6 +8,7 @@ import {
   Plus,
   RefreshCw
 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface QuickActionsToolbarProps {
   onAction: (action: string) => void;

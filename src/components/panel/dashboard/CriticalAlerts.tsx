@@ -7,6 +7,7 @@ import {
   Clock,
   ChevronRight
 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AlertItem {
   id: string;
