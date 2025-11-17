@@ -2644,6 +2644,14 @@ export type Database = {
       }
       get_next_available_domain: { Args: never; Returns: string }
       get_primary_domain: { Args: never; Returns: string }
+      get_user_role_status: {
+        Args: { p_user_id: string }
+        Returns: {
+          has_role: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["user_status"]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2665,6 +2673,10 @@ export type Database = {
       }
       increment_news_view_count: {
         Args: { article_id: string }
+        Returns: undefined
+      }
+      increment_site_stats: {
+        Args: { p_metric_type?: string; p_site_id: string }
         Returns: undefined
       }
       log_change: {

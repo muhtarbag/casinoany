@@ -231,31 +231,24 @@ export default function SiteDetail() {
     staleTime: 5 * 60 * 1000, // 5 minutes - reviews don't change frequently
   });
 
-  // Track view on mount
+  // ✅ DÜZELTILDI: Thread-safe view tracking
   useEffect(() => {
     if (!site?.id || viewTracked) return;
 
     const trackView = async () => {
-      // Track site_stats
-      const { data: stats } = await supabase
-        .from('site_stats')
-        .select('*')
-        .eq('site_id', site.id)
-        .maybeSingle();
+      // Atomic UPSERT - race condition yok
+      const { error } = await supabase.rpc('increment_site_stats', {
+        p_site_id: site.id,
+        p_metric_type: 'view'
+      });
 
-      if (stats) {
-        await supabase
-          .from("site_stats")
-          .update({ views: stats.views + 1 })
-          .eq("site_id", site.id);
-      } else {
-        await supabase
-          .from("site_stats")
-          .insert({ site_id: site.id, views: 1, clicks: 0 });
+      if (error) {
+        console.error('View tracking failed:', error);
+        return;
       }
 
       setViewTracked(true);
-      // Only invalidate site-stats, not all queries
+      // Optimistically update local state
       queryClient.setQueryData(["site-stats", site.id], (old: any) => {
         if (!old) return old;
         return { ...old, views: (old.views || 0) + 1 };
@@ -286,28 +279,17 @@ export default function SiteDetail() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, scrollDirection]);
 
-  // Track click mutation
+  // ✅ DÜZELTILDI: Thread-safe click tracking
   const trackClickMutation = useMutation({
     mutationFn: async () => {
       if (!site?.id) return;
-      const { data: stats } = await supabase
-        .from('site_stats')
-        .select('*')
-        .eq('site_id', site.id)
-        .maybeSingle();
+      
+      const { error } = await supabase.rpc('increment_site_stats', {
+        p_site_id: site.id,
+        p_metric_type: 'click'
+      });
 
-      if (stats) {
-        const { error } = await supabase
-          .from("site_stats")
-          .update({ clicks: stats.clicks + 1 })
-          .eq("site_id", site.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("site_stats")
-          .insert({ site_id: site.id, clicks: 1, views: 1 });
-        if (error) throw error;
-      }
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-stats", site?.id] });

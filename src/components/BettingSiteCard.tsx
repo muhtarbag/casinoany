@@ -119,23 +119,17 @@ const BettingSiteCardComponent = ({
     }
   }, [logo]);
 
+  // ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
   const trackClickMutation = useMutation({
     mutationFn: async () => {
       if (!id) return;
-      const { data: stats } = await supabase
-        .from('site_stats')
-        .select('*')
-        .eq('site_id', id)
-        .maybeSingle();
-
-      if (stats) {
-        await supabase.from('site_stats')
-          .update({ clicks: stats.clicks + 1 })
-          .eq('site_id', id);
-      } else {
-        await supabase.from('site_stats')
-          .insert({ site_id: id, clicks: 1, views: 0 });
-      }
+      
+      const { error } = await supabase.rpc('increment_site_stats', {
+        p_site_id: id,
+        p_metric_type: 'click'
+      });
+      
+      if (error) throw error;
     },
     onSuccess: () => {
       // Invalidate all site-related queries (stats, featured, lists, etc.)

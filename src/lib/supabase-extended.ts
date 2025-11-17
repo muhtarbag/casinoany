@@ -238,6 +238,16 @@ export const TypedRPC = {
     p_is_affiliate_click?: boolean;
   }) => supabase.rpc('increment_casino_analytics', params),
   
+  // ✅ YENİ: Thread-safe site stats increment
+  incrementSiteStats: (params: {
+    p_site_id: string;
+    p_metric_type?: 'view' | 'click' | 'email_click' | 'whatsapp_click' | 'telegram_click' | 'twitter_click' | 'instagram_click' | 'facebook_click' | 'youtube_click';
+  }) => supabase.rpc('increment_site_stats', params),
+  
+  // ✅ YENİ: Güvenli rol kontrolü
+  getUserRoleStatus: (userId: string) => 
+    supabase.rpc('get_user_role_status', { p_user_id: userId }),
+  
   incrementBlogViewCount: (postId: string) =>
     supabase.rpc('increment_blog_view_count', { post_id: postId }),
   

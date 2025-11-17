@@ -90,7 +90,7 @@ export const useSiteStats = () => {
   });
 };
 
-// Site istatistiği güncelleme
+// ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
 export const useUpdateSiteStats = () => {
   const queryClient = useQueryClient();
 
@@ -100,41 +100,14 @@ export const useUpdateSiteStats = () => {
       type 
     }: { 
       siteId: string; 
-      type: 'view' | 'click';
+      type: 'view' | 'click' | 'email_click' | 'whatsapp_click' | 'telegram_click' | 'twitter_click' | 'instagram_click' | 'facebook_click' | 'youtube_click';
     }) => {
-      // Mevcut stats'ı al
-      const { data: existingStats } = await supabase
-        .from('site_stats')
-        .select('*')
-        .eq('site_id', siteId)
-        .single();
+      const { error } = await supabase.rpc('increment_site_stats', {
+        p_site_id: siteId,
+        p_metric_type: type
+      });
 
-      if (existingStats) {
-        // Güncelle
-        const update: any = type === 'view' 
-          ? { views: existingStats.views + 1 }
-          : { clicks: existingStats.clicks + 1 };
-
-        const { error } = await supabase
-          .from('site_stats')
-          .update(update)
-          .eq('site_id', siteId);
-
-        if (error) throw error;
-      } else {
-        // Yeni oluştur
-        const insert: any = {
-          site_id: siteId,
-          views: type === 'view' ? 1 : 0,
-          clicks: type === 'click' ? 1 : 0,
-        };
-
-        const { error } = await supabase
-          .from('site_stats')
-          .insert(insert);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sites.stats() });
