@@ -222,6 +222,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     
+    // ✅ CRITICAL FIX: Redirect to home page after successful login
+    window.location.href = '/';
+    
     return { error: null };
   }, []);
 

@@ -34,11 +34,10 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.LONG, // 15 minutes (reduced from 1 hour)
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // CRITICAL FIX: Always fetch on mount
-    refetchOnReconnect: false,
+    staleTime: 0, // No cache - always fresh
+    gcTime: CACHE_TIMES.LONG, // Keep in memory for 15 min
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
 
@@ -81,10 +80,10 @@ export const useFeaturedSites = (options?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.LONG, // 15 minutes (reduced from 1 hour)
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // CRITICAL FIX: Always fetch on mount
+    staleTime: 0, // No cache - always fresh
+    gcTime: CACHE_TIMES.LONG, // Keep in memory for 15 min
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
 
@@ -101,10 +100,10 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.LONG, // 15 minutes
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: true, // CRITICAL FIX: Always fetch on mount
+    staleTime: 0, // No cache - always fresh
+    gcTime: CACHE_TIMES.LONG, // Keep in memory for 15 min
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
 
