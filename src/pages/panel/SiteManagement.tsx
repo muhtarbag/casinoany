@@ -202,7 +202,11 @@ const SiteManagement = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
-            <SiteOwnerDashboard siteData={siteData} />
+            <SiteOwnerDashboard 
+              siteId={siteData.id} 
+              siteName={siteData.name}
+              siteData={siteData} 
+            />
           </TabsContent>
 
           <TabsContent value="content" className="space-y-4">
