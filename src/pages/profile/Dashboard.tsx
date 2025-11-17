@@ -21,7 +21,7 @@ export default function Dashboard() {
         supabase.from('user_favorite_sites').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('user_site_memberships').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('site_reviews').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('user_complaints').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('site_complaints').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('user_bonus_tracking').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active')
       ]);
 
