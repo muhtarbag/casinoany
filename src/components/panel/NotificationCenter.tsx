@@ -37,11 +37,11 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
   });
 
   // Fetch recent notifications
-  const { data: notifications } = useQuery({
+  const { data: notifications, isLoading } = useQuery({
     queryKey: ['site-notifications', siteId],
     queryFn: async () => {
       // Şikayetler
-      const { data: complaints } = await supabase
+      const { data: complaints, error: complaintsError } = await supabase
         .from('site_complaints')
         .select('id, title, created_at, status')
         .eq('site_id', siteId)
@@ -49,14 +49,22 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
         .order('created_at', { ascending: false })
         .limit(10);
 
+      if (complaintsError) {
+        console.error('Complaints fetch error:', complaintsError);
+      }
+
       // Yorumlar
-      const { data: reviews } = await supabase
+      const { data: reviews, error: reviewsError } = await supabase
         .from('site_reviews')
         .select('id, comment, rating, created_at')
         .eq('site_id', siteId)
         .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: false })
         .limit(10);
+
+      if (reviewsError) {
+        console.error('Reviews fetch error:', reviewsError);
+      }
 
       return {
         complaints: complaints || [],
@@ -65,6 +73,17 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
     },
     enabled: !!siteId,
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Bell className="w-12 h-12 animate-pulse mx-auto text-primary" />
+          <p className="text-sm text-muted-foreground">Bildirimler yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Stats
   const unreadComplaints = notifications?.complaints?.filter(c => c.status === 'pending').length || 0;
@@ -226,8 +245,18 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
 
             <ScrollArea className="h-[400px] mt-4">
               <TabsContent value="all" className="space-y-3">
-                {/* Şikayetler */}
-                {notifications?.complaints.map((complaint) => (
+                {!notifications || (notifications.complaints.length === 0 && notifications.reviews.length === 0) ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <BellOff className="h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-sm font-medium">Henüz bildirim yok</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Son 7 gün içinde herhangi bir bildirim almadınız
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Şikayetler */}
+                    {notifications?.complaints?.map((complaint) => (
                   <div
                     key={`complaint-${complaint.id}`}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -278,17 +307,23 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                     </div>
                   </div>
                 ))}
-
-                {totalNotifications === 0 && (
-                  <div className="text-center py-12">
-                    <BellOff className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Henüz bildirim bulunmuyor</p>
-                  </div>
+                  </>
                 )}
+
+                {/* Eski empty state kaldırıldı */}
               </TabsContent>
 
               <TabsContent value="complaints" className="space-y-3">
-                {notifications?.complaints.map((complaint) => (
+                {!notifications || notifications.complaints.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-sm font-medium">Henüz şikayet yok</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Son 7 gün içinde şikayet almadınız
+                    </p>
+                  </div>
+                ) : (
+                  notifications?.complaints?.map((complaint) => (
                   <div
                     key={complaint.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -312,11 +347,21 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                       Görüntüle
                     </Button>
                   </div>
-                ))}
+                ))
+                )}
               </TabsContent>
 
               <TabsContent value="reviews" className="space-y-3">
-                {notifications?.reviews.map((review) => (
+                {!notifications || notifications.reviews.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-sm font-medium">Henüz yorum yok</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Son 7 gün içinde yorum almadınız
+                    </p>
+                  </div>
+                ) : (
+                  notifications?.reviews?.map((review) => (
                   <div
                     key={review.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -339,7 +384,8 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                       </p>
                     </div>
                   </div>
-                ))}
+                ))
+                )}
               </TabsContent>
             </ScrollArea>
           </Tabs>
