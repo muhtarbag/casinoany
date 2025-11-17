@@ -282,7 +282,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0 pb-24 lg:pb-0">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
                 {children}
@@ -293,8 +293,8 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 backdrop-blur-lg bg-card/95 bottom-nav">
-        <div className="flex items-center justify-around py-2 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-lg" style={{ zIndex: 9999 }}>
+        <div className="flex items-center justify-around py-3 px-2 safe-area-inset-bottom">
           {menuItems.slice(0, 5).map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
@@ -353,9 +353,6 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </Link>
         </div>
       </nav>
-
-      {/* Mobile Bottom Padding */}
-      <div className="lg:hidden h-20" />
     </div>
   );
 };
