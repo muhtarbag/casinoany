@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { PanelSidebar } from './PanelSidebar';
+import { NotificationBell } from './notifications/NotificationBell';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
@@ -10,6 +11,7 @@ interface PanelLayoutProps {
   onTabChange: (tab: string) => void;
   children: ReactNode;
   breadcrumbs?: { label: string; href?: string }[];
+  siteId?: string;
 }
 
 export function PanelLayout({ 
@@ -17,7 +19,8 @@ export function PanelLayout({
   activeTab, 
   onTabChange, 
   children,
-  breadcrumbs = []
+  breadcrumbs = [],
+  siteId
 }: PanelLayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
@@ -29,7 +32,7 @@ export function PanelLayout({
         />
         
         <SidebarInset className="flex-1">
-          {/* Header with Breadcrumbs */}
+          {/* Header with Breadcrumbs & Notifications */}
           <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="h-6" />
@@ -58,6 +61,13 @@ export function PanelLayout({
                   ))}
                 </BreadcrumbList>
               </Breadcrumb>
+            )}
+
+            {/* Notification Bell */}
+            {siteId && (
+              <div className="ml-auto">
+                <NotificationBell siteId={siteId} />
+              </div>
             )}
           </header>
 

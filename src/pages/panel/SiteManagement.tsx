@@ -175,6 +175,7 @@ const SiteManagement = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         breadcrumbs={getBreadcrumbs()}
+        siteId={siteData.id}
       >
         {renderContent()}
       </PanelLayout>
