@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight } from "lucide-react";
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Heart } from "lucide-react";
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { toast } from "sonner";
 import RecommendedSites from "@/components/RecommendedSites";
@@ -92,6 +92,62 @@ export default function SiteDetail() {
       throw new Error("No slug or id provided");
     },
     retry: false,
+  });
+
+  // Check if site is in user's favorites
+  const { data: isFavorite, isLoading: favoriteLoading } = useQuery({
+    queryKey: ["user-favorite", site?.id, user?.id],
+    queryFn: async () => {
+      if (!user || !site?.id) return false;
+      const { data, error } = await supabase
+        .from("user_favorite_sites")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("site_id", site.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return !!data;
+    },
+    enabled: !!user && !!site?.id,
+  });
+
+  // Toggle favorite mutation
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        toast.error("Favorilere eklemek için giriş yapmalısınız");
+        navigate("/login");
+        return;
+      }
+      if (!site?.id) return;
+
+      if (isFavorite) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from("user_favorite_sites")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("site_id", site.id);
+        if (error) throw error;
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from("user_favorite_sites")
+          .insert({
+            user_id: user.id,
+            site_id: site.id,
+          });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-favorite", site?.id, user?.id] });
+      toast.success(isFavorite ? "Favorilerden çıkarıldı" : "Favorilere eklendi");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Bir hata oluştu");
+    },
   });
 
   // Load logo from storage or use direct URL
@@ -432,6 +488,9 @@ export default function SiteDetail() {
             averageRating={averageRating}
             reviewCount={reviews?.length || 0}
             onAffiliateClick={handleAffiliateClick}
+            isFavorite={isFavorite}
+            onToggleFavorite={() => toggleFavoriteMutation.mutate()}
+            favoriteLoading={favoriteLoading || toggleFavoriteMutation.isPending}
           />
         </div>
 
