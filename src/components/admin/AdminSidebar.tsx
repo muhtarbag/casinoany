@@ -10,7 +10,8 @@ import {
   Mail,
   Shield,
   Folder,
-  Bell
+  Bell,
+  AlertTriangle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -74,6 +75,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'reviews', icon: MessageSquare, label: 'Yorumlar', route: '/admin/reviews', roles: ['content_editor'], shortcut: 'g r' },
         { id: 'comments', icon: MessageSquare, label: 'Blog Yorumları', route: '/admin/blog/comments', roles: ['content_editor'] },
+        { id: 'complaints', icon: AlertTriangle, label: 'Şikayetler', route: '/admin/complaints', roles: ['content_editor'] },
         { id: 'notifications', icon: Bell, label: 'Bildirimler', route: '/admin/notifications', roles: ['content_editor'] },
       ],
     },
