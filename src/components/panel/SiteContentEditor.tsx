@@ -202,12 +202,8 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
       {/* Content Editor Tabs */}
       <Card>
         <CardContent className="pt-6">
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
-              <TabsTrigger value="overview" className="gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline">Genel</span>
-              </TabsTrigger>
+          <Tabs defaultValue="expert" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
               <TabsTrigger value="expert" className="gap-2">
                 <Award className="h-4 w-4" />
                 <span className="hidden sm:inline">Uzman</span>
@@ -237,27 +233,6 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
                 <span className="hidden sm:inline">Gelişmiş</span>
               </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="overview" className="space-y-4">
-              <CasinoContentEditor
-                pros={pros}
-                cons={cons}
-                setPros={setPros}
-                setCons={setCons}
-                verdict={verdict}
-                setVerdict={setVerdict}
-                expertReview={expertReview}
-                setExpertReview={setExpertReview}
-                gameCategories={gameCategories}
-                setGameCategories={setGameCategories}
-                loginGuide={loginGuide}
-                setLoginGuide={setLoginGuide}
-                withdrawalGuide={withdrawalGuide}
-                setWithdrawalGuide={setWithdrawalGuide}
-                faq={faq}
-                setFaq={setFaq}
-              />
-            </TabsContent>
 
             <TabsContent value="expert" className="space-y-4">
               <CasinoContentEditor
