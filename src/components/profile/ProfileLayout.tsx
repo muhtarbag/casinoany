@@ -142,6 +142,14 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     }
   ];
 
+  // Mobile bottom nav items (most important only)
+  const mobileBottomNavItems = [
+    menuItems.find(item => item.href === '/')!,
+    menuItems.find(item => item.href === '/profile/dashboard')!,
+    menuItems.find(item => item.href === '/profile/favorites')!,
+    menuItems.find(item => item.href === '/profile/reviews')!,
+  ];
+
   const getInitials = () => {
     if (!user?.email) return 'U';
     return user.email.charAt(0).toUpperCase();
@@ -295,7 +303,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       {/* Mobile Bottom Navigation */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-lg" style={{ zIndex: 9999 }}>
         <div className="flex items-center justify-around py-3 px-2 safe-area-inset-bottom">
-          {menuItems.slice(0, 5).map((item) => {
+          {mobileBottomNavItems.map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
             const badgeCount = getBadgeCount(item.badgeKey);
@@ -342,14 +350,17 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           <Link
             to="/profile/settings"
             className={cn(
-              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors',
+              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation',
               location.pathname === '/profile/settings'
                 ? 'text-primary'
                 : 'text-muted-foreground'
             )}
+            style={{
+              WebkitTapHighlightColor: 'transparent'
+            }}
           >
-            <User className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Daha Fazla</span>
+            <Settings className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Ayarlar</span>
           </Link>
         </div>
       </nav>
