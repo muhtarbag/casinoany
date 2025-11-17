@@ -20,12 +20,11 @@ const Complaints = () => {
   const { data: complaints, isLoading } = useQuery({
     queryKey: ['complaints', searchTerm, categoryFilter, statusFilter],
     queryFn: async () => {
-      let query = (supabase as any)
+      let query = supabase
         .from('site_complaints')
         .select(`
           *,
-          betting_sites (name, slug, logo_url),
-          complaint_responses (count)
+          betting_sites (name, slug, logo_url)
         `)
         .eq('is_public', true)
         .order('created_at', { ascending: false });

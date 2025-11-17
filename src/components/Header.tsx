@@ -47,6 +47,13 @@ export const Header = () => {
               Blog
             </NavLink>
             <NavLink 
+              to="/sikayetler" 
+              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
+              activeClassName="text-primary font-semibold"
+            >
+              Şikayetler
+            </NavLink>
+            <NavLink 
               to="/about" 
               className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
               activeClassName="text-primary font-semibold"

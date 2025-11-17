@@ -60,7 +60,7 @@ const NewComplaint = () => {
         complaintData.anonymous_email = anonymousEmail;
       }
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_complaints')
         .insert(complaintData)
         .select()
