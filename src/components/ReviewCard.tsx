@@ -63,7 +63,7 @@ const ReviewCard = memo(({ review }: ReviewCardProps) => {
           >
             {[...Array(5)].map((_, i) => (
               <Star 
-                key={i} 
+                key={`star-${review.id}-${i}`} 
                 className={`w-4 h-4 ${i < review.rating ? "fill-gold text-gold" : "fill-muted text-muted"}`}
                 aria-hidden="true"
               />

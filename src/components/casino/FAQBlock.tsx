@@ -30,7 +30,7 @@ export const FAQBlock = ({ faq }: FAQBlockProps) => {
       <CardContent>
         <Accordion type="single" collapsible className="w-full">
           {faq.map((item, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
+            <AccordionItem key={`faq-${item.question.slice(0, 20)}-${index}`} value={`item-${index}`}>
               <AccordionTrigger className="text-left">
                 {item.question}
               </AccordionTrigger>
