@@ -17,7 +17,7 @@ const SiteOwners = () => {
   const { data: applications, isLoading } = useQuery({
     queryKey: ['site-owner-applications'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('site_owners')
         .select(`
           *,

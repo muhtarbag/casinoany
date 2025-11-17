@@ -42,40 +42,55 @@ Lütfen aşağıdaki içerikleri JSON formatında oluştur:
 
 İçerik Türkçe olmalı, profesyonel ve kullanıcı dostu bir dil kullan. Site özelliklerini ve bonusları vurgula. HTML içeriklerde sadece temel HTML etiketleri (p, strong, em, ol, ul, li) kullan.`;
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { 
-          role: 'system', 
-          content: 'Sen casino ve bahis siteleri konusunda uzman bir içerik yazarısın. JSON formatında yapılandırılmış içerik üretiyorsun.' 
-        },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
-    }),
-  });
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'Sen casino ve bahis siteleri konusunda uzman bir içerik yazarısın. JSON formatında yapılandırılmış içerik üretiyorsun.' 
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`AI Gateway error: ${response.status}`);
-  }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`AI Gateway error: ${response.status} - ${errorText}`);
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
 
-  const data = await response.json();
-  const content = data.choices[0].message.content;
-  
-  let jsonContent = content;
-  if (content.includes('```json')) {
-    jsonContent = content.split('```json')[1].split('```')[0].trim();
-  } else if (content.includes('```')) {
-    jsonContent = content.split('```')[1].split('```')[0].trim();
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid AI response structure:', JSON.stringify(data));
+      throw new Error('Invalid AI response structure');
+    }
+    
+    const content = data.choices[0].message.content;
+    
+    let jsonContent = content;
+    if (content.includes('```json')) {
+      jsonContent = content.split('```json')[1].split('```')[0].trim();
+    } else if (content.includes('```')) {
+      jsonContent = content.split('```')[1].split('```')[0].trim();
+    }
+    
+    const parsedContent = JSON.parse(jsonContent);
+    console.log('✅ Successfully generated content for:', siteName);
+    return parsedContent;
+  } catch (error) {
+    console.error('❌ Error generating content for', siteName, ':', error);
+    throw error;
   }
-  
-  return JSON.parse(jsonContent);
 }
 
 async function saveSiteContent(supabase: any, siteId: string, content: any) {

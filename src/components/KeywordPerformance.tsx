@@ -60,13 +60,13 @@ export const KeywordPerformance = () => {
   const { data: posts } = useQuery({
     queryKey: ['blog-posts-list'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('blog_posts')
         .select('id, title')
         .eq('is_published', true)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as any[];
+      return data;
     },
   });
 

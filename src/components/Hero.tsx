@@ -50,6 +50,12 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    
+    // FIX MEMORY LEAK: Cleanup event listeners
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
   }, [emblaApi, onSelect]);
 
   // Auto-scroll on mobile

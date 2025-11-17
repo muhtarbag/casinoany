@@ -319,7 +319,7 @@ export const NotificationPopup = () => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('bonus_requests')
         .insert([{
           notification_id: openNotificationId,
