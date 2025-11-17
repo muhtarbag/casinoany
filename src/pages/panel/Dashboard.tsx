@@ -78,7 +78,7 @@ export default function Dashboard() {
             <Button 
               variant="outline" 
               className="w-full justify-start"
-              onClick={() => navigate('/categories')}
+              onClick={() => navigate('/kategoriler')}
             >
               Kategorilere Göz At
             </Button>
