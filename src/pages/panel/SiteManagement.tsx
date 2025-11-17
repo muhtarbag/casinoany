@@ -1,28 +1,66 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2, Heart, MessageSquare, TrendingUp, Edit } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SiteOwnerDashboard } from '@/components/panel/SiteOwnerDashboard';
+import { SiteContentEditor } from '@/components/panel/SiteContentEditor';
+import { SiteComplaintsManager } from '@/components/panel/SiteComplaintsManager';
 
 const SiteManagement = () => {
   const { user, isSiteOwner, ownedSites } = useAuth();
   const navigate = useNavigate();
 
-  const { data: sites, isLoading } = useQuery({
-    queryKey: ['owned-sites', user?.id],
+  const { data: siteData, isLoading } = useQuery({
+    queryKey: ['owned-site-full', user?.id],
     queryFn: async () => {
-      if (!user || ownedSites.length === 0) return [];
+      if (!user || ownedSites.length === 0) return null;
       
-      const { data, error } = await supabase
+      // Get site with all related data
+      const { data: site, error: siteError } = await supabase
         .from('betting_sites')
         .select('*')
-        .in('id', ownedSites);
+        .eq('id', ownedSites[0])
+        .single();
       
-      if (error) throw error;
-      return data;
+      if (siteError) throw siteError;
+
+      // Get favorite count
+      const { count: favoriteCount, error: favError } = await supabase
+        .from('user_favorite_sites')
+        .select('*', { count: 'exact', head: true })
+        .eq('site_id', site.id);
+      
+      if (favError) console.error('Favorite count error:', favError);
+
+      // Get complaints count
+      const { count: complaintsCount, error: compError } = await supabase
+        .from('site_complaints')
+        .select('*', { count: 'exact', head: true })
+        .eq('site_id', site.id);
+      
+      if (compError) console.error('Complaints count error:', compError);
+
+      // Get stats
+      const { data: stats, error: statsError } = await supabase
+        .from('site_stats')
+        .select('views, clicks')
+        .eq('site_id', site.id)
+        .single();
+      
+      if (statsError && statsError.code !== 'PGRST116') {
+        console.error('Stats error:', statsError);
+      }
+
+      return {
+        ...site,
+        favoriteCount: favoriteCount || 0,
+        complaintsCount: complaintsCount || 0,
+        stats: stats || { views: 0, clicks: 0 },
+      };
     },
     enabled: !!user && isSiteOwner && ownedSites.length > 0,
   });
@@ -39,78 +77,193 @@ const SiteManagement = () => {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!siteData) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="pt-6 text-center py-12">
+            <p className="text-muted-foreground">
+              Henüz onaylanmış siteniz bulunmuyor. Admin onayı bekleniyor.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <>
       <SEO 
-        title="Site Yönetimi"
-        description="Sitelerinizi yönetin"
+        title={`${siteData.name} - Site Yönetimi`}
+        description="Sitenizi yönetin, içerik düzenleyin, şikayetleri görüntüleyin"
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Site Yönetimi</h1>
-          <p className="text-muted-foreground">
-            Sitelerinizi buradan yönetebilirsiniz
-          </p>
+          <div className="flex items-center gap-4 mb-4">
+            {siteData.logo_url && (
+              <img 
+                src={siteData.logo_url} 
+                alt={siteData.name} 
+                className="w-16 h-16 object-contain rounded-lg border"
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold">{siteData.name}</h1>
+              <p className="text-muted-foreground">Site Yönetim Paneli</p>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid gap-4 md:grid-cols-4 mb-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Favorilere Eklenme
+                </CardTitle>
+                <Heart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{siteData.favoriteCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  Kullanıcı favoriye ekledi
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Şikayetler
+                </CardTitle>
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{siteData.complaintsCount}</div>
+                <p className="text-xs text-muted-foreground">
+                  Toplam şikayet
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Görüntülenme
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{siteData.stats.views}</div>
+                <p className="text-xs text-muted-foreground">
+                  Toplam görüntülenme
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Değerlendirme
+                </CardTitle>
+                <Edit className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {siteData.avg_rating?.toFixed(1) || '0.0'}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {siteData.review_count || 0} değerlendirme
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        ) : sites && sites.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sites.map((site: any) => (
-              <Card key={site.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {site.logo_url && (
-                      <img src={site.logo_url} alt={site.name} className="w-8 h-8 object-contain" />
-                    )}
-                    {site.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Rating: {site.rating || 'N/A'}/5
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Yorumlar: {site.review_count || 0}
-                    </p>
-                    <div className="flex gap-2 mt-4">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        asChild
-                        className="flex-1"
-                      >
-                        <a href={`/sites/${site.slug}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Görüntüle
-                        </a>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => navigate(`/admin/sites?edit=${site.id}`)}
-                        className="flex-1"
-                      >
-                        Düzenle
-                      </Button>
+        {/* Tabs */}
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
+            <TabsTrigger value="content">İçerik Yönetimi</TabsTrigger>
+            <TabsTrigger value="complaints">
+              Şikayetler {siteData.complaintsCount > 0 && `(${siteData.complaintsCount})`}
+            </TabsTrigger>
+            <TabsTrigger value="stats">İstatistikler</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <SiteOwnerDashboard siteData={siteData} />
+          </TabsContent>
+
+          <TabsContent value="content" className="space-y-4">
+            <SiteContentEditor siteId={siteData.id} />
+          </TabsContent>
+
+          <TabsContent value="complaints" className="space-y-4">
+            <SiteComplaintsManager siteId={siteData.id} />
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Detaylı İstatistikler</CardTitle>
+                <CardDescription>
+                  Sitenizin performans metrikleri
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Toplam Görüntülenme
+                      </p>
+                      <p className="text-3xl font-bold">{siteData.stats.views}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Tıklanma
+                      </p>
+                      <p className="text-3xl font-bold">{siteData.stats.clicks}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Tıklama Oranı (CTR)
+                      </p>
+                      <p className="text-3xl font-bold">
+                        {siteData.stats.views > 0 
+                          ? ((siteData.stats.clicks / siteData.stats.views) * 100).toFixed(2)
+                          : '0.00'
+                        }%
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Favori Oranı
+                      </p>
+                      <p className="text-3xl font-bold">
+                        {siteData.stats.views > 0 
+                          ? ((siteData.favoriteCount / siteData.stats.views) * 100).toFixed(2)
+                          : '0.00'
+                        }%
+                      </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-muted-foreground">
-                Henüz onaylanmış siteniz bulunmuyor. Admin onayı bekleniyor.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );
