@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
  * OPTIMIZED ADMIN STATS
  * Single parallel query for all metrics - eliminates 5 sequential network requests
  * Performance: ~80% faster than previous implementation
+ * 
+ * ✅ STALE DATA FIX: Reduced staleTime and added refetchInterval for fresher data
  */
 export const useAdminStats = () => {
   // OPTIMIZED: Single parallel query with Promise.all
@@ -34,8 +36,10 @@ export const useAdminStats = () => {
         totalClicks: clicksResult.count || 0,
       };
     },
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 5 * 60 * 1000, // 5 minutes (reduced from 30 minutes)
+    gcTime: 15 * 60 * 1000, // 15 minutes (reduced from 1 hour)
+    refetchOnWindowFocus: true, // Refetch when user focuses window
+    refetchInterval: 5 * 60 * 1000, // Auto-refetch every 5 minutes
   });
 
   return {

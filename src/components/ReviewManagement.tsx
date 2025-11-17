@@ -138,7 +138,11 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["betting-sites"] });
       toast({
         title: "Başarılı",
         description: "Yorum onaylandı",
@@ -163,7 +167,10 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       toast({
         title: "Başarılı",
         description: "Yorum reddedildi ve silindi",
@@ -188,7 +195,11 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["betting-sites"] });
       toast({
         title: "Başarılı",
         description: `${selectedReviews.length} yorum onaylandı`,
@@ -214,7 +225,10 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       toast({
         title: "Başarılı",
         description: `${selectedReviews.length} yorum silindi`,
