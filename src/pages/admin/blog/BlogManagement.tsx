@@ -1,5 +1,11 @@
-import { BlogManagement as BlogManagementComponent } from '@/components/BlogManagement';
+import { Suspense } from 'react';
+import { LoadingState } from '@/components/ui/loading-state';
+import { LazyBlogManagement } from '@/components/Performance/LazyAdminComponents';
 
 export default function BlogManagement() {
-  return <BlogManagementComponent />;
+  return (
+    <Suspense fallback={<LoadingState variant="skeleton" rows={8} />}>
+      <LazyBlogManagement />
+    </Suspense>
+  );
 }

@@ -1,5 +1,11 @@
-import { NewsManagement } from '@/components/NewsManagement';
+import { Suspense } from 'react';
+import { LoadingState } from '@/components/ui/loading-state';
+import { LazyNewsManagement } from '@/components/Performance/LazyAdminComponents';
 
 export default function News() {
-  return <NewsManagement />;
+  return (
+    <Suspense fallback={<LoadingState variant="skeleton" rows={8} />}>
+      <LazyNewsManagement />
+    </Suspense>
+  );
 }
