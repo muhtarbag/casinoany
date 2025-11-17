@@ -2407,6 +2407,7 @@ export type Database = {
         | "finance"
         | "seo_manager"
         | "moderator"
+        | "site_owner"
       user_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -2542,6 +2543,7 @@ export const Constants = {
         "finance",
         "seo_manager",
         "moderator",
+        "site_owner",
       ],
       user_status: ["pending", "approved", "rejected"],
     },
