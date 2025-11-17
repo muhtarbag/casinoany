@@ -36,7 +36,8 @@ const Favorites = () => {
             logo_url,
             rating,
             bonus,
-            is_active
+            is_active,
+            affiliate_link
           )
         `)
         .eq('user_id', user.id)
@@ -161,14 +162,18 @@ const Favorites = () => {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           asChild
                           className="flex-1"
                         >
-                          <Link to={`/sites/${fav.betting_sites.slug}`}>
+                          <a 
+                            href={fav.betting_sites.affiliate_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            Detay
-                          </Link>
+                            Siteye Git
+                          </a>
                         </Button>
                         <Button
                           size="sm"
