@@ -39,6 +39,7 @@ const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/Blo
 const AdminAffiliateManagement = lazyWithPreload(() => import("./pages/admin/finance/AffiliateManagement"));
 const AdminBonusManagement = lazyWithPreload(() => import("./pages/admin/finance/BonusManagement"));
 const AdminReviews = lazyWithPreload(() => import("./pages/admin/Reviews"));
+const AdminComplaints = lazyWithPreload(() => import("./pages/admin/Complaints"));
 const AdminNotifications = lazyWithPreload(() => import("./pages/admin/Notifications"));
 const AdminNews = lazyWithPreload(() => import("./pages/admin/News"));
 const AdminCasinoContent = lazyWithPreload(() => import("./pages/admin/content/CasinoContent"));
@@ -141,6 +142,7 @@ const AppContent = () => {
             <Route path="blog/stats" element={<AdminBlogStats />} />
             <Route path="blog/comments" element={<AdminBlogComments />} />
             <Route path="reviews" element={<AdminReviews />} />
+            <Route path="complaints" element={<AdminComplaints />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="content/casino" element={<AdminCasinoContent />} />
