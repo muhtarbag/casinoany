@@ -44,7 +44,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleGoHome = () => {
     this.setState({ hasError: false, error: null });
-    window.location.href = '/';
+    // Use replace to avoid back button loop
+    window.location.replace('/');
   };
 
   public render() {

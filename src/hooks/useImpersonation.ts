@@ -69,7 +69,7 @@ export const useImpersonation = () => {
 
       // 5. Reload to apply new session
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.replace('/');
       }, 1000);
 
       return true;
@@ -120,7 +120,7 @@ export const useImpersonation = () => {
 
       // Redirect to admin users page
       setTimeout(() => {
-        window.location.href = '/admin/system/users';
+        window.location.replace('/admin/system/users');
       }, 500);
 
       return true;

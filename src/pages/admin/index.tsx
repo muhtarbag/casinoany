@@ -13,20 +13,25 @@ export default function AdminRoot() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Auth check with proper redirect
+  // Auth check with proper redirect - only trigger after auth is fully loaded
   useEffect(() => {
-    if (!authLoading && (!user || !isAdmin)) {
-      navigate('/', { replace: true });
-      showErrorToast(new Error('Unauthorized'), 'Bu sayfaya erişim yetkiniz yok.');
+    if (!authLoading) {
+      if (!user || !isAdmin) {
+        // Use window.location.replace to completely break any potential loops
+        window.location.replace('/');
+        showErrorToast(new Error('Unauthorized'), 'Bu sayfaya erişim yetkiniz yok.');
+      }
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, isAdmin, authLoading]);
 
-  // Redirect /admin to /admin/dashboard
+  // Redirect /admin to /admin/dashboard - only if authenticated
   useEffect(() => {
-    if (location.pathname === '/admin' || location.pathname === '/admin/') {
-      navigate('/admin/dashboard', { replace: true });
+    if (!authLoading && user && isAdmin) {
+      if (location.pathname === '/admin' || location.pathname === '/admin/') {
+        navigate('/admin/dashboard', { replace: true });
+      }
     }
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, authLoading, user, isAdmin]);
 
   // Fetch user profile
   const { data: userProfile } = useQuery({
@@ -176,10 +181,20 @@ export default function AdminRoot() {
     return items;
   };
 
+  // Show loading only during auth check
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Don't render admin layout if not authorized - redirect will happen in useEffect
+  if (!user || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
