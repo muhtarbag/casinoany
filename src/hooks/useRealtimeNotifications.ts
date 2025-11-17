@@ -18,6 +18,10 @@ export function useRealtimeNotifications({
   useEffect(() => {
     if (!enabled || !siteId) return;
 
+    // ✅ FIX: Prevent memory leaks with mounted flag
+    let mounted = true;
+    const queryClientRef = queryClient;
+
     // Subscribe to new complaints
     const complaintsChannel = supabase
       .channel('new-complaints')
@@ -30,16 +34,20 @@ export function useRealtimeNotifications({
           filter: `site_id=eq.${siteId}`,
         },
         (payload) => {
+          if (!mounted) return; // ✅ Prevent state update on unmounted component
+          
           console.log('New complaint:', payload);
           
-          queryClient.invalidateQueries({ queryKey: ['site-complaints', siteId] });
-          queryClient.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
+          queryClientRef.invalidateQueries({ queryKey: ['site-complaints', siteId] });
+          queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
           
           const complaint = payload.new as any;
-          toast({
-            title: '🔔 Yeni Şikayet',
-            description: `${complaint.title}`,
-          });
+          if (mounted) {
+            toast({
+              title: '🔔 Yeni Şikayet',
+              description: `${complaint.title}`,
+            });
+          }
         }
       )
       .subscribe();
@@ -56,13 +64,15 @@ export function useRealtimeNotifications({
           filter: `site_id=eq.${siteId}`,
         },
         (payload) => {
+          if (!mounted) return; // ✅ Prevent state update on unmounted component
+          
           console.log('New review:', payload);
           
-          queryClient.invalidateQueries({ queryKey: ['site-reviews', siteId] });
-          queryClient.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
+          queryClientRef.invalidateQueries({ queryKey: ['site-reviews', siteId] });
+          queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
           
           const review = payload.new as any;
-          if (review.is_approved) {
+          if (review.is_approved && mounted) {
             toast({
               title: '⭐ Yeni Değerlendirme',
               description: `${review.rating} yıldız aldınız!`,
@@ -83,16 +93,19 @@ export function useRealtimeNotifications({
           table: 'complaint_responses',
         },
         (payload) => {
+          if (!mounted) return; // ✅ Prevent state update on unmounted component
+          
           console.log('New complaint response:', payload);
-          queryClient.invalidateQueries({ queryKey: ['site-complaints', siteId] });
+          queryClientRef.invalidateQueries({ queryKey: ['site-complaints', siteId] });
         }
       )
       .subscribe();
 
     return () => {
+      mounted = false; // ✅ Set flag before cleanup
       supabase.removeChannel(complaintsChannel);
       supabase.removeChannel(reviewsChannel);
       supabase.removeChannel(responsesChannel);
     };
-  }, [siteId, enabled, queryClient, toast]);
+  }, [siteId, enabled]); // ✅ Removed queryClient and toast from dependencies
 }
