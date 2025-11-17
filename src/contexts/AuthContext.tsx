@@ -47,30 +47,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    let isCancelled = false;
     
-    // Get initial session first
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkUserRoles(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    // Then setup listener for future changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!mounted) return;
+    // ✅ FIX: Proper async initialization with cancellation
+    const initAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (isCancelled) return;
+        if (error) throw error;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          checkUserRoles(session.user.id);
+          await checkUserRoles(session.user.id);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          prodLogger.error('Failed to initialize auth', error as Error, { 
+            component: 'auth' 
+          });
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initAuth();
+
+    // Then setup listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (isCancelled) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await checkUserRoles(session.user.id);
         } else {
           setIsAdmin(false);
           setIsSiteOwner(false);
@@ -81,17 +98,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => {
-      mounted = false;
+      isCancelled = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // ✅ Correct: Empty deps, cleanup handled properly
 
   const checkUserRoles = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role, status')
-        .eq('user_id', userId);
+      // ✅ SECURITY FIX: Use server-side RPC function instead of direct query
+      // This prevents client-side manipulation of role checks
+      const { data, error } = await supabase.rpc('get_current_user_roles');
       
       if (error) {
         prodLogger.error('Failed to fetch user roles', error, { 
@@ -101,25 +117,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       
-      // Only set roles if user is approved
-      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
-      const roles = approvedRoles.map(r => r.role);
-      
-      // Check site ownership independently from roles
-      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
-        .from('site_owners')
-        .select('site_id')
-        .eq('user_id', userId)
-        .eq('status', 'approved');
-      
-      if (ownershipError) {
-        prodLogger.error('Failed to fetch site ownership', ownershipError, { 
-          component: 'auth',
-          metadata: { userId } 
-        });
-      }
-      
-      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
+      // Data is already filtered by approved status on server-side
+      const roles = data?.map(r => r.role) || [];
+      const sites = data?.[0]?.owned_sites || [];
       
       setUserRoles(roles);
       setIsAdmin(roles.includes('admin'));
