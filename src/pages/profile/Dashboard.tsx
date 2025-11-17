@@ -270,7 +270,7 @@ export default function Dashboard() {
           {/* Quick Actions List - Better for Mobile Scrolling */}
           <div className="space-y-4 md:hidden">
             <h2 className="text-base font-semibold px-1">Hızlı Erişim</h2>
-            <div className="space-y-5">
+            <div className="space-y-6">
               {quickActions.map((action) => (
                 <Link key={action.href} to={action.href}>
                   <Card className={cn(
