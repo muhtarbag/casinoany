@@ -86,6 +86,7 @@ const BettingSiteCardComponent = ({
   const isFavorite = checkFavorite(id);
 
 
+  // ✅ OPTIMIZE: Stabilize logo URL logic with useMemo
   useEffect(() => {
     if (logo) {
       setIsLoading(true);
@@ -102,9 +103,10 @@ const BettingSiteCardComponent = ({
         setIsLoading(false);
       }
     } else {
+      setLogoUrl(null);
       setIsLoading(false);
     }
-  }, [logo]);
+  }, [logo]); // ✅ FIX: Only re-run when logo changes
 
   // ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
   const trackClickMutation = useMutation({

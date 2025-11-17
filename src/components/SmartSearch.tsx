@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -80,15 +80,13 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     return score;
   };
 
-  // Update suggestions based on search
-  useEffect(() => {
+  // ✅ OPTIMIZE: useMemo for filtered suggestions to prevent recalculation
+  const filteredSuggestions = useMemo(() => {
     if (!localSearch.trim() || !allSites) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
+      return [];
     }
 
-    const searchResults = allSites
+    return allSites
       .map((site: any) => ({
         ...site,
         score: Math.max(
@@ -100,13 +98,18 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
       .filter(site => site.score > 20)
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
+  }, [localSearch, allSites]);
 
-    setSuggestions(searchResults);
-    if (searchResults.length > 0) {
+  // Update suggestions based on filtered results
+  useEffect(() => {
+    setSuggestions(filteredSuggestions);
+    if (filteredSuggestions.length > 0) {
       setShowSuggestions(true);
       setShowPopular(false);
+    } else {
+      setShowSuggestions(false);
     }
-  }, [localSearch, allSites]);
+  }, [filteredSuggestions]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
