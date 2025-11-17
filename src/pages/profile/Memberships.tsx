@@ -55,7 +55,8 @@ const Memberships = () => {
             id,
             name,
             slug,
-            logo_url
+            logo_url,
+            affiliate_link
           )
         `)
         .eq('user_id', user.id)
@@ -322,13 +323,18 @@ const Memberships = () => {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           asChild
                         >
-                          <Link to={`/sites/${membership.betting_sites.slug}`}>
+                          <a 
+                            href={membership.betting_sites.affiliate_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center"
+                          >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            Detay
-                          </Link>
+                            Oynamaya Başla
+                          </a>
                         </Button>
                         <Button
                           size="sm"
