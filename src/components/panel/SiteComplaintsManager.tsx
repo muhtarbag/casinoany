@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { AdvancedSearch, SearchQuery } from './filters/AdvancedSearch';
 
 interface SiteComplaintsManagerProps {
   siteId: string;
@@ -29,9 +30,7 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
   const queryClient = useQueryClient();
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [responseText, setResponseText] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [severityFilter, setSeverityFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<SearchQuery>({ term: '' });
 
   // Fetch complaints
   const { data: complaints, isLoading } = useQuery({
