@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/errorHandling';
 
 interface UseDataFetchOptions<T> {
@@ -38,7 +38,7 @@ export function useDataFetch<T>(
   const [error, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     setIsError(false);
     setError(null);
@@ -72,7 +72,12 @@ export function useDataFetch<T>(
         logger.logInfo(`Retry attempt ${attempt}/${maxRetries}`);
       }
     }
-  };
+  }, [fetchFn, retry, maxRetries, retryDelay, onSuccess, onError]);
+
+  // ✅ FIX: Auto-fetch on mount
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return {
     data,

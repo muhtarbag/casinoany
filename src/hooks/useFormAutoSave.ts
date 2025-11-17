@@ -20,6 +20,7 @@ export function useFormAutoSave<T>({
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastSavedRef = useRef<string>();
   const isSavingRef = useRef(false);
+  const saveOperationRef = useRef<Promise<void> | null>(null);
 
   // Save draft to localStorage
   const saveDraft = useCallback((draft: T) => {
@@ -70,13 +71,15 @@ export function useFormAutoSave<T>({
     // Save draft immediately to localStorage
     saveDraft(data);
 
-    // Set new timeout for server save
+    // ✅ FIX: Prevent race condition with operation tracking
     timeoutRef.current = setTimeout(async () => {
-      if (isSavingRef.current) return;
+      // Skip if already saving
+      if (isSavingRef.current || saveOperationRef.current) return;
       
       try {
         isSavingRef.current = true;
-        await onSave(data);
+        saveOperationRef.current = onSave(data);
+        await saveOperationRef.current;
         lastSavedRef.current = dataString;
         clearDraft();
       } catch (error) {
@@ -88,6 +91,7 @@ export function useFormAutoSave<T>({
         });
       } finally {
         isSavingRef.current = false;
+        saveOperationRef.current = null;
       }
     }, delay);
 

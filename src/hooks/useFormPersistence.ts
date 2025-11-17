@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
 
 interface FormPersistenceOptions {
@@ -28,15 +28,16 @@ export function useFormPersistence<T extends Record<string, any>>(
     return initialValues;
   });
 
-  const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+  // ✅ FIX: Use ref instead of state to prevent memory leak
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounced save to localStorage
+  // ✅ FIX: Remove saveTimeout from deps to prevent stale closures
   const saveToStorage = useCallback((newValues: T) => {
-    if (saveTimeout) {
-      clearTimeout(saveTimeout);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
 
-    const timeout = setTimeout(() => {
+    saveTimeoutRef.current = setTimeout(() => {
       try {
         // Filter out excluded fields
         const filtered = Object.keys(newValues).reduce((acc, field) => {
@@ -51,9 +52,7 @@ export function useFormPersistence<T extends Record<string, any>>(
         logger.error('system', 'Failed to save form draft', error as Error);
       }
     }, debounceMs);
-
-    setSaveTimeout(timeout);
-  }, [storageKey, excludeFields, debounceMs, saveTimeout]);
+  }, [storageKey, excludeFields, debounceMs]);
 
   // Update values and trigger save
   const updateValues = useCallback((newValues: Partial<T>) => {
@@ -83,14 +82,14 @@ export function useFormPersistence<T extends Record<string, any>>(
     }
   }, [storageKey]);
 
-  // Cleanup timeout on unmount
+  // ✅ FIX: Proper cleanup with ref
   useEffect(() => {
     return () => {
-      if (saveTimeout) {
-        clearTimeout(saveTimeout);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [saveTimeout]);
+  }, []);
 
   return {
     values,

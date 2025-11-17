@@ -103,6 +103,12 @@ export function useRealtimeNotifications({
 
     return () => {
       mounted = false; // ✅ Set flag before cleanup
+      
+      // ✅ FIX: Properly unsubscribe before removing channels
+      complaintsChannel.unsubscribe();
+      reviewsChannel.unsubscribe();
+      responsesChannel.unsubscribe();
+      
       supabase.removeChannel(complaintsChannel);
       supabase.removeChannel(reviewsChannel);
       supabase.removeChannel(responsesChannel);
