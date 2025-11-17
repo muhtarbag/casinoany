@@ -152,15 +152,15 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="space-y-4">
+        <div className="flex flex-col gap-5">
           {menuItems.map((item) => (
-            <Link key={item.href} to={item.href}>
+            <Link key={item.href} to={item.href} className="block">
               <Card className={cn(
                 "group cursor-pointer transition-all duration-300 border-l-4",
                 item.borderColor,
                 "hover:shadow-lg hover:bg-accent/5 active:scale-[0.98]"
               )}>
-                <CardContent className="p-4">
+                <CardContent className="p-5">
                   <div className="flex items-center gap-4">
                     {/* Icon */}
                     <div className={cn(
