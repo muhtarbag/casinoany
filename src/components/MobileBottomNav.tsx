@@ -27,7 +27,7 @@ export const MobileBottomNav = () => {
     {
       icon: Grid3x3,
       label: 'Kategoriler',
-      path: '/categories',
+      path: '/kategoriler',
     },
     ...(user ? [{
       icon: Heart,
