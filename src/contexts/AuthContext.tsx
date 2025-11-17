@@ -244,14 +244,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
       
-      // Redirect to home page after logout
-      window.location.href = '/';
+      // Redirect to login page after logout
+      window.location.href = '/login';
     } catch (error) {
       prodLogger.error('Unexpected error during sign out', error as Error, { 
         component: 'auth' 
       });
-      // Even if there's an error, redirect to home
-      window.location.href = '/';
+      // Even if there's an error, redirect to login
+      window.location.href = '/login';
     }
   }, []);
 
