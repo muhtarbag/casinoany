@@ -227,28 +227,6 @@ const BettingSiteCardComponent = ({
       onClick={handleCardClick}
     >
       <CardHeader className="space-y-4 p-6 relative">
-        {/* Favorite Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "absolute top-4 right-4 z-10 rounded-full transition-all duration-200",
-            "hover:scale-110 active:scale-95",
-            isFavorite 
-              ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" 
-              : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-          )}
-          onClick={handleFavoriteClick}
-          disabled={toggleFavoriteMutation.isPending || isFavoriteLoading}
-        >
-          <Heart 
-            className={cn(
-              "h-5 w-5 transition-all",
-              isFavorite && "fill-current"
-            )} 
-          />
-        </Button>
-
         <div className="flex items-start justify-between gap-4">
           <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm relative">
             {/* Loading Skeleton */}
@@ -278,7 +256,30 @@ const BettingSiteCardComponent = ({
               </div>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2 mt-8">
+          <div className="flex flex-col items-end gap-2">
+            {/* Favorite Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full transition-all duration-200",
+                "hover:scale-110 active:scale-95",
+                isFavorite 
+                  ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" 
+                  : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+              )}
+              onClick={handleFavoriteClick}
+              disabled={toggleFavoriteMutation.isPending || isFavoriteLoading}
+            >
+              <Heart 
+                className={cn(
+                  "h-5 w-5 transition-all",
+                  isFavorite && "fill-current"
+                )} 
+              />
+            </Button>
+            
+            {/* Rating */}
             <div className="flex items-center gap-1 px-3 py-1.5 bg-gold/10 rounded-lg border border-gold/20">
               <Star className="w-4 h-4 fill-gold text-gold" />
               <span className="font-bold text-sm">{rating.toFixed(1)}</span>
