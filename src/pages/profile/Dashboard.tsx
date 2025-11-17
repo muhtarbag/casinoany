@@ -164,10 +164,6 @@ export default function Dashboard() {
     }
   ];
 
-  // Primary action (most important)
-  const primaryAction = quickActions[0];
-  const secondaryActions = quickActions.slice(1);
-
   return (
     <>
       <SEO 
@@ -202,60 +198,9 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Hero Primary Action (Mobile: Full Width, Desktop: Prominent) */}
-          <Link to={primaryAction.href}>
-            <Card className={cn(
-              "group cursor-pointer transition-all duration-300 border-2",
-              primaryAction.borderColor,
-              primaryAction.bgColor,
-              primaryAction.hoverBg,
-              "hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]",
-              "md:hover:scale-[1.02]"
-            )}>
-              <CardContent className="p-5 md:p-6">
-                <div className="flex items-center gap-4">
-                  {/* Icon */}
-                  <div className={cn(
-                    "h-16 w-16 md:h-20 md:w-20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg transition-transform group-hover:scale-110",
-                    primaryAction.bgColor
-                  )}>
-                    <primaryAction.icon className={cn("h-8 w-8 md:h-10 md:w-10", primaryAction.color)} />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-lg md:text-xl truncate">{primaryAction.title}</h3>
-                      {(primaryAction.count || 0) > 0 && (
-                        <TrendingUp className={cn("h-5 w-5 flex-shrink-0", primaryAction.color)} />
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2 truncate">
-                      {primaryAction.description}
-                    </p>
-                    {(primaryAction.count || 0) === 0 && (
-                      <p className="text-xs text-muted-foreground italic">
-                        {primaryAction.emptyMessage}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Badge */}
-                  {(primaryAction.count || 0) > 0 ? (
-                    <Badge className="text-2xl md:text-3xl px-4 py-2 font-bold flex-shrink-0">
-                      {primaryAction.count}
-                    </Badge>
-                  ) : (
-                    <ArrowRight className={cn("h-6 w-6 flex-shrink-0 transition-transform group-hover:translate-x-1", primaryAction.color)} />
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Secondary Stats Grid - Mobile: 2x2, Desktop: 4 columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {secondaryActions.map((action) => (
+          {/* Quick Access Grid - All items same size */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+            {quickActions.map((action) => (
               <Link key={action.href} to={action.href}>
                 <Card className={cn(
                   "group cursor-pointer transition-all duration-300 h-full",
