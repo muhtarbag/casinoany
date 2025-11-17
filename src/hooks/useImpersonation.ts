@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -12,12 +12,11 @@ export const useImpersonation = () => {
   const [loading, setLoading] = useState(false);
   const { isAdmin } = useAuth();
 
-  // Check if currently impersonating
-  const checkImpersonationStatus = () => {
+  // Check impersonation status on mount
+  useEffect(() => {
     const originalSession = localStorage.getItem('original_admin_session');
     setIsImpersonating(!!originalSession);
-    return !!originalSession;
-  };
+  }, []);
 
   // Start impersonation
   const impersonateUser = async (userId: string, userName: string) => {
@@ -137,18 +136,18 @@ export const useImpersonation = () => {
     }
   };
 
-  // Get impersonation duration
-  const getImpersonationDuration = () => {
+  // Get impersonation duration (memoized to prevent re-renders)
+  const getImpersonationDuration = useCallback(() => {
     const startTime = localStorage.getItem('impersonation_start_time');
     if (!startTime) return null;
     
     const duration = Date.now() - parseInt(startTime);
     const minutes = Math.floor(duration / 60000);
     return minutes;
-  };
+  }, []);
 
   return {
-    isImpersonating: checkImpersonationStatus(),
+    isImpersonating,
     loading,
     impersonateUser,
     exitImpersonation,
