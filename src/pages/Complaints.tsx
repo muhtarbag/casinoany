@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, MessageSquare, ThumbsUp, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
@@ -79,7 +81,9 @@ const Complaints = () => {
         title="Şikayetler"
         description="Bahis siteleri hakkındaki kullanıcı şikayetlerini görüntüleyin"
       />
-      <div className="container mx-auto px-4 py-8">
+      <Header />
+      <div className="min-h-screen bg-gradient-dark">
+        <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold mb-2">Şikayetler</h1>
@@ -214,7 +218,9 @@ const Complaints = () => {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
+      <Footer />
     </>
   );
 };

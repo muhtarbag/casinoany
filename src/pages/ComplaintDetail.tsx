@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ThumbsUp, MessageSquare, ArrowLeft, CheckCircle, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
@@ -179,13 +181,20 @@ const ComplaintDetail = () => {
 
   if (!complaint) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">Şikayet bulunamadı</p>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <SEO title="Şikayet Bulunamadı" description="Aradığınız şikayet bulunamadı" />
+        <Header />
+        <div className="min-h-screen bg-gradient-dark">
+          <div className="container mx-auto px-4 py-8">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <p className="text-muted-foreground">Şikayet bulunamadı</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        <Footer />
+      </>
     );
   }
 
@@ -197,7 +206,9 @@ const ComplaintDetail = () => {
         title={complaint.title}
         description={complaint.description.substring(0, 160)}
       />
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Header />
+      <div className="min-h-screen bg-gradient-dark">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -378,7 +389,9 @@ const ComplaintDetail = () => {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
+      <Footer />
     </>
   );
 };
