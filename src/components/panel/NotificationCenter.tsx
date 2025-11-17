@@ -67,8 +67,8 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
   });
 
   // Stats
-  const unreadComplaints = notifications?.complaints.filter(c => c.status === 'pending').length || 0;
-  const totalNotifications = (notifications?.complaints.length || 0) + (notifications?.reviews.length || 0);
+  const unreadComplaints = notifications?.complaints?.filter(c => c.status === 'pending').length || 0;
+  const totalNotifications = (notifications?.complaints?.length || 0) + (notifications?.reviews?.length || 0);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {

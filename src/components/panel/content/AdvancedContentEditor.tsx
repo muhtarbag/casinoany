@@ -14,9 +14,11 @@ import {
   Box,
   Sparkles,
   Eye,
-  Undo2
+  Undo2,
+  Code2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { StylePreview } from './StylePreview';
 
 interface BlockStyles {
   prosConsBlock?: {
@@ -105,17 +107,21 @@ export function AdvancedContentEditor({ blockStyles, onStylesChange }: AdvancedC
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
+            variant={previewMode ? 'default' : 'outline'}
             size="sm"
             onClick={() => setPreviewMode(!previewMode)}
           >
-            <Eye className="h-4 w-4 mr-2" />
-            {previewMode ? 'Düzenleme Modu' : 'Önizleme'}
+            {previewMode ? <Code2 className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+            {previewMode ? 'Düzenleme' : 'Önizleme'}
           </Button>
         </div>
       </div>
 
-      {/* Quick Color Presets */}
+      {previewMode ? (
+        <StylePreview blockStyles={localStyles} />
+      ) : (
+        <>
+          {/* Quick Color Presets */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
@@ -628,6 +634,8 @@ export function AdvancedContentEditor({ blockStyles, onStylesChange }: AdvancedC
           </Card>
         </TabsContent>
       </Tabs>
+      </>
+      )}
 
       {/* Preview Info */}
       <Card className="bg-muted/50">
