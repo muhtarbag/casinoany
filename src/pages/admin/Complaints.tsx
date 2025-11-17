@@ -33,7 +33,7 @@ export default function AdminComplaints() {
         .select(`
           *,
           betting_sites (name, slug, logo_url),
-          profiles!site_complaints_user_id_fkey (username, email, first_name, last_name)
+          profiles (username, email, first_name, last_name)
         `)
         .order('created_at', { ascending: false });
 
@@ -76,7 +76,7 @@ export default function AdminComplaints() {
         .from('complaint_responses')
         .select(`
           *,
-          profiles!complaint_responses_user_id_fkey (username, email, first_name, last_name)
+          profiles (username, email, first_name, last_name)
         `)
         .eq('complaint_id', selectedComplaint.id)
         .order('created_at', { ascending: true });

@@ -1145,6 +1145,13 @@ export type Database = {
             referencedRelation: "site_complaints"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "complaint_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       content_optimization_suggestions: {
@@ -1756,6 +1763,13 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_complaints_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
