@@ -89,15 +89,24 @@ const Users = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
+      // Önce user_roles'u onayla
+      const { error: roleError } = await supabase
         .from('user_roles')
         .update({ status: 'approved' })
         .eq('user_id', userId);
-      if (error) throw error;
+      if (roleError) throw roleError;
+
+      // Kurumsal kullanıcı ise profile'ı da doğrulanmış olarak işaretle
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ is_verified: true })
+        .eq('id', userId)
+        .eq('user_type', 'corporate');
+      if (profileError) throw profileError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({ title: 'Başarılı', description: 'Kullanıcı onaylandı' });
+      toast({ title: 'Başarılı', description: 'Kullanıcı onaylandı ve doğrulandı' });
     },
   });
 
