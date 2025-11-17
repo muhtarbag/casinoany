@@ -7,29 +7,17 @@ import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema, FAQSchema, ItemLis
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useFeaturedSites } from '@/hooks/queries/useSiteQueries';
 
 const Index = () => {
   const handleSearch = (term: string) => {
     document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Fetch featured sites for ItemList schema
-  const { data: featuredSitesForSchema } = useQuery({
-    queryKey: ['featured-sites-schema'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('name, slug, logo_url, bonus')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('rating', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
-    },
+  // Use centralized hook for featured sites schema
+  const { data: featuredSitesForSchema } = useFeaturedSites({
+    limit: 10,
+    select: 'name, slug, logo_url, bonus'
   });
 
   const breadcrumbItems = [
@@ -85,7 +73,7 @@ const Index = () => {
       {featuredSitesForSchema && featuredSitesForSchema.length > 0 && (
         <ItemListSchema 
           title="En İyi Casino Siteleri 2025"
-          items={featuredSitesForSchema.map(site => ({
+          items={featuredSitesForSchema.map((site: any) => ({
             name: site.name,
             url: `${window.location.origin}/site/${site.slug}`,
             image: site.logo_url || undefined

@@ -120,7 +120,8 @@ export const queryKeys = {
     stats: () => [...queryKeys.sites.all, 'stats'] as const,
     statsByIds: (siteIds: string[]) => 
       [...queryKeys.sites.all, 'stats', 'byIds', ...siteIds.sort()] as const,
-    featured: () => [...queryKeys.sites.all, 'featured'] as const,
+    featured: (limit?: number) => [...queryKeys.sites.all, 'featured', limit] as const,
+    categories: (categoryId: string) => [...queryKeys.sites.all, 'category', categoryId] as const,
   },
   
   // Analytics (OPTIMIZED: Event-sourcing pattern)
