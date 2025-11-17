@@ -26,7 +26,7 @@ export default function Complaints() {
     site_id: '',
     title: '',
     description: '',
-    complaint_type: 'other'
+    complaint_type: 'diger'
   });
 
   const { data: complaints, isLoading } = useQuery({
@@ -35,7 +35,7 @@ export default function Complaints() {
       if (!user) return [];
       
       const { data, error } = await supabase
-        .from('user_complaints')
+        .from('site_complaints')
         .select(`
           *,
           betting_sites (
@@ -70,10 +70,15 @@ export default function Complaints() {
   const createComplaintMutation = useMutation({
     mutationFn: async (data: any) => {
       const { error } = await supabase
-        .from('user_complaints')
+        .from('site_complaints')
         .insert({
-          ...data,
-          user_id: user?.id
+          site_id: data.site_id,
+          user_id: user?.id,
+          title: data.title,
+          description: data.description,
+          category: data.complaint_type,
+          severity: 'normal',
+          is_public: false, // Kullanıcı panelinden oluşturulan şikayetler varsayılan olarak özel
         });
 
       if (error) throw error;
@@ -81,7 +86,7 @@ export default function Complaints() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-complaints'] });
       setIsDialogOpen(false);
-      setFormData({ site_id: '', title: '', description: '', complaint_type: 'other' });
+      setFormData({ site_id: '', title: '', description: '', complaint_type: 'diger' });
       toast.success('Şikayetiniz başarıyla oluşturuldu');
     },
     onError: () => {
@@ -105,25 +110,26 @@ export default function Complaints() {
   }
 
   const statusColors: Record<string, string> = {
-    pending: 'default',
-    reviewing: 'secondary',
-    resolved: 'success',
-    rejected: 'destructive'
+    open: 'destructive',
+    in_review: 'secondary',
+    resolved: 'default',
+    closed: 'outline'
   };
 
   const statusLabels: Record<string, string> = {
-    pending: 'Beklemede',
-    reviewing: 'İnceleniyor',
+    open: 'Açık',
+    in_review: 'İnceleniyor',
     resolved: 'Çözüldü',
-    rejected: 'Reddedildi'
+    closed: 'Kapalı'
   };
 
   const complaintTypeLabels: Record<string, string> = {
-    payment: 'Ödeme',
+    odeme: 'Ödeme',
     bonus: 'Bonus',
-    support: 'Destek',
-    technical: 'Teknik',
-    other: 'Diğer'
+    musteri_hizmetleri: 'Müşteri Hizmetleri',
+    teknik: 'Teknik',
+    guvenlik: 'Güvenlik',
+    diger: 'Diğer'
   };
 
   return (
@@ -181,11 +187,12 @@ export default function Complaints() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="payment">Ödeme</SelectItem>
+                        <SelectItem value="odeme">Ödeme</SelectItem>
                         <SelectItem value="bonus">Bonus</SelectItem>
-                        <SelectItem value="support">Destek</SelectItem>
-                        <SelectItem value="technical">Teknik</SelectItem>
-                        <SelectItem value="other">Diğer</SelectItem>
+                        <SelectItem value="musteri_hizmetleri">Müşteri Hizmetleri</SelectItem>
+                        <SelectItem value="teknik">Teknik</SelectItem>
+                        <SelectItem value="guvenlik">Güvenlik</SelectItem>
+                        <SelectItem value="diger">Diğer</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -251,29 +258,40 @@ export default function Complaints() {
                             className="w-12 h-12 rounded object-contain"
                           />
                         )}
-                        <div>
-                          <CardTitle className="text-lg">{complaint.title}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-muted-foreground">
-                              {complaint.betting_sites?.name}
-                            </span>
-                            <Badge variant={statusColors[complaint.status] as any}>
-                              {statusLabels[complaint.status]}
-                            </Badge>
-                            <Badge variant="outline">
-                              {complaintTypeLabels[complaint.complaint_type]}
-                            </Badge>
+                          <div>
+                            <CardTitle className="text-lg">{complaint.title}</CardTitle>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-sm text-muted-foreground">
+                                {complaint.betting_sites?.name}
+                              </span>
+                              <Badge variant={statusColors[complaint.status] as any}>
+                                {statusLabels[complaint.status]}
+                              </Badge>
+                              <Badge variant="outline">
+                                {complaintTypeLabels[complaint.category]}
+                              </Badge>
+                              {!complaint.is_public && (
+                                <Badge variant="secondary">Özel</Badge>
+                              )}
+                            </div>
                           </div>
-                        </div>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground mb-4">{complaint.description}</p>
-                    {complaint.admin_response && (
+                    {complaint.response_count > 0 && (
                       <div className="bg-muted/50 p-4 rounded-lg mb-4">
-                        <p className="font-semibold mb-2">Yönetici Yanıtı:</p>
-                        <p className="text-sm">{complaint.admin_response}</p>
+                        <p className="font-semibold mb-2">
+                          {complaint.response_count} cevap var
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/sikayetler/${complaint.id}`)}
+                        >
+                          Cevapları Görüntüle
+                        </Button>
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground">
