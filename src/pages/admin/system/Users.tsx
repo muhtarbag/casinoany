@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useImpersonation } from '@/hooks/useImpersonation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, UserCog } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -32,6 +33,7 @@ const Users = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const { impersonateUser, loading: impersonating } = useImpersonation();
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -548,8 +550,28 @@ const Users = () => {
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedUser(null)}>
+          <DialogFooter className="flex gap-2">
+            {/* ✅ YENİ: Üye gibi davran butonu */}
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const userName = selectedUser?.profile?.company_name || 
+                  `${selectedUser?.profile?.first_name || ''} ${selectedUser?.profile?.last_name || ''}` ||
+                  selectedUser?.profile?.email;
+                
+                const success = await impersonateUser(selectedUser?.user_id, userName);
+                if (success) {
+                  setSelectedUser(null);
+                }
+              }}
+              disabled={impersonating || selectedUser?.status !== 'approved'}
+              className="flex items-center gap-2"
+            >
+              <UserCog className="h-4 w-4" />
+              {impersonating ? 'Giriş yapılıyor...' : 'Üye gibi davran'}
+            </Button>
+
+            <Button variant="ghost" onClick={() => setSelectedUser(null)}>
               Kapat
             </Button>
           </DialogFooter>

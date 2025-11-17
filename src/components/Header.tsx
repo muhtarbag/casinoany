@@ -3,18 +3,20 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, Shield } from 'lucide-react';
 import { MobileMenu } from '@/components/MobileMenu';
+import { ImpersonationBanner } from '@/components/ImpersonationBanner';
 import logo from '@/assets/casinodoo-logo.svg';
 
 export const Header = () => {
   const { user, isAdmin, isSiteOwner, signOut } = useAuth();
 
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 md:py-4">
-        <nav className="flex items-center justify-between">
-          <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" loading="eager" />
-          </NavLink>
+    <>
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 md:py-4">
+          <nav className="flex items-center justify-between">
+            <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
+              <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" loading="eager" />
+            </NavLink>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-2 md:gap-6">
@@ -118,5 +120,9 @@ export const Header = () => {
         </nav>
       </div>
     </header>
+    
+    {/* ✅ YENİ: Impersonation banner */}
+    <ImpersonationBanner />
+  </>
   );
 };

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TypedRPC } from '@/lib/supabase-extended';
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from '@/hooks/useFavorites';
 import { analytics } from "@/lib/analytics";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -52,6 +53,7 @@ export default function SiteDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { isFavorite: checkFavorite, toggleFavorite, isToggling } = useFavorites();
   const [viewTracked, setViewTracked] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showStickyCTA, setShowStickyCTA] = useState(false);
@@ -94,61 +96,20 @@ export default function SiteDetail() {
     retry: false,
   });
 
-  // Check if site is in user's favorites
-  const { data: isFavorite, isLoading: favoriteLoading } = useQuery({
-    queryKey: ["user-favorite", site?.id, user?.id],
-    queryFn: async () => {
-      if (!user || !site?.id) return false;
-      const { data, error } = await supabase
-        .from("user_favorite_sites")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("site_id", site.id)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return !!data;
-    },
-    enabled: !!user && !!site?.id,
-  });
+  // ✅ OPTIMIZE EDİLDİ: O(1) lookup
+  const isFavorite = checkFavorite(site?.id);
 
-  // Toggle favorite mutation
-  const toggleFavoriteMutation = useMutation({
-    mutationFn: async () => {
-      if (!user) {
-        toast.error("Favorilere eklemek için giriş yapmalısınız");
-        navigate("/login");
-        return;
-      }
-      if (!site?.id) return;
+  // ✅ OPTIMIZE EDİLDİ: Global favorites hook kullanıyor
+  const handleToggleFavorite = () => {
+    if (!user) {
+      toast.error("Favorilere eklemek için giriş yapmalısınız");
+      navigate("/login");
+      return;
+    }
+    if (!site?.id) return;
 
-      if (isFavorite) {
-        // Remove from favorites
-        const { error } = await supabase
-          .from("user_favorite_sites")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("site_id", site.id);
-        if (error) throw error;
-      } else {
-        // Add to favorites
-        const { error } = await supabase
-          .from("user_favorite_sites")
-          .insert({
-            user_id: user.id,
-            site_id: site.id,
-          });
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-favorite", site?.id, user?.id] });
-      toast.success(isFavorite ? "Favorilerden çıkarıldı" : "Favorilere eklendi");
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Bir hata oluştu");
-    },
-  });
+    toggleFavorite({ siteId: site.id, isFavorite });
+  };
 
   // Load logo from storage or use direct URL
   useEffect(() => {
@@ -471,8 +432,8 @@ export default function SiteDetail() {
             reviewCount={reviews?.length || 0}
             onAffiliateClick={handleAffiliateClick}
             isFavorite={isFavorite}
-            onToggleFavorite={() => toggleFavoriteMutation.mutate()}
-            favoriteLoading={favoriteLoading || toggleFavoriteMutation.isPending}
+            onToggleFavorite={handleToggleFavorite}
+            favoriteLoading={isToggling}
           />
         </div>
 
