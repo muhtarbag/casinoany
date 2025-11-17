@@ -4,6 +4,7 @@ import { PanelSidebar } from './PanelSidebar';
 import { NotificationBell } from './notifications/NotificationBell';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Kbd } from '@/components/ui/kbd';
 
 interface PanelLayoutProps {
   siteData: any;
@@ -63,12 +64,15 @@ export function PanelLayout({
               </Breadcrumb>
             )}
 
-            {/* Notification Bell */}
-            {siteId && (
-              <div className="ml-auto">
-                <NotificationBell siteId={siteId} />
+            {/* Notification Bell & Shortcuts Hint */}
+            <div className="ml-auto flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-1 text-xs text-muted-foreground">
+                <span>Kısayollar için</span>
+                <Kbd>?</Kbd>
+                <span>basın</span>
               </div>
-            )}
+              {siteId && <NotificationBell siteId={siteId} />}
+            </div>
           </header>
 
           {/* Main Content */}

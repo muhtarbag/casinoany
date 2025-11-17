@@ -11,10 +11,12 @@ import {
   TrendingUp,
   Users,
   AlertCircle,
+  Inbox,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EnhancedEmptyState } from '../EnhancedEmptyState';
 
 interface ActivityFeedProps {
   siteId: string;
@@ -139,15 +141,17 @@ export function ActivityFeed({ siteId, limit = 20 }: ActivityFeedProps) {
       </CardHeader>
       <CardContent>
         {activities.length === 0 ? (
-          <div className="text-center py-8">
-            <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground">Henüz aktivite yok</p>
-          </div>
+          <EnhancedEmptyState
+            icon={Inbox}
+            title="Henüz aktivite yok"
+            description="Siteniz hakkında henüz aktivite bulunmuyor. İlk aktivitelerinizi bekleyin!"
+            variant="default"
+          />
         ) : (
           <ScrollArea className="h-[400px] pr-4">
-            <div className="space-y-4">
+            <div className="space-y-4 animate-fade-in">
               {activities.map((activity: any) => (
-                <div key={`${activity.type}-${activity.id}`} className="flex gap-3">
+                <div key={`${activity.type}-${activity.id}`} className="flex gap-3 hover-scale">
                   <div className="flex-shrink-0 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
                     {getActivityIcon(activity.type)}
                   </div>

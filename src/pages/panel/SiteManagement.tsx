@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
@@ -14,11 +14,28 @@ import { SiteBasicInfoEditor } from '@/components/panel/SiteBasicInfoEditor';
 import { SiteReportsExport } from '@/components/panel/SiteReportsExport';
 import { NotificationCenter } from '@/components/panel/NotificationCenter';
 import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
+import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
 
 const SiteManagement = () => {
   const { user, isSiteOwner, ownedSites } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Enable keyboard shortcuts
+  useGlobalKeyboardShortcuts(ownedSites[0]);
+  
+  // Listen for ? key to show shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        setShowShortcuts(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const { data: siteData, isLoading } = useQuery({
     queryKey: ['owned-site-full', user?.id],
@@ -177,8 +194,15 @@ const SiteManagement = () => {
         breadcrumbs={getBreadcrumbs()}
         siteId={siteData.id}
       >
-        {renderContent()}
+        <div className="animate-fade-in">
+          {renderContent()}
+        </div>
       </PanelLayout>
+      
+      <KeyboardShortcuts 
+        open={showShortcuts} 
+        onOpenChange={setShowShortcuts} 
+      />
     </>
   );
 };

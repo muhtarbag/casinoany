@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, ThumbsUp, MessageSquare, TrendingUp, Users } from 'lucide-react';
+import { Star, ThumbsUp, MessageSquare, TrendingUp, Users, Inbox } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import {
@@ -21,6 +21,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { EnhancedEmptyState } from './EnhancedEmptyState';
+import { LoadingState } from '@/components/admin/LoadingState';
 
 interface UserFeedbackManagerProps {
   siteId: string;
@@ -28,7 +30,7 @@ interface UserFeedbackManagerProps {
 
 export const UserFeedbackManager = ({ siteId }: UserFeedbackManagerProps) => {
   // Fetch reviews
-  const { data: reviews } = useQuery({
+  const { data: reviews, isLoading } = useQuery({
     queryKey: ['site-reviews-feedback', siteId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -109,6 +111,21 @@ export const UserFeedbackManager = ({ siteId }: UserFeedbackManagerProps) => {
         : 0,
     };
   });
+
+  if (isLoading) {
+    return <LoadingState variant="spinner" text="Yorumlar yükleniyor..." />;
+  }
+
+  if (!reviews || reviews.length === 0) {
+    return (
+      <EnhancedEmptyState
+        icon={Inbox}
+        title="Henüz yorum yok"
+        description="Siteniz hakkında henüz onaylanmış yorum bulunmuyor. İlk yorumların gelmesini bekleyin!"
+        variant="centered"
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
