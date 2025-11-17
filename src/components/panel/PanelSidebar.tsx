@@ -20,9 +20,10 @@ import {
   SidebarHeader,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { SiteData } from '@/types/site';
 
 interface PanelSidebarProps {
-  siteData: any;
+  siteData: SiteData;
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
