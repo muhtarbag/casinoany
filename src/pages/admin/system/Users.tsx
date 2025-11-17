@@ -161,8 +161,16 @@ const Users = () => {
     );
   }
 
-  const individualUsers = users?.filter(u => u.profile && u.profile.user_type === 'individual') || [];
-  const corporateUsers = users?.filter(u => u.profile && u.profile.user_type === 'corporate') || [];
+  // Kullanıcıları user_type'a göre ayır - varsayılan 'individual'
+  const individualUsers = users?.filter(u => {
+    const userType = u.profile?.user_type || 'individual';
+    return userType === 'individual';
+  }) || [];
+  
+  const corporateUsers = users?.filter(u => {
+    const userType = u.profile?.user_type;
+    return userType === 'corporate';
+  }) || [];
 
   const renderIndividualTable = () => (
     <Table>
