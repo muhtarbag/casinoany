@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
   const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>([]);
   const [blockStyles, setBlockStyles] = useState<any>({});
   const [hasChanges, setHasChanges] = useState(false);
+  const isFirstRender = useRef(true);
 
   // Fetch site content
   const { data: siteContent, isLoading } = useQuery({
@@ -59,10 +60,28 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     }
   }, [siteContent]);
 
-  // Track changes
+  // Track changes - ✅ Fixed: Skip first render and compare with original data
   useEffect(() => {
-    setHasChanges(true);
-  }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq, blockStyles]);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    
+    if (siteContent) {
+      const hasActualChanges = 
+        JSON.stringify(pros) !== JSON.stringify(siteContent.pros) ||
+        JSON.stringify(cons) !== JSON.stringify(siteContent.cons) ||
+        verdict !== (siteContent.verdict || '') ||
+        expertReview !== (siteContent.expert_review || '') ||
+        JSON.stringify(gameCategories) !== JSON.stringify(siteContent.game_categories || {}) ||
+        loginGuide !== (siteContent.login_guide || '') ||
+        withdrawalGuide !== (siteContent.withdrawal_guide || '') ||
+        JSON.stringify(faq) !== JSON.stringify(siteContent.faq || []) ||
+        JSON.stringify(blockStyles) !== JSON.stringify(siteContent.block_styles || {});
+      
+      setHasChanges(hasActualChanges);
+    }
+  }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq, blockStyles, siteContent]);
 
   // Save mutation
   const saveMutation = useMutation({
@@ -86,9 +105,24 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-content', siteId] });
+      // ✅ OPTIMIZED: Optimistic update to prevent unnecessary refetch
+      queryClient.setQueryData(['site-content', siteId], {
+        pros,
+        cons,
+        verdict,
+        expert_review: expertReview,
+        game_categories: gameCategories,
+        login_guide: loginGuide,
+        withdrawal_guide: withdrawalGuide,
+        faq,
+        block_styles: blockStyles,
+      });
+      
+      // Only invalidate parent query
       queryClient.invalidateQueries({ queryKey: ['owned-site-full'] });
+      
       setHasChanges(false);
+      isFirstRender.current = true; // Reset first render flag
       toast({
         title: 'Başarılı',
         description: 'İçerik başarıyla kaydedildi',

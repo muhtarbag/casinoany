@@ -85,9 +85,12 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
     );
   }
 
-  // Stats
-  const unreadComplaints = notifications?.complaints?.filter(c => c.status === 'pending').length || 0;
-  const totalNotifications = (notifications?.complaints?.length || 0) + (notifications?.reviews?.length || 0);
+  // Stats - Safe null handling
+  const complaints = notifications?.complaints ?? [];
+  const reviews = notifications?.reviews ?? [];
+  
+  const unreadComplaints = complaints.filter(c => c.status === 'pending').length;
+  const totalNotifications = complaints.length + reviews.length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -236,16 +239,16 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                 Tümü ({totalNotifications})
               </TabsTrigger>
               <TabsTrigger value="complaints">
-                Şikayetler ({notifications?.complaints.length || 0})
+                Şikayetler ({complaints.length})
               </TabsTrigger>
               <TabsTrigger value="reviews">
-                Yorumlar ({notifications?.reviews.length || 0})
+                Yorumlar ({reviews.length})
               </TabsTrigger>
             </TabsList>
 
             <ScrollArea className="h-[400px] mt-4">
               <TabsContent value="all" className="space-y-3">
-                {!notifications || (notifications.complaints.length === 0 && notifications.reviews.length === 0) ? (
+                {complaints.length === 0 && reviews.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <BellOff className="h-12 w-12 text-muted-foreground mb-4" />
                     <p className="text-sm font-medium">Henüz bildirim yok</p>
@@ -256,7 +259,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                 ) : (
                   <>
                     {/* Şikayetler */}
-                    {notifications?.complaints?.map((complaint) => (
+                    {complaints.map((complaint) => (
                   <div
                     key={`complaint-${complaint.id}`}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -283,7 +286,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                 ))}
 
                 {/* Yorumlar */}
-                {notifications?.reviews.map((review) => (
+                {reviews.map((review) => (
                   <div
                     key={`review-${review.id}`}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -314,7 +317,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
               </TabsContent>
 
               <TabsContent value="complaints" className="space-y-3">
-                {!notifications || notifications.complaints.length === 0 ? (
+                {complaints.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
                     <p className="text-sm font-medium">Henüz şikayet yok</p>
@@ -323,7 +326,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                     </p>
                   </div>
                 ) : (
-                  notifications?.complaints?.map((complaint) => (
+                  complaints.map((complaint) => (
                   <div
                     key={complaint.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -352,7 +355,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
               </TabsContent>
 
               <TabsContent value="reviews" className="space-y-3">
-                {!notifications || notifications.reviews.length === 0 ? (
+                {reviews.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
                     <p className="text-sm font-medium">Henüz yorum yok</p>
@@ -361,7 +364,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                     </p>
                   </div>
                 ) : (
-                  notifications?.reviews?.map((review) => (
+                  reviews.map((review) => (
                   <div
                     key={review.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
