@@ -92,7 +92,8 @@ export const useFavorites = () => {
 
   // Helper function - O(1) lookup
   const isFavorite = (siteId: string | undefined) => {
-    if (!siteId || !favoritesSet) return false;
+    if (!siteId) return false;
+    if (!favoritesSet || !(favoritesSet instanceof Set)) return false;
     return favoritesSet.has(siteId);
   };
 
