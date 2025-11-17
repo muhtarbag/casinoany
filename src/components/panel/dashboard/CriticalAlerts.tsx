@@ -24,6 +24,7 @@ interface CriticalAlertsProps {
 }
 
 export const CriticalAlerts = ({ alerts, onActionClick }: CriticalAlertsProps) => {
+  const isMobile = useIsMobile();
   if (alerts.length === 0) return null;
 
   const getAlertIcon = (type: string) => {

@@ -14,6 +14,7 @@ interface QuickActionsToolbarProps {
 }
 
 export const QuickActionsToolbar = ({ onAction }: QuickActionsToolbarProps) => {
+  const isMobile = useIsMobile();
   const actions = [
     {
       id: 'content',
