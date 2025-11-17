@@ -7,6 +7,8 @@ import { Heart, ExternalLink, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
 const Favorites = () => {
   const { user } = useAuth();
@@ -58,23 +60,28 @@ const Favorites = () => {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">Favorilerinizi görmek için giriş yapın</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-dark flex flex-col">
+        <Header />
+        <div className="flex-1 container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <p className="text-muted-foreground">Favorilerinizi görmek için giriş yapın</p>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-dark flex flex-col">
+      <Header />
       <SEO 
         title="Favori Sitelerim"
         description="Favori bahis sitelerinizi görüntüleyin ve yönetin"
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Favori Sitelerim</h1>
           <p className="text-muted-foreground">
@@ -166,7 +173,8 @@ const Favorites = () => {
           </Card>
         )}
       </div>
-    </>
+      <Footer />
+    </div>
   );
 };
 
