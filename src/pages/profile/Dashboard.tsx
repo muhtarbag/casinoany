@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, MessageSquare, AlertTriangle, Gift, User, ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
+import { Heart, MessageSquare, AlertTriangle, Gift, User, ArrowRight, Sparkles, TrendingUp, Settings } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
@@ -149,6 +149,18 @@ export default function Dashboard() {
       borderColor: 'border-orange-500/20',
       hoverBg: 'hover:bg-orange-500/15',
       emptyMessage: 'Şikayetiniz yoksa ne mutlu!'
+    },
+    {
+      title: 'Profilim',
+      description: 'Hesap ayarları ve bilgilerim',
+      icon: Settings,
+      count: undefined,
+      href: '/profile/settings',
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
+      hoverBg: 'hover:bg-purple-500/15',
+      emptyMessage: 'Profilinizi düzenleyin'
     }
   ];
 
