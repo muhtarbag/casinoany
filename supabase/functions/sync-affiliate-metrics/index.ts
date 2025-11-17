@@ -57,9 +57,9 @@ Deno.serve(async (req) => {
           .select('total_views, affiliate_clicks, block_interactions')
           .eq('site_id', site.id)
           .eq('view_date', syncDate)
-          .single();
+          .maybeSingle();
 
-        if (casinoError && casinoError.code !== 'PGRST116') {
+        if (casinoError) {
           console.error(`⚠️ Casino analytics error for ${site.name}:`, casinoError);
         }
 
@@ -68,9 +68,9 @@ Deno.serve(async (req) => {
           .from('site_stats')
           .select('views, clicks')
           .eq('site_id', site.id)
-          .single();
+          .maybeSingle();
 
-        if (statsError && statsError.code !== 'PGRST116') {
+        if (statsError) {
           console.error(`⚠️ Site stats error for ${site.name}:`, statsError);
         }
 

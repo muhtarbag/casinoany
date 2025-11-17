@@ -40,7 +40,7 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', adminUser.id)
       .eq('status', 'approved')
-      .single()
+      .maybeSingle()
 
     if (!roles || roles.role !== 'admin') {
       throw new Error('Only admins can impersonate users')
