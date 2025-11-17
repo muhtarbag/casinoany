@@ -44,10 +44,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Cache user roles to prevent duplicate requests
-  const rolesCache = useRef<{ userId: string; roles: string[]; timestamp: number } | null>(null);
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   useEffect(() => {
     let mounted = true;
@@ -90,17 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const checkUserRoles = async (userId: string) => {
-    // Check cache first
-    if (rolesCache.current?.userId === userId) {
-      const cacheAge = Date.now() - rolesCache.current.timestamp;
-      if (cacheAge < CACHE_DURATION) {
-        const roles = rolesCache.current.roles;
-        setUserRoles(roles);
-        setIsAdmin(roles.includes('admin'));
-        return;
-      }
-    }
-
     const { data } = await supabase
       .from('user_roles')
       .select('role, status')
@@ -110,29 +95,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const approvedRoles = data?.filter(r => r.status === 'approved') || [];
     const roles = approvedRoles.map(r => r.role);
     
-    // Update cache
-    rolesCache.current = {
-      userId,
-      roles,
-      timestamp: Date.now()
-    };
+    // Check site ownership independently from roles
+    const { data: ownedSitesData } = await (supabase as any)
+      .from('site_owners')
+      .select('site_id')
+      .eq('user_id', userId)
+      .eq('status', 'approved');
+    
+    const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
     
     setUserRoles(roles);
     setIsAdmin(roles.includes('admin'));
-    setIsSiteOwner(roles.includes('site_owner' as any));
-    
-    // Check site ownership
-    if (roles.includes('site_owner' as any)) {
-      const { data: ownedSitesData } = await (supabase as any)
-        .from('site_owners')
-        .select('site_id')
-        .eq('user_id', userId)
-        .eq('status', 'approved');
-      
-      setOwnedSites(ownedSitesData?.map((s: any) => s.site_id) || []);
-    } else {
-      setOwnedSites([]);
-    }
+    setIsSiteOwner(sites.length > 0); // Site ownership based on site_owners table
+    setOwnedSites(sites);
   };
 
   const signUp = async (
