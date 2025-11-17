@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ThumbsUp, MessageSquare, ArrowLeft, CheckCircle, Shield } from 'lucide-react';
+import { ThumbsUp, MessageSquare, ArrowLeft, CheckCircle, Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
@@ -15,6 +15,8 @@ import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const ComplaintDetail = () => {
   const { id } = useParams();
@@ -124,6 +126,30 @@ const ComplaintDetail = () => {
     },
   });
 
+  const togglePublicMutation = useMutation({
+    mutationFn: async (isPublic: boolean) => {
+      const { error } = await supabase
+        .from('site_complaints')
+        .update({ is_public: isPublic })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      toast({
+        title: 'Başarılı',
+        description: 'Görünürlük ayarı güncellendi',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Güncelleme sırasında bir hata oluştu',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const categoryLabels: Record<string, string> = {
     odeme: 'Ödeme',
     bonus: 'Bonus',
@@ -199,6 +225,7 @@ const ComplaintDetail = () => {
   }
 
   const canManageComplaint = isAdmin || isOwnerOfThisSite;
+  const isOwnComplaint = user && complaint.user_id === user.id;
 
   return (
     <>
@@ -215,6 +242,39 @@ const ComplaintDetail = () => {
             Geri
           </Link>
         </Button>
+
+        {/* Visibility Control for Own Complaints */}
+        {isOwnComplaint && complaint.status === 'open' && (
+          <Card className="mb-4 border-primary/20 bg-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {complaint.is_public ? (
+                    <Eye className="h-5 w-5 text-primary" />
+                  ) : (
+                    <EyeOff className="h-5 w-5 text-muted-foreground" />
+                  )}
+                  <div>
+                    <Label htmlFor="visibility-toggle" className="text-base font-semibold cursor-pointer">
+                      {complaint.is_public ? 'Herkese Açık' : 'Özel'}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {complaint.is_public 
+                        ? 'Şikayetiniz /sikayetler sayfasında görünüyor' 
+                        : 'Şikayet sadece sizin ve site yöneticileri tarafından görülebilir'}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="visibility-toggle"
+                  checked={complaint.is_public}
+                  onCheckedChange={(checked) => togglePublicMutation.mutate(checked)}
+                  disabled={togglePublicMutation.isPending}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="mb-6">
           <CardHeader>
