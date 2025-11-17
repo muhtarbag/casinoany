@@ -59,24 +59,32 @@ export const useSite = (slug: string) => {
   });
 };
 
-// Featured sites
-export const useFeaturedSites = () => {
+// Featured sites - Centralized with flexible options
+export const useFeaturedSites = (options?: {
+  limit?: number;
+  select?: string;
+}) => {
+  const limit = options?.limit || 6;
+  const select = options?.select || '*';
+  
   return useQuery({
-    queryKey: queryKeys.sites.featured(),
+    queryKey: queryKeys.sites.featured(limit),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('*')
+        .select(select)
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
-        .limit(6);
+        .limit(limit);
 
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
+    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 

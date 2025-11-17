@@ -9,6 +9,7 @@ import BlurText from './BlurText';
 import FloatingLines from './FloatingLines';
 import { RetryBoundary } from './feedback/RetryBoundary';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useFeaturedSites, useSiteStats } from '@/hooks/queries/useSiteQueries';
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -143,37 +144,13 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     }
   }, [carouselSettings]);
 
-  const { data: featuredSites, isLoading: isFeaturedLoading } = useQuery({
-    queryKey: ['featured-sites'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('rating', { ascending: false })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    },
+  // Use centralized hooks for data fetching
+  const { data: featuredSites, isLoading: isFeaturedLoading } = useFeaturedSites({
+    limit: 3,
+    select: 'id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube'
   });
 
-  const featuredIds = featuredSites?.map((site: any) => site.id) || [];
-
-  const { data: siteStats } = useQuery({
-    queryKey: ['site-stats', ...featuredIds.sort()],
-    queryFn: async () => {
-      if (!featuredSites || featuredSites.length === 0) return [];
-      
-      const { data, error } = await supabase
-        .from('site_stats')
-        .select('site_id, views, clicks')
-        .in('site_id', featuredIds);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!featuredSites && featuredSites.length > 0,
-  });
+  const { data: siteStats } = useSiteStats();
 
 
   return (
@@ -250,8 +227,8 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                   ref={emblaRef}
                 >
                   <div className="flex gap-4 md:gap-6">
-                    {featuredSites.map((site, index) => {
-                      const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
+                    {featuredSites.map((site: any, index: number) => {
+                      const stats = siteStats?.find((s: any) => s.site_id === site.id);
                       return (
                         <div 
                           key={site.id} 
