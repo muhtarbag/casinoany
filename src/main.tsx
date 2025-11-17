@@ -17,6 +17,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/mobile-optimizations.css";
+import "./styles/mobile-touch.css";
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 
 // Initialize Route Preloading

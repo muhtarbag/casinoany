@@ -16,6 +16,7 @@ import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 // Lazy load pages with preloading capability
 // Lazy load pages with preloading capability
@@ -98,6 +99,9 @@ const NewComplaint = lazyWithPreload(() => import("./pages/NewComplaint"));
 
 // SEO-optimized pages
 const DenemeBonusu = lazyWithPreload(() => import("./pages/DenemeBonusuDynamic"));
+
+// PWA Install page
+const Install = lazyWithPreload(() => import("./pages/Install"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -190,6 +194,9 @@ const AppContent = () => {
           {/* SEO-optimized content pages */}
           <Route path="/deneme-bonusu" element={<DenemeBonusu />} />
           
+          {/* PWA Install page */}
+          <Route path="/install" element={<Install />} />
+          
           {/* Category pages */}
           <Route path="/kategoriler" element={<Categories />} />
           <Route path="/kategori/:slug" element={<CategoryDetail />} />
@@ -233,6 +240,7 @@ const App = () => {
               <OptimizedNotificationPopup />
               <ScrollToTop />
               <AppContent />
+              <MobileBottomNav />
             </BrowserRouter>
             </TooltipProvider>
           </AuthProvider>

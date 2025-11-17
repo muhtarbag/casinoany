@@ -37,6 +37,11 @@ export const PWAInstallPrompt = () => {
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
 
+    if (outcome === 'accepted') {
+      // User accepted the install prompt
+      localStorage.setItem('pwa-installed', 'true');
+    }
+
     // Clear the deferredPrompt
     setDeferredPrompt(null);
     setShowPrompt(false);
