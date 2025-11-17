@@ -148,6 +148,7 @@ const Users = () => {
         <TableRow>
           <TableHead>Email</TableHead>
           <TableHead>Ad Soyad</TableHead>
+          <TableHead>Telefon</TableHead>
           <TableHead>Kullanıcı Adı</TableHead>
           <TableHead>Rol</TableHead>
           <TableHead>Durum</TableHead>
@@ -165,6 +166,7 @@ const Users = () => {
                   ? `${user.profile.first_name} ${user.profile.last_name}`
                   : '-'}
               </TableCell>
+              <TableCell>{user.profile?.phone || '-'}</TableCell>
               <TableCell>{user.profile?.username || '-'}</TableCell>
               <TableCell>
                 <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
