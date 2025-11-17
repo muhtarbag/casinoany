@@ -150,9 +150,10 @@ export const useCategory = (slug: string) => {
         .select('*')
         .eq('slug', slug)
         .eq('is_active', true)
-        .single();
+        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
 
       if (error) throw error;
+      if (!data) throw new Error('Category not found');
       return data as Category;
     },
     staleTime: CACHE_TIMES.VERY_LONG,

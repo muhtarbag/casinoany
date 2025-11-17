@@ -16,7 +16,7 @@ export default function AMPSiteDetail() {
         .select('*')
         .eq('slug', slug)
         .eq('is_active', true)
-        .single();
+        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
       if (error) throw error;
       return data;
     },

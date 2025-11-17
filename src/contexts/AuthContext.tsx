@@ -45,23 +45,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // ✅ FIX: Prevent unnecessary re-renders with memoized context value
-  const authContextValue = useMemo<AuthContextType>(
-    () => ({
-      user,
-      session,
-      isAdmin,
-      isSiteOwner,
-      ownedSites,
-      userRoles,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-    }),
-    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading]
-  );
 
   useEffect(() => {
     let mounted = true;
@@ -245,6 +228,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
   };
+
+  // ✅ FIX: Memoize context value AFTER function definitions
+  const authContextValue = useMemo<AuthContextType>(
+    () => ({
+      user,
+      session,
+      isAdmin,
+      isSiteOwner,
+      ownedSites,
+      userRoles,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+    }),
+    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading]
+  );
 
   return (
     <AuthContext.Provider value={authContextValue}>

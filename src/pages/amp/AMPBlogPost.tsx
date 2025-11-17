@@ -16,7 +16,7 @@ export default function AMPBlogPost() {
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
-        .single();
+        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
       if (error) throw error;
       return data;
     },
