@@ -10,7 +10,25 @@ interface AuthContextType {
   ownedSites: string[];
   userRoles: string[];
   loading: boolean;
-  signUp: (email: string, password: string, accountType?: 'user' | 'site_owner', siteId?: string, userData?: { firstName?: string; lastName?: string; phone?: string }) => Promise<{ error: any }>;
+  signUp: (
+    email: string, 
+    password: string, 
+    accountType?: 'user' | 'site_owner', 
+    siteId?: string, 
+    userData?: { 
+      firstName?: string; 
+      lastName?: string; 
+      phone?: string;
+      companyName?: string;
+      companyTaxNumber?: string;
+      companyType?: string;
+      companyAuthorizedPerson?: string;
+      companyPhone?: string;
+      companyEmail?: string;
+      companyAddress?: string;
+      companyWebsite?: string;
+    }
+  ) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -117,7 +135,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, accountType: 'user' | 'site_owner' = 'user', siteId?: string, userData?: { firstName?: string; lastName?: string; phone?: string }) => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    accountType: 'user' | 'site_owner' = 'user', 
+    siteId?: string, 
+    userData?: { 
+      firstName?: string; 
+      lastName?: string; 
+      phone?: string;
+      companyName?: string;
+      companyTaxNumber?: string;
+      companyType?: string;
+      companyAuthorizedPerson?: string;
+      companyPhone?: string;
+      companyEmail?: string;
+      companyAddress?: string;
+      companyWebsite?: string;
+    }
+  ) => {
     const redirectUrl = `${window.location.origin}/`;
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -125,9 +161,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
+          accountType,
           first_name: userData?.firstName,
           last_name: userData?.lastName,
-          phone: userData?.phone
+          phone: userData?.phone,
+          companyName: userData?.companyName,
+          companyTaxNumber: userData?.companyTaxNumber,
+          companyType: userData?.companyType,
+          companyAuthorizedPerson: userData?.companyAuthorizedPerson,
+          companyPhone: userData?.companyPhone,
+          companyEmail: userData?.companyEmail,
+          companyAddress: userData?.companyAddress,
+          companyWebsite: userData?.companyWebsite
         }
       }
     });

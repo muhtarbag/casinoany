@@ -133,7 +133,19 @@ const Signup = () => {
 
     setLoading(true);
     
-    const userData = userType === 'user' ? { firstName, lastName, phone } : undefined;
+    const userData = userType === 'user' 
+      ? { 
+          firstName, 
+          lastName, 
+          phone 
+        } 
+      : {
+          companyName: wizardData.companyName,
+          companyAuthorizedPerson: wizardData.contactName,
+          companyPhone: wizardData.contactWhatsapp || wizardData.contactTelegram,
+          companyEmail: wizardData.contactEmail
+        };
+    
     const result = await signUp(email, password, userType, wizardData.selectedSite !== 'new_site' ? wizardData.selectedSite : null, userData);
     if (result.error) {
       setLoading(false);
