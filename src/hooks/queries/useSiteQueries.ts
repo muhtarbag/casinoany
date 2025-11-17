@@ -35,6 +35,7 @@ export const useSites = (filters?: {
       return data || [];
     },
     staleTime: 30 * 60 * 1000, // 30 minutes - sites rarely change
+    gcTime: 60 * 60 * 1000, // 1 hour
   });
 };
 
@@ -49,6 +50,8 @@ export const useSite = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.VERY_LONG,
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false, // Site detail rarely changes
     enabled: !!slug,
   });
 };
@@ -70,6 +73,7 @@ export const useFeaturedSites = () => {
       return data || [];
     },
     staleTime: CACHE_TIMES.VERY_LONG,
+    gcTime: 60 * 60 * 1000, // 1 hour
   });
 };
 
@@ -87,6 +91,8 @@ export const useSiteStats = () => {
       return data || [];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 20 * 60 * 1000, // 20 minutes
+    refetchOnWindowFocus: true, // Fresh stats on focus
   });
 };
 
