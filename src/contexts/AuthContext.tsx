@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { prodLogger } from '@/lib/productionLogger';
 
 interface AuthContextType {
   user: User | null;
@@ -86,28 +87,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const checkUserRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role, status')
-      .eq('user_id', userId);
-    
-    // Only set roles if user is approved
-    const approvedRoles = data?.filter(r => r.status === 'approved') || [];
-    const roles = approvedRoles.map(r => r.role);
-    
-    // Check site ownership independently from roles
-    const { data: ownedSitesData } = await (supabase as any)
-      .from('site_owners')
-      .select('site_id')
-      .eq('user_id', userId)
-      .eq('status', 'approved');
-    
-    const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
-    
-    setUserRoles(roles);
-    setIsAdmin(roles.includes('admin'));
-    setIsSiteOwner(sites.length > 0); // Site ownership based on site_owners table
-    setOwnedSites(sites);
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', userId);
+      
+      if (error) {
+        prodLogger.error('Failed to fetch user roles', error, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+        return;
+      }
+      
+      // Only set roles if user is approved
+      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
+      const roles = approvedRoles.map(r => r.role);
+      
+      // Check site ownership independently from roles
+      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
+        .from('site_owners')
+        .select('site_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+      
+      if (ownershipError) {
+        prodLogger.error('Failed to fetch site ownership', ownershipError, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+      }
+      
+      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
+      
+      setUserRoles(roles);
+      setIsAdmin(roles.includes('admin'));
+      setIsSiteOwner(sites.length > 0);
+      setOwnedSites(sites);
+    } catch (error) {
+      prodLogger.error('Unexpected error in checkUserRoles', error, { 
+        component: 'auth',
+        metadata: { userId } 
+      });
+    }
   };
 
   const signUp = async (

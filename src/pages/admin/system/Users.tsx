@@ -105,12 +105,16 @@ const Users = () => {
       if (profileError) throw profileError;
 
       // site_owners tablosundaki kaydı da onayla
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error('Oturum bilgisi alınamadı');
+      
       const { error: siteOwnerError } = await (supabase as any)
         .from('site_owners')
         .update({ 
           status: 'approved',
           approved_at: new Date().toISOString(),
-          approved_by: (await supabase.auth.getUser()).data.user?.id
+          approved_by: user?.id
         })
         .eq('user_id', userId);
       if (siteOwnerError) throw siteOwnerError;

@@ -63,7 +63,9 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
   // Add response mutation
   const addResponseMutation = useMutation({
     mutationFn: async ({ complaintId, text }: { complaintId: string; text: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error('Oturum bilgisi alınamadı');
       if (!user) throw new Error('Oturum açmanız gerekiyor');
 
       const { error } = await supabase
