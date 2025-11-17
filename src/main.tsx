@@ -21,7 +21,7 @@ import "./styles/mobile-touch.css";
 import { setupRoutePreloading } from './utils/lazyLoadRoutes';
 import { preloadCriticalChunks } from './utils/preloadCriticalChunks';
 
-// Initialize Route Preloading & Critical Chunks
+// Initialize Route Preloading & Critical Chunks & Cache Warming
 if (typeof window !== 'undefined') {
   if ('requestIdleCallback' in window) {
     requestIdleCallback(() => {
