@@ -4,6 +4,7 @@
  */
 
 import { memo, ComponentType } from 'react';
+import { devLogger } from '@/lib/devLogger';
 
 /**
  * Deep comparison memo for complex props
@@ -71,7 +72,7 @@ export function withPerformanceTracking<P extends object>(
       const renderTime = end - start;
       
       if (renderTime > 16) { // More than one frame (60fps)
-        console.warn(`[Performance] ${componentName} took ${renderTime.toFixed(2)}ms to render`);
+        devLogger.performance(componentName, renderTime);
       }
       
       return result;

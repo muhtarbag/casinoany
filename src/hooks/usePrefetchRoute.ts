@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { queryKeys, CACHE_TIMES } from '@/lib/queryClient';
+import { devLogger } from '@/lib/devLogger';
 
 interface PrefetchOptions {
   delay?: number; // Delay before prefetching (ms)
@@ -34,11 +35,11 @@ export function usePrefetchSiteDetail(siteSlug: string | undefined, options: Pre
       // Check if already cached
       const cachedData = queryClient.getQueryData(queryKeys.sites.detail(siteSlug));
       if (cachedData) {
-        console.log(`✅ Site ${siteSlug} already cached, skipping prefetch`);
+        devLogger.prefetch(siteSlug, 'cached');
         return;
       }
 
-      console.log(`🔄 Prefetching site: ${siteSlug}`);
+      devLogger.prefetch(siteSlug, 'start');
 
       // Prefetch site detail
       queryClient.prefetchQuery({
@@ -112,7 +113,7 @@ export function usePrefetchBlogPost(postSlug: string | undefined, options: Prefe
       const cachedData = queryClient.getQueryData(['blog-post', postSlug]);
       if (cachedData) return;
 
-      console.log(`🔄 Prefetching blog post: ${postSlug}`);
+      devLogger.prefetch(postSlug, 'start');
 
       queryClient.prefetchQuery({
         queryKey: ['blog-post', postSlug],
@@ -160,7 +161,7 @@ export function usePrefetchCategory(categorySlug: string | undefined, options: P
       const cachedData = queryClient.getQueryData(['category', categorySlug]);
       if (cachedData) return;
 
-      console.log(`🔄 Prefetching category: ${categorySlug}`);
+      devLogger.prefetch(categorySlug, 'start');
 
       queryClient.prefetchQuery({
         queryKey: ['category', categorySlug],

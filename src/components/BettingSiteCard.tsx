@@ -12,6 +12,7 @@ import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePrefetchSiteDetail } from '@/hooks/usePrefetchRoute';
+import { devLogger } from '@/lib/devLogger';
 import { cn } from '@/lib/utils';
 
 // Helper function to generate consistent random number from site ID
