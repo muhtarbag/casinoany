@@ -409,48 +409,6 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
           </div>
         </CardContent>
       </Card>
-
-      {/* Affiliate Info (Read-only) */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Affiliate Bilgileri</CardTitle>
-          <CardDescription>
-            Bu bilgiler sadece görüntüleme amaçlıdır. Değişiklik için admin ile iletişime geçin.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Komisyon Oranı</Label>
-              <Input
-                value={siteData.affiliate_commission_percentage ? `%${siteData.affiliate_commission_percentage}` : 'Belirlenmemiş'}
-                disabled
-                className="bg-muted"
-              />
-            </div>
-            <div>
-              <Label>Aylık Sabit Ödeme</Label>
-              <Input
-                value={siteData.affiliate_has_monthly_payment 
-                  ? `${siteData.affiliate_monthly_payment || 0} ₺`
-                  : 'Yok'}
-                disabled
-                className="bg-muted"
-              />
-            </div>
-            {siteData.affiliate_contract_date && (
-              <div>
-                <Label>Sözleşme Tarihi</Label>
-                <Input
-                  value={new Date(siteData.affiliate_contract_date).toLocaleDateString('tr-TR')}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
