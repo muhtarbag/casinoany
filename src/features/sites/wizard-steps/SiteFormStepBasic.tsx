@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useCategories } from '@/hooks/queries/useCategoryQueries';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { memo } from 'react';
 
 interface SiteFormStepBasicProps {
   form: UseFormReturn<SiteFormData>;
@@ -18,13 +19,14 @@ interface SiteFormStepBasicProps {
   onLogoPreviewChange: (preview: string | null) => void;
 }
 
-export function SiteFormStepBasic({
-  form,
-  logoFile,
-  logoPreview,
-  onLogoFileChange,
-  onLogoPreviewChange,
-}: SiteFormStepBasicProps) {
+const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
+  const {
+    form,
+    logoFile,
+    logoPreview,
+    onLogoFileChange,
+    onLogoPreviewChange,
+  } = props;
   const { data: categories } = useCategories({ isActive: true });
   
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -226,4 +228,6 @@ export function SiteFormStepBasic({
       </div>
     </div>
   );
-}
+};
+
+export const SiteFormStepBasic = memo(SiteFormStepBasicComponent);

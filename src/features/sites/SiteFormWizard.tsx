@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { SiteFormData } from '@/schemas/siteValidation';
 import { Button } from '@/components/ui/button';
@@ -27,17 +27,18 @@ interface SiteFormWizardProps {
 
 const STEPS = ['Temel Bilgiler', 'Sosyal Medya', 'Affiliate'];
 
-export function SiteFormWizard({
-  form,
-  editingId,
-  logoFile,
-  logoPreview,
-  onLogoFileChange,
-  onLogoPreviewChange,
-  onSubmit,
-  onCancel,
-  isLoading,
-}: SiteFormWizardProps) {
+const SiteFormWizardComponent = (props: SiteFormWizardProps) => {
+  const {
+    form,
+    editingId,
+    logoFile,
+    logoPreview,
+    onLogoFileChange,
+    onLogoPreviewChange,
+    onSubmit,
+    onCancel,
+    isLoading,
+  } = props;
   const [currentStep, setCurrentStep] = useState(0);
   const isMobile = useIsMobile();
 
@@ -230,3 +231,5 @@ function getFieldsForStep(step: number): string[] {
       return [];
   }
 }
+
+export const SiteFormWizard = memo(SiteFormWizardComponent);

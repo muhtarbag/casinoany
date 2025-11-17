@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,20 +24,22 @@ interface Step1BasicProps {
   disabled?: boolean;
 }
 
-export const Step1Basic = ({
-  selectedSite,
-  setSelectedSite,
-  newSiteName,
-  setNewSiteName,
-  companyName,
-  setCompanyName,
-  description,
-  setDescription,
-  logoUrl,
-  setLogoUrl,
-  sites,
-  disabled
-}: Step1BasicProps) => {
+export const Step1Basic = memo((props: Step1BasicProps) => {
+  const {
+    selectedSite,
+    setSelectedSite,
+    newSiteName,
+    setNewSiteName,
+    companyName,
+    setCompanyName,
+    description,
+    setDescription,
+    logoUrl,
+    setLogoUrl,
+    sites,
+    disabled
+  } = props;
+  
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(logoUrl || null);
@@ -184,4 +186,4 @@ export const Step1Basic = ({
       </div>
     </div>
   );
-};
+});
