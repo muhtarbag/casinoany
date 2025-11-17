@@ -26,10 +26,12 @@ import { useSavedFilters } from '@/hooks/useSavedFilters';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+import { SiteData, SiteWithStats } from '@/types/site';
+
 interface SiteOwnerDashboardProps {
   siteId: string;
   siteName: string;
-  siteData: any;
+  siteData: SiteWithStats;
   onNavigate?: (tab: string) => void;
 }
 

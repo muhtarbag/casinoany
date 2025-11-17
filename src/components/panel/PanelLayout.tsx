@@ -5,9 +5,10 @@ import { NotificationBell } from './notifications/NotificationBell';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Kbd } from '@/components/ui/kbd';
+import { SiteData } from '@/types/site';
 
 interface PanelLayoutProps {
-  siteData: any;
+  siteData: SiteData;
   activeTab: string;
   onTabChange: (tab: string) => void;
   children: ReactNode;

@@ -14,10 +14,11 @@ import { FormFieldError } from './forms/FormFieldError';
 import { FormLoadingState } from './forms/FormLoadingState';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { z } from 'zod';
+import { SiteData } from '@/types/site';
 
 interface SiteBasicInfoEditorProps {
   siteId: string;
-  siteData: any;
+  siteData: SiteData;
 }
 
 export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorProps) => {
