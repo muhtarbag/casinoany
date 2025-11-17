@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, MessageSquare, AlertTriangle, Gift, User, Bell, Settings } from 'lucide-react';
+import { Heart, MessageSquare, AlertTriangle, Gift, User, Bell, Settings, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
@@ -152,49 +152,56 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {menuItems.map((item) => (
-              <Link key={item.href} to={item.href}>
-                <Card className={cn(
-                  "group cursor-pointer transition-all duration-300 h-full border-2",
-                  item.borderColor,
-                  item.bgColor,
-                  "hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                )}>
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex flex-col items-center text-center gap-3">
-                      {/* Icon */}
-                      <div className={cn(
-                        "w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shadow-md transition-transform group-hover:scale-110",
-                        item.bgColor
-                      )}>
-                        <item.icon className={cn("w-7 h-7 sm:w-8 sm:h-8", item.color)} />
-                      </div>
+        <div className="space-y-3">
+          {menuItems.map((item) => (
+            <Link key={item.href} to={item.href}>
+              <Card className={cn(
+                "group cursor-pointer transition-all duration-300 border-l-4",
+                item.borderColor,
+                "hover:shadow-lg hover:bg-accent/5 active:scale-[0.98]"
+              )}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    {/* Icon */}
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110",
+                      item.bgColor
+                    )}>
+                      <item.icon className={cn("w-6 h-6", item.color)} />
+                    </div>
 
-                      {/* Title */}
-                      <h3 className="font-semibold text-sm sm:text-base leading-tight">
-                        {item.title}
-                      </h3>
-
-                      {/* Count Badge */}
+                    {/* Title and Count */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base mb-1">{item.title}</h3>
                       {item.count !== undefined && (
+                        <p className="text-sm text-muted-foreground">
+                          {item.count} {item.count === 1 ? 'adet' : 'adet'}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Badge or Arrow */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {item.count !== undefined && item.count > 0 && (
                         <Badge 
                           variant="secondary" 
-                          className={cn(
-                            "text-base sm:text-lg px-3 py-1 font-bold",
-                            item.count > 0 && "animate-pulse"
-                          )}
+                          className="text-lg px-3 py-1 font-bold"
                         >
                           {item.count}
                         </Badge>
                       )}
+                      <ChevronRight 
+                        className={cn(
+                          "w-5 h-5 transition-transform group-hover:translate-x-1",
+                          item.color
+                        )} 
+                      />
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </ProfileLayout>
     </>
