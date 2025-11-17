@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -124,7 +126,9 @@ const NewComplaint = () => {
         title="Şikayet Et"
         description="Bahis siteleri hakkında şikayetinizi paylaşın"
       />
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <Header />
+      <div className="min-h-screen bg-gradient-dark">
+        <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -273,7 +277,9 @@ const NewComplaint = () => {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
+      <Footer />
     </>
   );
 };
