@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Star } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
@@ -17,21 +18,21 @@ interface ReviewCardProps {
   };
 }
 
-export default function ReviewCard({ review }: ReviewCardProps) {
+const getInitials = (name: string) => {
+  const names = name.split(' ');
+  if (names.length >= 2) {
+    return (names[0][0] + names[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
+const ReviewCard = memo(({ review }: ReviewCardProps) => {
   const username = review.name || review.profiles?.username || "Anonim";
   const date = new Date(review.created_at).toLocaleDateString("tr-TR", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-
-  const getInitials = (name: string) => {
-    const names = name.split(' ');
-    if (names.length >= 2) {
-      return (names[0][0] + names[1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  };
 
   return (
     <Card className="bg-card border-border hover:border-primary/30 transition-colors">
@@ -59,4 +60,8 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
+
+ReviewCard.displayName = 'ReviewCard';
+
+export default ReviewCard;

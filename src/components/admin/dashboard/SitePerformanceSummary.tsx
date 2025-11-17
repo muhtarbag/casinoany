@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSiteAnalytics } from '@/hooks/queries/useAnalyticsQueries';
@@ -7,7 +7,7 @@ import { BarChart3, TrendingUp, Eye, MousePointer } from 'lucide-react';
 import { subDays, startOfDay } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function SitePerformanceSummary() {
+export const SitePerformanceSummary = memo(() => {
   const [selectedSite, setSelectedSite] = useState<{
     id: string;
     name: string;
@@ -23,14 +23,14 @@ export function SitePerformanceSummary() {
     []
   );
 
-  const handleSiteClick = (siteId: string, siteName: string, logoUrl: string | null, rating: number | null) => {
+  const handleSiteClick = useCallback((siteId: string, siteName: string, logoUrl: string | null, rating: number | null) => {
     setSelectedSite({
       id: siteId,
       name: siteName,
       logo: logoUrl,
       rating: rating,
     });
-  };
+  }, []);
 
   const { data: sites, isLoading } = useSiteAnalytics(dateRange);
 
@@ -259,4 +259,6 @@ export function SitePerformanceSummary() {
       />
     </Card>
   );
-}
+});
+
+SitePerformanceSummary.displayName = 'SitePerformanceSummary';

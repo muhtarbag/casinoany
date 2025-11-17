@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,11 +14,13 @@ interface CategoryCardProps {
   };
 }
 
-export function CategoryCard({ category }: CategoryCardProps) {
-  // Dinamik ikon yükleme
-  const IconComponent = (LucideIcons as any)[
-    category.icon.charAt(0).toUpperCase() + category.icon.slice(1)
-  ] || LucideIcons.Folder;
+export const CategoryCard = memo(({ category }: CategoryCardProps) => {
+  // Dinamik ikon yükleme - memoized
+  const IconComponent = useMemo(() => {
+    return (LucideIcons as any)[
+      category.icon.charAt(0).toUpperCase() + category.icon.slice(1)
+    ] || LucideIcons.Folder;
+  }, [category.icon]);
 
   return (
     <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 active:scale-95">
@@ -102,4 +105,6 @@ export function CategoryCard({ category }: CategoryCardProps) {
       </CardFooter>
     </Card>
   );
-}
+});
+
+CategoryCard.displayName = 'CategoryCard';
