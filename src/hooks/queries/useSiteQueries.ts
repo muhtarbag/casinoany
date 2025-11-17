@@ -4,7 +4,7 @@ import { TypedDB } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-// Sites listesi
+// Sites listesi - Optimized caching
 export const useSites = (filters?: {
   isActive?: boolean;
   isFeatured?: boolean;
@@ -34,8 +34,11 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 30 * 60 * 1000, // 30 minutes - sites rarely change
-    gcTime: 60 * 60 * 1000, // 1 hour
+    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - sites rarely change
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 };
 
@@ -77,7 +80,7 @@ export const useFeaturedSites = () => {
   });
 };
 
-// Site stats
+// Site stats - Optimized for analytics
 export const useSiteStats = () => {
   return useQuery({
     queryKey: queryKeys.sites.stats(),
@@ -90,9 +93,10 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 20 * 60 * 1000, // 20 minutes
-    refetchOnWindowFocus: true, // Fresh stats on focus
+    staleTime: CACHE_TIMES.LONG, // 15 minutes - stats don't need real-time
+    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 

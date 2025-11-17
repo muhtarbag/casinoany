@@ -217,7 +217,21 @@ const AppContent = () => {
 
 const App = () => {
   // CRITICAL: Create queryClient inside component with useMemo to ensure React is initialized
-  const queryClient = useMemo(() => createAppQueryClient(), []);
+  const queryClient = useMemo(() => {
+    const client = createAppQueryClient();
+    
+    // Warm up cache with critical data in background
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      requestIdleCallback(async () => {
+        const { warmUpCache } = await import('@/utils/queryPrefetching');
+        warmUpCache(client).catch(() => {
+          // Silent fail - cache warming is not critical
+        });
+      }, { timeout: 3000 });
+    }
+    
+    return client;
+  }, []);
   
   return (
     <ErrorTrackingProvider>

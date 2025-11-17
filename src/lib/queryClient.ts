@@ -99,6 +99,16 @@ export const queryKeys = {
     stats: () => [...queryKeys.blog.all, 'stats'] as const,
   },
   
+  // Categories
+  categories: {
+    all: ['categories'] as const,
+    lists: () => [...queryKeys.categories.all, 'list'] as const,
+    list: (filters?: Record<string, any>) => 
+      [...queryKeys.categories.lists(), filters] as const,
+    details: () => [...queryKeys.categories.all, 'detail'] as const,
+    detail: (slug: string) => [...queryKeys.categories.details(), slug] as const,
+  },
+  
   // Sites
   sites: {
     all: ['sites'] as const,

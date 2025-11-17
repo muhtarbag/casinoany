@@ -4,7 +4,7 @@ import { TypedDB, TypedRPC } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-// Blog posts listesi
+// Blog posts listesi - Optimized caching
 export const useBlogPosts = (filters?: {
   isPublished?: boolean;
   category?: string;
@@ -34,8 +34,10 @@ export const useBlogPosts = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: CACHE_TIMES.LONG, // 15 minutes - blog content rarely changes
+    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -62,7 +64,7 @@ export const useBlogPost = (slug: string) => {
   });
 };
 
-// Blog yorumları (profiller dahil)
+// Blog yorumları (profiller dahil) - Optimized
 export const useBlogComments = (postId: string) => {
   return useQuery({
     queryKey: queryKeys.blog.comments(postId),
@@ -103,8 +105,9 @@ export const useBlogComments = (postId: string) => {
 
       return commentsWithProfiles;
     },
-    staleTime: CACHE_TIMES.SHORT,
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: CACHE_TIMES.MEDIUM, // 5 minutes - comments change moderately
+    gcTime: CACHE_TIMES.LONG, // 15 minutes
+    refetchOnWindowFocus: false,
     enabled: !!postId,
   });
 };
