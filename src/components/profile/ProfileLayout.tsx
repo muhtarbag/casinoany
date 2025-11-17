@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageTransition } from './PageTransition';
+import { PullToRefresh } from './PullToRefresh';
 
 interface ProfileLayoutProps {
   children: ReactNode;
@@ -36,7 +37,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
   const location = useLocation();
 
   // Fetch notification badges
-  const { data: badges } = useQuery({
+  const { data: badges, refetch: refetchBadges } = useQuery({
     queryKey: ['profile-badges', user?.id],
     queryFn: async () => {
       if (!user) return { reviews: 0, complaints: 0, bonuses: 0 };
@@ -68,6 +69,14 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     enabled: !!user,
     refetchInterval: 30000 // Refresh every 30 seconds
   });
+
+  const handleRefresh = async () => {
+    await refetchBadges();
+    // Add haptic feedback if supported
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+  };
 
   const menuItems: MenuItem[] = [
     {
@@ -208,16 +217,18 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
-            <PageTransition>
-              {children}
-            </PageTransition>
+            <PullToRefresh onRefresh={handleRefresh}>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </PullToRefresh>
           </main>
         </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 backdrop-blur-lg bg-card/95">
-        <div className="flex items-center justify-around py-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 backdrop-blur-lg bg-card/95 bottom-nav">
+        <div className="flex items-center justify-around py-2 safe-area-bottom">
           {menuItems.slice(0, 5).map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
@@ -229,10 +240,15 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
                 to={item.href}
                 className={cn(
                   'relative flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-0',
+                  'active:scale-95 active:bg-muted/50',
+                  'touch-manipulation select-none',
                   isActive
                     ? 'text-primary scale-110'
-                    : 'text-muted-foreground active:scale-95'
+                    : 'text-muted-foreground'
                 )}
+                style={{
+                  WebkitTapHighlightColor: 'transparent'
+                }}
               >
                 {badgeCount && (
                   <Badge 

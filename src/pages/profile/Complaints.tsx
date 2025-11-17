@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 
 export default function Complaints() {
   const { user } = useAuth();
@@ -223,25 +224,18 @@ export default function Complaints() {
             </Dialog>
           </div>
 
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Şikayetlerim</CardTitle>
-              <CardDescription>
-                Bahis siteleri hakkındaki şikayetlerinizi görüntüleyin ve takip edin
-              </CardDescription>
-            </CardHeader>
-          </Card>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Şikayetlerim</CardTitle>
+            <CardDescription>
+              Bahis siteleri hakkındaki şikayetlerinizi görüntüleyin ve takip edin
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
-          {isLoading ? (
-            <div className="grid gap-4">
-              {[...Array(3)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader className="h-24 bg-muted/50" />
-                  <CardContent className="h-32 bg-muted/30" />
-                </Card>
-              ))}
-            </div>
-          ) : complaints && complaints.length > 0 ? (
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : complaints && complaints.length > 0 ? (
             <div className="space-y-4">
               {complaints.map((complaint: any) => (
                 <Card key={complaint.id}>

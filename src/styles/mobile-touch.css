@@ -144,6 +144,40 @@
     padding-bottom: calc(env(safe-area-inset-bottom) + 4px);
   }
 
+  /* Native app feel - active states */
+  .touch-active {
+    transition: all 0.15s ease;
+  }
+
+  .touch-active:active {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+
+  /* Card press effect */
+  .card-press:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Button press effect */
+  .btn-press:active {
+    transform: scale(0.95);
+  }
+
+  /* Ripple effect container */
+  .ripple-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
   /* Hide scrollbar on mobile for cleaner look */
   .hide-scrollbar::-webkit-scrollbar {
     display: none;

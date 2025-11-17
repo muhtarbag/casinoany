@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 
 export default function BonusTracking() {
   const { user } = useAuth();
@@ -289,14 +290,7 @@ export default function BonusTracking() {
       </Card>
 
       {isLoading ? (
-        <div className="grid gap-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="h-24 bg-muted/50" />
-              <CardContent className="h-32 bg-muted/30" />
-            </Card>
-          ))}
-        </div>
+        <ProfileSkeleton />
       ) : bonuses && bonuses.length > 0 ? (
             <div className="space-y-4">
               {bonuses.map((bonus: any) => (

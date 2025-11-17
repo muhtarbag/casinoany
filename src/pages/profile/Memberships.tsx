@@ -12,6 +12,7 @@ import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 import {
   Dialog,
   DialogContent,
@@ -277,15 +278,7 @@ const Memberships = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-20 bg-muted rounded" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ProfileSkeleton />
         ) : memberships && memberships.length > 0 ? (
           <div className="grid gap-4">
             {memberships.map((membership: any) => (
