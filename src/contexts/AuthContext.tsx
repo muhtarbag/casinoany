@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useRe
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prodLogger } from '@/lib/productionLogger';
+import { connectionMonitor } from '@/lib/supabaseConnectionMonitor';
 
 interface AuthContextType {
   user: User | null;
@@ -78,6 +79,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initAuth();
 
+    // ✅ FIX: Start connection monitoring
+    connectionMonitor.start();
+
     // Then setup listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -100,6 +104,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       isCancelled = true;
       subscription.unsubscribe();
+      // ✅ FIX: Stop connection monitoring on unmount
+      connectionMonitor.stop();
     };
   }, []); // ✅ Correct: Empty deps, cleanup handled properly
 

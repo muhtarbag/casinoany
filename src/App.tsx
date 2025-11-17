@@ -14,6 +14,7 @@ import { ErrorTrackingProvider } from "@/components/ErrorTrackingProvider";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { ConnectionStatus } from "@/components/ConnectionStatus";
 import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
