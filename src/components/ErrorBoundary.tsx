@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { devLogger } from '@/lib/devLogger';
 
 interface Props {
   children: ReactNode;
@@ -32,9 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
     
     // Still log in development
-    if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
+    devLogger.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   // ✅ FIX: Soft reset preserves session and cache
