@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { useState } from 'react';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 
 export default function Settings() {
   const { user } = useAuth();
@@ -106,7 +107,7 @@ export default function Settings() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">
@@ -115,7 +116,7 @@ export default function Settings() {
             <Button onClick={() => navigate('/login')}>Giriş Yap</Button>
           </CardContent>
         </Card>
-      </div>
+      </ProfileLayout>
     );
   }
 
@@ -125,7 +126,7 @@ export default function Settings() {
         title="Hesap Ayarları"
         description="Profil bilgilerinizi ve tercihlerinizi yönetin"
       />
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <div className="max-w-2xl mx-auto">
           <div className="mb-6">
             <Button variant="ghost" onClick={() => navigate('/profile/dashboard')}>
@@ -282,7 +283,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </ProfileLayout>
     </>
   );
 }

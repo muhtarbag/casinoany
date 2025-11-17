@@ -16,6 +16,7 @@ import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 
 export default function BonusTracking() {
   const { user } = useAuth();
@@ -141,7 +142,7 @@ export default function BonusTracking() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">
@@ -150,7 +151,7 @@ export default function BonusTracking() {
             <Button onClick={() => navigate('/login')}>Giriş Yap</Button>
           </CardContent>
         </Card>
-      </div>
+      </ProfileLayout>
     );
   }
 
@@ -174,19 +175,15 @@ export default function BonusTracking() {
         title="Bonus Takibi"
         description="Aktif bonuslarınızı takip edin"
       />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6 flex items-center justify-between">
-            <Button variant="ghost" onClick={() => navigate('/profile/dashboard')}>
-              ← Hesabıma Dön
-            </Button>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Bonus Ekle
-                </Button>
-              </DialogTrigger>
+      <ProfileLayout>
+        <div className="flex justify-end mb-6">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Bonus Ekle
+              </Button>
+            </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Yeni Bonus Ekle</DialogTitle>
@@ -276,31 +273,31 @@ export default function BonusTracking() {
                     disabled={!formData.site_id || !formData.bonus_type || !formData.bonus_amount || !formData.received_date || createBonusMutation.isPending}
                   >
                     Bonus Ekle
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Bonus Takibi</CardTitle>
-              <CardDescription>
-                Aldığınız bonusları takip edin ve çevrim şartlarını yönetin
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Bonus Takibi</CardTitle>
+          <CardDescription>
+            Aldığınız bonusları takip edin ve çevrim şartlarını yönetin
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-          {isLoading ? (
-            <div className="grid gap-4">
-              {[...Array(3)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader className="h-24 bg-muted/50" />
-                  <CardContent className="h-32 bg-muted/30" />
-                </Card>
-              ))}
-            </div>
-          ) : bonuses && bonuses.length > 0 ? (
+      {isLoading ? (
+        <div className="grid gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="h-24 bg-muted/50" />
+              <CardContent className="h-32 bg-muted/30" />
+            </Card>
+          ))}
+        </div>
+      ) : bonuses && bonuses.length > 0 ? (
             <div className="space-y-4">
               {bonuses.map((bonus: any) => (
                 <Card key={bonus.id}>
@@ -388,21 +385,20 @@ export default function BonusTracking() {
                 </Card>
               ))}
             </div>
-          ) : (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground mb-4">
-                  Henüz bonus eklemediniz
-                </p>
-                <Button onClick={() => setIsDialogOpen(true)}>
-                  İlk Bonusu Ekle
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
+        ) : (
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground mb-4">
+                Henüz bonus eklemediniz
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)}>
+                İlk Bonusu Ekle
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </ProfileLayout>
     </>
   );
 }
