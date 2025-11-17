@@ -11,6 +11,7 @@ import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 
 export default function Reviews() {
   const { user } = useAuth();
@@ -78,14 +79,7 @@ export default function Reviews() {
   if (isLoading) {
     return (
       <ProfileLayout>
-        <div className="grid gap-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="h-24 bg-muted/50" />
-              <CardContent className="h-32 bg-muted/30" />
-            </Card>
-          ))}
-        </div>
+        <ProfileSkeleton />
       </ProfileLayout>
     );
   }

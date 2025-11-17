@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 
 const Favorites = () => {
   const { user } = useAuth();
@@ -76,23 +77,8 @@ const Favorites = () => {
         description="Favori bahis sitelerinizi görüntüleyin ve yönetin"
       />
       <ProfileLayout>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Favori Sitelerim</h1>
-          <p className="text-muted-foreground">
-            Favori olarak işaretlediğiniz bahis siteleriniz
-          </p>
-        </div>
-
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-20 bg-muted rounded" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ProfileSkeleton />
         ) : favorites && favorites.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav: any) => (
