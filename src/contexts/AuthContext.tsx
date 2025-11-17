@@ -180,16 +180,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) return { error };
     
     // Create user role if needed
-    if (data.user) {
-      const role = accountType === 'site_owner' ? 'site_owner' : 'user';
-      
-      // Insert role (pending for site owners, approved for regular users)
-      await (supabase as any).from('user_roles').insert({
-        user_id: data.user.id,
-        role: role as any,
-        status: accountType === 'site_owner' ? 'pending' : 'approved'
-      });
-    }
+    // ✅ Trigger otomatik role ekliyor, burada duplicate insert yapmıyoruz
+    // handle_new_user() trigger'ı user_roles'e otomatik insert yapıyor
     
     return { error };
   };
@@ -202,15 +194,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (error) return { error };
     
-    // Check if user is approved (only for users with role records)
+    // ✅ GÜÇLENDIRILMIŞ: Rol kontrolü - null durumları handle eder
     if (data.user) {
       const { data: roleData } = await supabase
         .from('user_roles')
-        .select('status')
+        .select('status, role')
         .eq('user_id', data.user.id)
-        .maybeSingle(); // Use maybeSingle instead of single to allow null
+        .maybeSingle();
       
-      // Only block if role record exists and status is pending/rejected
+      // Eğer rol kaydı varsa kontrol et
       if (roleData) {
         if (roleData.status === 'pending') {
           await supabase.auth.signOut();
@@ -221,8 +213,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await supabase.auth.signOut();
           return { error: { message: 'Hesabınız reddedildi. Destek ile iletişime geçin.' } };
         }
+      } else {
+        // ✅ YENİ: Rol kaydı yoksa (veri tutarsızlığı)
+        await supabase.auth.signOut();
+        return { 
+          error: { 
+            message: 'Hesap kurulumu tamamlanmamış. Lütfen yeniden kayıt olun veya destek ile iletişime geçin.' 
+          } 
+        };
       }
-      // If no role record exists (old users), allow login
     }
     
     return { error: null };
