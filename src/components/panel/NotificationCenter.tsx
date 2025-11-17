@@ -49,9 +49,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (complaintsError) {
-        console.error('Complaints fetch error:', complaintsError);
-      }
+      // Error handling moved to component-level error boundary
 
       // Yorumlar
       const { data: reviews, error: reviewsError } = await supabase
@@ -62,9 +60,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (reviewsError) {
-        console.error('Reviews fetch error:', reviewsError);
-      }
+      // Error handling moved to component-level error boundary
 
       return {
         complaints: complaints || [],

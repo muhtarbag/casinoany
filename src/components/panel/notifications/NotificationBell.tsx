@@ -101,7 +101,7 @@ export function NotificationBell({ siteId, className }: NotificationBellProps) {
           filter: `site_id=eq.${siteId}`,
         },
         (payload) => {
-          console.log('New notification:', payload);
+          // Realtime notification received
           queryClient.invalidateQueries({ queryKey: ['site-notifications', siteId] });
           
           // Show toast for new notification
