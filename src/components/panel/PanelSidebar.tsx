@@ -101,11 +101,13 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
       <SidebarHeader className="border-b px-4 py-3">
         <div className="flex items-center gap-3">
           {siteData?.logo_url && !isCollapsed && (
-            <img 
-              src={siteData.logo_url} 
-              alt={siteData.name}
-              className="h-8 w-8 rounded object-cover"
-            />
+            <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
+              <img 
+                src={siteData.logo_url} 
+                alt={siteData.name}
+                className="w-full h-full object-contain"
+              />
+            </div>
           )}
           {!isCollapsed && (
             <div className="flex-1 min-w-0">

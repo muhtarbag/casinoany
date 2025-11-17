@@ -336,12 +336,14 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         <CardContent className="space-y-4">
           <div className="flex items-center gap-6">
             {logoPreview && (
-              <div className="relative">
-                <img
-                  src={logoPreview}
-                  alt="Logo"
-                  className="w-24 h-24 rounded-lg object-cover border-2 border-border shadow-sm"
-                />
+              <div className="relative flex-shrink-0">
+                <div className="w-32 h-32 rounded-lg border-2 border-border bg-muted flex items-center justify-center p-3 shadow-sm">
+                  <img
+                    src={logoPreview}
+                    alt="Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
                 {logoFile && (
                   <Badge variant="secondary" className="absolute -top-2 -right-2">
                     Yeni
@@ -357,7 +359,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
                 className="max-w-sm"
               />
               <p className="text-xs text-muted-foreground mt-2">
-                Önerilen boyut: 200x200px
+                Önerilen boyut: 200x200px veya daha büyük (şeffaf arka plan önerilir)
               </p>
             </div>
           </div>
