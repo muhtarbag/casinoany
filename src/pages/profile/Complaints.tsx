@@ -16,6 +16,7 @@ import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useState } from 'react';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 
 export default function Complaints() {
   const { user } = useAuth();
@@ -96,7 +97,7 @@ export default function Complaints() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">
@@ -105,7 +106,7 @@ export default function Complaints() {
             <Button onClick={() => navigate('/login')}>Giriş Yap</Button>
           </CardContent>
         </Card>
-      </div>
+      </ProfileLayout>
     );
   }
 
@@ -138,12 +139,8 @@ export default function Complaints() {
         title="Şikayetlerim"
         description="Site şikayetlerinizi takip edin"
       />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6 flex items-center justify-between">
-            <Button variant="ghost" onClick={() => navigate('/profile/dashboard')}>
-              ← Hesabıma Dön
-            </Button>
+      <ProfileLayout>
+        <div className="mb-6 flex items-center justify-between">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -314,8 +311,7 @@ export default function Complaints() {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
+      </ProfileLayout>
     </>
   );
 }

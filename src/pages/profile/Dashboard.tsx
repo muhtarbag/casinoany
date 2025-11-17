@@ -6,6 +6,7 @@ import { Heart, Star, MessageSquare, AlertTriangle, Gift, User, Settings } from 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -110,7 +111,7 @@ export default function Dashboard() {
         title="Hesabım | Kullanıcı Paneli"
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Hoş Geldiniz 👋</h1>
@@ -156,7 +157,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </ProfileLayout>
     </>
   );
 }

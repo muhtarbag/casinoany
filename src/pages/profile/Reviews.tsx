@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 
 export default function Reviews() {
   const { user } = useAuth();
@@ -61,7 +62,7 @@ export default function Reviews() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground mb-4">
@@ -70,13 +71,13 @@ export default function Reviews() {
             <Button onClick={() => navigate('/login')}>Giriş Yap</Button>
           </CardContent>
         </Card>
-      </div>
+      </ProfileLayout>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <div className="grid gap-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -85,7 +86,7 @@ export default function Reviews() {
             </Card>
           ))}
         </div>
-      </div>
+      </ProfileLayout>
     );
   }
 
@@ -95,22 +96,15 @@ export default function Reviews() {
         title="Yorumlarım"
         description="Site yorumlarınızı görüntüleyin ve yönetin"
       />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <Button variant="ghost" onClick={() => navigate('/profile/dashboard')}>
-              ← Hesabıma Dön
-            </Button>
-          </div>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Yorumlarım</CardTitle>
-              <CardDescription>
-                Bahis sitelerine yaptığınız yorumları görüntüleyin ve yönetin
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      <ProfileLayout>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Yorumlarım</CardTitle>
+            <CardDescription>
+              Bahis sitelerine yaptığınız yorumları görüntüleyin ve yönetin
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
           {reviews && reviews.length > 0 ? (
             <div className="space-y-4">
@@ -182,8 +176,7 @@ export default function Reviews() {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
+      </ProfileLayout>
     </>
   );
 }

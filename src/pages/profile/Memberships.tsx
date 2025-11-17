@@ -11,9 +11,7 @@ import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { Breadcrumb } from '@/components/Breadcrumb';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import {
   Dialog,
   DialogContent,
@@ -38,8 +36,6 @@ const Memberships = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSiteId, setSelectedSiteId] = useState('');
   const [username, setUsername] = useState('');
@@ -162,13 +158,13 @@ const Memberships = () => {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ProfileLayout>
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground">Üyeliklerinizi görmek için giriş yapın</p>
           </CardContent>
         </Card>
-      </div>
+      </ProfileLayout>
     );
   }
 
@@ -178,51 +174,7 @@ const Memberships = () => {
         title="Kayıtlı Olduğum Siteler"
         description="Kayıt olduğunuz bahis sitelerinizi görüntüleyin ve yönetin"
       />
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumb 
-          items={[
-            { label: 'Profilim', href: '/profile/dashboard' },
-            { label: 'Kayıtlı Sitelerim' }
-          ]} 
-        />
-
-        <Tabs value="memberships" className="mb-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger 
-              value="dashboard" 
-              onClick={() => navigate('/profile/dashboard')}
-            >
-              Genel
-            </TabsTrigger>
-            <TabsTrigger 
-              value="favorites" 
-              onClick={() => navigate('/profile/favorites')}
-            >
-              Favoriler
-            </TabsTrigger>
-            <TabsTrigger value="memberships">
-              Üyelikler
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reviews" 
-              onClick={() => navigate('/profile/reviews')}
-            >
-              Yorumlar
-            </TabsTrigger>
-            <TabsTrigger 
-              value="complaints" 
-              onClick={() => navigate('/profile/complaints')}
-            >
-              Şikayetler
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings" 
-              onClick={() => navigate('/profile/settings')}
-            >
-              Ayarlar
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <ProfileLayout>
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Kayıtlı Olduğum Siteler</h1>
@@ -424,7 +376,7 @@ const Memberships = () => {
             </CardContent>
           </Card>
         )}
-      </div>
+      </ProfileLayout>
     </>
   );
 };
