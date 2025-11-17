@@ -222,8 +222,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     
-    // ✅ FIX: onAuthStateChange will handle redirect automatically
-    // No manual redirect needed - prevents state loss
+    // ✅ CRITICAL FIX: Must redirect after successful login
+    // onAuthStateChange doesn't trigger redirect immediately
+    window.location.href = '/';
     
     return { error: null };
   }, []);
