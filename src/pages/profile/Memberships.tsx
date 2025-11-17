@@ -284,28 +284,28 @@ const Memberships = () => {
           <div className="grid gap-4">
             {memberships.map((membership: any) => (
               <Card key={membership.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
                     {membership.betting_sites.logo_url && (
                       <img
                         src={membership.betting_sites.logo_url}
                         alt={membership.betting_sites.name}
-                        className="w-16 h-16 object-contain rounded"
+                        className="w-16 h-16 object-contain rounded mx-auto sm:mx-0"
                       />
                     )}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-2">
+                        <div className="flex-1">
                           <h3 className="font-semibold text-lg">
                             {membership.betting_sites.name}
                           </h3>
                           {membership.username && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground break-all">
                               Kullanıcı adı: <span className="font-medium">{membership.username}</span>
                             </p>
                           )}
                         </div>
-                        <Badge variant={membership.is_active ? 'default' : 'secondary'}>
+                        <Badge variant={membership.is_active ? 'default' : 'secondary'} className="w-fit">
                           {membership.is_active ? 'Aktif' : 'Pasif'}
                         </Badge>
                       </div>
@@ -320,17 +320,18 @@ const Memberships = () => {
                         </p>
                       )}
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           size="sm"
                           variant="default"
                           asChild
+                          className="w-full sm:w-auto"
                         >
                           <a 
                             href={membership.betting_sites.affiliate_link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="flex items-center"
+                            className="flex items-center justify-center"
                           >
                             <ExternalLink className="w-4 h-4 mr-1" />
                             Oynamaya Başla
@@ -344,6 +345,7 @@ const Memberships = () => {
                             isActive: !membership.is_active
                           })}
                           disabled={toggleActiveMutation.isPending}
+                          className="w-full sm:w-auto"
                         >
                           {membership.is_active ? 'Pasif Yap' : 'Aktif Yap'}
                         </Button>
@@ -352,6 +354,7 @@ const Memberships = () => {
                           variant="destructive"
                           onClick={() => deleteMembershipMutation.mutate(membership.id)}
                           disabled={deleteMembershipMutation.isPending}
+                          className="w-full sm:w-auto"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
