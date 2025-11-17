@@ -290,7 +290,7 @@ const Memberships = () => {
                       <img
                         src={membership.betting_sites.logo_url}
                         alt={membership.betting_sites.name}
-                        className="w-16 h-16 object-contain rounded mx-auto sm:mx-0"
+                        className="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded mx-auto sm:mx-0"
                       />
                     )}
                     <div className="flex-1 w-full">
