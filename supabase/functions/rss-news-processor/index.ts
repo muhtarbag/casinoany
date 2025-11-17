@@ -70,7 +70,7 @@ serve(async (req) => {
               .from('news_articles')
               .select('id')
               .eq('source_url', item.link)
-              .single();
+              .maybeSingle();
 
             if (existing) {
               console.log(`Skipping duplicate: ${item.link}`);
