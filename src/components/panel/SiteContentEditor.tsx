@@ -3,9 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Eye, FileText, HelpCircle, Gamepad2, LogIn, Wallet, Award } from 'lucide-react';
 import { CasinoContentEditor } from '@/components/CasinoContentEditor';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SiteContentEditorProps {
   siteId: string;
@@ -22,6 +24,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
   const [loginGuide, setLoginGuide] = useState('');
   const [withdrawalGuide, setWithdrawalGuide] = useState('');
   const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>([]);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch site content
   const { data: siteContent, isLoading } = useQuery({
@@ -53,6 +56,11 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     }
   }, [siteContent]);
 
+  // Track changes
+  useEffect(() => {
+    setHasChanges(true);
+  }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq]);
+
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -76,6 +84,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-content', siteId] });
       queryClient.invalidateQueries({ queryKey: ['owned-site-full'] });
+      setHasChanges(false);
       toast({
         title: 'Başarılı',
         description: 'İçerik başarıyla kaydedildi',
@@ -98,53 +107,293 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     );
   }
 
+  const contentStats = {
+    prosCount: pros.length,
+    consCount: cons.length,
+    faqCount: faq.length,
+    gamesCount: Object.keys(gameCategories).length,
+    hasExpertReview: !!expertReview,
+    hasVerdict: !!verdict,
+    hasLoginGuide: !!loginGuide,
+    hasWithdrawalGuide: !!withdrawalGuide,
+  };
+
+  const completionPercentage = Math.round(
+    ((contentStats.prosCount > 0 ? 1 : 0) +
+      (contentStats.consCount > 0 ? 1 : 0) +
+      (contentStats.hasExpertReview ? 1 : 0) +
+      (contentStats.hasVerdict ? 1 : 0) +
+      (contentStats.hasLoginGuide ? 1 : 0) +
+      (contentStats.hasWithdrawalGuide ? 1 : 0) +
+      (contentStats.faqCount > 0 ? 1 : 0) +
+      (contentStats.gamesCount > 0 ? 1 : 0)) /
+      8 *
+      100
+  );
+
   return (
     <div className="space-y-6">
+      {/* Header Stats */}
       <Card>
         <CardHeader>
-          <CardTitle>Site İçeriğini Düzenle</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>İçerik Yönetimi</span>
+            <div className="flex items-center gap-2">
+              {hasChanges && (
+                <span className="text-sm text-muted-foreground font-normal">
+                  Kaydedilmemiş değişiklikler
+                </span>
+              )}
+              <Button
+                onClick={() => saveMutation.mutate()}
+                disabled={saveMutation.isPending || !hasChanges}
+                size="sm"
+              >
+                {saveMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Kaydediliyor...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Değişiklikleri Kaydet
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardTitle>
           <CardDescription>
-            Sitenizin detay sayfasında görünecek içerikleri buradan düzenleyebilirsiniz
+            Site içeriğinizi düzenleyin ve yönetin
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-end mb-4">
-            <Button
-              onClick={() => saveMutation.mutate()}
-              disabled={saveMutation.isPending}
-            >
-              {saveMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Kaydediliyor...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Değişiklikleri Kaydet
-                </>
-              )}
-            </Button>
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">{completionPercentage}%</div>
+              <p className="text-sm text-muted-foreground">İçerik Tamamlama</p>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">{contentStats.prosCount + contentStats.consCount}</div>
+              <p className="text-sm text-muted-foreground">Artı/Eksi Özellik</p>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">{contentStats.faqCount}</div>
+              <p className="text-sm text-muted-foreground">SSS Sorusu</p>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">{contentStats.gamesCount}</div>
+              <p className="text-sm text-muted-foreground">Oyun Kategorisi</p>
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <CasinoContentEditor
-            pros={pros}
-            setPros={setPros}
-            cons={cons}
-            setCons={setCons}
-            verdict={verdict}
-            setVerdict={setVerdict}
-            expertReview={expertReview}
-            setExpertReview={setExpertReview}
-            gameCategories={gameCategories}
-            setGameCategories={setGameCategories}
-            loginGuide={loginGuide}
-            setLoginGuide={setLoginGuide}
-            withdrawalGuide={withdrawalGuide}
-            setWithdrawalGuide={setWithdrawalGuide}
-            faq={faq}
-            setFaq={setFaq}
-          />
+      {/* Content Warning */}
+      {completionPercentage < 50 && (
+        <Alert>
+          <Eye className="h-4 w-4" />
+          <AlertDescription>
+            İçerik tamamlama oranınız düşük. Kullanıcılara daha iyi bir deneyim sunmak için tüm bölümleri doldurun.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Content Editor Tabs */}
+      <Card>
+        <CardContent className="pt-6">
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+              <TabsTrigger value="overview" className="gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Genel</span>
+              </TabsTrigger>
+              <TabsTrigger value="expert" className="gap-2">
+                <Award className="h-4 w-4" />
+                <span className="hidden sm:inline">Uzman</span>
+              </TabsTrigger>
+              <TabsTrigger value="games" className="gap-2">
+                <Gamepad2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Oyunlar</span>
+              </TabsTrigger>
+              <TabsTrigger value="login" className="gap-2">
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">Giriş</span>
+              </TabsTrigger>
+              <TabsTrigger value="withdrawal" className="gap-2">
+                <Wallet className="h-4 w-4" />
+                <span className="hidden sm:inline">Çekim</span>
+              </TabsTrigger>
+              <TabsTrigger value="faq" className="gap-2">
+                <HelpCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">SSS</span>
+              </TabsTrigger>
+              <TabsTrigger value="verdict" className="gap-2">
+                <Award className="h-4 w-4" />
+                <span className="hidden sm:inline">Değerlendirme</span>
+              </TabsTrigger>
+              <TabsTrigger value="advanced" className="gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Gelişmiş</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="expert" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="games" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="login" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="withdrawal" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="faq" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="verdict" className="space-y-4">
+              <CasinoContentEditor
+                pros={pros}
+                cons={cons}
+                setPros={setPros}
+                setCons={setCons}
+                verdict={verdict}
+                setVerdict={setVerdict}
+                expertReview={expertReview}
+                setExpertReview={setExpertReview}
+                gameCategories={gameCategories}
+                setGameCategories={setGameCategories}
+                loginGuide={loginGuide}
+                setLoginGuide={setLoginGuide}
+                withdrawalGuide={withdrawalGuide}
+                setWithdrawalGuide={setWithdrawalGuide}
+                faq={faq}
+                setFaq={setFaq}
+              />
+            </TabsContent>
+
+            <TabsContent value="advanced" className="space-y-4">
+              <Alert>
+                <FileText className="h-4 w-4" />
+                <AlertDescription>
+                  Gelişmiş içerik düzenleme araçları yakında eklenecek. Block stilleri, özel tasarım ve daha fazlası...
+                </AlertDescription>
+              </Alert>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
