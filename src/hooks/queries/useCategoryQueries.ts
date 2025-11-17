@@ -91,6 +91,7 @@ export const useCategories = (filters?: {
       return data as Category[];
     },
     staleTime: CACHE_TIMES.LONG,
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 
@@ -101,40 +102,50 @@ export const useCategoriesWithStats = () => {
   return useQuery({
     queryKey: categoryKeys.stats(),
     queryFn: async () => {
-      const { data: categories, error: catError } = await supabase
-        .from('categories')
-        .select('*')
-        .order('display_order', { ascending: true });
+      // ✅ OPTIMIZED: Single parallel query instead of N+1
+      const [
+        { data: categories, error: catError },
+        { data: siteCounts, error: siteError },
+        { data: blogCounts, error: blogError }
+      ] = await Promise.all([
+        supabase
+          .from('categories')
+          .select('*')
+          .order('display_order', { ascending: true }),
+        supabase
+          .from('site_categories')
+          .select('category_id'),
+        supabase
+          .from('blog_posts')
+          .select('category_id')
+          .eq('is_published', true)
+      ]);
 
       if (catError) throw catError;
+      if (siteError) throw siteError;
+      if (blogError) throw blogError;
 
-      // Her kategori için site ve blog sayısını getir
-      const categoriesWithStats = await Promise.all(
-        (categories || []).map(async (category) => {
-          // Site sayısı
-          const { count: siteCount } = await supabase
-            .from('site_categories')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id);
+      // Count in memory instead of N database queries
+      const siteCountMap = new Map<string, number>();
+      siteCounts?.forEach((sc) => {
+        siteCountMap.set(sc.category_id, (siteCountMap.get(sc.category_id) || 0) + 1);
+      });
 
-          // Blog sayısı
-          const { count: blogCount } = await supabase
-            .from('blog_posts')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id)
-            .eq('is_published', true);
+      const blogCountMap = new Map<string, number>();
+      blogCounts?.forEach((bc) => {
+        blogCountMap.set(bc.category_id, (blogCountMap.get(bc.category_id) || 0) + 1);
+      });
 
-          return {
-            ...category,
-            site_count: siteCount || 0,
-            blog_count: blogCount || 0,
-          };
-        })
-      );
+      const categoriesWithStats = (categories || []).map((category) => ({
+        ...category,
+        site_count: siteCountMap.get(category.id) || 0,
+        blog_count: blogCountMap.get(category.id) || 0,
+      }));
 
       return categoriesWithStats as CategoryWithStats[];
     },
     staleTime: CACHE_TIMES.MEDIUM,
+    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 };
 
@@ -157,6 +168,8 @@ export const useCategory = (slug: string) => {
       return data as Category;
     },
     staleTime: CACHE_TIMES.VERY_LONG,
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false, // Category detail rarely changes
     enabled: !!slug,
   });
 };

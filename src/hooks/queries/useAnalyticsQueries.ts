@@ -127,7 +127,10 @@ export const useSiteAnalytics = (dateRange: { start: Date; end: Date }) => {
 
       return Array.from(siteMap.values());
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - analytics data changes frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: true, // Refresh analytics on window focus
+    refetchInterval: 5 * 60 * 1000, // Auto-refresh every 5 minutes
   });
 };
 
@@ -172,6 +175,8 @@ export const useSiteDetailAnalytics = (siteId: string | null, dateRange: { start
       };
     },
     enabled: !!siteId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: true, // Refresh site analytics on focus
   });
 };

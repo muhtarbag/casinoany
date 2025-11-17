@@ -35,6 +35,7 @@ export const useBlogPosts = (filters?: {
       return data || [];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 
@@ -55,6 +56,8 @@ export const useBlogPost = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.LONG,
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false, // Blog content rarely changes
     enabled: !!slug,
   });
 };
@@ -101,6 +104,7 @@ export const useBlogComments = (postId: string) => {
       return commentsWithProfiles;
     },
     staleTime: CACHE_TIMES.SHORT,
+    gcTime: 10 * 60 * 1000, // 10 minutes
     enabled: !!postId,
   });
 };
@@ -138,6 +142,7 @@ export const useBlogStats = () => {
       }));
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 20 * 60 * 1000, // 20 minutes
   });
 };
 
