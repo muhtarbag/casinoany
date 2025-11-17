@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SiteOwnerDashboard } from '@/components/panel/SiteOwnerDashboard';
 import { SiteContentEditor } from '@/components/panel/SiteContentEditor';
 import { SiteComplaintsManager } from '@/components/panel/SiteComplaintsManager';
+import { SiteBasicInfoEditor } from '@/components/panel/SiteBasicInfoEditor';
+import { SiteReportsExport } from '@/components/panel/SiteReportsExport';
 
 const SiteManagement = () => {
   const { user, isSiteOwner, ownedSites } = useAuth();
@@ -192,9 +194,10 @@ const SiteManagement = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-            <TabsTrigger value="content">İçerik Yönetimi</TabsTrigger>
+            <TabsTrigger value="settings">Site Yönetimi</TabsTrigger>
+            <TabsTrigger value="content">İçerik Düzenleme</TabsTrigger>
             <TabsTrigger value="complaints">
               Şikayetler {siteData.complaintsCount > 0 && `(${siteData.complaintsCount})`}
             </TabsTrigger>
@@ -209,6 +212,13 @@ const SiteManagement = () => {
             />
           </TabsContent>
 
+          <TabsContent value="settings" className="space-y-4">
+            <SiteBasicInfoEditor 
+              siteId={siteData.id}
+              siteData={siteData}
+            />
+          </TabsContent>
+
           <TabsContent value="content" className="space-y-4">
             <SiteContentEditor siteId={siteData.id} />
           </TabsContent>
@@ -218,54 +228,11 @@ const SiteManagement = () => {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Detaylı İstatistikler</CardTitle>
-                <CardDescription>
-                  Sitenizin performans metrikleri
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Toplam Görüntülenme
-                      </p>
-                      <p className="text-3xl font-bold">{siteData.stats.views}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Tıklanma
-                      </p>
-                      <p className="text-3xl font-bold">{siteData.stats.clicks}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Tıklama Oranı (CTR)
-                      </p>
-                      <p className="text-3xl font-bold">
-                        {siteData.stats.views > 0 
-                          ? ((siteData.stats.clicks / siteData.stats.views) * 100).toFixed(2)
-                          : '0.00'
-                        }%
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Favori Oranı
-                      </p>
-                      <p className="text-3xl font-bold">
-                        {siteData.stats.views > 0 
-                          ? ((siteData.favoriteCount / siteData.stats.views) * 100).toFixed(2)
-                          : '0.00'
-                        }%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <SiteReportsExport 
+              siteId={siteData.id}
+              siteName={siteData.name}
+              siteData={siteData}
+            />
           </TabsContent>
         </Tabs>
       </div>
