@@ -88,6 +88,14 @@ export default function Dashboard() {
       color: 'text-primary'
     },
     {
+      title: 'Üyeliklerim',
+      description: 'Kayıtlı olduğunuz siteler',
+      icon: User,
+      count: stats?.memberships,
+      href: '/profile/memberships',
+      color: 'text-blue-500'
+    },
+    {
       title: 'Favorilerim',
       description: 'Favori bahis siteleriniz',
       icon: Heart,
@@ -167,6 +175,7 @@ export default function Dashboard() {
                       <div className={cn(
                         "h-12 w-12 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
                         action.color === 'text-primary' && "bg-primary/10",
+                        action.color === 'text-blue-500' && "bg-blue-500/10",
                         action.color === 'text-red-500' && "bg-red-500/10",
                         action.color === 'text-green-500' && "bg-green-500/10",
                         action.color === 'text-orange-500' && "bg-orange-500/10"
