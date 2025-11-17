@@ -222,8 +222,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     
-    // ✅ CRITICAL FIX: Redirect to home page after successful login
-    window.location.href = '/';
+    // ✅ FIX: onAuthStateChange will handle redirect automatically
+    // No manual redirect needed - prevents state loss
     
     return { error: null };
   }, []);
@@ -247,14 +247,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
       
-      // Redirect to login page after logout
-      window.location.href = '/login';
+      // ✅ FIX: Redirect to homepage (public) after logout
+      window.location.href = '/';
     } catch (error) {
       prodLogger.error('Unexpected error during sign out', error as Error, { 
         component: 'auth' 
       });
-      // Even if there's an error, redirect to login
-      window.location.href = '/login';
+      // Even if there's an error, redirect to homepage
+      window.location.href = '/';
     }
   }, []);
 
