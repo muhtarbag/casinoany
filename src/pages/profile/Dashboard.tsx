@@ -2,15 +2,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, MessageSquare, AlertTriangle, Gift, User, TrendingUp } from 'lucide-react';
+import { Heart, MessageSquare, AlertTriangle, Gift, User, ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
   const { user, isSiteOwner, loading } = useAuth();
@@ -79,9 +78,16 @@ export default function Dashboard() {
     );
   }
 
-  const [currentActionIndex, setCurrentActionIndex] = useState(0);
+  // Check if user has any activity
+  const hasActivity = stats && (
+    stats.favorites > 0 || 
+    stats.memberships > 0 || 
+    stats.reviews > 0 || 
+    stats.complaints > 0 || 
+    stats.activeBonuses > 0
+  );
 
-  // Priority-ordered quick actions (most used first)
+  // Priority-ordered quick actions
   const quickActions = [
     {
       title: 'Aktif Bonuslarım',
@@ -90,8 +96,11 @@ export default function Dashboard() {
       count: stats?.activeBonuses,
       href: '/profile/bonus-tracking',
       color: 'text-primary',
-      gradient: 'from-primary/20 to-primary/5',
-      priority: 1
+      bgColor: 'bg-primary/10',
+      borderColor: 'border-primary/20',
+      hoverBg: 'hover:bg-primary/15',
+      isPrimary: true,
+      emptyMessage: 'Henüz bonus takibi yapmıyorsunuz'
     },
     {
       title: 'Favorilerim',
@@ -100,8 +109,10 @@ export default function Dashboard() {
       count: stats?.favorites,
       href: '/profile/favorites',
       color: 'text-red-500',
-      gradient: 'from-red-500/20 to-red-500/5',
-      priority: 2
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20',
+      hoverBg: 'hover:bg-red-500/15',
+      emptyMessage: 'Favori sitenizi ekleyin'
     },
     {
       title: 'Üyeliklerim',
@@ -110,8 +121,10 @@ export default function Dashboard() {
       count: stats?.memberships,
       href: '/profile/memberships',
       color: 'text-blue-500',
-      gradient: 'from-blue-500/20 to-blue-500/5',
-      priority: 3
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
+      hoverBg: 'hover:bg-blue-500/15',
+      emptyMessage: 'Üyeliklerinizi takip edin'
     },
     {
       title: 'Yorumlarım',
@@ -120,8 +133,10 @@ export default function Dashboard() {
       count: stats?.reviews,
       href: '/profile/reviews',
       color: 'text-green-500',
-      gradient: 'from-green-500/20 to-green-500/5',
-      priority: 4
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500/20',
+      hoverBg: 'hover:bg-green-500/15',
+      emptyMessage: 'İlk yorumunuzu yazın'
     },
     {
       title: 'Şikayetlerim',
@@ -130,25 +145,16 @@ export default function Dashboard() {
       count: stats?.complaints,
       href: '/profile/complaints',
       color: 'text-orange-500',
-      gradient: 'from-orange-500/20 to-orange-500/5',
-      priority: 5
+      bgColor: 'bg-orange-500/10',
+      borderColor: 'border-orange-500/20',
+      hoverBg: 'hover:bg-orange-500/15',
+      emptyMessage: 'Şikayetiniz yoksa ne mutlu!'
     }
-  ].sort((a, b) => a.priority - b.priority);
+  ];
 
-  // Swipe gesture for mobile navigation
-  const { handlers } = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (currentActionIndex < quickActions.length - 1) {
-        setCurrentActionIndex(prev => prev + 1);
-      }
-    },
-    onSwipeRight: () => {
-      if (currentActionIndex > 0) {
-        setCurrentActionIndex(prev => prev - 1);
-      }
-    },
-    threshold: 50
-  });
+  // Primary action (most important)
+  const primaryAction = quickActions[0];
+  const secondaryActions = quickActions.slice(1);
 
   return (
     <>
@@ -157,168 +163,148 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="space-y-6 pb-6">
-          {/* Hero Stats - Priority Metrics */}
+        <div className="space-y-4 md:space-y-6">
+          
+          {/* Onboarding / Empty State for New Users */}
+          {!hasActivity && (
+            <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg mb-2">Hoş Geldiniz! 👋</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Hesabınız hazır. Şimdi favori sitelerinizi ekleyerek, bonusları takip ederek ve yorumlar yazarak başlayabilirsiniz.
+                    </p>
+                    <Button size="sm" asChild>
+                      <Link to="/">
+                        Siteleri Keşfet
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Hero Primary Action (Mobile: Full Width, Desktop: Prominent) */}
+          <Link to={primaryAction.href}>
+            <Card className={cn(
+              "group cursor-pointer transition-all duration-300 border-2",
+              primaryAction.borderColor,
+              primaryAction.bgColor,
+              primaryAction.hoverBg,
+              "hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]",
+              "md:hover:scale-[1.02]"
+            )}>
+              <CardContent className="p-5 md:p-6">
+                <div className="flex items-center gap-4">
+                  {/* Icon */}
+                  <div className={cn(
+                    "h-16 w-16 md:h-20 md:w-20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg transition-transform group-hover:scale-110",
+                    primaryAction.bgColor
+                  )}>
+                    <primaryAction.icon className={cn("h-8 w-8 md:h-10 md:w-10", primaryAction.color)} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg md:text-xl truncate">{primaryAction.title}</h3>
+                      {(primaryAction.count || 0) > 0 && (
+                        <TrendingUp className={cn("h-5 w-5 flex-shrink-0", primaryAction.color)} />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2 truncate">
+                      {primaryAction.description}
+                    </p>
+                    {(primaryAction.count || 0) === 0 && (
+                      <p className="text-xs text-muted-foreground italic">
+                        {primaryAction.emptyMessage}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Badge */}
+                  {(primaryAction.count || 0) > 0 ? (
+                    <Badge className="text-2xl md:text-3xl px-4 py-2 font-bold flex-shrink-0">
+                      {primaryAction.count}
+                    </Badge>
+                  ) : (
+                    <ArrowRight className={cn("h-6 w-6 flex-shrink-0 transition-transform group-hover:translate-x-1", primaryAction.color)} />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Secondary Stats Grid - Mobile: 2x2, Desktop: 4 columns */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <Link to="/profile/bonus-tracking">
-              <Card className="group cursor-pointer bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
-                <CardContent className="p-4 text-center">
-                  <div className="relative">
-                    <Gift className="h-8 w-8 mx-auto mb-2 text-primary transition-transform group-hover:scale-110" />
-                    {(stats?.activeBonuses || 0) > 0 && (
-                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-pulse" />
-                    )}
-                  </div>
-                  <p className="text-2xl md:text-3xl font-bold">{stats?.activeBonuses || 0}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Aktif Bonus</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/profile/favorites">
-              <Card className="group cursor-pointer bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
-                <CardContent className="p-4 text-center">
-                  <Heart className="h-8 w-8 mx-auto mb-2 text-red-500 transition-transform group-hover:scale-110 group-hover:fill-red-500" />
-                  <p className="text-2xl md:text-3xl font-bold">{stats?.favorites || 0}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Favori</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/profile/reviews">
-              <Card className="group cursor-pointer bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
-                <CardContent className="p-4 text-center">
-                  <div className="relative">
-                    <MessageSquare className="h-8 w-8 mx-auto mb-2 text-green-500 transition-transform group-hover:scale-110" />
-                    {(stats?.reviews || 0) > 0 && (
-                      <TrendingUp className="absolute -top-1 -right-1 h-4 w-4 text-green-600" />
-                    )}
-                  </div>
-                  <p className="text-2xl md:text-3xl font-bold">{stats?.reviews || 0}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Yorum</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/profile/complaints">
-              <Card className="group cursor-pointer bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
-                <CardContent className="p-4 text-center">
-                  <div className="relative">
-                    <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-orange-500 transition-transform group-hover:scale-110" />
-                    {(stats?.complaints || 0) > 0 && (
-                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-orange-500 rounded-full animate-pulse" />
-                    )}
-                  </div>
-                  <p className="text-2xl md:text-3xl font-bold">{stats?.complaints || 0}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Şikayet</p>
-                </CardContent>
-              </Card>
-            </Link>
+            {secondaryActions.map((action) => (
+              <Link key={action.href} to={action.href}>
+                <Card className={cn(
+                  "group cursor-pointer transition-all duration-300 h-full",
+                  action.borderColor,
+                  action.bgColor,
+                  action.hoverBg,
+                  "hover:shadow-lg hover:scale-[1.03] active:scale-[0.97]"
+                )}>
+                  <CardContent className="p-4 text-center">
+                    <div className="relative inline-block mb-3">
+                      <action.icon className={cn("h-8 w-8 mx-auto transition-transform group-hover:scale-110", action.color)} />
+                      {(action.count || 0) > 0 && (
+                        <span className={cn("absolute -top-1 -right-1 h-3 w-3 rounded-full animate-pulse", action.bgColor)} />
+                      )}
+                    </div>
+                    <p className="text-xl md:text-2xl font-bold mb-1">{action.count || 0}</p>
+                    <p className="text-xs text-muted-foreground truncate">{action.title}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
 
-          {/* Quick Actions - Mobile: Swipeable Carousel, Desktop: Grid */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Hızlı Erişim</h2>
-              {/* Mobile: Swipe indicator */}
-              <div className="flex md:hidden gap-1">
-                {quickActions.map((_, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all duration-300",
-                      index === currentActionIndex 
-                        ? "w-6 bg-primary" 
-                        : "w-1.5 bg-muted"
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Mobile: Swipeable Single Card */}
-            <div className="md:hidden" {...handlers}>
-              <div className="overflow-hidden">
-                <div 
-                  className="flex transition-transform duration-300 ease-out"
-                  style={{ transform: `translateX(-${currentActionIndex * 100}%)` }}
-                >
-                  {quickActions.map((action) => (
-                    <Link
-                      key={action.href}
-                      to={action.href}
-                      className="w-full flex-shrink-0 px-1"
-                    >
-                      <Card className={cn(
-                        "bg-gradient-to-br border-l-4 hover:shadow-xl transition-all duration-300 active:scale-[0.98]",
-                        action.gradient
-                      )}>
-                        <CardContent className="p-5">
-                          <div className="flex items-center gap-4">
-                            <div className={cn(
-                              "h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg",
-                              action.color === 'text-primary' && "bg-primary/20",
-                              action.color === 'text-blue-500' && "bg-blue-500/20",
-                              action.color === 'text-red-500' && "bg-red-500/20",
-                              action.color === 'text-green-500' && "bg-green-500/20",
-                              action.color === 'text-orange-500' && "bg-orange-500/20"
-                            )}>
-                              <action.icon className={cn("h-7 w-7", action.color)} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-base mb-1 truncate">{action.title}</h3>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {action.description}
-                              </p>
-                            </div>
-                            {action.count !== undefined && action.count > 0 && (
-                              <Badge variant="secondary" className="text-lg px-3 py-1 font-bold">
-                                {action.count}
-                              </Badge>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop: Grid View */}
-            <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Quick Actions List - Better for Mobile Scrolling */}
+          <div className="space-y-3 md:hidden">
+            <h2 className="text-base font-semibold px-1">Hızlı Erişim</h2>
+            <div className="space-y-2">
               {quickActions.map((action) => (
-                <Link
-                  key={action.href}
-                  to={action.href}
-                  className="group"
-                >
+                <Link key={action.href} to={action.href}>
                   <Card className={cn(
-                    "bg-gradient-to-br border-l-4 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]",
-                    action.gradient
+                    "group cursor-pointer transition-all duration-200 border-l-4",
+                    action.borderColor,
+                    action.bgColor,
+                    action.hoverBg,
+                    "active:scale-[0.98]"
                   )}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3 min-h-[44px]">
+                        {/* Icon */}
                         <div className={cn(
-                          "h-14 w-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg",
-                          action.color === 'text-primary' && "bg-primary/20",
-                          action.color === 'text-blue-500' && "bg-blue-500/20",
-                          action.color === 'text-red-500' && "bg-red-500/20",
-                          action.color === 'text-green-500' && "bg-green-500/20",
-                          action.color === 'text-orange-500' && "bg-orange-500/20"
+                          "h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0",
+                          action.bgColor
                         )}>
-                          <action.icon className={cn("h-7 w-7", action.color)} />
+                          <action.icon className={cn("h-6 w-6", action.color)} />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-base mb-1">{action.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {action.description}
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm mb-0.5 truncate">{action.title}</h3>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {(action.count || 0) > 0 ? action.description : action.emptyMessage}
                           </p>
                         </div>
-                        {action.count !== undefined && action.count > 0 && (
-                          <Badge variant="secondary" className="text-lg px-3 py-1 font-bold">
+
+                        {/* Count or Arrow */}
+                        {(action.count || 0) > 0 ? (
+                          <Badge variant="secondary" className="text-base px-2.5 py-1 font-bold flex-shrink-0">
                             {action.count}
                           </Badge>
+                        ) : (
+                          <ArrowRight className={cn("h-5 w-5 flex-shrink-0 transition-transform group-hover:translate-x-1", action.color)} />
                         )}
                       </div>
                     </CardContent>

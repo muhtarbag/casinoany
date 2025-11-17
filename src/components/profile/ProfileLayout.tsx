@@ -142,12 +142,30 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     }
   ];
 
-  // Mobile bottom nav items (most important only)
+  // Mobile bottom nav items (most important only) - Simplified for better UX
   const mobileBottomNavItems = [
-    menuItems.find(item => item.href === '/')!,
-    menuItems.find(item => item.href === '/profile/dashboard')!,
-    menuItems.find(item => item.href === '/profile/favorites')!,
-    menuItems.find(item => item.href === '/profile/reviews')!,
+    {
+      icon: Home,
+      label: 'Ana Sayfa',
+      href: '/'
+    },
+    {
+      icon: LayoutDashboard,
+      label: 'Genel Bakış',
+      href: '/profile/dashboard'
+    },
+    {
+      icon: Heart,
+      label: 'Favoriler',
+      href: '/profile/favorites',
+      badgeKey: undefined
+    },
+    {
+      icon: Gift,
+      label: 'Bonuslar',
+      href: '/profile/bonus-tracking',
+      badgeKey: 'bonuses' as const
+    },
   ];
 
   const getInitials = () => {
@@ -300,68 +318,62 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-lg" style={{ zIndex: 9999 }}>
-        <div className="flex items-center justify-around py-3 px-2 safe-area-inset-bottom">
+      {/* Mobile Bottom Navigation - Optimized for Touch */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl safe-area-inset-bottom" style={{ zIndex: 9999 }}>
+        <div className="grid grid-cols-4 px-2 py-3">
           {mobileBottomNavItems.map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
-            const badgeCount = getBadgeCount(item.badgeKey);
+            const badgeCount = item.badgeKey ? getBadgeCount(item.badgeKey) : null;
 
             return (
               <Link
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  'relative flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-0',
-                  'active:scale-95 active:bg-muted/50',
-                  'touch-manipulation select-none',
-                  isActive
-                    ? 'text-primary scale-110'
-                    : 'text-muted-foreground'
+                  "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-200 min-h-[56px]",
+                  "active:scale-95 active:bg-muted/50",
+                  "touch-manipulation select-none",
+                  isActive && "bg-primary/10"
                 )}
-                style={{
-                  WebkitTapHighlightColor: 'transparent'
-                }}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
+                {/* Badge Notification */}
                 {badgeCount && (
                   <Badge 
                     variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] animate-pulse z-10"
+                    className="absolute top-1 right-1/4 h-5 min-w-5 p-0 flex items-center justify-center text-[10px] font-bold animate-pulse z-10 pointer-events-none"
                   >
                     {badgeCount > 99 ? '99+' : badgeCount}
                   </Badge>
                 )}
-                <Icon className={cn(
-                  "h-5 w-5 shrink-0 transition-transform",
-                  isActive && "scale-110"
-                )} />
+
+                {/* Icon */}
+                <div className={cn(
+                  "h-7 w-7 flex items-center justify-center transition-all",
+                  isActive ? "scale-110" : "scale-100"
+                )}>
+                  <Icon className={cn(
+                    "h-6 w-6 transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )} />
+                </div>
+
+                {/* Label */}
                 <span className={cn(
-                  "text-[10px] font-medium truncate max-w-full transition-all",
-                  isActive && "font-bold"
+                  "text-[10px] font-medium leading-none transition-all",
+                  isActive ? "text-primary font-bold" : "text-muted-foreground"
                 )}>
                   {item.label}
                 </span>
+
+                {/* Active Indicator */}
+                {isActive && (
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-t-full" />
+                )}
               </Link>
             );
           })}
-          
-          {/* More Menu */}
-          <Link
-            to="/profile/settings"
-            className={cn(
-              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation',
-              location.pathname === '/profile/settings'
-                ? 'text-primary'
-                : 'text-muted-foreground'
-            )}
-            style={{
-              WebkitTapHighlightColor: 'transparent'
-            }}
-          >
-            <Settings className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Ayarlar</span>
-          </Link>
         </div>
       </nav>
     </div>
