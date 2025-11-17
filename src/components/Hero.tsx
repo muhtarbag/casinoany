@@ -105,11 +105,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
       
       return settings;
     },
-    // ✅ FIX: Settings rarely change
+    // ✅ BALANCE: Cache but allow initial load
     staleTime: 60 * 60 * 1000, // 1 hour
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // CRITICAL: Must fetch on first mount
   });
 
   // Fetch CMS content for hero title and description
@@ -138,11 +138,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         hero_description: contentMap['hero_description'] || 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
       };
     },
-    // ✅ FIX: CMS content rarely changes
+    // ✅ BALANCE: Cache but allow initial load
     staleTime: 60 * 60 * 1000, // 1 hour
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // CRITICAL: Must fetch on first mount
   });
 
   useEffect(() => {
