@@ -12,8 +12,11 @@ import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const { user, isSiteOwner, loading } = useAuth();
+  const { user, isSiteOwner, loading, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
+
+  // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
   // Redirect site owners to their management panel
   useEffect(() => {
@@ -24,16 +27,16 @@ export default function Dashboard() {
 
   // Fetch user stats
   const { data: stats } = useQuery({
-    queryKey: ['user-stats', user?.id],
+    queryKey: ['user-stats', effectiveUserId],
     queryFn: async () => {
-      if (!user) return null;
+      if (!effectiveUserId) return null;
 
       const [favorites, memberships, reviews, complaints, bonuses] = await Promise.all([
-        supabase.from('user_favorite_sites').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('user_site_memberships').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('site_reviews').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('site_complaints').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-        supabase.from('user_bonus_tracking').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active')
+        supabase.from('user_favorite_sites').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
+        supabase.from('user_site_memberships').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
+        supabase.from('site_reviews').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
+        supabase.from('site_complaints').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId),
+        supabase.from('user_bonus_tracking').select('id', { count: 'exact', head: true }).eq('user_id', effectiveUserId).eq('status', 'active')
       ]);
 
       return {
@@ -44,7 +47,7 @@ export default function Dashboard() {
         activeBonuses: bonuses.count || 0
       };
     },
-    enabled: !!user
+    enabled: !!effectiveUserId
   });
 
   // Show loading state while checking auth
