@@ -42,14 +42,14 @@ export const FeaturedSitesSection = () => {
           className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 bg-card dark:bg-card rounded-lg flex items-center justify-center border-2 border-border shadow-md ring-2 ring-primary/20 transition-all duration-300 hover:shadow-xl hover:ring-primary/40">
+            <div className="w-28 h-28 bg-card dark:bg-card rounded-lg flex items-center justify-center border-2 border-border shadow-md ring-2 ring-primary/20 transition-all duration-300 hover:shadow-xl hover:ring-primary/40">
               {site.logo_url ? (
                 <OptimizedImage
                   src={site.logo_url}
                   alt={`${site.name} logo`}
-                  className="w-16 h-16 object-contain"
-                  width={64}
-                  height={64}
+                  className="w-24 h-24 object-contain"
+                  width={96}
+                  height={96}
                   objectFit="contain"
                   fetchPriority="high"
                   priority={true}
@@ -57,7 +57,7 @@ export const FeaturedSitesSection = () => {
                   fallback="/placeholder.svg"
                 />
               ) : (
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-3xl font-bold text-primary">
                   {site.name.charAt(0)}
                 </span>
               )}
