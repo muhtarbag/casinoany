@@ -113,7 +113,14 @@ export const Step2ContactSocial = ({
                 <Phone className="w-4 h-4" />
                 WhatsApp
               </Label>
-              <Input id="contactWhatsapp" type="tel" placeholder="+90 5XX XXX XX XX" value={contactWhatsapp} onChange={e => setContactWhatsapp(e.target.value)} disabled={disabled} />
+              <Input 
+                id="contactWhatsapp" 
+                type="text" 
+                placeholder="+90 5XX XXX XX XX veya https://wa.me/905XXXXXXXXX" 
+                value={contactWhatsapp} 
+                onChange={e => setContactWhatsapp(e.target.value)} 
+                disabled={disabled} 
+              />
             </div>
           </div>
         </div>
@@ -179,7 +186,14 @@ export const Step2ContactSocial = ({
               <Phone className="w-4 h-4 text-green-600" />
               WhatsApp İş Hattı
             </Label>
-            <Input id="socialWhatsapp" type="tel" placeholder="+90 5XX XXX XX XX" value={contactWhatsapp} onChange={e => setContactWhatsapp(e.target.value)} disabled={disabled} />
+            <Input 
+              id="socialWhatsapp" 
+              type="text" 
+              placeholder="+90 5XX XXX XX XX veya https://wa.me/905XXXXXXXXX" 
+              value={contactWhatsapp} 
+              onChange={e => setContactWhatsapp(e.target.value)} 
+              disabled={disabled} 
+            />
           </div>
 
           <div className="space-y-2">
