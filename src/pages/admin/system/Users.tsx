@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { SEO } from '@/components/SEO';
 import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone, X, UserCog } from 'lucide-react';
 import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
@@ -273,15 +274,11 @@ const Users = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
-      toast({ title: 'Başarılı', description: 'Kullanıcı silindi' });
+      showSuccessToast('Kullanıcı başarıyla silindi');
     },
     onError: (error: any) => {
       console.error('Delete mutation error:', error);
-      toast({ 
-        title: 'Hata', 
-        description: error.message || 'Kullanıcı silinirken bir hata oluştu',
-        variant: 'destructive'
-      });
+      showErrorToast(error, 'Kullanıcı silinirken bir hata oluştu');
     },
   });
 
@@ -345,25 +342,20 @@ const Users = () => {
       }
 
       if (errors.length > 0) {
-        toast({ 
-          title: 'Kısmi Başarı', 
-          description: `${completed - errors.length}/${total} kullanıcı silindi. ${errors.length} hata oluştu.`,
-          variant: 'default'
-        });
+        showErrorToast(
+          new Error(`${errors.length} kullanıcı silinemedi`),
+          `${completed - errors.length}/${total} kullanıcı silindi`
+        );
       } else {
-        toast({ title: 'Başarılı', description: `${completed} kullanıcı silindi` });
+        showSuccessToast(`${completed} kullanıcı başarıyla silindi`);
       }
 
       setSelectedUserIds([]);
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Toplu silme hatası:', error);
-      toast({ 
-        title: 'Hata', 
-        description: 'Toplu silme sırasında bir hata oluştu',
-        variant: 'destructive'
-      });
+      showErrorToast(error, 'Toplu silme sırasında bir hata oluştu');
     } finally {
       setIsBulkProcessing(false);
       setBulkProgress(0);
