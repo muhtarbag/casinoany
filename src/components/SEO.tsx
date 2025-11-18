@@ -51,7 +51,7 @@ export const SEO = ({
   const defaultStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'BahisSiteleri',
+    name: 'CasinoAny.com',
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     sameAs: [
@@ -70,11 +70,11 @@ export const SEO = ({
     dateModified: article.modifiedTime,
     author: {
       '@type': 'Person',
-      name: article.author || 'BahisSiteleri',
+      name: article.author || 'CasinoAny.com',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'BahisSiteleri',
+      name: 'CasinoAny.com',
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,
@@ -101,7 +101,7 @@ export const SEO = ({
       {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="BahisSiteleri" />
+      <meta property="og:site_name" content="CasinoAny.com" />
       <meta property="og:locale" content="tr_TR" />
 
       {/* Article specific OG tags */}

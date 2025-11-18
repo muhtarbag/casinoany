@@ -108,11 +108,11 @@ export default function NewsDetail() {
           dateModified: article.updated_at,
           author: {
             '@type': 'Organization',
-            name: 'BahisSiteleri',
+            name: 'CasinoAny.com',
           },
           publisher: {
             '@type': 'Organization',
-            name: 'BahisSiteleri',
+            name: 'CasinoAny.com',
             logo: {
               '@type': 'ImageObject',
               url: `${window.location.origin}/logo.png`,
