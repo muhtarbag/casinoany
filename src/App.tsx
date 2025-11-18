@@ -10,7 +10,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ErrorTrackingProvider } from "@/components/ErrorTrackingProvider";
 import { OptimizedNotificationPopup } from "@/components/OptimizedNotificationPopup";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -222,9 +221,8 @@ const App = () => {
   const queryClient = useMemo(() => createAppQueryClient(), []);
   
   return (
-    <ErrorTrackingProvider>
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
           <HelmetProvider>
           <AuthProvider>
             <TooltipProvider>
@@ -254,8 +252,7 @@ const App = () => {
             </AuthProvider>
           </HelmetProvider>
         </QueryClientProvider>
-      </ErrorBoundary>
-    </ErrorTrackingProvider>
+    </ErrorBoundary>
   );
 };
 
