@@ -98,6 +98,7 @@ export const NotificationPopup = () => {
 
   // Admin paneldeyse bildirimleri gösterme
   const isAdminPanel = location.pathname.startsWith('/admin');
+  const isPanelPage = location.pathname.startsWith('/panel');
   
   // Kullanıcı segmentini belirle
   const userSegment = getUserSegment(user);
@@ -106,8 +107,8 @@ export const NotificationPopup = () => {
   const { data: notifications } = useQuery({
     queryKey: ['active-notifications', location.pathname, userSegment],
     queryFn: async () => {
-      // Admin paneldeyse boş dön
-      if (isAdminPanel) return [];
+      // Admin panel veya kullanıcı panelindeyse boş dön
+      if (isAdminPanel || isPanelPage) return [];
       
       const now = new Date().toISOString();
       
