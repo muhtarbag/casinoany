@@ -87,7 +87,7 @@ export const Step3CompanyDetails = ({
           <div className="space-y-2">
             <Label htmlFor="companyWebsite" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              Şirket Web Sitesi
+              Şirket Web Sitesi ( Maskeli Affilatete Redirect Link )
             </Label>
             <Input
               id="companyWebsite"
