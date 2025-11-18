@@ -41,6 +41,13 @@ const SiteManagement = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Redirect admin users without sites to admin panel
+  useEffect(() => {
+    if (!isSiteOwner && isAdmin && !isImpersonating) {
+      navigate('/admin');
+    }
+  }, [isSiteOwner, isAdmin, isImpersonating, navigate]);
+
   const { data: siteData, isLoading } = useQuery({
     queryKey: ['owned-site-full', effectiveUserId],
     queryFn: async () => {
