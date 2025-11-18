@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -775,56 +775,6 @@ const Users = () => {
                 Doğrula
               </Button>
             )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-                  <label className="text-sm font-medium">Kayıt Tarihi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.created_at 
-                      ? new Date(selectedUser.profile.created_at).toLocaleDateString('tr-TR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })
-                      : '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Doğrulama Durumu</label>
-                  <Badge variant={selectedUser.profile?.is_verified ? 'default' : 'secondary'} className="mt-1">
-                    {selectedUser.profile?.is_verified ? (
-                      <span className="flex items-center gap-1">
-                        <Shield className="w-3 h-3" /> Doğrulandı
-                      </span>
-                    ) : (
-                      'Doğrulanmadı'
-                    )}
-                  </Badge>
-                </div>
-              </div>
-
-              {!selectedUser.profile?.is_verified && (
-                <div className="pt-4 border-t">
-                  <Button
-                    onClick={() => verifyMutation.mutate(selectedUser.user_id)}
-                    disabled={verifyMutation.isPending}
-                    className="w-full"
-                  >
-                    {verifyMutation.isPending ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Doğrulanıyor...</>
-                    ) : (
-                      <><Shield className="w-4 h-4 mr-2" /> Kurumsal Kullanıcıyı Doğrula</>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-
-          <DialogFooter className="flex gap-2">
-            <Button variant="ghost" onClick={() => setSelectedUser(null)}>
-              Kapat
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
