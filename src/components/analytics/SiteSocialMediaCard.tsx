@@ -10,13 +10,13 @@ interface SiteSocialMediaCardProps {
 }
 
 const socialPlatforms = [
-  { key: 'email_clicks', label: 'Email', icon: Mail, color: 'text-blue-500' },
-  { key: 'whatsapp_clicks', label: 'WhatsApp', icon: MessageCircle, color: 'text-green-500' },
-  { key: 'telegram_clicks', label: 'Telegram', icon: Send, color: 'text-sky-500' },
-  { key: 'twitter_clicks', label: 'Twitter/X', icon: Twitter, color: 'text-slate-900 dark:text-slate-100' },
-  { key: 'instagram_clicks', label: 'Instagram', icon: Instagram, color: 'text-pink-500' },
-  { key: 'facebook_clicks', label: 'Facebook', icon: Facebook, color: 'text-blue-600' },
-  { key: 'youtube_clicks', label: 'YouTube', icon: Youtube, color: 'text-red-500' },
+  { key: 'email_clicks', label: 'Email', icon: Mail, color: '#6366f1' },
+  { key: 'whatsapp_clicks', label: 'WhatsApp', icon: MessageCircle, color: '#25D366' },
+  { key: 'telegram_clicks', label: 'Telegram', icon: Send, color: '#0088cc' },
+  { key: 'twitter_clicks', label: 'X', icon: Twitter, color: '#1DA1F2' },
+  { key: 'instagram_clicks', label: 'Instagram', icon: Instagram, color: '#E4405F' },
+  { key: 'facebook_clicks', label: 'Facebook', icon: Facebook, color: '#1877F2' },
+  { key: 'youtube_clicks', label: 'YouTube', icon: Youtube, color: '#FF0000' },
 ];
 
 export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardProps) => {
@@ -36,12 +36,12 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <Skeleton className="h-5 w-32" />
         </CardHeader>
-        <CardContent>
-          <Skeleton className="h-32 w-full" />
+        <CardContent className="pt-0">
+          <Skeleton className="h-20 w-full" />
         </CardContent>
       </Card>
     );
@@ -52,35 +52,35 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
   }, 0);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">
-          {siteName} - Sosyal Medya Performansı
+    <Card className="shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold flex items-center justify-between">
+          <span>{siteName}</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            {totalClicks.toLocaleString()} tıklama
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-4 border-b">
-            <span className="text-sm text-muted-foreground">Toplam Tıklama</span>
-            <span className="text-2xl font-bold">{totalClicks.toLocaleString()}</span>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {socialPlatforms.map((platform) => {
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {socialPlatforms
+            .filter(platform => (stats?.[platform.key as keyof typeof stats] as number || 0) > 0)
+            .map((platform) => {
               const Icon = platform.icon;
-              const clicks = (stats?.[platform.key as keyof typeof stats] as number) || 0;
-              const percentage = totalClicks > 0 ? ((clicks / totalClicks) * 100).toFixed(1) : '0';
+              const clicks = stats?.[platform.key as keyof typeof stats] as number || 0;
+              const percentage = totalClicks > 0 ? ((clicks / totalClicks) * 100).toFixed(0) : '0';
 
               return (
-                <div key={platform.key} className="flex flex-col items-center p-4 rounded-lg bg-muted/50">
-                  <Icon className={`h-6 w-6 mb-2 ${platform.color}`} />
-                  <span className="text-xs text-muted-foreground mb-1">{platform.label}</span>
-                  <span className="text-lg font-semibold">{clicks.toLocaleString()}</span>
-                  <span className="text-xs text-muted-foreground">%{percentage}</span>
+                <div
+                  key={platform.key}
+                  className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/20 hover:bg-muted/40 transition-colors"
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" style={{ color: platform.color }} />
+                  <p className="text-xs font-semibold">{clicks}</p>
+                  <p className="text-[10px] text-muted-foreground">%{percentage}</p>
                 </div>
               );
             })}
-          </div>
         </div>
       </CardContent>
     </Card>
