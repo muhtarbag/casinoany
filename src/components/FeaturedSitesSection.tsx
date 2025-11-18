@@ -42,7 +42,7 @@ export const FeaturedSitesSection = () => {
           className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 bg-white/90 dark:bg-card/90 rounded-lg flex items-center justify-center border-2 border-border shadow-md ring-2 ring-primary/20 transition-all duration-300 hover:shadow-xl hover:ring-primary/40">
+            <div className="w-20 h-20 bg-card dark:bg-card rounded-lg flex items-center justify-center border-2 border-border shadow-md ring-2 ring-primary/20 transition-all duration-300 hover:shadow-xl hover:ring-primary/40">
               {site.logo_url ? (
                 <OptimizedImage
                   src={site.logo_url}

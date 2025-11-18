@@ -177,7 +177,7 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-60 h-40 bg-white/90 dark:bg-card/90 rounded-xl flex items-center justify-center overflow-hidden border-2 border-border hover:border-primary/70 shadow-md hover:shadow-xl ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
+          <div className="flex-shrink-0 w-60 h-40 bg-card dark:bg-card rounded-xl flex items-center justify-center overflow-hidden border-2 border-border hover:border-primary/70 shadow-md hover:shadow-xl ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
             {/* Loading Skeleton */}
             {isLoading && !showFallback && (
               <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse" />
