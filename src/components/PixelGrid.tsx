@@ -112,6 +112,7 @@ export const PixelGrid = () => {
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sites.map((site: any, index: number) => {
+          const isPriority = index < 6;
           // Find banners for this position
           const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
           
@@ -135,6 +136,7 @@ export const PixelGrid = () => {
                 youtube={site.youtube || ''}
                 reviewCount={site.review_count || 0}
                 avgRating={site.avg_rating || 0}
+                priority={isPriority}
               />
               {bannersAtPosition.length > 0 && (
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">

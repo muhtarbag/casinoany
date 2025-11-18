@@ -49,6 +49,7 @@ interface BettingSiteCardProps {
   clicks?: number;
   reviewCount?: number;
   avgRating?: number;
+  priority?: boolean;
 }
 
 const BettingSiteCardComponent = ({
@@ -71,6 +72,7 @@ const BettingSiteCardComponent = ({
   clicks = 0,
   reviewCount = 0,
   avgRating = 0,
+  priority = false,
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -175,7 +177,7 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-48 h-32 bg-card/80 rounded-lg flex items-center justify-center overflow-hidden border-2 border-border/50 shadow-sm relative">
+          <div className="flex-shrink-0 w-60 h-40 bg-white/90 dark:bg-card/90 rounded-xl flex items-center justify-center overflow-hidden border-2 border-border hover:border-primary/70 shadow-md hover:shadow-xl ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
             {/* Loading Skeleton */}
             {isLoading && !showFallback && (
               <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse" />
@@ -185,13 +187,14 @@ const BettingSiteCardComponent = ({
               <OptimizedImage
                 src={logoUrl!}
                 alt={`${name} logo`}
-                className={`w-full h-full object-contain p-2 transition-opacity duration-300 ${
+                className={`w-32 h-32 object-contain p-1 transition-all duration-300 group-hover/logo:scale-105 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
                 }`}
-                width={96}
-                height={96}
+                width={128}
+                height={128}
                 objectFit="contain"
-                fetchPriority="auto"
+                fetchPriority={priority ? 'high' : 'auto'}
+                priority={priority}
                 responsive={false}
                 fallback="/placeholder.svg"
               />
