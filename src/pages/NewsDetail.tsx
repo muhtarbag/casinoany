@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -10,6 +10,7 @@ import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQueries";
 import { BreadcrumbSchema } from "@/components/StructuredData";
+import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -18,12 +19,44 @@ export default function NewsDetail() {
   const incrementView = useIncrementNewsView();
   const viewTrackedRef = useRef(false);
 
+  // Fetch AI-suggested internal links
+  const { data: internalLinks } = useInternalLinks(
+    article?.slug ? `/news/${article.slug}` : '',
+    !!article?.slug
+  );
+
+  // Enrich content with internal links
+  const enrichedContent = useMemo(() => {
+    const rawContent = article?.content_html || article?.content || '';
+    if (!rawContent) return '';
+    if (!internalLinks || internalLinks.length === 0) {
+      return rawContent;
+    }
+    return applyInternalLinks(rawContent, internalLinks);
+  }, [article?.content_html, article?.content, internalLinks]);
+
   useEffect(() => {
     if (article?.id && !viewTrackedRef.current) {
       incrementView.mutate(article.id);
       viewTrackedRef.current = true;
     }
   }, [article?.id, incrementView]);
+
+  // Track internal link clicks
+  useEffect(() => {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('internal-link')) {
+        const linkId = target.getAttribute('data-link-id');
+        if (linkId) {
+          trackLinkClick(linkId);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
+    return () => document.removeEventListener('click', handleLinkClick);
+  }, []);
 
   if (isLoading) {
     return (
@@ -142,7 +175,7 @@ export default function NewsDetail() {
 
           <div
             className="prose prose-lg max-w-none mb-8"
-            dangerouslySetInnerHTML={{ __html: article.content_html || article.content }}
+            dangerouslySetInnerHTML={{ __html: enrichedContent }}
           />
 
           {article.tags && article.tags.length > 0 && (
