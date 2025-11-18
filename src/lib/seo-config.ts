@@ -18,10 +18,19 @@ export const seoConfig = {
   fbPixelId: '', // Değiştirin
   
   // Google Search Console verification
-  googleSiteVerification: '', // Değiştirin
+  // To get this: 1. Go to https://search.google.com/search-console
+  // 2. Add your property -> Choose "HTML tag" method
+  // 3. Copy the content value from the meta tag
+  googleSiteVerification: 'YOUR_VERIFICATION_CODE_HERE',
   
-  // Yandex verification
-  yandexVerification: '', // Değiştirin
+  // Yandex verification (important for Turkey)
+  // To get this: 1. Go to https://webmaster.yandex.com
+  // 2. Add your site and choose "Meta tag" method
+  // 3. Copy the content value
+  yandexVerification: 'YOUR_YANDEX_VERIFICATION_CODE',
+  
+  // Bing Webmaster verification
+  bingVerification: 'YOUR_BING_VERIFICATION_CODE'
 };
 
 // Google Analytics Snippet
