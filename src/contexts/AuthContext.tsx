@@ -11,6 +11,10 @@ interface AuthContextType {
   ownedSites: string[];
   userRoles: string[];
   loading: boolean;
+  impersonatedUserId: string | null;
+  isImpersonating: boolean;
+  impersonateUser: (userId: string) => void;
+  stopImpersonation: () => void;
   signUp: (
     email: string, 
     password: string, 
@@ -45,9 +49,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    
+    // Restore impersonation state from localStorage
+    const savedImpersonatedUserId = localStorage.getItem('impersonated_user_id');
+    if (savedImpersonatedUserId) {
+      setImpersonatedUserId(savedImpersonatedUserId);
+    }
     
     // Get initial session first
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -76,6 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsSiteOwner(false);
           setOwnedSites([]);
           setUserRoles([]);
+          setImpersonatedUserId(null);
+          localStorage.removeItem('impersonated_user_id');
         }
       }
     );
@@ -227,6 +240,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setImpersonatedUserId(null);
+    localStorage.removeItem('impersonated_user_id');
+  };
+
+  const impersonateUser = (userId: string) => {
+    if (!isAdmin) {
+      prodLogger.warn('Unauthorized impersonation attempt', { userId });
+      return;
+    }
+    setImpersonatedUserId(userId);
+    localStorage.setItem('impersonated_user_id', userId);
+  };
+
+  const stopImpersonation = () => {
+    setImpersonatedUserId(null);
+    localStorage.removeItem('impersonated_user_id');
   };
 
   // ✅ FIX: Memoize context value AFTER function definitions
@@ -239,11 +268,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ownedSites,
       userRoles,
       loading,
+      impersonatedUserId,
+      isImpersonating: !!impersonatedUserId,
+      impersonateUser,
+      stopImpersonation,
       signUp,
       signIn,
       signOut,
     }),
-    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading]
+    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading, impersonatedUserId]
   );
 
   return (

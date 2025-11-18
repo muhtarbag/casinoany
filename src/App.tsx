@@ -18,6 +18,7 @@ import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 
 // Lazy load pages with preloading capability
 // Lazy load pages with preloading capability
@@ -243,6 +244,7 @@ const App = () => {
                   includeFacebookPixel={false}
                   includeSchemas={true}
                 />
+                <ImpersonationBanner />
                 <OptimizedNotificationPopup />
                 <ScrollToTop />
                 <AppContent />
