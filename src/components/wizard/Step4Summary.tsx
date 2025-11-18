@@ -8,9 +8,6 @@ interface Step4SummaryProps {
   newSiteName: string;
   companyName: string;
   description: string;
-  companyTaxNumber: string;
-  companyType: string;
-  companyAddress: string;
   companyWebsite: string;
   contactName: string;
   contactEmail: string;
@@ -36,16 +33,6 @@ export const Step4Summary = (props: Step4SummaryProps) => {
   const siteName = props.selectedSite === 'new_site' 
     ? props.newSiteName 
     : props.sites?.find(s => s.id === props.selectedSite)?.name || 'Site seçilmedi';
-
-  const companyTypeMap: Record<string, string> = {
-    limited: 'Limited Şirket (Ltd. Şti.)',
-    anonim: 'Anonim Şirket (A.Ş.)',
-    sahis: 'Şahıs Şirketi',
-    komandit: 'Komandit Şirket',
-    kolektif: 'Kolektif Şirket',
-    kooperatif: 'Kooperatif',
-    diger: 'Diğer'
-  };
 
   return (
     <div className="space-y-6">
@@ -84,23 +71,8 @@ export const Step4Summary = (props: Step4SummaryProps) => {
           <div className="grid gap-3">
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">{props.companyName}</p>
-                <p className="text-xs text-muted-foreground">{companyTypeMap[props.companyType] || props.companyType}</p>
-              </div>
+              <p className="text-sm font-medium">{props.companyName}</p>
             </div>
-
-            {props.companyTaxNumber && (
-              <div className="text-sm">
-                <span className="text-muted-foreground">Vergi No:</span> {props.companyTaxNumber}
-              </div>
-            )}
-
-            {props.companyAddress && (
-              <div className="text-sm">
-                <span className="text-muted-foreground">Adres:</span> {props.companyAddress}
-              </div>
-            )}
 
             {props.companyWebsite && (
               <div className="flex items-center gap-2 text-sm">
