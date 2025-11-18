@@ -318,7 +318,7 @@ const Signup = () => {
 
     switch (currentStep) {
       case 0:
-        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} />;
+        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={email} />;
       case 1:
         return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} disabled={loading} />;
       case 2:
