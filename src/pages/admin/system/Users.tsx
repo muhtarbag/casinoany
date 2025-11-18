@@ -36,7 +36,6 @@ const Users = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Önce tüm profilleri çek (email artık profiles'da)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -45,14 +44,25 @@ const Users = () => {
       if (profilesError) throw profilesError;
       if (!profiles) return [];
 
-      // Tüm rolleri çek
       const { data: roles } = await supabase
         .from('user_roles')
         .select('*');
 
-      // Her profile için role bilgisini ekle
+      // Site owners verilerini çek
+      const { data: siteOwners } = await supabase
+        .from('site_owners')
+        .select(`
+          *,
+          betting_sites:site_id (
+            id,
+            name,
+            slug
+          )
+        `);
+
       return profiles.map(profile => {
         const role = roles?.find(r => r.user_id === profile.id);
+        const siteOwner = siteOwners?.find(so => so.user_id === profile.id);
         
         return {
           id: role?.id || `profile-${profile.id}`,
@@ -63,7 +73,8 @@ const Users = () => {
           profile: {
             ...profile,
             email: profile.email || 'Email bilgisi yok'
-          }
+          },
+          site_owner: siteOwner || null
         };
       });
     },
@@ -280,102 +291,143 @@ const Users = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Şirket Adı</TableHead>
-          <TableHead>Vergi No</TableHead>
+          <TableHead>Şirket/Site</TableHead>
           <TableHead>Yetkili Kişi</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Telefon</TableHead>
+          <TableHead>İletişim</TableHead>
+          <TableHead>Sosyal Medya</TableHead>
           <TableHead>Doğrulama</TableHead>
           <TableHead>Durum</TableHead>
+          <TableHead>Kayıt</TableHead>
           <TableHead className="text-right">İşlemler</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {corporateUsers.length > 0 ? (
-          corporateUsers.map((user: any) => (
-            <TableRow 
-              key={user.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setSelectedUser(user)}
-            >
-              <TableCell className="font-medium">{user.profile?.company_name || '-'}</TableCell>
-              <TableCell>{user.profile?.company_tax_number || '-'}</TableCell>
-              <TableCell>{user.profile?.company_authorized_person || '-'}</TableCell>
-              <TableCell>{user.profile?.company_email || user.profile?.email || '-'}</TableCell>
-              <TableCell>{user.profile?.company_phone || '-'}</TableCell>
-              <TableCell>
-                <Badge variant={user.profile?.is_verified ? 'default' : 'secondary'}>
-                  {user.profile?.is_verified ? (
-                    <span className="flex items-center gap-1">
-                      <Shield className="w-3 h-3" /> Doğrulandı
-                    </span>
-                  ) : (
-                    'Doğrulanmadı'
-                  )}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    user.status === 'approved'
-                      ? 'default'
+          corporateUsers.map((user: any) => {
+            const so = user.site_owner;
+            const siteName = so?.betting_sites?.name || so?.new_site_name || '-';
+            
+            return (
+              <TableRow 
+                key={user.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => setSelectedUser(user)}
+              >
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="font-medium flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
+                      {user.profile?.company_name || '-'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Site: {siteName}</div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="text-sm">{so?.contact_person_name || user.profile?.contact_person_name || '-'}</div>
+                    <div className="text-xs text-muted-foreground">{so?.contact_email || user.profile?.email || '-'}</div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {(so?.contact_teams || user.profile?.contact_teams) && (
+                      <Badge variant="outline" className="text-xs">Teams</Badge>
+                    )}
+                    {(so?.contact_telegram || user.profile?.contact_telegram) && (
+                      <Badge variant="outline" className="text-xs">Telegram</Badge>
+                    )}
+                    {(so?.contact_whatsapp || user.profile?.contact_whatsapp) && (
+                      <Badge variant="outline" className="text-xs">WhatsApp</Badge>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {(so?.social_facebook || user.profile?.social_facebook) && <Badge variant="secondary" className="text-xs">FB</Badge>}
+                    {(so?.social_twitter || user.profile?.social_twitter) && <Badge variant="secondary" className="text-xs">X</Badge>}
+                    {(so?.social_instagram || user.profile?.social_instagram) && <Badge variant="secondary" className="text-xs">IG</Badge>}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={user.profile?.is_verified ? 'default' : 'secondary'}>
+                    {user.profile?.is_verified ? (
+                      <span className="flex items-center gap-1">
+                        <Shield className="w-3 h-3" /> Doğrulandı
+                      </span>
+                    ) : (
+                      'Doğrulanmadı'
+                    )}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      user.status === 'approved'
+                        ? 'default'
+                        : user.status === 'rejected'
+                        ? 'destructive'
+                        : 'secondary'
+                    }
+                  >
+                    {user.status === 'approved'
+                      ? 'Onaylandı'
                       : user.status === 'rejected'
-                      ? 'destructive'
-                      : 'secondary'
-                  }
-                >
-                  {user.status === 'approved'
-                    ? 'Onaylandı'
-                    : user.status === 'rejected'
-                    ? 'Reddedildi'
-                    : 'Bekliyor'}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                  {!user.profile?.is_verified && (
+                      ? 'Reddedildi'
+                      : 'Bekliyor'}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm text-muted-foreground">
+                    {user.profile?.created_at
+                      ? new Date(user.profile.created_at).toLocaleDateString('tr-TR')
+                      : '-'}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    {user.status === 'pending' && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => approveMutation.mutate(user.user_id)}
+                          disabled={approveMutation.isPending}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => rejectMutation.mutate(user.user_id)}
+                          disabled={rejectMutation.isPending}
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                    {!user.profile?.is_verified && user.status === 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => verifyMutation.mutate(user.user_id)}
+                        disabled={verifyMutation.isPending}
+                      >
+                        <Shield className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="default"
-                      onClick={() => verifyMutation.mutate(user.user_id)}
-                      disabled={verifyMutation.isPending}
-                      title="Kurumsal Kullanıcıyı Doğrula"
+                      variant="outline"
+                      onClick={() => deleteMutation.mutate(user.user_id)}
+                      disabled={deleteMutation.isPending}
                     >
-                      <Shield className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
-                  )}
-                  {user.status === 'pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => approveMutation.mutate(user.user_id)}
-                        disabled={approveMutation.isPending}
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectMutation.mutate(user.user_id)}
-                        disabled={rejectMutation.isPending}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => deleteMutation.mutate(user.user_id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })
         ) : (
           <TableRow>
             <TableCell colSpan={8} className="text-center text-muted-foreground">
@@ -475,68 +527,257 @@ const Users = () => {
         </Card>
       </div>
 
-      {/* Corporate User Detail Dialog */}
+      {/* User Detail Dialog - Enhanced with all information */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Kurumsal Kullanıcı Detayları</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedUser?.profile?.user_type === 'corporate' ? (
+                <><Building2 className="w-5 h-5" />Kurumsal Kullanıcı Detayları</>
+              ) : (
+                <><UserCircle className="w-5 h-5" />Kullanıcı Detayları</>
+              )}
+            </DialogTitle>
             <DialogDescription>
-              {selectedUser?.profile?.company_name}
+              {selectedUser?.profile?.company_name || `${selectedUser?.profile?.first_name} ${selectedUser?.profile?.last_name}`}
             </DialogDescription>
           </DialogHeader>
 
           {selectedUser && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Şirket Adı</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_name || '-'}
-                  </p>
+            <div className="space-y-6">
+              {/* Durum Bilgisi */}
+              <div className="flex gap-3">
+                <Badge
+                  variant={
+                    selectedUser.status === 'approved'
+                      ? 'default'
+                      : selectedUser.status === 'rejected'
+                      ? 'destructive'
+                      : 'secondary'
+                  }
+                  className="text-sm"
+                >
+                  {selectedUser.status === 'approved' ? 'Onaylandı' : selectedUser.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
+                </Badge>
+                {selectedUser.profile?.is_verified && (
+                  <Badge variant="default" className="text-sm">
+                    <Shield className="w-3 h-3 mr-1" />Doğrulanmış
+                  </Badge>
+                )}
+              </div>
+
+              {selectedUser.profile?.user_type === 'corporate' ? (
+                /* Kurumsal Kullanıcı Detayları */
+                <Tabs defaultValue="company" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="company">Şirket</TabsTrigger>
+                    <TabsTrigger value="site">Site</TabsTrigger>
+                    <TabsTrigger value="contact">İletişim</TabsTrigger>
+                    <TabsTrigger value="social">Sosyal</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="company" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium">Şirket Adı</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_name || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Vergi/TC No</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_tax_number || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Şirket Tipi</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_type || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Yetkili Kişi</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_authorized_person || selectedUser.profile?.contact_person_name || '-'}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-sm font-medium">Adres</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_address || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Web Sitesi</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_website || '-'}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-sm font-medium">Açıklama</label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_description || selectedUser.site_owner?.description || '-'}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="site" className="space-y-4 mt-4">
+                    {selectedUser.site_owner?.logo_url && (
+                      <div>
+                        <label className="text-sm font-medium">Logo</label>
+                        <img src={selectedUser.site_owner.logo_url} alt="Site Logo" className="h-20 object-contain mt-2 rounded border p-2" />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium">Site</label>
+                        <p className="text-sm text-muted-foreground">
+                          {selectedUser.site_owner?.betting_sites?.name || selectedUser.site_owner?.new_site_name || 'Site bilgisi yok'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Durum</label>
+                        <p className="text-sm">
+                          <Badge variant={selectedUser.site_owner?.status === 'approved' ? 'default' : 'secondary'}>
+                            {selectedUser.site_owner?.status === 'approved' ? 'Aktif' : 'Bekliyor'}
+                          </Badge>
+                        </p>
+                      </div>
+                      {selectedUser.site_owner?.approved_at && (
+                        <div className="col-span-2">
+                          <label className="text-sm font-medium">Onay Tarihi</label>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(selectedUser.site_owner.approved_at).toLocaleDateString('tr-TR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="contact" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Mail className="w-4 h-4" />Email
+                        </label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.site_owner?.contact_email || selectedUser.profile?.contact_email || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4" />Teams
+                        </label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.site_owner?.contact_teams || selectedUser.profile?.contact_teams || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Send className="w-4 h-4" />Telegram
+                        </label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.site_owner?.contact_telegram || selectedUser.profile?.contact_telegram || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Phone className="w-4 h-4" />WhatsApp
+                        </label>
+                        <p className="text-sm text-muted-foreground">{selectedUser.site_owner?.contact_whatsapp || selectedUser.profile?.contact_whatsapp || '-'}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="social" className="space-y-4 mt-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { label: 'Facebook', field: 'social_facebook', icon: 'facebook' },
+                        { label: 'Twitter/X', field: 'social_twitter', icon: 'twitter' },
+                        { label: 'Instagram', field: 'social_instagram', icon: 'instagram' },
+                        { label: 'LinkedIn', field: 'social_linkedin', icon: 'linkedin' },
+                        { label: 'YouTube', field: 'social_youtube', icon: 'youtube' },
+                        { label: 'Telegram Kanal', field: 'social_telegram_channel', icon: 'telegram' },
+                        { label: 'Kick', field: 'social_kick', icon: 'kick' },
+                        { label: 'Discord', field: 'social_discord', icon: 'discord' },
+                        { label: 'Bio Link', field: 'bio_link', icon: 'link' }
+                      ].map(social => {
+                        const value = selectedUser.site_owner?.[social.field] || selectedUser.profile?.[social.field];
+                        return (
+                          <div key={social.field}>
+                            <label className="text-sm font-medium">{social.label}</label>
+                            <p className="text-sm text-muted-foreground break-all">
+                              {value || '-'}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              ) : (
+                /* Bireysel Kullanıcı Detayları */
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Ad Soyad</label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedUser.profile?.first_name} {selectedUser.profile?.last_name}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Kullanıcı Adı</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.username || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Email</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.email || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Telefon</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.phone || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Şehir</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.city || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">İlçe</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.district || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Favori Takım</label>
+                      <p className="text-sm text-muted-foreground">{selectedUser.profile?.favorite_team || '-'}</p>
+                    </div>
+                  </div>
+                  
+                  {selectedUser.profile?.interests && selectedUser.profile.interests.length > 0 && (
+                    <div>
+                      <label className="text-sm font-medium">İlgi Alanları</label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {selectedUser.profile.interests.map((interest: string) => (
+                          <Badge key={interest} variant="secondary">{interest}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedUser.profile?.favorite_game_providers && selectedUser.profile.favorite_game_providers.length > 0 && (
+                    <div>
+                      <label className="text-sm font-medium">Favori Oyun Sağlayıcıları</label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {selectedUser.profile.favorite_game_providers.map((provider: string) => (
+                          <Badge key={provider} variant="outline">{provider}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label className="text-sm font-medium">Vergi Numarası</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_tax_number || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Şirket Tipi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_type || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Yetkili Kişi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_authorized_person || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Email</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_email || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Telefon</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_phone || '-'}
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <label className="text-sm font-medium">Adres</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_address || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Website</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_website || '-'}
-                  </p>
-                </div>
-                <div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            {selectedUser?.profile?.user_type === 'corporate' && !selectedUser?.profile?.is_verified && selectedUser?.status === 'approved' && (
+              <Button
+                onClick={() => verifyMutation.mutate(selectedUser.user_id)}
+                disabled={verifyMutation.isPending}
+              >
+                {verifyMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
+                Doğrula
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
                   <label className="text-sm font-medium">Kayıt Tarihi</label>
                   <p className="text-sm text-muted-foreground">
                     {selectedUser.profile?.created_at 
