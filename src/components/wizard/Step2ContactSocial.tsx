@@ -1,133 +1,117 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube, Link2, Pin } from 'lucide-react';
+import { Mail, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface Step2ContactSocialProps {
   contactName: string;
   setContactName: (value: string) => void;
-  contactEmail: string;
-  setContactEmail: (value: string) => void;
-  contactTeams: string;
-  setContactTeams: (value: string) => void;
-  contactTelegram: string;
-  setContactTelegram: (value: string) => void;
-  contactWhatsapp: string;
-  setContactWhatsapp: (value: string) => void;
+  email: string;
+  setEmail: (value: string) => void;
+  telegram: string;
+  setTelegram: (value: string) => void;
+  whatsapp: string;
+  setWhatsapp: (value: string) => void;
   facebook: string;
   setFacebook: (value: string) => void;
   twitter: string;
   setTwitter: (value: string) => void;
   instagram: string;
   setInstagram: (value: string) => void;
-  linkedin: string;
-  setLinkedin: (value: string) => void;
   youtube: string;
   setYoutube: (value: string) => void;
-  telegramChannel: string;
-  setTelegramChannel: (value: string) => void;
-  kick: string;
-  setKick: (value: string) => void;
-  discord: string;
-  setDiscord: (value: string) => void;
-  bioLink: string;
-  setBioLink: (value: string) => void;
-  supportEmail: string;
-  setSupportEmail: (value: string) => void;
-  pinterest: string;
-  setPinterest: (value: string) => void;
   disabled?: boolean;
 }
+
 export const Step2ContactSocial = ({
   contactName,
   setContactName,
-  contactEmail,
-  setContactEmail,
-  contactTeams,
-  setContactTeams,
-  contactTelegram,
-  setContactTelegram,
-  contactWhatsapp,
-  setContactWhatsapp,
+  email,
+  setEmail,
+  telegram,
+  setTelegram,
+  whatsapp,
+  setWhatsapp,
   facebook,
   setFacebook,
   twitter,
   setTwitter,
   instagram,
   setInstagram,
-  linkedin,
-  setLinkedin,
   youtube,
   setYoutube,
-  telegramChannel,
-  setTelegramChannel,
-  kick,
-  setKick,
-  discord,
-  setDiscord,
-  bioLink,
-  setBioLink,
-  supportEmail,
-  setSupportEmail,
-  pinterest,
-  setPinterest,
   disabled
 }: Step2ContactSocialProps) => {
-  const hasAtLeastOneContact = contactEmail || contactTeams || contactTelegram || contactWhatsapp;
-  return <div className="space-y-6">
+  const hasAtLeastOneContact = email || telegram || whatsapp;
+
+  return (
+    <div className="space-y-6">
       <div>
         <h3 className="font-semibold text-lg mb-4">İletişim Bilgileri</h3>
         <Alert variant={hasAtLeastOneContact ? "default" : "destructive"} className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            En az bir iletişim yöntemi zorunludur (Email, Teams, Telegram veya WhatsApp)
+            En az bir iletişim yöntemi zorunludur (Email, Telegram veya WhatsApp)
           </AlertDescription>
         </Alert>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="contactName">Yetkili Kişi Adı *</Label>
-            <Input id="contactName" type="text" placeholder="Ad Soyad" value={contactName} onChange={e => setContactName(e.target.value)} disabled={disabled} />
+            <Input
+              id="contactName"
+              type="text"
+              placeholder="Ad Soyad"
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              disabled={disabled}
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="contactEmail" className="flex items-center gap-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
                 Email
               </Label>
-              <Input id="contactEmail" type="email" placeholder="iletisim@site.com" value={contactEmail} onChange={e => setContactEmail(e.target.value)} disabled={disabled} />
+              <Input
+                id="email"
+                type="email"
+                placeholder="iletisim@site.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={disabled}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contactTeams" className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Microsoft Teams
-              </Label>
-              <Input id="contactTeams" type="text" placeholder="Teams kullanıcı adı" value={contactTeams} onChange={e => setContactTeams(e.target.value)} disabled={disabled} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactTelegram" className="flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                Telegram
-              </Label>
-              <Input id="contactTelegram" type="text" placeholder="@kullaniciadi" value={contactTelegram} onChange={e => setContactTelegram(e.target.value)} disabled={disabled} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactWhatsapp" className="flex items-center gap-2">
+              <Label htmlFor="whatsapp" className="flex items-center gap-2">
                 <Phone className="w-4 h-4" />
                 WhatsApp
               </Label>
-              <Input 
-                id="contactWhatsapp" 
-                type="text" 
-                placeholder="+90 5XX XXX XX XX veya https://wa.me/905XXXXXXXXX" 
-                value={contactWhatsapp} 
-                onChange={e => setContactWhatsapp(e.target.value)} 
-                disabled={disabled} 
+              <Input
+                id="whatsapp"
+                type="text"
+                placeholder="+90 555 555 55 55"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                disabled={disabled}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telegram" className="flex items-center gap-2">
+                <Send className="w-4 h-4" />
+                Telegram
+              </Label>
+              <Input
+                id="telegram"
+                type="text"
+                placeholder="@kullaniciadi"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -137,8 +121,8 @@ export const Step2ContactSocial = ({
       <Separator />
 
       <div>
-        <h3 className="font-semibold text-lg mb-2">Şirket Sosyal Medya Hesapları</h3>
-        <p className="text-sm text-muted-foreground mb-4">Opsiyonel - Sosyal medya hesaplarınızı ekleyebilirsiniz</p>
+        <h3 className="font-semibold text-lg mb-4">Sosyal Medya Hesapları</h3>
+        <p className="text-sm text-muted-foreground mb-4">Sosyal medya hesaplarınızı ekleyin (isteğe bağlı)</p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -146,7 +130,14 @@ export const Step2ContactSocial = ({
               <Facebook className="w-4 h-4 text-blue-600" />
               Facebook
             </Label>
-            <Input id="facebook" type="url" placeholder="https://facebook.com/..." value={facebook} onChange={e => setFacebook(e.target.value)} disabled={disabled} />
+            <Input
+              id="facebook"
+              type="url"
+              placeholder="https://facebook.com/..."
+              value={facebook}
+              onChange={(e) => setFacebook(e.target.value)}
+              disabled={disabled}
+            />
           </div>
 
           <div className="space-y-2">
@@ -154,7 +145,14 @@ export const Step2ContactSocial = ({
               <Twitter className="w-4 h-4 text-sky-500" />
               Twitter / X
             </Label>
-            <Input id="twitter" type="url" placeholder="https://twitter.com/..." value={twitter} onChange={e => setTwitter(e.target.value)} disabled={disabled} />
+            <Input
+              id="twitter"
+              type="url"
+              placeholder="https://twitter.com/..."
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              disabled={disabled}
+            />
           </div>
 
           <div className="space-y-2">
@@ -162,15 +160,14 @@ export const Step2ContactSocial = ({
               <Instagram className="w-4 h-4 text-pink-600" />
               Instagram
             </Label>
-            <Input id="instagram" type="url" placeholder="https://instagram.com/..." value={instagram} onChange={e => setInstagram(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="linkedin" className="flex items-center gap-2">
-              <Linkedin className="w-4 h-4 text-blue-700" />
-              LinkedIn
-            </Label>
-            <Input id="linkedin" type="url" placeholder="https://linkedin.com/..." value={linkedin} onChange={e => setLinkedin(e.target.value)} disabled={disabled} />
+            <Input
+              id="instagram"
+              type="url"
+              placeholder="https://instagram.com/..."
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              disabled={disabled}
+            />
           </div>
 
           <div className="space-y-2">
@@ -178,72 +175,17 @@ export const Step2ContactSocial = ({
               <Youtube className="w-4 h-4 text-red-600" />
               YouTube
             </Label>
-            <Input id="youtube" type="url" placeholder="https://youtube.com/..." value={youtube} onChange={e => setYoutube(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="telegramChannel" className="flex items-center gap-2">
-              <Send className="w-4 h-4 text-sky-500" />
-              Telegram Kanalı
-            </Label>
-            <Input id="telegramChannel" type="url" placeholder="https://t.me/..." value={telegramChannel} onChange={e => setTelegramChannel(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="socialWhatsapp" className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-green-600" />
-              WhatsApp İş Hattı
-            </Label>
-            <Input 
-              id="socialWhatsapp" 
-              type="text" 
-              placeholder="+90 5XX XXX XX XX veya https://wa.me/905XXXXXXXXX" 
-              value={contactWhatsapp} 
-              onChange={e => setContactWhatsapp(e.target.value)} 
-              disabled={disabled} 
+            <Input
+              id="youtube"
+              type="url"
+              placeholder="https://youtube.com/..."
+              value={youtube}
+              onChange={(e) => setYoutube(e.target.value)}
+              disabled={disabled}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="kick" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-green-600" />
-              Kick
-            </Label>
-            <Input id="kick" type="url" placeholder="https://kick.com/..." value={kick} onChange={e => setKick(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="discord" className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-indigo-600" />
-              Discord
-            </Label>
-            <Input id="discord" type="url" placeholder="https://discord.gg/..." value={discord} onChange={e => setDiscord(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="pinterest" className="flex items-center gap-2">
-              <Pin className="w-4 h-4 text-red-600" />
-              Pinterest
-            </Label>
-            <Input id="pinterest" type="url" placeholder="https://pinterest.com/..." value={pinterest} onChange={e => setPinterest(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="supportEmail" className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-blue-600" />
-              Destek Mail
-            </Label>
-            <Input id="supportEmail" type="email" placeholder="destek@sirket.com" value={supportEmail} onChange={e => setSupportEmail(e.target.value)} disabled={disabled} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bioLink" className="flex items-center gap-2">
-              <Link2 className="w-4 h-4 text-purple-600" />
-              Bio/Link Sayfası
-            </Label>
-            <Input id="bioLink" type="url" placeholder="https://linktr.ee/... veya benzeri" value={bioLink} onChange={e => setBioLink(e.target.value)} disabled={disabled} />
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };

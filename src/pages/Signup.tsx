@@ -113,7 +113,7 @@ const Signup = () => {
           toast({ title: 'Hata', description: 'Lütfen yetkili kişi adını girin', variant: 'destructive' });
           return false;
         }
-        if (!contactEmail && !contactTeams && !contactTelegram && !contactWhatsapp) {
+        if (!siteEmail && !siteTelegram && !siteWhatsapp) {
           toast({ title: 'Hata', description: 'En az bir iletişim yöntemi girmelisiniz', variant: 'destructive' });
           return false;
         }
@@ -136,7 +136,7 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !confirmPassword) {
+    if (!userEmail || !password || !confirmPassword) {
       toast({ title: 'Hata', description: 'Lütfen tüm zorunlu alanları doldurun', variant: 'destructive' });
       return;
     }
@@ -180,25 +180,17 @@ const Signup = () => {
         metadata.companyDescription = description;
         metadata.companyWebsite = companyWebsite;
         metadata.contactPersonName = contactName;
-        metadata.contactEmail = contactEmail;
-        metadata.contactTeams = contactTeams;
-        metadata.contactTelegram = contactTelegram;
-        metadata.contactWhatsapp = contactWhatsapp;
-        metadata.socialFacebook = facebook;
-        metadata.socialTwitter = twitter;
-        metadata.socialInstagram = instagram;
-        metadata.socialLinkedin = linkedin;
-        metadata.socialYoutube = youtube;
-        metadata.socialTelegramChannel = telegramChannel;
-        metadata.socialKick = kick;
-        metadata.socialDiscord = discord;
-        metadata.bioLink = bioLink;
-        metadata.supportEmail = supportEmail;
-        metadata.socialPinterest = pinterest;
+        metadata.siteEmail = siteEmail;
+        metadata.siteTelegram = siteTelegram;
+        metadata.siteWhatsapp = siteWhatsapp;
+        metadata.siteFacebook = siteFacebook;
+        metadata.siteTwitter = siteTwitter;
+        metadata.siteInstagram = siteInstagram;
+        metadata.siteYoutube = siteYoutube;
       }
 
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: userEmail,
         password,
         options: {
           data: metadata
@@ -290,13 +282,13 @@ const Signup = () => {
 
     switch (currentStep) {
       case 0:
-        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={email} />;
+        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={userEmail} />;
       case 1:
         return <Step2ContactSocial contactName={contactName} setContactName={setContactName} email={siteEmail} setEmail={setSiteEmail} telegram={siteTelegram} setTelegram={setSiteTelegram} whatsapp={siteWhatsapp} setWhatsapp={setSiteWhatsapp} facebook={siteFacebook} setFacebook={setSiteFacebook} twitter={siteTwitter} setTwitter={setSiteTwitter} instagram={siteInstagram} setInstagram={setSiteInstagram} youtube={siteYoutube} setYoutube={setSiteYoutube} disabled={loading} />;
       case 2:
         return <Step3CompanyDetails companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
       case 3:
-        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} supportEmail={supportEmail} pinterest={pinterest} logoUrl={logoUrl} sites={sites || []} />;
+        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyWebsite={companyWebsite} contactName={contactName} email={siteEmail} telegram={siteTelegram} whatsapp={siteWhatsapp} facebook={siteFacebook} twitter={siteTwitter} instagram={siteInstagram} youtube={siteYoutube} logoUrl={logoUrl} sites={sites || []} />;
       default:
         return null;
     }
@@ -350,7 +342,7 @@ const Signup = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="email">E-posta *</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
+                <Input id="email" type="email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} required disabled={loading} />
               </div>
 
               <div className="space-y-2">
