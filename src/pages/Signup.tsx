@@ -19,7 +19,7 @@ import { Step4Summary } from '@/components/wizard/Step4Summary';
 import { StepIndividualProfile } from '@/components/wizard/StepIndividualProfile';
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -45,21 +45,13 @@ const Signup = () => {
   const [logoUrl, setLogoUrl] = useState('');
   const [companyWebsite, setCompanyWebsite] = useState('');
   const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactTeams, setContactTeams] = useState('');
-  const [contactTelegram, setContactTelegram] = useState('');
-  const [contactWhatsapp, setContactWhatsapp] = useState('');
-  const [facebook, setFacebook] = useState('');
-  const [twitter, setTwitter] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [linkedin, setLinkedin] = useState('');
-  const [youtube, setYoutube] = useState('');
-  const [telegramChannel, setTelegramChannel] = useState('');
-  const [kick, setKick] = useState('');
-  const [discord, setDiscord] = useState('');
-  const [bioLink, setBioLink] = useState('');
-  const [supportEmail, setSupportEmail] = useState('');
-  const [pinterest, setPinterest] = useState('');
+  const [siteEmail, setSiteEmail] = useState('');
+  const [siteTelegram, setSiteTelegram] = useState('');
+  const [siteWhatsapp, setSiteWhatsapp] = useState('');
+  const [siteFacebook, setSiteFacebook] = useState('');
+  const [siteTwitter, setSiteTwitter] = useState('');
+  const [siteInstagram, setSiteInstagram] = useState('');
+  const [siteYoutube, setSiteYoutube] = useState('');
   
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -222,21 +214,13 @@ const Signup = () => {
           description: description,
           logo_url: logoUrl,
           contact_person_name: contactName,
-          contact_email: contactEmail,
-          contact_teams: contactTeams,
-          contact_telegram: contactTelegram,
-          contact_whatsapp: contactWhatsapp,
-          social_facebook: facebook,
-          social_twitter: twitter,
-          social_instagram: instagram,
-          social_linkedin: linkedin,
-          social_youtube: youtube,
-          social_telegram_channel: telegramChannel,
-          social_kick: kick,
-          social_discord: discord,
-          social_bio_link: bioLink,
-          support_email: supportEmail,
-          social_pinterest: pinterest,
+          site_email: siteEmail,
+          site_telegram: siteTelegram,
+          site_whatsapp: siteWhatsapp,
+          site_facebook: siteFacebook,
+          site_twitter: siteTwitter,
+          site_instagram: siteInstagram,
+          site_youtube: siteYoutube,
           status: 'pending'
         };
 
@@ -308,7 +292,7 @@ const Signup = () => {
       case 0:
         return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={email} />;
       case 1:
-        return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} supportEmail={supportEmail} setSupportEmail={setSupportEmail} pinterest={pinterest} setPinterest={setPinterest} disabled={loading} />;
+        return <Step2ContactSocial contactName={contactName} setContactName={setContactName} email={siteEmail} setEmail={setSiteEmail} telegram={siteTelegram} setTelegram={setSiteTelegram} whatsapp={siteWhatsapp} setWhatsapp={setSiteWhatsapp} facebook={siteFacebook} setFacebook={setSiteFacebook} twitter={siteTwitter} setTwitter={setSiteTwitter} instagram={siteInstagram} setInstagram={setSiteInstagram} youtube={siteYoutube} setYoutube={setSiteYoutube} disabled={loading} />;
       case 2:
         return <Step3CompanyDetails companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
       case 3:
