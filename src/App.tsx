@@ -15,20 +15,18 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
-import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 
 // Create queryClient once outside component to avoid React dispatcher issues
 const queryClient = createAppQueryClient();
 
-// Lazy load pages with preloading capability
-const Index = lazyWithPreload(() => import("./pages/Index"));
-const ForgotPassword = lazyWithPreload(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
+// All pages imported directly (no lazy loading for maximum stability)
+import Index from "./pages/Index";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
-// CRITICAL: Core auth & admin pages imported directly to prevent React dispatcher null errors
-// These pages are essential and should not be lazy loaded
+// CRITICAL: Core auth & admin pages imported directly
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminRoot from "./pages/admin";
@@ -38,75 +36,76 @@ import AdminSitesHub from "./pages/admin/sites/index";
 import AdminRoleManagement from "./pages/admin/system/RoleManagement";
 import AdminUsers from "./pages/admin/system/Users";
 
-// Secondary admin pages can be lazy loaded safely
-const AdminBlogManagement = lazyWithPreload(() => import("./pages/admin/blog/BlogManagement"));
-const AdminAffiliateManagement = lazyWithPreload(() => import("./pages/admin/finance/AffiliateManagement"));
-const AdminBonusManagement = lazyWithPreload(() => import("./pages/admin/finance/BonusManagement"));
-const AdminReviews = lazyWithPreload(() => import("./pages/admin/Reviews"));
-const AdminComplaints = lazyWithPreload(() => import("./pages/admin/Complaints"));
-const AdminNotifications = lazyWithPreload(() => import("./pages/admin/Notifications"));
-const AdminNews = lazyWithPreload(() => import("./pages/admin/News"));
-const AdminCasinoContent = lazyWithPreload(() => import("./pages/admin/content/CasinoContent"));
-const AdminCategoryManagement = lazyWithPreload(() => import("./pages/admin/content/CategoryManagement"));
-const AdminBonusRequests = lazyWithPreload(() => import("./pages/admin/finance/BonusRequests"));
-const AdminContentPlanner = lazyWithPreload(() => import("./pages/admin/content/ContentPlanner"));
-const AdminChangeHistory = lazyWithPreload(() => import("./pages/admin/system/ChangeHistory"));
-const AdminBuildHealth = lazyWithPreload(() => import("./pages/admin/system/BuildHealth"));
-const AdminFeaturedSites = lazyWithPreload(() => import("./pages/admin/sites/FeaturedSites"));
-const AdminBannerManagement = lazyWithPreload(() => import("./pages/admin/sites/BannerManagement"));
-const AdminRecommendedSites = lazyWithPreload(() => import("./pages/admin/sites/RecommendedSites"));
-const AdminSiteStats = lazyWithPreload(() => import("./pages/admin/sites/SiteStats"));
-const AdminBlogStats = lazyWithPreload(() => import("./pages/admin/blog/BlogStats"));
-const AdminBlogComments = lazyWithPreload(() => import("./pages/admin/blog/BlogComments"));
-const AdminSystemLogs = lazyWithPreload(() => import("./pages/admin/system/SystemLogs"));
-const AdminSiteOwners = lazyWithPreload(() => import("./pages/admin/SiteOwners"));
+// Admin pages - all imported directly
+import AdminBlogManagement from "./pages/admin/blog/BlogManagement";
+import AdminAffiliateManagement from "./pages/admin/finance/AffiliateManagement";
+import AdminBonusManagement from "./pages/admin/finance/BonusManagement";
+import AdminReviews from "./pages/admin/Reviews";
+import AdminComplaints from "./pages/admin/Complaints";
+import AdminNotifications from "./pages/admin/Notifications";
+import AdminNews from "./pages/admin/News";
+import AdminCasinoContent from "./pages/admin/content/CasinoContent";
+import AdminCategoryManagement from "./pages/admin/content/CategoryManagement";
+import AdminBonusRequests from "./pages/admin/finance/BonusRequests";
+import AdminContentPlanner from "./pages/admin/content/ContentPlanner";
+import AdminChangeHistory from "./pages/admin/system/ChangeHistory";
+import AdminBuildHealth from "./pages/admin/system/BuildHealth";
+import AdminFeaturedSites from "./pages/admin/sites/FeaturedSites";
+import AdminBannerManagement from "./pages/admin/sites/BannerManagement";
+import AdminRecommendedSites from "./pages/admin/sites/RecommendedSites";
+import AdminSiteStats from "./pages/admin/sites/SiteStats";
+import AdminBlogStats from "./pages/admin/blog/BlogStats";
+import AdminBlogComments from "./pages/admin/blog/BlogComments";
+import AdminSystemLogs from "./pages/admin/system/SystemLogs";
+import AdminSiteOwners from "./pages/admin/SiteOwners";
 
-const Blog = lazyWithPreload(() => import("./pages/Blog"));
-const BlogPost = lazyWithPreload(() => import("./pages/BlogPost"));
-const News = lazyWithPreload(() => import("./pages/News"));
-const NewsDetail = lazyWithPreload(() => import("./pages/NewsDetail"));
-const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
-const SiteDetail = lazyWithPreload(() => import("./pages/SiteDetail"));
-const CasinoSites = lazyWithPreload(() => import("./pages/CasinoSites"));
-const SportsBetting = lazyWithPreload(() => import("./pages/SportsBetting"));
-const LiveCasino = lazyWithPreload(() => import("./pages/LiveCasino"));
-const BonusCampaigns = lazyWithPreload(() => import("./pages/BonusCampaigns"));
-const MobileBetting = lazyWithPreload(() => import("./pages/MobileBetting"));
-const About = lazyWithPreload(() => import("./pages/About"));
-const Privacy = lazyWithPreload(() => import("./pages/Privacy"));
-const Terms = lazyWithPreload(() => import("./pages/Terms"));
-const Cookies = lazyWithPreload(() => import("./pages/Cookies"));
-const KVKK = lazyWithPreload(() => import("./pages/KVKK"));
-const Sitemap = lazyWithPreload(() => import("./pages/Sitemap"));
-const SiteRedirect = lazyWithPreload(() => import("./pages/SiteRedirect"));
-const AMPBlogPost = lazyWithPreload(() => import("./pages/amp/AMPBlogPost"));
-const AMPSiteDetail = lazyWithPreload(() => import("./pages/amp/AMPSiteDetail"));
-const Categories = lazyWithPreload(() => import("./pages/Categories"));
-const CategoryDetail = lazyWithPreload(() => import("./pages/CategoryDetail"));
+// Public pages - all imported directly
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import News from "./pages/News";
+import NewsDetail from "./pages/NewsDetail";
+import NotFound from "./pages/NotFound";
+import SiteDetail from "./pages/SiteDetail";
+import CasinoSites from "./pages/CasinoSites";
+import SportsBetting from "./pages/SportsBetting";
+import LiveCasino from "./pages/LiveCasino";
+import BonusCampaigns from "./pages/BonusCampaigns";
+import MobileBetting from "./pages/MobileBetting";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
+import KVKK from "./pages/KVKK";
+import Sitemap from "./pages/Sitemap";
+import SiteRedirect from "./pages/SiteRedirect";
+import AMPBlogPost from "./pages/amp/AMPBlogPost";
+import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
+import Categories from "./pages/Categories";
+import CategoryDetail from "./pages/CategoryDetail";
 
-// User profile pages
-const Favorites = lazyWithPreload(() => import("./pages/profile/Favorites"));
-const Memberships = lazyWithPreload(() => import("./pages/profile/Memberships"));
-const ProfileDashboard = lazyWithPreload(() => import("./pages/profile/Dashboard"));
-const ProfileReviews = lazyWithPreload(() => import("./pages/profile/Reviews"));
-const ProfileComplaints = lazyWithPreload(() => import("./pages/profile/Complaints"));
-const BonusTracking = lazyWithPreload(() => import("./pages/profile/BonusTracking"));
-const ProfileSettings = lazyWithPreload(() => import("./pages/profile/Settings"));
+// User profile pages - all imported directly
+import Favorites from "./pages/profile/Favorites";
+import Memberships from "./pages/profile/Memberships";
+import ProfileDashboard from "./pages/profile/Dashboard";
+import ProfileReviews from "./pages/profile/Reviews";
+import ProfileComplaints from "./pages/profile/Complaints";
+import BonusTracking from "./pages/profile/BonusTracking";
+import ProfileSettings from "./pages/profile/Settings";
 
-// User panel pages
-const UserDashboard = lazyWithPreload(() => import("./pages/panel/Dashboard"));
-const SiteManagement = lazyWithPreload(() => import("./pages/panel/SiteManagement"));
+// User panel pages - all imported directly
+import UserDashboard from "./pages/panel/Dashboard";
+import SiteManagement from "./pages/panel/SiteManagement";
 
-// Complaint pages
-const Complaints = lazyWithPreload(() => import("./pages/Complaints"));
-const ComplaintDetail = lazyWithPreload(() => import("./pages/ComplaintDetail"));
-const NewComplaint = lazyWithPreload(() => import("./pages/NewComplaint"));
+// Complaint pages - all imported directly
+import Complaints from "./pages/Complaints";
+import ComplaintDetail from "./pages/ComplaintDetail";
+import NewComplaint from "./pages/NewComplaint";
 
-// SEO-optimized pages
-const DenemeBonusu = lazyWithPreload(() => import("./pages/DenemeBonusuDynamic"));
+// SEO-optimized pages - all imported directly
+import DenemeBonusu from "./pages/DenemeBonusuDynamic";
 
-// PWA Install page
-const Install = lazyWithPreload(() => import("./pages/Install"));
+// PWA Install page - imported directly
+import Install from "./pages/Install";
 
 // Loading fallback component
 const PageLoader = () => (
