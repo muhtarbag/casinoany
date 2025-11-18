@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { blogManagementReducer, createInitialState } from '@/reducers/blogManagementReducer';
@@ -10,13 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Trash2, Edit, Eye, Plus, Save, X, Upload, Sparkles, Loader2, Calendar, Clock, Tag, ExternalLink } from 'lucide-react';
+import { Trash2, Edit, Eye, Plus, Save, X, Upload, Sparkles, Loader2, Calendar, Clock, Tag, ExternalLink, Link as LinkIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCategories } from '@/hooks/queries/useCategoryQueries';
+import { generateInternalLinks } from '@/hooks/useInternalLinking';
 
 import { RichTextEditor } from './RichTextEditor';
 
@@ -62,6 +63,7 @@ export const BlogManagement = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: categories } = useCategories({ isActive: true });
+  const [isGeneratingLinks, setIsGeneratingLinks] = useState(false);
   
   const [state, dispatch] = useReducer(blogManagementReducer, createInitialState());
   
@@ -469,6 +471,42 @@ export const BlogManagement = () => {
     setIsPreviewOpen(true);
   };
 
+  const handleGenerateInternalLinks = async () => {
+    if (!editingId || !formData.slug || !formData.content) {
+      toast({
+        title: 'Eksik Bilgi',
+        description: 'Internal link oluşturmak için blog yazısını kaydetmelisiniz',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsGeneratingLinks(true);
+    
+    try {
+      await generateInternalLinks(
+        `/blog/${formData.slug}`,
+        'blog',
+        formData.content,
+        5
+      );
+      
+      toast({
+        title: '✅ Internal Linkler Oluşturuldu',
+        description: 'AI tarafından 5 adet contextual link önerildi. Blog sayfasında otomatik görünecek.',
+      });
+    } catch (error) {
+      console.error('Internal link generation error:', error);
+      toast({
+        title: 'Hata',
+        description: 'Internal link oluşturma başarısız oldu',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGeneratingLinks(false);
+    }
+  };
+
   const generateSlug = (title: string) => {
     const trMap: { [key: string]: string } = {
       'ç': 'c', 'ğ': 'g', 'ı': 'i', 'İ': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
@@ -814,6 +852,26 @@ export const BlogManagement = () => {
                   <Eye className="w-4 h-4 mr-2" />
                   Önizle
                 </Button>
+                {editingId && (
+                  <Button 
+                    type="button" 
+                    variant="secondary" 
+                    onClick={handleGenerateInternalLinks}
+                    disabled={isGeneratingLinks}
+                  >
+                    {isGeneratingLinks ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Link Oluşturuluyor...
+                      </>
+                    ) : (
+                      <>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        AI Internal Link Öner
+                      </>
+                    )}
+                  </Button>
+                )}
                 <Button type="button" variant="outline" onClick={resetForm}>
                   <X className="w-4 h-4 mr-2" />
                   İptal
