@@ -57,6 +57,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedOwnedSites, setImpersonatedOwnedSites] = useState<string[]>([]);
   const [impersonatedUserRoles, setImpersonatedUserRoles] = useState<string[]>([]);
 
+  const checkImpersonatedUserRoles = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', userId);
+      
+      if (error) {
+        prodLogger.error('Failed to fetch impersonated user roles', error, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+        return;
+      }
+      
+      // Only set roles if user is approved
+      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
+      const roles = approvedRoles.map(r => r.role);
+      
+      // Check site ownership independently from roles
+      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
+        .from('site_owners')
+        .select('site_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+      
+      if (ownershipError) {
+        prodLogger.error('Failed to fetch impersonated user site ownership', ownershipError, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+      }
+      
+      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
+      
+      setImpersonatedUserRoles(roles);
+      setImpersonatedIsAdmin(roles.includes('admin'));
+      setImpersonatedIsSiteOwner(sites.length > 0);
+      setImpersonatedOwnedSites(sites);
+    } catch (error) {
+      prodLogger.error('Unexpected error in checkImpersonatedUserRoles', error, { 
+        component: 'auth',
+        metadata: { userId } 
+      });
+    }
+  };
+
   // Impersonate edildiğinde impersonate edilen kullanıcının rollerini çek
   useEffect(() => {
     if (impersonatedUserId) {
@@ -165,52 +212,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const checkImpersonatedUserRoles = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role, status')
-        .eq('user_id', userId);
-      
-      if (error) {
-        prodLogger.error('Failed to fetch impersonated user roles', error, { 
-          component: 'auth',
-          metadata: { userId } 
-        });
-        return;
-      }
-      
-      // Only set roles if user is approved
-      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
-      const roles = approvedRoles.map(r => r.role);
-      
-      // Check site ownership independently from roles
-      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
-        .from('site_owners')
-        .select('site_id')
-        .eq('user_id', userId)
-        .eq('status', 'approved');
-      
-      if (ownershipError) {
-        prodLogger.error('Failed to fetch impersonated user site ownership', ownershipError, { 
-          component: 'auth',
-          metadata: { userId } 
-        });
-      }
-      
-      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
-      
-      setImpersonatedUserRoles(roles);
-      setImpersonatedIsAdmin(roles.includes('admin'));
-      setImpersonatedIsSiteOwner(sites.length > 0);
-      setImpersonatedOwnedSites(sites);
-    } catch (error) {
-      prodLogger.error('Unexpected error in checkImpersonatedUserRoles', error, { 
-        component: 'auth',
-        metadata: { userId } 
-      });
-    }
-  };
 
   const signUp = async (
     email: string, 
