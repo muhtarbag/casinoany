@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,7 @@ import { TypedRPC } from '@/lib/supabase-extended';
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from '@/hooks/useFavorites';
 import { analytics } from "@/lib/analytics";
+import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,8 +97,51 @@ export default function SiteDetail() {
     retry: false,
   });
 
+  // Fetch AI-suggested internal links for casino pages
+  const { data: internalLinks } = useInternalLinks(
+    site?.slug ? `/site/${site.slug}` : '',
+    !!site?.slug
+  );
+
   // ✅ OPTIMIZE EDİLDİ: O(1) lookup
   const isFavorite = checkFavorite(site?.id);
+
+  // Enrich casino content with internal links
+  const enrichedExpertReview = useMemo(() => {
+    if (!site?.expert_review || !internalLinks?.length) return site?.expert_review;
+    return applyInternalLinks(site.expert_review, internalLinks);
+  }, [site?.expert_review, internalLinks]);
+
+  const enrichedVerdict = useMemo(() => {
+    if (!site?.verdict || !internalLinks?.length) return site?.verdict;
+    return applyInternalLinks(site.verdict, internalLinks);
+  }, [site?.verdict, internalLinks]);
+
+  const enrichedLoginGuide = useMemo(() => {
+    if (!site?.login_guide || !internalLinks?.length) return site?.login_guide;
+    return applyInternalLinks(site.login_guide, internalLinks);
+  }, [site?.login_guide, internalLinks]);
+
+  const enrichedWithdrawalGuide = useMemo(() => {
+    if (!site?.withdrawal_guide || !internalLinks?.length) return site?.withdrawal_guide;
+    return applyInternalLinks(site.withdrawal_guide, internalLinks);
+  }, [site?.withdrawal_guide, internalLinks]);
+
+  // Track internal link clicks
+  useEffect(() => {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('internal-link')) {
+        const linkId = target.getAttribute('data-link-id');
+        if (linkId) {
+          trackLinkClick(linkId);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
+    return () => document.removeEventListener('click', handleLinkClick);
+  }, []);
 
   // ✅ OPTIMIZE EDİLDİ: Global favorites hook kullanıyor
   const handleToggleFavorite = () => {
@@ -456,11 +500,11 @@ export default function SiteDetail() {
             siteName={site.name}
             pros={site.pros}
             cons={site.cons}
-            verdict={site.verdict}
-            expertReview={site.expert_review}
+            verdict={enrichedVerdict}
+            expertReview={enrichedExpertReview}
             gameCategories={site.game_categories}
-            loginGuide={site.login_guide}
-            withdrawalGuide={site.withdrawal_guide}
+            loginGuide={enrichedLoginGuide}
+            withdrawalGuide={enrichedWithdrawalGuide}
             faq={site.faq}
           />
         </div>
