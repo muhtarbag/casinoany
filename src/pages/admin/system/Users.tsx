@@ -246,15 +246,42 @@ const Users = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
+      // 1. Delete from profiles (will cascade user_roles due to foreign keys)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+      
+      if (profileError) {
+        console.error('Profile deletion error:', profileError);
+        throw profileError;
+      }
+
+      // 2. Delete from auth.users using admin API
+      // Note: This requires service role key, regular users can't delete auth.users
+      // So we'll only delete from profiles and user_roles tables
+      const { error: roleError } = await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
-      if (error) throw error;
+
+      if (roleError) {
+        console.error('User roles deletion error:', roleError);
+        throw roleError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
       toast({ title: 'Başarılı', description: 'Kullanıcı silindi' });
+    },
+    onError: (error: any) => {
+      console.error('Delete mutation error:', error);
+      toast({ 
+        title: 'Hata', 
+        description: error.message || 'Kullanıcı silinirken bir hata oluştu',
+        variant: 'destructive'
+      });
     },
   });
 
@@ -294,20 +321,54 @@ const Users = () => {
   };
 
   const handleBulkDelete = async () => {
+    if (selectedUserIds.length === 0) return;
+    
     setIsBulkProcessing(true);
     setBulkProgress(0);
-    let completed = 0;
     
-    for (const userId of selectedUserIds) {
-      await deleteMutation.mutateAsync(userId);
-      completed++;
-      setBulkProgress((completed / selectedUserIds.length) * 100);
+    try {
+      const total = selectedUserIds.length;
+      let completed = 0;
+      const errors: string[] = [];
+
+      for (const userId of selectedUserIds) {
+        try {
+          await deleteMutation.mutateAsync(userId);
+          completed++;
+          setBulkProgress((completed / total) * 100);
+        } catch (error: any) {
+          console.error(`Failed to delete user ${userId}:`, error);
+          errors.push(`Kullanıcı ${userId}: ${error.message || 'Bilinmeyen hata'}`);
+          completed++;
+          setBulkProgress((completed / total) * 100);
+        }
+      }
+
+      if (errors.length > 0) {
+        toast({ 
+          title: 'Kısmi Başarı', 
+          description: `${completed - errors.length}/${total} kullanıcı silindi. ${errors.length} hata oluştu.`,
+          variant: 'default'
+        });
+      } else {
+        toast({ title: 'Başarılı', description: `${completed} kullanıcı silindi` });
+      }
+
+      setSelectedUserIds([]);
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
+    } catch (error) {
+      console.error('Toplu silme hatası:', error);
+      toast({ 
+        title: 'Hata', 
+        description: 'Toplu silme sırasında bir hata oluştu',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsBulkProcessing(false);
+      setBulkProgress(0);
+      setShowBulkDeleteDialog(false);
     }
-    
-    setIsBulkProcessing(false);
-    setSelectedUserIds([]);
-    setShowBulkDeleteDialog(false);
-    toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı silindi` });
   };
 
   const handleBulkVerify = async () => {
