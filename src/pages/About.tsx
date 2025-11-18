@@ -374,6 +374,259 @@ const About = () => {
             </Card>
           </div>
 
+          {/* Why CasinoAny */}
+          <div className="mb-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Neden CasinoAny.com?
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Hem bireysel kullanıcılar hem de kurumsal işbirlikleri için özel olarak tasarlanmış 
+                kapsamlı çözümler sunuyoruz.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* For Individual Users */}
+              <Card className="border-primary/30 hover:shadow-xl transition-all">
+                <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5">
+                  <CardTitle className="flex items-center gap-3 text-2xl">
+                    <Users className="w-7 h-7 text-primary" />
+                    Bireysel Kullanıcılar İçin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 space-y-6">
+                  {/* Benefits */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <Award className="w-5 h-5 text-primary" />
+                      Faydalar
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Güvenli Seçim:</strong> Sadece lisanslı ve güvenilir sitelere erişim
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Zaman Tasarrufu:</strong> Tüm siteleri tek platformda karşılaştırın
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>En İyi Bonuslar:</strong> Güncel kampanya ve bonus tekliflerine anında ulaşın
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Gerçek Yorumlar:</strong> Binlerce gerçek kullanıcı deneyimi
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-primary" />
+                      Özellikler
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Akıllı Filtreleme:</strong> Bonus türü, ödeme yöntemi, oyun kategorisine göre arama
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Detaylı İncelemeler:</strong> Her site için kapsamlı analiz ve puanlama
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Karşılaştırma Aracı:</strong> Siteleri yan yana koyarak özellikleri inceleyin
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Mobil Uyumlu:</strong> Her cihazdan kolay erişim ve kullanım
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advantages */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      Avantajlar
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>%100 Ücretsiz:</strong> Tüm özelliklere sınırsız erişim, kayıt gerekmez
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Günlük Güncellemeler:</strong> Yeni kampanyalar ve site değişiklikleri anında yayında
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Uzman Destek:</strong> Blog ve rehberlerle bilginizi artırın
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Şikayet Sistemi:</strong> Sorunlarınızı paylaşın, çözüm bulun
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* For Corporate Users */}
+              <Card className="border-secondary/30 hover:shadow-xl transition-all">
+                <CardHeader className="bg-gradient-to-br from-secondary/10 to-secondary/5">
+                  <CardTitle className="flex items-center gap-3 text-2xl">
+                    <Target className="w-7 h-7 text-secondary" />
+                    Kurumsal Kullanıcılar İçin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 space-y-6">
+                  {/* Benefits */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <Award className="w-5 h-5 text-secondary" />
+                      Faydalar
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Geniş Erişim:</strong> Aylık 50.000+ aktif kullanıcıya ulaşın
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Hedefli Kitle:</strong> Bahis oynamak isteyen nitelikli ziyaretçiler
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Marka Bilinirliği:</strong> Güvenilir platform aracılığıyla tanınırlık
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Rekabet Üstünlüğü:</strong> Rakiplerinizden öne çıkın
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-secondary" />
+                      Özellikler
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Özel Sayfalar:</strong> Siteniz için detaylı inceleme ve tanıtım sayfası
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Yönetim Paneli:</strong> İçeriklerinizi kendiniz güncelleyin
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Performans Raporları:</strong> Tıklama, görüntülenme ve dönüşüm analitikleri
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Şikayet Yönetimi:</strong> Kullanıcı geri bildirimlerine anında yanıt
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advantages */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-secondary" />
+                      Avantajlar
+                    </h4>
+                    <div className="space-y-2 pl-7">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>SEO Faydası:</strong> Yüksek DA/PA değerli backlink ve organik trafik
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Uzun Vadeli İşbirliği:</strong> Sürdürülebilir affiliate programları
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>İtibar Yönetimi:</strong> Objektif değerlendirme ve şeffaf iletişim
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-secondary mt-1 flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                          <strong>Esnek Paketler:</strong> İhtiyacınıza özel reklam ve sponsorluk seçenekleri
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-center text-muted-foreground mb-3">
+                      Sitenizi platformumuza eklemek veya işbirliği fırsatları hakkında bilgi almak için:
+                    </p>
+                    <div className="flex justify-center">
+                      <Badge variant="secondary" className="text-sm px-4 py-2">
+                        İletişim: info@casinoany.com
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           {/* Responsible Gaming */}
           <Card className="mb-12 border-destructive/30">
             <CardHeader className="bg-destructive/10">
