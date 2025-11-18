@@ -158,7 +158,7 @@ export const Step2ContactSocial = ({
             <Input id="linkedin" type="url" placeholder="https://linkedin.com/..." value={linkedin} onChange={e => setLinkedin(e.target.value)} disabled={disabled} />
           </div>
 
-          <div className="space-y-2 sm:col-span-2">
+          <div className="space-y-2">
             <Label htmlFor="youtube" className="flex items-center gap-2">
               <Youtube className="w-4 h-4 text-red-600" />
               YouTube
