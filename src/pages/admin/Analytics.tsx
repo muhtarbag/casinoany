@@ -2,9 +2,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SiteStats from "@/components/SiteStats";
 import { NotificationStats } from "@/components/notifications/NotificationStats";
+import { SocialPlatformTrends } from "@/components/analytics/SocialPlatformTrends";
 import { BarChart3, Bell, TrendingUp } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Analytics() {
+  // Fetch social media stats for trends
+  const { data: socialStats } = useQuery({
+    queryKey: ['social-media-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_stats')
+        .select(`
+          site_id,
+          email_clicks,
+          whatsapp_clicks,
+          telegram_clicks,
+          twitter_clicks,
+          instagram_clicks,
+          facebook_clicks,
+          youtube_clicks,
+          betting_sites!inner(name, is_active)
+        `)
+        .eq('betting_sites.is_active', true);
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -17,10 +44,14 @@ export default function Analytics() {
 
       {/* Analytics Tabs */}
       <Tabs defaultValue="sites" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="sites" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             Site Analitiği
+          </TabsTrigger>
+          <TabsTrigger value="social" className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Sosyal Medya
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
@@ -42,6 +73,24 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <SiteStats />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Social Media Analytics Tab */}
+        <TabsContent value="social" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Sosyal Medya Analitiği
+              </CardTitle>
+              <CardDescription>
+                Platform bazında tıklama performansı ve engagement metrikleri
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {socialStats && <SocialPlatformTrends statsData={socialStats} />}
             </CardContent>
           </Card>
         </TabsContent>

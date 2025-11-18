@@ -1,42 +1,11 @@
 import { Mail } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { trackSocialClick } from '@/lib/socialTracking';
 
 interface SiteDetailContactProps {
   site: any;
 }
-
-const trackSocialClick = async (siteId: string, platform: string) => {
-  try {
-    const { data: stats } = await supabase
-      .from('site_stats')
-      .select('*')
-      .eq('site_id', siteId)
-      .maybeSingle();
-
-    const columnName = `${platform}_clicks`;
-    
-    if (stats) {
-      const currentValue = Number(stats[columnName as keyof typeof stats] || 0);
-      await supabase
-        .from('site_stats')
-        .update({ [columnName]: currentValue + 1 })
-        .eq('site_id', siteId);
-    } else {
-      await supabase
-        .from('site_stats')
-        .insert({ 
-          site_id: siteId, 
-          views: 0, 
-          clicks: 0,
-          [columnName]: 1 
-        });
-    }
-  } catch (error) {
-    // Silent fail for analytics tracking
-  }
-};
 
 export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
   const hasContactInfo = site.email || site.whatsapp || site.telegram || 
