@@ -2,18 +2,20 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone, X } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone, X, UserCog } from 'lucide-react';
 import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
 import { EnhancedTablePagination } from '@/components/table/EnhancedTablePagination';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { UserBulkActionsToolbar } from '@/components/admin/UserBulkActionsToolbar';
 import {
   Table,
   TableBody,
@@ -32,7 +34,8 @@ import {
 } from '@/components/ui/dialog';
 
 const Users = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, impersonateUser } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
@@ -324,6 +327,12 @@ const Users = () => {
     toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı doğrulandı` });
   };
 
+  const handleImpersonate = (userId: string, userName: string) => {
+    impersonateUser(userId);
+    toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
+    navigate('/');
+  };
+
   const toggleUserSelection = (userId: string) => {
     setSelectedUserIds(prev => 
       prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
@@ -388,6 +397,12 @@ const Users = () => {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-12">
+            <Checkbox
+              checked={selectedUserIds.length === currentUsers.length && currentUsers.length > 0}
+              onCheckedChange={toggleSelectAll}
+            />
+          </TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Ad Soyad</TableHead>
           <TableHead>Telefon</TableHead>
@@ -465,6 +480,19 @@ const Users = () => {
                       </Button>
                     </>
                   )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleImpersonate(
+                      user.user_id, 
+                      user.profile?.first_name && user.profile?.last_name
+                        ? `${user.profile.first_name} ${user.profile.last_name}`
+                        : user.profile?.email || 'User'
+                    )}
+                    title="Üye Gibi Davran"
+                  >
+                    <UserCog className="w-4 h-4" />
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -624,6 +652,17 @@ const Users = () => {
                         <Shield className="w-4 h-4" />
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleImpersonate(
+                        user.user_id,
+                        user.profile?.company_name || user.profile?.email || 'User'
+                      )}
+                      title="Üye Gibi Davran"
+                    >
+                      <UserCog className="w-4 h-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
