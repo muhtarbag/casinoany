@@ -4,13 +4,13 @@
  * ✅ FIX: Added ErrorBoundary to catch lazy component load failures
  */
 
-import { Suspense, ComponentType, lazy as reactLazy } from 'react';
+import { Suspense, ComponentType, lazy as reactLazy, type ReactNode, type LazyExoticComponent } from 'react';
 import { LoadingState } from '@/components/ui/loading-state';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface LazyComponentProps {
   component: ComponentType<any>;
-  fallback?: React.ReactNode;
+  fallback?: ReactNode;
   [key: string]: any;
 }
 
@@ -38,7 +38,7 @@ export function LazyComponent({
 export function lazyWithRetry<T extends ComponentType<any>>(
   componentImport: () => Promise<{ default: T }>,
   retries = 3
-): React.LazyExoticComponent<T> {
+): LazyExoticComponent<T> {
   return reactLazy(() =>
     new Promise<{ default: T }>((resolve, reject) => {
       const attemptImport = (retriesLeft: number) => {
@@ -65,7 +65,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
  * Preload a lazy component
  */
 export function preloadComponent<T extends ComponentType<any>>(
-  lazyComponent: React.LazyExoticComponent<T>
+  lazyComponent: LazyExoticComponent<T>
 ): void {
   // Trigger preload by accessing the component
   // This works by causing React to start fetching the module
