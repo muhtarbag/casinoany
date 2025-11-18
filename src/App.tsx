@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -218,8 +218,8 @@ const AppContent = () => {
 };
 
 const App = () => {
-  // CRITICAL: Create queryClient inside component with React.useMemo to ensure React dispatcher is available
-  const queryClient = React.useMemo(() => createAppQueryClient(), []);
+  // CRITICAL: Create queryClient inside component with useMemo to ensure React dispatcher is available
+  const queryClient = useMemo(() => createAppQueryClient(), []);
   
   return (
     <ErrorTrackingProvider>
