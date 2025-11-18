@@ -31,6 +31,7 @@ const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
 // These pages are essential and should not be lazy loaded
 import AdminRoot from "./pages/admin";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminAnalytics from "./pages/admin/Analytics";
 import AdminSitesHub from "./pages/admin/sites/index";
 import AdminRoleManagement from "./pages/admin/system/RoleManagement";
 import AdminUsers from "./pages/admin/system/Users";
@@ -131,6 +132,7 @@ const AppContent = () => {
           <Route path="/admin" element={<AdminRoot />}>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="sites" element={<AdminSitesHub />} />
             <Route path="system/users" element={<AdminUsers />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />

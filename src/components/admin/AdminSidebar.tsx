@@ -11,7 +11,8 @@ import {
   Shield,
   Folder,
   Bell,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -44,12 +45,18 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
     return requiredRoles.some(role => userRoles.includes(role));
   };
 
-  // 🎯 5 Main Hubs (simplified from 7 groups)
+  // 🎯 6 Main Hubs
   const navigationGroups = [
     {
       label: '🏠 Dashboard',
       items: [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Genel Bakış', route: '/admin/dashboard', roles: [], shortcut: 'g d' },
+      ],
+    },
+    {
+      label: '📊 Analitik Hub',
+      items: [
+        { id: 'analytics', icon: BarChart3, label: 'Analitikler', route: '/admin/analytics', roles: [], shortcut: 'g n' },
       ],
     },
     {
@@ -105,27 +112,18 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton asChild>
-                      <Link
-                        to={item.route}
-                        className={cn(
-                          'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground',
-                          activeTab === item.id && 'bg-accent text-accent-foreground font-medium'
-                        )}
-                      >
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && (
-                          <>
-                            <span className="flex-1">{item.label}</span>
-                            {item.shortcut && (
-                              <Badge 
-                                variant="outline" 
-                                className="ml-auto text-[9px] font-mono px-1.5 py-0 opacity-40"
-                              >
-                                {item.shortcut}
-                              </Badge>
-                            )}
-                          </>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={activeTab === item.id}
+                      tooltip={collapsed ? item.label : undefined}
+                    >
+                      <Link to={item.route} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span className={cn(collapsed && "sr-only")}>{item.label}</span>
+                        {!collapsed && item.shortcut && (
+                          <Badge variant="outline" className="ml-auto text-xs">
+                            {item.shortcut}
+                          </Badge>
                         )}
                       </Link>
                     </SidebarMenuButton>
