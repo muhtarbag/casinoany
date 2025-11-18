@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Mail, MessageCircle, Send, Twitter, Instagram, Facebook, Youtube } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface SocialMediaStatsProps {
   statsData: any[];
@@ -74,93 +73,93 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
       </div>
 
       {/* Platform Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">{socialPlatforms.map((platform) => {
-                const IconComponent = platform.icon;
-                return (
-                  <div key={platform.name} className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
-                    <IconComponent className="w-6 h-6" style={{ color: platform.color }} />
-                    <span className="text-sm font-medium">{platform.name}</span>
-                    <span className="text-2xl font-bold">{platform.clicks.toLocaleString()}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Platform Karşılaştırması</CardTitle>
-          <CardDescription>Sosyal medya platformları tıklama dağılımı</CardDescription>
+          <CardTitle>Sosyal Medya Tıklamaları</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
-            <BarChart data={platformTotals}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                angle={-45} 
-                textAnchor="end" 
-                height={100}
-                className="text-xs"
-              />
-              <YAxis className="text-xs" />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="clicks" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {socialPlatforms.map((platform) => {
+              const Icon = platform.icon;
+              const clicks = platformTotals[platform.key] || 0;
+              const percentage = totalSocialClicks > 0 ? ((clicks / totalSocialClicks) * 100).toFixed(1) : '0';
 
-      {/* Top Sites per Platform */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Platform Bazında En Aktif Siteler</CardTitle>
-          <CardDescription>Her platformda en çok tıklanan siteler</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {platformTotals.slice(0, 3).map((platform) => {
-              const topSites = [...statsData]
-                .filter(stat => (stat[socialPlatforms.find(p => p.label === platform.name)?.key || ''] || 0) > 0)
-                .sort((a, b) => {
-                  const key = socialPlatforms.find(p => p.label === platform.name)?.key || '';
-                  return (b[key] || 0) - (a[key] || 0);
-                })
-                .slice(0, 5);
-
-              if (topSites.length === 0) return null;
-
-              const IconComponent = platform.icon;
-              
               return (
-                <div key={platform.name} className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <IconComponent className="w-5 h-5" style={{ color: platform.color }} />
-                    <h4 className="font-semibold">{platform.name}</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {topSites.map((stat, index) => {
-                      const key = socialPlatforms.find(p => p.label === platform.name)?.key || '';
-                      return (
-                        <div key={stat.id} className="flex items-center justify-between p-2 rounded bg-muted/30">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">#{index + 1}</span>
-                            <span className="font-medium">{stat.site_name}</span>
-                          </div>
-                          <span className="font-bold">{(stat[key] || 0).toLocaleString()}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                <div key={platform.key} className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
+                  <Icon className="w-6 h-6" style={{ color: platform.color }} />
+                  <span className="text-sm font-medium">{platform.label}</span>
+                  <span className="text-2xl font-bold">{clicks.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground">%{percentage}</span>
                 </div>
               );
             })}
           </div>
         </CardContent>
       </Card>
+
+      {/* Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Platform Karşılaştırması</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={socialPlatforms.map(p => ({
+              name: p.label,
+              clicks: platformTotals[p.key] || 0,
+              fill: p.color,
+            }))}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="clicks" fill="#8884d8" name="Tıklama" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Top Sites per Platform */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {socialPlatforms
+          .filter(platform => platformTotals[platform.key] > 0)
+          .sort((a, b) => (platformTotals[b.key] || 0) - (platformTotals[a.key] || 0))
+          .slice(0, 3)
+          .map((platform) => {
+            const Icon = platform.icon;
+            // Get top 5 sites for this platform
+            const topSites = statsData
+              .map(stat => ({
+                name: stat.betting_sites?.name || 'Unknown',
+                clicks: stat[platform.key] || 0,
+              }))
+              .filter(site => site.clicks > 0)
+              .sort((a, b) => b.clicks - a.clicks)
+              .slice(0, 5);
+
+            return (
+              <Card key={platform.key}>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Icon className="w-5 h-5" style={{ color: platform.color }} />
+                    {platform.label} - En Aktif Siteler
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {topSites.map((site, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
+                        <span className="text-sm font-medium truncate">{site.name}</span>
+                        <span className="text-sm text-muted-foreground">{site.clicks} tıklama</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+      </div>
     </div>
   );
 };
