@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Mail, Phone, Globe, MessageSquare, Send, CheckCircle2 } from 'lucide-react';
+import { Building2, Mail, Phone, Globe, Send, CheckCircle2, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface Step4SummaryProps {
@@ -10,21 +10,13 @@ interface Step4SummaryProps {
   description: string;
   companyWebsite: string;
   contactName: string;
-  contactEmail: string;
-  contactTeams: string;
-  contactTelegram: string;
-  contactWhatsapp: string;
+  email: string;
+  telegram: string;
+  whatsapp: string;
   facebook: string;
   twitter: string;
   instagram: string;
-  linkedin: string;
   youtube: string;
-  telegramChannel: string;
-  kick: string;
-  discord: string;
-  bioLink: string;
-  supportEmail: string;
-  pinterest: string;
   logoUrl: string;
   sites: any[];
 }
@@ -108,28 +100,24 @@ export const Step4Summary = (props: Step4SummaryProps) => {
           )}
 
           <div className="grid gap-2 text-sm">
-            {props.contactEmail && (
+            {props.email && (
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span>{props.contactEmail}</span>
+                <span>{props.email}</span>
               </div>
             )}
-            {props.contactTeams && (
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                <span>Teams: {props.contactTeams}</span>
-              </div>
-            )}
-            {props.contactTelegram && (
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4 text-muted-foreground" />
-                <span>Telegram: {props.contactTelegram}</span>
-              </div>
-            )}
-            {props.contactWhatsapp && (
+
+            {props.whatsapp && (
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-muted-foreground" />
-                <span>WhatsApp: {props.contactWhatsapp}</span>
+                <span>{props.whatsapp}</span>
+              </div>
+            )}
+
+            {props.telegram && (
+              <div className="flex items-center gap-2">
+                <Send className="w-4 h-4 text-muted-foreground" />
+                <span>{props.telegram}</span>
               </div>
             )}
           </div>
@@ -137,8 +125,7 @@ export const Step4Summary = (props: Step4SummaryProps) => {
       </Card>
 
       {/* Social Media */}
-      {(props.facebook || props.twitter || props.instagram || props.linkedin || props.youtube || 
-        props.telegramChannel || props.kick || props.discord || props.bioLink || props.supportEmail || props.pinterest) && (
+      {(props.facebook || props.twitter || props.instagram || props.youtube) && (
         <Card>
           <CardContent className="pt-6">
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
@@ -146,14 +133,7 @@ export const Step4Summary = (props: Step4SummaryProps) => {
               {props.facebook && <Badge variant="outline">Facebook</Badge>}
               {props.twitter && <Badge variant="outline">Twitter/X</Badge>}
               {props.instagram && <Badge variant="outline">Instagram</Badge>}
-              {props.linkedin && <Badge variant="outline">LinkedIn</Badge>}
               {props.youtube && <Badge variant="outline">YouTube</Badge>}
-              {props.telegramChannel && <Badge variant="outline">Telegram Kanal</Badge>}
-              {props.kick && <Badge variant="outline">Kick</Badge>}
-              {props.discord && <Badge variant="outline">Discord</Badge>}
-              {props.pinterest && <Badge variant="outline">Pinterest</Badge>}
-              {props.supportEmail && <Badge variant="outline">Destek Mail</Badge>}
-              {props.bioLink && <Badge variant="outline">Bio Link</Badge>}
             </div>
           </CardContent>
         </Card>
