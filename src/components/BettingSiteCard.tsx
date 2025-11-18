@@ -12,6 +12,7 @@ import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
+import { trackSocialClick } from '@/lib/socialTracking';
 
 // Helper function to generate consistent random number from site ID
 const getRandomBaseFromId = (id: string | undefined, min: number, max: number): number => {
@@ -276,7 +277,10 @@ const BettingSiteCardComponent = ({
               const Icon = link.icon;
               return (
                 <a key={`social-${id}-${link.label}-${idx}`} href={link.href} target="_blank" rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackSocialClick(id || '', link.platform as any, name);
+                  }}
                   className="flex items-center justify-center p-2 rounded-lg transition-all duration-300 group/social relative overflow-hidden"
                   aria-label={link.label}
                   style={{ 
