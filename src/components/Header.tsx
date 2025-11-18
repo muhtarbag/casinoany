@@ -12,7 +12,7 @@ export const Header = () => {
   return (
     <header className={cn(
       "border-b border-border bg-card/50 backdrop-blur-sm sticky z-[60]",
-      isImpersonating ? "top-[52px]" : "top-0"
+      isImpersonating ? "top-[41px]" : "top-0"
     )}>
         <div className="container mx-auto px-4 py-3 md:py-4">
           <nav className="flex items-center justify-between">
