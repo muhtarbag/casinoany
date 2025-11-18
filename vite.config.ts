@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
+import viteCompression from 'vite-plugin-compression';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -13,6 +14,20 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(), 
     mode === "development" && componentTagger(),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240, // Only compress files > 10KB
+      algorithm: 'gzip',
+      ext: '.gz',
+    }),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'brotliCompress',
+      ext: '.br',
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
@@ -189,26 +204,52 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks
+          // Core React - Most critical, loaded first
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          
+          // Data Management - Frequently used
           'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
-          'vendor-ui': [
+          'vendor-supabase': ['@supabase/supabase-js'],
+          
+          // UI Components - Split by usage frequency
+          'vendor-ui-core': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-popover'
+          ],
+          'vendor-ui-extended': [
             '@radix-ui/react-accordion',
             '@radix-ui/react-alert-dialog',
             '@radix-ui/react-avatar',
             '@radix-ui/react-checkbox',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-popover',
             '@radix-ui/react-scroll-area',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast'
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-switch'
           ],
-          'vendor-icons': ['lucide-react'],
+          
+          // Icons & Visual
+          'vendor-icons': ['lucide-react', 'react-icons'],
+          'vendor-animation': ['framer-motion'],
+          
+          // Charts - Heavy, load on demand
           'vendor-charts': ['recharts'],
+          
+          // Forms & Validation
           'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge']
+          
+          // Rich Content - Heavy editor
+          'vendor-editor': ['react-quill'],
+          
+          // Utilities - Small but frequently used
+          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge', 'lodash-es'],
+          
+          // Theme & SEO
+          'vendor-misc': ['next-themes', 'react-helmet-async', 'sonner']
         }
       },
     },
