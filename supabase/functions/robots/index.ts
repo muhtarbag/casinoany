@@ -23,40 +23,42 @@ Deno.serve(async (req) => {
 
     const domain = primaryDomain || 'www.casinoany.com';
 
-    const robotsTxt = `# CasinoAny - Türkiye'nin En İyi Casino ve Bahis Siteleri Karşılaştırma Platformu
-# Son güncelleme: ${new Date().toISOString().split('T')[0]}
+    // Multi-sitemap structure
+    const sitemaps = [
+      'sitemap.xml',
+      'sitemap-pages.xml',
+      'sitemap-casinos.xml',
+      'sitemap-blogs.xml',
+      'sitemap-bonuses.xml',
+      'sitemap-news.xml',
+      'sitemap-static.xml',
+      'sitemap-images.xml',
+    ];
+
+    const robotsTxt = `# CasinoAny - Dynamic Robots.txt
+# Güncelleme: ${new Date().toISOString().split('T')[0]}
 
 User-agent: *
 Allow: /
 
-# Ana sitemap
-Sitemap: https://${domain}/sitemap.xml
+# Multi-sitemap index
+${sitemaps.map(s => `Sitemap: https://${domain}/${s}`).join('\n')}
 
-# Crawl rate - Arama motorlarına optimize
-# Google
+# Crawl rate optimization
 User-agent: Googlebot
 Crawl-delay: 1
 
-# Bing
 User-agent: Bingbot
 Crawl-delay: 2
 
-# Yandex
 User-agent: YandexBot
 Crawl-delay: 3
 
-# Yahoo
-User-agent: Slurp
-Crawl-delay: 3
-
-# SEO Tool botlarını engelle
+# Block SEO scrapers
 User-agent: AhrefsBot
 Disallow: /
 
 User-agent: SemrushBot
-Disallow: /
-
-User-agent: DotBot
 Disallow: /
 
 User-agent: MJ12bot
@@ -65,18 +67,17 @@ Disallow: /
 User-agent: BLEXBot
 Disallow: /
 
-# Admin ve hassas sayfalar
+# Sensitive paths
 Disallow: /admin/
 Disallow: /login
 Disallow: /signup
 Disallow: /api/
 
-# Tracking parametrelerini temizle
-# Yandex için
+# Clean tracking params (Yandex specific)
 User-agent: YandexBot
 Clean-param: utm_source&utm_medium&utm_campaign&fbclid&gclid
 
-# Önemli: CSS, JS ve görsellere izin ver
+# Allow all static assets for better indexing
 Allow: /*.css$
 Allow: /*.js$
 Allow: /*.jpg$
@@ -88,7 +89,8 @@ Allow: /*.webp$
 Allow: /assets/
 Allow: /public/
 Allow: /logos/
-Allow: /banners/
+Allow: /cdn/
+Allow: /images/
 `;
 
     return new Response(robotsTxt, {

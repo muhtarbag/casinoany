@@ -1,5 +1,5 @@
-// Sitemap Index Engine
-// Multi-sitemap architecture for enterprise SEO
+// Bonus Campaigns Sitemap
+// Handles all active bonus offers
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -23,29 +23,39 @@ Deno.serve(async (req) => {
     const { data: primaryDomain } = await supabase.rpc('get_primary_domain');
     const domain = primaryDomain || 'www.casinoany.com';
 
-    const sitemaps = [
-      'sitemap-pages.xml',
-      'sitemap-casinos.xml',
-      'sitemap-blogs.xml',
-      'sitemap-bonuses.xml',
-      'sitemap-news.xml',
-      'sitemap-static.xml',
-      'sitemap-images.xml',
-    ];
+    // Fetch all active bonus offers with site info
+    const { data: bonuses, error } = await supabase
+      .from('bonus_offers')
+      .select(`
+        id,
+        title,
+        updated_at,
+        site_id,
+        betting_sites!inner(slug)
+      `)
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false })
+      .limit(50000);
 
-    const lastmod = new Date().toISOString();
+    if (error) throw error;
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemaps
-  .map(
-    (sitemap) => `  <sitemap>
-    <loc>https://${domain}/${sitemap}</loc>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${(bonuses || [])
+  .map((bonus: any) => {
+    const lastmod = bonus.updated_at
+      ? new Date(bonus.updated_at).toISOString()
+      : new Date().toISOString();
+
+    return `  <url>
+    <loc>https://${domain}/site/${bonus.betting_sites.slug}?bonus=${bonus.id}</loc>
     <lastmod>${lastmod}</lastmod>
-  </sitemap>`
-  )
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+  })
   .join('\n')}
-</sitemapindex>`;
+</urlset>`;
 
     return new Response(xml, {
       headers: {
@@ -54,10 +64,10 @@ ${sitemaps
       },
     });
   } catch (error) {
-    console.error('Sitemap index error:', error);
+    console.error('Sitemap-bonuses error:', error);
     return new Response(
       `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>`,
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`,
       { headers: corsHeaders, status: 500 }
     );
   }

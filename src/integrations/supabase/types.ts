@@ -1258,6 +1258,113 @@ export type Database = {
           },
         ]
       }
+      internal_links: {
+        Row: {
+          ai_relevance_score: number | null
+          anchor_text: string
+          click_count: number | null
+          context_snippet: string | null
+          conversion_count: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          link_type: string
+          metadata: Json | null
+          position_in_content: number | null
+          source_page: string
+          source_type: string
+          target_page: string
+          target_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_relevance_score?: number | null
+          anchor_text: string
+          click_count?: number | null
+          context_snippet?: string | null
+          conversion_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          link_type?: string
+          metadata?: Json | null
+          position_in_content?: number | null
+          source_page: string
+          source_type: string
+          target_page: string
+          target_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_relevance_score?: number | null
+          anchor_text?: string
+          click_count?: number | null
+          context_snippet?: string | null
+          conversion_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          link_type?: string
+          metadata?: Json | null
+          position_in_content?: number | null
+          source_page?: string
+          source_type?: string
+          target_page?: string
+          target_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      link_performance: {
+        Row: {
+          avg_time_on_target: number | null
+          bounce_rate: number | null
+          clicks: number | null
+          created_at: string | null
+          ctr: number | null
+          date: string
+          id: string
+          impressions: number | null
+          link_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_time_on_target?: number | null
+          bounce_rate?: number | null
+          clicks?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          date?: string
+          id?: string
+          impressions?: number | null
+          link_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_time_on_target?: number | null
+          bounce_rate?: number | null
+          clicks?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          date?: string
+          id?: string
+          impressions?: number | null
+          link_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_performance_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "internal_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       news_articles: {
         Row: {
           category: string | null
@@ -2752,6 +2859,16 @@ export type Database = {
       }
       get_next_available_domain: { Args: never; Returns: string }
       get_primary_domain: { Args: never; Returns: string }
+      get_related_links: {
+        Args: { p_limit?: number; p_source_page: string }
+        Returns: {
+          anchor_text: string
+          id: string
+          link_type: string
+          relevance_score: number
+          target_page: string
+        }[]
+      }
       get_user_role_status: {
         Args: { p_user_id: string }
         Returns: {
@@ -2837,6 +2954,10 @@ export type Database = {
           p_site_id?: string
         }
         Returns: string
+      }
+      track_internal_link_click: {
+        Args: { p_link_id: string }
+        Returns: undefined
       }
       track_page_view: {
         Args: {

@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { buildCanonical, getRobotsMetaTag, shouldNoIndex } from '@/lib/seo/canonical';
 
 interface SEOProps {
   title: string;
@@ -29,7 +30,14 @@ export const SEO = ({
   structuredData,
 }: SEOProps) => {
   const siteUrl = window.location.origin;
-  const currentUrl = canonical || window.location.href;
+  const currentPath = window.location.pathname;
+  
+  // Use canonical engine for clean URLs
+  const currentUrl = canonical || buildCanonical(currentPath);
+  
+  // Determine if page should be noindexed
+  const robotsTag = getRobotsMetaTag(currentPath);
+  const isNoIndex = shouldNoIndex(currentPath);
   
   // Title optimization: Keep under 60 chars for SERP display
   const fullTitle = title.length > 50 
@@ -121,7 +129,8 @@ export const SEO = ({
       <meta name="twitter:image" content={finalOgImage} />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="robots" content={robotsTag} />
+      {isNoIndex && <meta name="googlebot" content="noindex, follow" />}
       <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
       <meta name="bingbot" content="index, follow" />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />

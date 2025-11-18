@@ -1,5 +1,5 @@
-// Sitemap Index Engine
-// Multi-sitemap architecture for enterprise SEO
+// Static Resources Sitemap
+// Categories and other static content
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -23,41 +23,44 @@ Deno.serve(async (req) => {
     const { data: primaryDomain } = await supabase.rpc('get_primary_domain');
     const domain = primaryDomain || 'www.casinoany.com';
 
-    const sitemaps = [
-      'sitemap-pages.xml',
-      'sitemap-casinos.xml',
-      'sitemap-blogs.xml',
-      'sitemap-bonuses.xml',
-      'sitemap-news.xml',
-      'sitemap-static.xml',
-      'sitemap-images.xml',
-    ];
+    // Fetch all active categories
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('slug, updated_at')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
 
-    const lastmod = new Date().toISOString();
+    if (error) throw error;
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemaps
-  .map(
-    (sitemap) => `  <sitemap>
-    <loc>https://${domain}/${sitemap}</loc>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${(categories || [])
+  .map((category) => {
+    const lastmod = category.updated_at
+      ? new Date(category.updated_at).toISOString()
+      : new Date().toISOString();
+
+    return `  <url>
+    <loc>https://${domain}/categories/${category.slug}</loc>
     <lastmod>${lastmod}</lastmod>
-  </sitemap>`
-  )
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+  })
   .join('\n')}
-</sitemapindex>`;
+</urlset>`;
 
     return new Response(xml, {
       headers: {
         ...corsHeaders,
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'public, max-age=7200',
       },
     });
   } catch (error) {
-    console.error('Sitemap index error:', error);
+    console.error('Sitemap-static error:', error);
     return new Response(
       `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>`,
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`,
       { headers: corsHeaders, status: 500 }
     );
   }
