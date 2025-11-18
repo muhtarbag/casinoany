@@ -4,12 +4,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, Shield } from 'lucide-react';
 import { MobileMenu } from '@/components/MobileMenu';
 import logo from '@/assets/casinodoo-logo.svg';
+import { cn } from '@/lib/utils';
 
 export const Header = () => {
-  const { user, isAdmin, isSiteOwner, signOut } = useAuth();
+  const { user, isAdmin, isSiteOwner, signOut, isImpersonating } = useAuth();
 
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-[60]">
+    <header className={cn(
+      "border-b border-border bg-card/50 backdrop-blur-sm sticky z-[60]",
+      isImpersonating ? "top-[52px]" : "top-0"
+    )}>
         <div className="container mx-auto px-4 py-3 md:py-4">
           <nav className="flex items-center justify-between">
             <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
