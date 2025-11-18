@@ -14,6 +14,7 @@ import { SiteBasicInfoEditor } from '@/components/panel/SiteBasicInfoEditor';
 import { SiteReportsExport } from '@/components/panel/SiteReportsExport';
 import { NotificationCenter } from '@/components/panel/NotificationCenter';
 import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
+import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
 
 const SiteManagement = () => {
@@ -150,6 +151,8 @@ const SiteManagement = () => {
         );
       case 'content':
         return <SiteContentEditor siteId={siteData.id} />;
+      case 'bonuses':
+        return <SiteBonusManager siteId={siteData.id} />;
       case 'complaints':
         return <SiteComplaintsManager siteId={siteData.id} />;
       case 'feedback':

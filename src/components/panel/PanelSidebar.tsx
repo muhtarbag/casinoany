@@ -6,7 +6,8 @@ import {
   BarChart3, 
   Bell, 
   MessageCircle,
-  Building2
+  Building2,
+  Gift
 } from 'lucide-react';
 import {
   Sidebar,
@@ -58,6 +59,12 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
           title: "İçerik Yönetimi",
           icon: FileText,
           description: "Uzman yorumu, rehberler"
+        },
+        {
+          id: "bonuses",
+          title: "Bonuslar",
+          icon: Gift,
+          description: "Bonus ve kampanyalar"
         }
       ]
     },
