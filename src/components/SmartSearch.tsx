@@ -228,7 +228,10 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
                 <button
                   key={site.id || `suggestion-${index}`}
                   type="button"
-                  onClick={() => handleSuggestionClick(site.slug, site.name)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSuggestionClick(site.slug, site.name);
+                  }}
                   className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors border-b border-border last:border-b-0 flex items-center gap-3"
                 >
                   <div className="flex-shrink-0">
