@@ -85,7 +85,8 @@ export default function Dashboard() {
     enabled: !!user?.id,
   });
 
-  if (!siteOwnerStatus?.role || profile?.user_type === 'individual') {
+  // Kullanıcı tipi kontrolü - bireysel kullanıcılar için basit panel göster
+  if (profile?.user_type === 'individual') {
     return (
       <>
         <SEO title="Panel" description="Kullanıcı paneli" />
@@ -108,6 +109,26 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
             </Card>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Kurumsal kullanıcılar için detaylı panel
+  if (!siteOwnerStatus?.role) {
+    return (
+      <>
+        <SEO title="Panel" description="Kullanıcı paneli" />
+        <div className="min-h-screen bg-background py-12">
+          <div className="container max-w-6xl mx-auto px-4">
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Kurumsal Hesap</AlertTitle>
+              <AlertDescription>
+                Site sahipliği başvurunuz henüz onaylanmamış. Lütfen admin onayını bekleyin.
+              </AlertDescription>
+            </Alert>
           </div>
         </div>
       </>

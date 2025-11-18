@@ -380,10 +380,16 @@ const Users = () => {
     toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı doğrulandı` });
   };
 
-  const handleImpersonate = (userId: string, userName: string) => {
+  const handleImpersonate = async (userId: string, userName: string, userType: string) => {
     impersonateUser(userId);
     toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
-    navigate('/');
+    
+    // Kullanıcı tipine göre doğru panele yönlendir
+    if (userType === 'corporate') {
+      navigate('/panel');
+    } else {
+      navigate('/profile');
+    }
   };
 
   const toggleUserSelection = (userId: string) => {
@@ -540,7 +546,8 @@ const Users = () => {
                       user.user_id, 
                       user.profile?.first_name && user.profile?.last_name
                         ? `${user.profile.first_name} ${user.profile.last_name}`
-                        : user.profile?.email || 'User'
+                        : user.profile?.email || 'User',
+                      'individual'
                     )}
                     title="Üye Gibi Davran"
                   >
@@ -710,7 +717,8 @@ const Users = () => {
                       variant="ghost"
                       onClick={() => handleImpersonate(
                         user.user_id,
-                        user.profile?.company_name || user.profile?.email || 'User'
+                        user.profile?.company_name || user.profile?.email || 'User',
+                        'corporate'
                       )}
                       title="Üye Gibi Davran"
                     >
