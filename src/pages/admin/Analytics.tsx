@@ -3,7 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SiteStats from "@/components/SiteStats";
 import { NotificationStats } from "@/components/notifications/NotificationStats";
 import { SocialPlatformTrends } from "@/components/analytics/SocialPlatformTrends";
-import { BarChart3, Bell, TrendingUp } from "lucide-react";
+import { SiteSocialMediaCard } from "@/components/analytics/SiteSocialMediaCard";
+import { BarChart3, Bell, TrendingUp, Building2 } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -32,6 +33,21 @@ export default function Analytics() {
     },
   });
 
+  // Fetch active sites for site-specific analytics
+  const { data: activeSites } = useQuery({
+    queryKey: ['active-sites-for-analytics'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -44,14 +60,18 @@ export default function Analytics() {
 
       {/* Analytics Tabs */}
       <Tabs defaultValue="sites" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="sites" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             Site Analitiği
           </TabsTrigger>
           <TabsTrigger value="social" className="gap-2">
             <TrendingUp className="h-4 w-4" />
-            Sosyal Medya
+            Sosyal Medya Trendleri
+          </TabsTrigger>
+          <TabsTrigger value="site-social" className="gap-2">
+            <Building2 className="h-4 w-4" />
+            Site Bazında
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
@@ -91,6 +111,32 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               {socialStats && <SocialPlatformTrends statsData={socialStats} />}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Site-Specific Social Media Analytics Tab */}
+        <TabsContent value="site-social" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                Site Bazında Sosyal Medya Analitiği
+              </CardTitle>
+              <CardDescription>
+                Her site için sosyal medya platformlarının tıklama performansı
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {activeSites?.map((site) => (
+                  <SiteSocialMediaCard
+                    key={site.id}
+                    siteId={site.id}
+                    siteName={site.name}
+                  />
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
