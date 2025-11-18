@@ -14,8 +14,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
+import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -24,6 +25,12 @@ export default function BlogPost() {
   const { data: post, isLoading } = useBlogPost(slug || '');
   const incrementView = useIncrementBlogView();
   const viewTrackedRef = useRef(false);
+
+  // Fetch AI-suggested internal links
+  const { data: internalLinks } = useInternalLinks(
+    post?.slug ? `/blog/${post.slug}` : '',
+    !!post?.slug // only fetch when we have a slug
+  );
 
   // Fetch related posts based on tags
   const { data: relatedPosts } = useQuery({
@@ -55,12 +62,37 @@ export default function BlogPost() {
     enabled: !!post?.id && !!post?.tags,
   });
 
+  // Enrich content with internal links
+  const enrichedContent = useMemo(() => {
+    if (!post?.content) return '';
+    if (!internalLinks || internalLinks.length === 0) {
+      return post.content.replace(/\n/g, '<br />');
+    }
+    return applyInternalLinks(post.content, internalLinks);
+  }, [post?.content, internalLinks]);
+
   useEffect(() => {
     if (post?.id && !viewTrackedRef.current) {
       incrementView.mutate(post.id);
       viewTrackedRef.current = true;
     }
   }, [post?.id, incrementView]);
+
+  // Track internal link clicks
+  useEffect(() => {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('internal-link')) {
+        const linkId = target.getAttribute('data-link-id');
+        if (linkId) {
+          trackLinkClick(linkId);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
+    return () => document.removeEventListener('click', handleLinkClick);
+  }, []);
 
   if (isLoading) {
     return (
@@ -255,7 +287,7 @@ export default function BlogPost() {
                 prose-blockquote:border-l-primary
                 prose-blockquote:text-muted-foreground
                 prose-li:text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
+              dangerouslySetInnerHTML={{ __html: enrichedContent }}
             />
           </Card>
 
