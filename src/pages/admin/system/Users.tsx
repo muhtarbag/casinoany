@@ -401,25 +401,27 @@ const Users = () => {
       <TableBody>
         {currentUsers.length > 0 ? (
           currentUsers.map((user: any) => (
-            <TableRow 
-              key={user.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setSelectedUser(user)}
-            >
-              <TableCell>{user.profile?.email || '-'}</TableCell>
-              <TableCell>
+            <TableRow key={user.id} className="hover:bg-muted/50">
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  checked={selectedUserIds.includes(user.user_id)}
+                  onCheckedChange={() => toggleUserSelection(user.user_id)}
+                />
+              </TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">{user.profile?.email || '-'}</TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                 {user.profile?.first_name && user.profile?.last_name
                   ? `${user.profile.first_name} ${user.profile.last_name}`
                   : '-'}
               </TableCell>
-              <TableCell>{user.profile?.phone || '-'}</TableCell>
-              <TableCell>{user.profile?.username || '-'}</TableCell>
-              <TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">{user.profile?.phone || '-'}</TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">{user.profile?.username || '-'}</TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                 <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                   {user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderatör' : 'Kullanıcı'}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                 <Badge
                   variant={
                     user.status === 'approved'
@@ -436,7 +438,7 @@ const Users = () => {
                     : 'Bekliyor'}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                 {user.profile?.created_at
                   ? new Date(user.profile.created_at).toLocaleDateString('tr-TR')
                   : '-'}
@@ -490,6 +492,12 @@ const Users = () => {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-12">
+            <Checkbox
+              checked={selectedUserIds.length === currentUsers.length && currentUsers.length > 0}
+              onCheckedChange={toggleSelectAll}
+            />
+          </TableHead>
           <TableHead>Şirket/Site</TableHead>
           <TableHead>Yetkili Kişi</TableHead>
           <TableHead>İletişim</TableHead>
@@ -507,12 +515,14 @@ const Users = () => {
             const siteName = so?.betting_sites?.name || so?.new_site_name || '-';
             
             return (
-              <TableRow 
-                key={user.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => setSelectedUser(user)}
-              >
-                <TableCell>
+              <TableRow key={user.id} className="hover:bg-muted/50">
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedUserIds.includes(user.user_id)}
+                    onCheckedChange={() => toggleUserSelection(user.user_id)}
+                  />
+                </TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <div className="space-y-1">
                     <div className="font-medium flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-muted-foreground" />
@@ -521,13 +531,13 @@ const Users = () => {
                     <div className="text-xs text-muted-foreground">Site: {siteName}</div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <div className="space-y-1">
                     <div className="text-sm">{so?.contact_person_name || user.profile?.contact_person_name || '-'}</div>
                     <div className="text-xs text-muted-foreground">{so?.contact_email || user.profile?.email || '-'}</div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <div className="flex gap-1">
                     {(so?.contact_teams || user.profile?.contact_teams) && (
                       <Badge variant="outline" className="text-xs">Teams</Badge>
@@ -540,14 +550,14 @@ const Users = () => {
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <div className="flex gap-1">
                     {(so?.social_facebook || user.profile?.social_facebook) && <Badge variant="secondary" className="text-xs">FB</Badge>}
                     {(so?.social_twitter || user.profile?.social_twitter) && <Badge variant="secondary" className="text-xs">X</Badge>}
                     {(so?.social_instagram || user.profile?.social_instagram) && <Badge variant="secondary" className="text-xs">IG</Badge>}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <Badge variant={user.profile?.is_verified ? 'default' : 'secondary'}>
                     {user.profile?.is_verified ? (
                       <span className="flex items-center gap-1">
@@ -558,7 +568,7 @@ const Users = () => {
                     )}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <Badge
                     variant={
                       user.status === 'approved'
@@ -575,7 +585,7 @@ const Users = () => {
                       : 'Bekliyor'}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => setSelectedUser(user)} className="cursor-pointer">
                   <div className="text-sm text-muted-foreground">
                     {user.profile?.created_at
                       ? new Date(user.profile.created_at).toLocaleDateString('tr-TR')
@@ -737,11 +747,137 @@ const Users = () => {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="individual" className="mt-6">
+                  <TabsContent value="individual" className="mt-6 space-y-4">
+                    {selectedUserIds.length > 0 && (
+                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="secondary" className="text-sm">
+                              {selectedUserIds.length} seçildi
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedUserIds([])}
+                              className="h-8"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Temizle
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => setShowBulkApproveDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Onayla
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowBulkRejectDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Reddet
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setShowBulkDeleteDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Sil
+                            </Button>
+                          </div>
+                        </div>
+                        {isBulkProcessing && (
+                          <div className="mt-3">
+                            <Progress value={bulkProgress} className="h-2" />
+                            <p className="text-sm text-muted-foreground mt-1">İşleniyor... %{Math.round(bulkProgress)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {renderIndividualTable()}
                   </TabsContent>
 
                   <TabsContent value="corporate" className="mt-6 space-y-4">
+                    {selectedUserIds.length > 0 && (
+                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="secondary" className="text-sm">
+                              {selectedUserIds.length} seçildi
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedUserIds([])}
+                              className="h-8"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Temizle
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => setShowBulkApproveDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Onayla
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowBulkRejectDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Reddet
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowBulkVerifyDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <Shield className="w-4 h-4 mr-1" />
+                              Doğrula
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setShowBulkDeleteDialog(true)}
+                              className="h-8"
+                              disabled={isBulkProcessing}
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Sil
+                            </Button>
+                          </div>
+                        </div>
+                        {isBulkProcessing && (
+                          <div className="mt-3">
+                            <Progress value={bulkProgress} className="h-2" />
+                            <p className="text-sm text-muted-foreground mt-1">İşleniyor... %{Math.round(bulkProgress)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {activeTab === 'corporate' && (
                       <div className="flex gap-2">
                         <Button
@@ -1039,6 +1175,79 @@ const Users = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Action Dialogs */}
+      <AlertDialog open={showBulkApproveDialog} onOpenChange={setShowBulkApproveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Onay</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı onaylamak istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkApprove} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Onayla
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkRejectDialog} onOpenChange={setShowBulkRejectDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Reddetme</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı reddetmek istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkReject} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Reddet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Silme</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} disabled={isBulkProcessing} className="bg-destructive hover:bg-destructive/90">
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Sil
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkVerifyDialog} onOpenChange={setShowBulkVerifyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Doğrulama</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı doğrulamak istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkVerify} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Doğrula
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
