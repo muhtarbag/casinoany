@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +18,9 @@ import { createAppQueryClient } from "@/lib/queryClient";
 import { lazyWithPreload } from "@/utils/lazyLoadRoutes";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
+
+// Create queryClient once outside component to avoid React dispatcher issues
+const queryClient = createAppQueryClient();
 
 // Lazy load pages with preloading capability
 // Lazy load pages with preloading capability
@@ -217,9 +220,6 @@ const AppContent = () => {
 };
 
 const App = () => {
-  // CRITICAL: Create queryClient inside component with useMemo to ensure React dispatcher is available
-  const queryClient = useMemo(() => createAppQueryClient(), []);
-  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
