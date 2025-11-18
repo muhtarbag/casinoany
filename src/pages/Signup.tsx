@@ -14,6 +14,9 @@ import { useQuery } from '@tanstack/react-query';
 import { WizardProgress } from '@/components/wizard/WizardProgress';
 import { Step1Basic } from '@/components/wizard/Step1Basic';
 import { Step2ContactSocial } from '@/components/wizard/Step2ContactSocial';
+import { Step3CompanyDetails } from '@/components/wizard/Step3CompanyDetails';
+import { Step4Summary } from '@/components/wizard/Step4Summary';
+import { StepIndividualProfile } from '@/components/wizard/StepIndividualProfile';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
