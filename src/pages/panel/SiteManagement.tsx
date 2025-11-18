@@ -18,7 +18,7 @@ import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
 
 const SiteManagement = () => {
-  const { user, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
+  const { user, isAdmin, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -81,10 +81,10 @@ const SiteManagement = () => {
         stats: statsResult.data || { views: 0, clicks: 0 },
       };
     },
-    enabled: !!effectiveUserId && isSiteOwner && ownedSites.length > 0,
+    enabled: !!effectiveUserId && (isSiteOwner || isAdmin) && ownedSites.length > 0,
   });
 
-  if (!user || !isSiteOwner) {
+  if (!user || (!isSiteOwner && !isAdmin)) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card>
