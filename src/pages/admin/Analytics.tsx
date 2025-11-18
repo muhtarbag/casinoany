@@ -33,18 +33,47 @@ export default function Analytics() {
     },
   });
 
-  // Fetch active sites for site-specific analytics
+  // Fetch active sites with their social media stats for sorting
   const { data: activeSites } = useQuery({
     queryKey: ['active-sites-for-analytics'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, slug')
-        .eq('is_active', true)
-        .order('name');
+        .select(`
+          id, 
+          name, 
+          slug,
+          site_stats (
+            email_clicks,
+            whatsapp_clicks,
+            telegram_clicks,
+            twitter_clicks,
+            instagram_clicks,
+            facebook_clicks,
+            youtube_clicks
+          )
+        `)
+        .eq('is_active', true);
 
       if (error) throw error;
-      return data || [];
+      
+      // Calculate total clicks and sort by it
+      const sitesWithTotals = (data || []).map(site => {
+        const stats = site.site_stats?.[0] || {};
+        const totalClicks = (
+          (stats.email_clicks || 0) +
+          (stats.whatsapp_clicks || 0) +
+          (stats.telegram_clicks || 0) +
+          (stats.twitter_clicks || 0) +
+          (stats.instagram_clicks || 0) +
+          (stats.facebook_clicks || 0) +
+          (stats.youtube_clicks || 0)
+        );
+        return { ...site, totalClicks };
+      });
+      
+      // Sort by total clicks (highest first)
+      return sitesWithTotals.sort((a, b) => b.totalClicks - a.totalClicks);
     },
   });
 
@@ -128,7 +157,7 @@ export default function Analytics() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {activeSites?.map((site) => (
                   <SiteSocialMediaCard
                     key={site.id}
