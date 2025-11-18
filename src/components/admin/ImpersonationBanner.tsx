@@ -32,22 +32,24 @@ export const ImpersonationBanner = () => {
     : 'Unknown User';
 
   return (
-    <Alert className="fixed top-0 left-0 right-0 z-[70] rounded-none border-b-2 border-warning bg-warning/10">
-      <AlertCircle className="h-4 w-4 text-warning" />
-      <AlertDescription className="flex items-center justify-between">
-        <span className="text-sm font-medium">
-          Admin olarak <strong>{displayName}</strong> görüntülüyorsunuz
-        </span>
+    <div className="fixed top-0 left-0 right-0 z-[70] bg-warning/5 border-b border-warning/20 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="h-3.5 w-3.5 text-warning" />
+          <span className="text-xs text-muted-foreground">
+            Görüntülenen: <span className="font-medium text-foreground">{displayName}</span>
+          </span>
+        </div>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={stopImpersonation}
-          className="ml-4 h-7 gap-1"
+          className="h-6 px-2 text-xs gap-1 hover:bg-warning/10"
         >
           <X className="h-3 w-3" />
-          Normal Moda Dön
+          Çıkış
         </Button>
-      </AlertDescription>
-    </Alert>
+      </div>
+    </div>
   );
 };
