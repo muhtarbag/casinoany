@@ -23,15 +23,14 @@ import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 const queryClient = createAppQueryClient();
 
 // Lazy load pages with preloading capability
-// Lazy load pages with preloading capability
 const Index = lazyWithPreload(() => import("./pages/Index"));
-const Login = lazyWithPreload(() => import("./pages/Login"));
-const Signup = lazyWithPreload(() => import("./pages/Signup"));
 const ForgotPassword = lazyWithPreload(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazyWithPreload(() => import("./pages/ResetPassword"));
 
-// CRITICAL: Core admin pages imported directly to prevent React dispatcher null errors
+// CRITICAL: Core auth & admin pages imported directly to prevent React dispatcher null errors
 // These pages are essential and should not be lazy loaded
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import AdminRoot from "./pages/admin";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminAnalytics from "./pages/admin/Analytics";
