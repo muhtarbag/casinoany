@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notification_preferences: {
+        Row: {
+          admin_id: string
+          created_at: string | null
+          notify_new_registrations: boolean | null
+          notify_via_email: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string | null
+          notify_new_registrations?: boolean | null
+          notify_via_email?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string | null
+          notify_new_registrations?: boolean | null
+          notify_via_email?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       affiliate_metrics: {
         Row: {
           created_at: string
@@ -1571,15 +1595,21 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio_link: string | null
           city: string | null
           company_address: string | null
           company_authorized_person: string | null
+          company_description: string | null
           company_email: string | null
           company_name: string | null
           company_phone: string | null
           company_tax_number: string | null
           company_type: string | null
           company_website: string | null
+          contact_person_name: string | null
+          contact_teams: string | null
+          contact_telegram: string | null
+          contact_whatsapp: string | null
           created_at: string | null
           district: string | null
           email: string | null
@@ -1591,21 +1621,35 @@ export type Database = {
           is_verified: boolean | null
           last_name: string | null
           phone: string | null
+          social_discord: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_kick: string | null
+          social_linkedin: string | null
+          social_telegram_channel: string | null
+          social_twitter: string | null
+          social_youtube: string | null
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"]
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio_link?: string | null
           city?: string | null
           company_address?: string | null
           company_authorized_person?: string | null
+          company_description?: string | null
           company_email?: string | null
           company_name?: string | null
           company_phone?: string | null
           company_tax_number?: string | null
           company_type?: string | null
           company_website?: string | null
+          contact_person_name?: string | null
+          contact_teams?: string | null
+          contact_telegram?: string | null
+          contact_whatsapp?: string | null
           created_at?: string | null
           district?: string | null
           email?: string | null
@@ -1617,21 +1661,35 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
+          social_discord?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_kick?: string | null
+          social_linkedin?: string | null
+          social_telegram_channel?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio_link?: string | null
           city?: string | null
           company_address?: string | null
           company_authorized_person?: string | null
+          company_description?: string | null
           company_email?: string | null
           company_name?: string | null
           company_phone?: string | null
           company_tax_number?: string | null
           company_type?: string | null
           company_website?: string | null
+          contact_person_name?: string | null
+          contact_teams?: string | null
+          contact_telegram?: string | null
+          contact_whatsapp?: string | null
           created_at?: string | null
           district?: string | null
           email?: string | null
@@ -1643,6 +1701,14 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
+          social_discord?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_kick?: string | null
+          social_linkedin?: string | null
+          social_telegram_channel?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
@@ -2719,6 +2785,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_status_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
