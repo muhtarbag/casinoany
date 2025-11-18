@@ -395,9 +395,9 @@ const Users = () => {
     
     // Kullanıcı tipine göre doğru panele yönlendir
     if (profile?.user_type === 'corporate') {
-      navigate('/panel');
+      navigate('/panel/site-management');
     } else {
-      navigate('/profile');
+      navigate('/profile/dashboard');
     }
   };
 
