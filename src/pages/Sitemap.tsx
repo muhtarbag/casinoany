@@ -97,6 +97,8 @@ export default function Sitemap() {
             const pageName = loc.split('/').filter(Boolean).pop() || 'Ana Sayfa';
             const displayName = pageName === window.location.origin.split('/').pop() 
               ? 'Ana Sayfa' 
+              : pageName.includes('.') // If it's a domain, don't capitalize
+              ? pageName
               : pageName.charAt(0).toUpperCase() + pageName.slice(1);
 
             return (
