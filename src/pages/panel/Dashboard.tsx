@@ -19,31 +19,34 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
 
+  // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
+
   const { data: profile } = useQuery({
-    queryKey: ['user-profile', user?.id],
+    queryKey: ['user-profile', effectiveUserId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', effectiveUserId)
         .single();
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!effectiveUserId,
   });
 
   const { data: siteOwnerStatus } = useQuery({
-    queryKey: ['site-owner-status', user?.id],
+    queryKey: ['site-owner-status', effectiveUserId],
     queryFn: async () => {
       const { data: role } = await supabase
         .from('user_roles')
         .select('role, status')
-        .eq('user_id', user?.id)
+        .eq('user_id', effectiveUserId)
         .eq('role', 'site_owner')
         .single();
 
@@ -61,28 +64,28 @@ export default function Dashboard() {
             is_active
           )
         `)
-        .eq('user_id', user?.id)
+        .eq('user_id', effectiveUserId)
         .single();
 
       return { role, siteOwner };
     },
-    enabled: !!user?.id,
+    enabled: !!effectiveUserId,
   });
 
   const { data: notifications } = useQuery({
-    queryKey: ['user-notifications', user?.id],
+    queryKey: ['user-notifications', effectiveUserId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_status_notifications')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', effectiveUserId)
         .order('created_at', { ascending: false })
         .limit(5);
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!effectiveUserId,
   });
 
   // Kullanıcı tipi kontrolü - bireysel kullanıcılar için basit panel göster

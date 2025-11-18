@@ -381,12 +381,20 @@ const Users = () => {
     toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı doğrulandı` });
   };
 
-  const handleImpersonate = async (userId: string, userName: string, userType: string) => {
+  const handleImpersonate = async (userId: string, userName: string) => {
     impersonateUser(userId);
+    
+    // Impersonate edilen kullanıcının profilini çek ve tipine göre yönlendir
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('user_type')
+      .eq('id', userId)
+      .single();
+    
     toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
     
     // Kullanıcı tipine göre doğru panele yönlendir
-    if (userType === 'corporate') {
+    if (profile?.user_type === 'corporate') {
       navigate('/panel');
     } else {
       navigate('/profile');
@@ -590,8 +598,7 @@ const Users = () => {
                       user.user_id, 
                       user.profile?.first_name && user.profile?.last_name
                         ? `${user.profile.first_name} ${user.profile.last_name}`
-                        : user.profile?.email || 'User',
-                      'individual'
+                        : user.profile?.email || 'User'
                     )}
                     title="Üye Gibi Davran"
                   >
@@ -761,8 +768,7 @@ const Users = () => {
                       variant="ghost"
                       onClick={() => handleImpersonate(
                         user.user_id,
-                        user.profile?.company_name || user.profile?.email || 'User',
-                        'corporate'
+                        user.profile?.company_name || user.profile?.email || 'User'
                       )}
                       title="Üye Gibi Davran"
                     >

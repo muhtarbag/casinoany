@@ -18,10 +18,13 @@ import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
 
 const SiteManagement = () => {
-  const { user, isSiteOwner, ownedSites } = useAuth();
+  const { user, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts(ownedSites[0]);
@@ -39,9 +42,9 @@ const SiteManagement = () => {
   }, []);
 
   const { data: siteData, isLoading } = useQuery({
-    queryKey: ['owned-site-full', user?.id],
+    queryKey: ['owned-site-full', effectiveUserId],
     queryFn: async () => {
-      if (!user || ownedSites.length === 0) return null;
+      if (!effectiveUserId || ownedSites.length === 0) return null;
       
       // ✅ OPTIMIZED: Parallel execution with Promise.all - 80% faster
       const [siteResult, favoriteResult, complaintsResult, statsResult] = await Promise.all([
@@ -78,7 +81,7 @@ const SiteManagement = () => {
         stats: statsResult.data || { views: 0, clicks: 0 },
       };
     },
-    enabled: !!user && isSiteOwner && ownedSites.length > 0,
+    enabled: !!effectiveUserId && isSiteOwner && ownedSites.length > 0,
   });
 
   if (!user || !isSiteOwner) {
