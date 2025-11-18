@@ -37,37 +37,40 @@ export default function Analytics() {
   const { data: activeSites } = useQuery({
     queryKey: ['active-sites-for-analytics'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First fetch all active sites
+      const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
-        .select(`
-          id, 
-          name, 
-          slug,
-          site_stats (
-            email_clicks,
-            whatsapp_clicks,
-            telegram_clicks,
-            twitter_clicks,
-            instagram_clicks,
-            facebook_clicks,
-            youtube_clicks
-          )
-        `)
+        .select('id, name, slug')
         .eq('is_active', true);
 
-      if (error) throw error;
-      
-      // Calculate total clicks and sort by it
-      const sitesWithTotals = (data || []).map(site => {
-        const stats = site.site_stats?.[0] || {};
+      if (sitesError) throw sitesError;
+      if (!sites || sites.length === 0) return [];
+
+      // Then fetch all stats for these sites
+      const siteIds = sites.map(s => s.id);
+      const { data: stats, error: statsError } = await supabase
+        .from('site_stats')
+        .select('site_id, email_clicks, whatsapp_clicks, telegram_clicks, twitter_clicks, instagram_clicks, facebook_clicks, youtube_clicks')
+        .in('site_id', siteIds);
+
+      if (statsError) throw statsError;
+
+      // Create a map of site_id to stats
+      const statsMap = new Map(
+        (stats || []).map(stat => [stat.site_id, stat])
+      );
+
+      // Calculate total clicks and combine data
+      const sitesWithTotals = sites.map(site => {
+        const siteStats = statsMap.get(site.id);
         const totalClicks = (
-          (stats.email_clicks || 0) +
-          (stats.whatsapp_clicks || 0) +
-          (stats.telegram_clicks || 0) +
-          (stats.twitter_clicks || 0) +
-          (stats.instagram_clicks || 0) +
-          (stats.facebook_clicks || 0) +
-          (stats.youtube_clicks || 0)
+          (siteStats?.email_clicks || 0) +
+          (siteStats?.whatsapp_clicks || 0) +
+          (siteStats?.telegram_clicks || 0) +
+          (siteStats?.twitter_clicks || 0) +
+          (siteStats?.instagram_clicks || 0) +
+          (siteStats?.facebook_clicks || 0) +
+          (siteStats?.youtube_clicks || 0)
         );
         return { ...site, totalClicks };
       });
