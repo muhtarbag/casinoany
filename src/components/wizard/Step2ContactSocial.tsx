@@ -1,7 +1,7 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube, Link2 } from 'lucide-react';
+import { Mail, MessageSquare, Send, Phone, AlertCircle, Facebook, Twitter, Instagram, Linkedin, Youtube, Link2, Pin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface Step2ContactSocialProps {
@@ -33,6 +33,10 @@ interface Step2ContactSocialProps {
   setDiscord: (value: string) => void;
   bioLink: string;
   setBioLink: (value: string) => void;
+  supportEmail: string;
+  setSupportEmail: (value: string) => void;
+  pinterest: string;
+  setPinterest: (value: string) => void;
   disabled?: boolean;
 }
 export const Step2ContactSocial = ({
@@ -64,6 +68,10 @@ export const Step2ContactSocial = ({
   setDiscord,
   bioLink,
   setBioLink,
+  supportEmail,
+  setSupportEmail,
+  pinterest,
+  setPinterest,
   disabled
 }: Step2ContactSocialProps) => {
   const hasAtLeastOneContact = contactEmail || contactTeams || contactTelegram || contactWhatsapp;
@@ -210,6 +218,22 @@ export const Step2ContactSocial = ({
               Discord
             </Label>
             <Input id="discord" type="url" placeholder="https://discord.gg/..." value={discord} onChange={e => setDiscord(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="pinterest" className="flex items-center gap-2">
+              <Pin className="w-4 h-4 text-red-600" />
+              Pinterest
+            </Label>
+            <Input id="pinterest" type="url" placeholder="https://pinterest.com/..." value={pinterest} onChange={e => setPinterest(e.target.value)} disabled={disabled} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="supportEmail" className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-blue-600" />
+              Destek Mail
+            </Label>
+            <Input id="supportEmail" type="email" placeholder="destek@sirket.com" value={supportEmail} onChange={e => setSupportEmail(e.target.value)} disabled={disabled} />
           </div>
 
           <div className="space-y-2">
