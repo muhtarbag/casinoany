@@ -8,9 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone, X } from 'lucide-react';
 import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
 import { EnhancedTablePagination } from '@/components/table/EnhancedTablePagination';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import {
   Table,
   TableBody,
@@ -42,6 +45,15 @@ const Users = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [verificationFilter, setVerificationFilter] = useState('all');
+  
+  // Bulk Actions States
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState(0);
+  const [showBulkApproveDialog, setShowBulkApproveDialog] = useState(false);
+  const [showBulkRejectDialog, setShowBulkRejectDialog] = useState(false);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [showBulkVerifyDialog, setShowBulkVerifyDialog] = useState(false);
 
   // Fetch total count for pagination
   const { data: totalCount } = useQuery({
@@ -243,6 +255,89 @@ const Users = () => {
     },
   });
 
+  // Bulk Operations
+  const handleBulkApprove = async () => {
+    setIsBulkProcessing(true);
+    setBulkProgress(0);
+    let completed = 0;
+    
+    for (const userId of selectedUserIds) {
+      await approveMutation.mutateAsync(userId);
+      completed++;
+      setBulkProgress((completed / selectedUserIds.length) * 100);
+    }
+    
+    setIsBulkProcessing(false);
+    setSelectedUserIds([]);
+    setShowBulkApproveDialog(false);
+    toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı onaylandı` });
+  };
+
+  const handleBulkReject = async () => {
+    setIsBulkProcessing(true);
+    setBulkProgress(0);
+    let completed = 0;
+    
+    for (const userId of selectedUserIds) {
+      await rejectMutation.mutateAsync(userId);
+      completed++;
+      setBulkProgress((completed / selectedUserIds.length) * 100);
+    }
+    
+    setIsBulkProcessing(false);
+    setSelectedUserIds([]);
+    setShowBulkRejectDialog(false);
+    toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı reddedildi` });
+  };
+
+  const handleBulkDelete = async () => {
+    setIsBulkProcessing(true);
+    setBulkProgress(0);
+    let completed = 0;
+    
+    for (const userId of selectedUserIds) {
+      await deleteMutation.mutateAsync(userId);
+      completed++;
+      setBulkProgress((completed / selectedUserIds.length) * 100);
+    }
+    
+    setIsBulkProcessing(false);
+    setSelectedUserIds([]);
+    setShowBulkDeleteDialog(false);
+    toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı silindi` });
+  };
+
+  const handleBulkVerify = async () => {
+    setIsBulkProcessing(true);
+    setBulkProgress(0);
+    let completed = 0;
+    
+    for (const userId of selectedUserIds) {
+      await verifyMutation.mutateAsync(userId);
+      completed++;
+      setBulkProgress((completed / selectedUserIds.length) * 100);
+    }
+    
+    setIsBulkProcessing(false);
+    setSelectedUserIds([]);
+    setShowBulkVerifyDialog(false);
+    toast({ title: 'Tamamlandı', description: `${selectedUserIds.length} kullanıcı doğrulandı` });
+  };
+
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds(prev => 
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUserIds.length === currentUsers.length) {
+      setSelectedUserIds([]);
+    } else {
+      setSelectedUserIds(currentUsers.map(u => u.user_id));
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -282,6 +377,7 @@ const Users = () => {
     setRoleFilter('all');
     setStatusFilter('all');
     setVerificationFilter('all');
+    setSelectedUserIds([]);
   };
 
   // Stats
