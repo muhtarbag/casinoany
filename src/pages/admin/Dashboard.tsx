@@ -1,9 +1,8 @@
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { LoadingState } from '@/components/ui/loading-state';
 import { DashboardTab } from '@/components/admin/DashboardTab';
-import { SitePerformanceSummary } from '@/components/admin/dashboard/SitePerformanceSummary';
+import { AdminAnalyticsDashboard } from '@/components/admin/dashboard/AdminAnalyticsDashboard';
 import { useNavigate } from 'react-router-dom';
-import { ErrorState } from '@/components/ui/error-state';
 import { RetryBoundary } from '@/components/feedback/RetryBoundary';
 
 export default function Dashboard() {
@@ -36,8 +35,8 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Site Performance Summary */}
-        <SitePerformanceSummary />
+        {/* Admin Analytics Dashboard */}
+        <AdminAnalyticsDashboard />
       </div>
     </RetryBoundary>
   );
