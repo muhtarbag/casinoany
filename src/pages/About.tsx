@@ -384,7 +384,7 @@ const About = () => {
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               <p className="leading-relaxed">
-                <strong>BahisSiteleri.com</strong> olarak, sorumlu bahis oyununu savunuyoruz ve destekliyoruz. 
+                <strong>CasinoAny.com</strong> olarak, sorumlu bahis oyununu savunuyoruz ve destekliyoruz. 
                 Bahis eğlenceli olmalı, asla bir gelir kaynağı veya problem haline gelmemelidir.
               </p>
               <div className="grid md:grid-cols-2 gap-4">
@@ -430,9 +430,9 @@ const About = () => {
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>BahisSiteleri.com nedir?</AccordionTrigger>
+                  <AccordionTrigger>CasinoAny.com nedir?</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    BahisSiteleri.com, Türkiye'deki güvenilir ve lisanslı bahis sitelerini karşılaştıran, 
+                    CasinoAny.com, Türkiye'deki güvenilir ve lisanslı bahis sitelerini karşılaştıran, 
                     inceleyen ve değerlendiren bağımsız bir platformdur. Kullanıcılarımıza en iyi bahis 
                     deneyimi için objektif bilgiler sunuyoruz.
                   </AccordionContent>
