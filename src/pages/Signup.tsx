@@ -30,29 +30,39 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState<'user' | 'site_owner'>('user');
   const [currentStep, setCurrentStep] = useState(0);
-  const [wizardData, setWizardData] = useState({
-    selectedSite: '',
-    newSiteName: '',
-    companyName: '',
-    description: '',
-    facebook: '',
-    twitter: '',
-    instagram: '',
-    linkedin: '',
-    youtube: '',
-    telegramChannel: '',
-    kick: '',
-    discord: '',
-    bioLink: '',
-    logoUrl: '',
-    contactName: '',
-    contactEmail: '',
-    contactTeams: '',
-    contactTelegram: '',
-    contactWhatsapp: '',
-  });
+
+  const [username, setUsername] = useState('');
+  const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
+  const [favoriteTeam, setFavoriteTeam] = useState('');
+  const [interests, setInterests] = useState<string[]>([]);
+  const [favoriteGameProviders, setFavoriteGameProviders] = useState<string[]>([]);
+
+  const [selectedSite, setSelectedSite] = useState('');
+  const [newSiteName, setNewSiteName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [description, setDescription] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [companyTaxNumber, setCompanyTaxNumber] = useState('');
+  const [companyType, setCompanyType] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
+  const [companyWebsite, setCompanyWebsite] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactTeams, setContactTeams] = useState('');
+  const [contactTelegram, setContactTelegram] = useState('');
+  const [contactWhatsapp, setContactWhatsapp] = useState('');
+  const [facebook, setFacebook] = useState('');
+  const [twitter, setTwitter] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [youtube, setYoutube] = useState('');
+  const [telegramChannel, setTelegramChannel] = useState('');
+  const [kick, setKick] = useState('');
+  const [discord, setDiscord] = useState('');
+  const [bioLink, setBioLink] = useState('');
   
-  const { signUp, user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -75,27 +85,59 @@ const Signup = () => {
     }
   }, [user, authLoading, navigate]);
 
-  const wizardSteps = ['Site ve Şirket', 'İletişim ve Sosyal Medya'];
+  const wizardSteps = userType === 'site_owner' 
+    ? ['Site ve Şirket', 'İletişim', 'Şirket Detayları', 'Özet']
+    : ['Profil Bilgileri'];
 
   const validateStep = (step: number): boolean => {
+    if (userType === 'user') {
+      if (!username.trim()) {
+        toast({ title: 'Hata', description: 'Lütfen kullanıcı adı girin', variant: 'destructive' });
+        return false;
+      }
+      if (username.length < 3) {
+        toast({ title: 'Hata', description: 'Kullanıcı adı en az 3 karakter olmalıdır', variant: 'destructive' });
+        return false;
+      }
+      return true;
+    }
+
     switch (step) {
       case 0:
-        if (!wizardData.selectedSite) {
+        if (!selectedSite) {
           toast({ title: 'Hata', description: 'Lütfen bir site seçin', variant: 'destructive' });
           return false;
         }
-        if (wizardData.selectedSite === 'new_site' && !wizardData.newSiteName.trim()) {
+        if (selectedSite === 'new_site' && !newSiteName.trim()) {
           toast({ title: 'Hata', description: 'Lütfen site adını girin', variant: 'destructive' });
+          return false;
+        }
+        if (!companyName.trim()) {
+          toast({ title: 'Hata', description: 'Lütfen şirket adını girin', variant: 'destructive' });
           return false;
         }
         return true;
       case 1:
-        if (!wizardData.contactName.trim()) {
+        if (!contactName.trim()) {
           toast({ title: 'Hata', description: 'Lütfen yetkili kişi adını girin', variant: 'destructive' });
           return false;
         }
-        if (!wizardData.contactEmail && !wizardData.contactTeams && !wizardData.contactTelegram && !wizardData.contactWhatsapp) {
+        if (!contactEmail && !contactTeams && !contactTelegram && !contactWhatsapp) {
           toast({ title: 'Hata', description: 'En az bir iletişim yöntemi girmelisiniz', variant: 'destructive' });
+          return false;
+        }
+        return true;
+      case 2:
+        if (!companyTaxNumber.trim()) {
+          toast({ title: 'Hata', description: 'Lütfen vergi numaranızı girin', variant: 'destructive' });
+          return false;
+        }
+        if (!companyType) {
+          toast({ title: 'Hata', description: 'Lütfen şirket tipini seçin', variant: 'destructive' });
+          return false;
+        }
+        if (!companyAddress.trim()) {
+          toast({ title: 'Hata', description: 'Lütfen şirket adresini girin', variant: 'destructive' });
           return false;
         }
         return true;
@@ -120,10 +162,11 @@ const Signup = () => {
       return;
     }
     
-    if (userType === 'user' && (!firstName.trim() || !lastName.trim() || !phone.trim())) {
+    if (!firstName.trim() || !lastName.trim() || !phone.trim()) {
       toast({ title: 'Hata', description: 'Lütfen ad, soyad ve telefon alanlarını doldurun', variant: 'destructive' });
       return;
     }
+
     if (password !== confirmPassword) {
       toast({ title: 'Hata', description: 'Şifreler eşleşmiyor', variant: 'destructive' });
       return;
@@ -132,214 +175,259 @@ const Signup = () => {
       toast({ title: 'Hata', description: 'Şifre en az 6 karakter olmalıdır', variant: 'destructive' });
       return;
     }
-    if (userType === 'site_owner' && !validateStep(1)) return;
+
+    if (userType === 'user' && !validateStep(0)) return;
+    if (userType === 'site_owner' && !validateStep(currentStep)) return;
 
     setLoading(true);
     
-    const userData = userType === 'user' 
-      ? { 
-          firstName, 
-          lastName, 
-          phone 
-        } 
-      : {
-          companyName: wizardData.companyName,
-          companyAuthorizedPerson: wizardData.contactName,
-          companyPhone: wizardData.contactWhatsapp || wizardData.contactTelegram,
-          companyEmail: wizardData.contactEmail
-        };
-    
-    const result = await signUp(email, password, userType, wizardData.selectedSite !== 'new_site' ? wizardData.selectedSite : null, userData);
-    if (result.error) {
-      setLoading(false);
-      toast({ title: 'Kayıt Başarısız', description: result.error.message, variant: 'destructive' });
-      return;
-    }
-
-    const { data: { user: newUser }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError) {
-      toast({ title: 'Hata', description: 'Kullanıcı bilgisi alınamadı', variant: 'destructive' });
-      setLoading(false);
-      return;
-    }
-    
-    if (userType === 'site_owner' && newUser) {
-      const ownerData: any = {
-        user_id: newUser.id,
-        company_name: wizardData.companyName,
-        description: wizardData.description,
-        logo_url: wizardData.logoUrl,
-        contact_person_name: wizardData.contactName,
-        contact_email: wizardData.contactEmail,
-        contact_teams: wizardData.contactTeams,
-        contact_telegram: wizardData.contactTelegram,
-        contact_whatsapp: wizardData.contactWhatsapp,
-        social_facebook: wizardData.facebook,
-        social_twitter: wizardData.twitter,
-        social_instagram: wizardData.instagram,
-        social_linkedin: wizardData.linkedin,
-        social_youtube: wizardData.youtube,
-        social_telegram_channel: wizardData.telegramChannel,
-        social_kick: wizardData.kick,
-        social_discord: wizardData.discord,
-        social_bio_link: wizardData.bioLink,
-        status: 'pending'
+    try {
+      const metadata: any = {
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone,
+        accountType: userType
       };
 
-      // If user wants to create a new site or selected existing site
-      if (wizardData.selectedSite === 'new_site') {
-        ownerData.new_site_name = wizardData.newSiteName;
+      if (userType === 'user') {
+        metadata.username = username;
+        metadata.city = city;
+        metadata.district = district;
+        metadata.favoriteTeam = favoriteTeam;
+        metadata.interests = interests.join(',');
+        metadata.favoriteGameProviders = favoriteGameProviders.join(',');
       } else {
-        ownerData.site_id = wizardData.selectedSite;
+        metadata.companyName = companyName;
+        metadata.companyDescription = description;
+        metadata.companyTaxNumber = companyTaxNumber;
+        metadata.companyType = companyType;
+        metadata.companyAddress = companyAddress;
+        metadata.companyWebsite = companyWebsite;
+        metadata.contactPersonName = contactName;
+        metadata.contactEmail = contactEmail;
+        metadata.contactTeams = contactTeams;
+        metadata.contactTelegram = contactTelegram;
+        metadata.contactWhatsapp = contactWhatsapp;
+        metadata.socialFacebook = facebook;
+        metadata.socialTwitter = twitter;
+        metadata.socialInstagram = instagram;
+        metadata.socialLinkedin = linkedin;
+        metadata.socialYoutube = youtube;
+        metadata.socialTelegramChannel = telegramChannel;
+        metadata.socialKick = kick;
+        metadata.socialDiscord = discord;
+        metadata.bioLink = bioLink;
       }
 
-      await (supabase as any).from('site_owners').insert(ownerData);
-      toast({ title: 'Başvuru Alındı!', description: 'Admin onayı bekleniyor.', duration: 6000 });
-    } else {
-      analytics.trackSignup();
-      toast({ title: 'Kayıt Başarılı!', description: 'Hesabınız oluşturuldu.', duration: 4000 });
-    }
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata
+        }
+      });
 
-    setLoading(false);
-    setTimeout(() => navigate('/login'), 2000);
+      if (signUpError) throw signUpError;
+
+      if (userType === 'site_owner' && authData.user) {
+        const ownerData: any = {
+          user_id: authData.user.id,
+          company_name: companyName,
+          description: description,
+          logo_url: logoUrl,
+          contact_person_name: contactName,
+          contact_email: contactEmail,
+          contact_teams: contactTeams,
+          contact_telegram: contactTelegram,
+          contact_whatsapp: contactWhatsapp,
+          social_facebook: facebook,
+          social_twitter: twitter,
+          social_instagram: instagram,
+          social_linkedin: linkedin,
+          social_youtube: youtube,
+          social_telegram_channel: telegramChannel,
+          social_kick: kick,
+          social_discord: discord,
+          social_bio_link: bioLink,
+          status: 'pending'
+        };
+
+        if (selectedSite === 'new_site') {
+          ownerData.new_site_name = newSiteName;
+        } else {
+          ownerData.site_id = selectedSite;
+        }
+
+        const { error: ownerError } = await supabase.from('site_owners').insert(ownerData);
+
+        if (ownerError) {
+          console.error('Site owner oluşturma hatası:', ownerError);
+          toast({ 
+            title: 'Uyarı', 
+            description: 'Hesabınız oluşturuldu ancak başvurunuz kaydedilemedi. Lütfen destek ile iletişime geçin.', 
+            variant: 'destructive' 
+          });
+        } else {
+          toast({ 
+            title: 'Başvuru Alındı!', 
+            description: 'Başvurunuz başarıyla kaydedildi. Yönetici onayı bekleniyor.', 
+            duration: 6000 
+          });
+        }
+      } else {
+        analytics.trackSignup();
+        toast({ 
+          title: 'Kayıt Başarılı!', 
+          description: 'Hesabınız başarıyla oluşturuldu.', 
+          duration: 4000 
+        });
+      }
+
+      setLoading(false);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (error: any) {
+      setLoading(false);
+      toast({ 
+        title: 'Kayıt Başarısız', 
+        description: error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.', 
+        variant: 'destructive' 
+      });
+    }
   };
 
   const renderWizardStep = () => {
-    const props = { ...wizardData, sites: sites || [], disabled: loading };
-    const update = (field: string) => (value: string) => setWizardData({...wizardData, [field]: value});
-    
+    if (userType === 'user') {
+      return (
+        <StepIndividualProfile
+          username={username}
+          setUsername={setUsername}
+          city={city}
+          setCity={setCity}
+          district={district}
+          setDistrict={setDistrict}
+          favoriteTeam={favoriteTeam}
+          setFavoriteTeam={setFavoriteTeam}
+          interests={interests}
+          setInterests={setInterests}
+          favoriteGameProviders={favoriteGameProviders}
+          setFavoriteGameProviders={setFavoriteGameProviders}
+          disabled={loading}
+        />
+      );
+    }
+
     switch (currentStep) {
-      case 0: return <Step1Basic {...props} setSelectedSite={update('selectedSite')} setNewSiteName={update('newSiteName')} setCompanyName={update('companyName')} setDescription={update('description')} setLogoUrl={update('logoUrl')} />;
-      case 1: return <Step2ContactSocial 
-        contactName={wizardData.contactName} 
-        setContactName={update('contactName')} 
-        contactEmail={wizardData.contactEmail} 
-        setContactEmail={update('contactEmail')} 
-        contactTeams={wizardData.contactTeams} 
-        setContactTeams={update('contactTeams')} 
-        contactTelegram={wizardData.contactTelegram} 
-        setContactTelegram={update('contactTelegram')} 
-        contactWhatsapp={wizardData.contactWhatsapp} 
-        setContactWhatsapp={update('contactWhatsapp')} 
-        facebook={wizardData.facebook} 
-        setFacebook={update('facebook')} 
-        twitter={wizardData.twitter} 
-        setTwitter={update('twitter')} 
-        instagram={wizardData.instagram} 
-        setInstagram={update('instagram')} 
-        linkedin={wizardData.linkedin} 
-        setLinkedin={update('linkedin')} 
-        youtube={wizardData.youtube} 
-        setYoutube={update('youtube')}
-        telegramChannel={wizardData.telegramChannel}
-        setTelegramChannel={update('telegramChannel')}
-        kick={wizardData.kick}
-        setKick={update('kick')}
-        discord={wizardData.discord}
-        setDiscord={update('discord')}
-        bioLink={wizardData.bioLink}
-        setBioLink={update('bioLink')}
-        disabled={loading} 
-      />;
-      default: return null;
+      case 0:
+        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} />;
+      case 1:
+        return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} disabled={loading} />;
+      case 2:
+        return <Step3CompanyDetails companyTaxNumber={companyTaxNumber} setCompanyTaxNumber={setCompanyTaxNumber} companyType={companyType} setCompanyType={setCompanyType} companyAddress={companyAddress} setCompanyAddress={setCompanyAddress} companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
+      case 3:
+        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyTaxNumber={companyTaxNumber} companyType={companyType} companyAddress={companyAddress} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} logoUrl={logoUrl} sites={sites || []} />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-dark p-4">
-      <Card className="w-full max-w-4xl">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Kayıt Ol</CardTitle>
-          <CardDescription className="text-center">Yeni hesap oluşturun</CardDescription>
+          <CardDescription className="text-center">Hesap oluşturmak için bilgilerinizi girin</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
               <Label>Hesap Tipi</Label>
-              <RadioGroup value={userType} onValueChange={(value: any) => setUserType(value)}>
-                <div className="flex items-center space-x-2 border rounded-lg p-3">
+              <RadioGroup value={userType} onValueChange={(value) => { setUserType(value as 'user' | 'site_owner'); setCurrentStep(0); }} className="flex flex-col sm:flex-row gap-4">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors">
                   <RadioGroupItem value="user" id="user" />
-                  <Label htmlFor="user" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Bireysel Kullanıcı Kaydı</div>
-                    <div className="text-sm text-muted-foreground">Siteleri favorilere ekle, yorum yap, şikayet et</div>
+                  <Label htmlFor="user" className="cursor-pointer flex-1">
+                    <div className="font-semibold">Bireysel Kullanıcı</div>
+                    <p className="text-xs text-muted-foreground mt-1">Site incelemesi yapabilir, yorum yazabilirsiniz</p>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-3">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors">
                   <RadioGroupItem value="site_owner" id="site_owner" />
-                  <Label htmlFor="site_owner" className="flex-1 cursor-pointer">
-                    <div className="font-semibold">Kurumsal Kullanıcı Kaydı</div>
-                    <div className="text-sm text-muted-foreground">Kendi sitenizi yönetin</div>
+                  <Label htmlFor="site_owner" className="cursor-pointer flex-1">
+                    <div className="font-semibold">Site Sahibi</div>
+                    <p className="text-xs text-muted-foreground mt-1">Site ekleyebilir, yönetebilirsiniz</p>
                   </Label>
                 </div>
               </RadioGroup>
             </div>
 
-            {userType === 'user' && (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Ad *</Label>
-                    <Input id="firstName" type="text" placeholder="Adınız" value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={loading} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Soyad *</Label>
-                    <Input id="lastName" type="text" placeholder="Soyadınız" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={loading} />
-                  </div>
-                </div>
-
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon *</Label>
-                  <Input id="phone" type="tel" placeholder="+90 5XX XXX XX XX" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} />
+                  <Label htmlFor="firstName">Ad *</Label>
+                  <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
                 </div>
-              </>
-            )}
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Soyad *</Label>
+                  <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
+                </div>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input id="email" type="email" placeholder="ornek@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefon *</Label>
+                <Input id="phone" type="tel" placeholder="+90 5XX XXX XX XX" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">E-posta *</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Şifre *</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} className="pr-10" />
-                  <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                  <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
+                  <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowPassword(!showPassword)} disabled={loading}>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Şifre Tekrar *</Label>
                 <div className="relative">
-                  <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} className="pr-10" />
-                  <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                  <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} />
+                  <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={loading}>
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
             </div>
 
-            {userType === 'site_owner' && (
-              <div className="border rounded-lg p-6 space-y-6">
-                <WizardProgress steps={wizardSteps} currentStep={currentStep} />
-                {renderWizardStep()}
-                <div className="flex gap-3">
-                  {currentStep > 0 && <Button type="button" variant="outline" onClick={handleBack} disabled={loading}><ChevronLeft className="w-4 h-4 mr-1" />Geri</Button>}
-                  {currentStep < wizardSteps.length - 1 && <Button type="button" onClick={handleNext} disabled={loading} className="ml-auto">İleri<ChevronRight className="w-4 h-4 ml-1" /></Button>}
-                </div>
-              </div>
-            )}
+            {wizardSteps.length > 0 && <WizardProgress steps={wizardSteps} currentStep={currentStep} />}
 
-            <Button type="submit" className="w-full bg-gradient-primary" disabled={loading}>
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />İşleniyor...</> : 'Kayıt Ol'}
-            </Button>
+            <div className="min-h-[300px]">{renderWizardStep()}</div>
+
+            <div className="flex gap-3">
+              {userType === 'site_owner' && currentStep > 0 && (
+                <Button type="button" variant="outline" onClick={handleBack} disabled={loading}>
+                  <ChevronLeft className="w-4 h-4 mr-2" />Geri
+                </Button>
+              )}
+              
+              {userType === 'site_owner' && currentStep < wizardSteps.length - 1 ? (
+                <Button type="button" onClick={handleNext} disabled={loading} className="ml-auto">
+                  İleri<ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button type="submit" disabled={loading} className="ml-auto">
+                  {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Kaydediliyor...</> : 'Kayıt Ol'}
+                </Button>
+              )}
+            </div>
+
+            <div className="text-center text-sm text-muted-foreground">
+              Zaten hesabınız var mı? <Link to="/login" className="text-primary hover:underline">Giriş Yap</Link>
+            </div>
           </form>
-          <div className="mt-4 text-center text-sm">
-            <span className="text-muted-foreground">Hesabınız var mı? </span>
-            <Link to="/login" className="text-primary hover:underline">Giriş Yap</Link>
-          </div>
         </CardContent>
       </Card>
     </div>
