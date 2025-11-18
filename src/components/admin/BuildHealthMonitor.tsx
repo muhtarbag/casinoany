@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ interface HealthCheck {
   name: string;
   status: 'pass' | 'warn' | 'fail' | 'checking';
   issues: BuildIssue[];
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 export const BuildHealthMonitor = () => {
