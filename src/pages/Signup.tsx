@@ -61,6 +61,8 @@ const Signup = () => {
   const [kick, setKick] = useState('');
   const [discord, setDiscord] = useState('');
   const [bioLink, setBioLink] = useState('');
+  const [supportEmail, setSupportEmail] = useState('');
+  const [pinterest, setPinterest] = useState('');
   
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -217,6 +219,8 @@ const Signup = () => {
         metadata.socialKick = kick;
         metadata.socialDiscord = discord;
         metadata.bioLink = bioLink;
+        metadata.supportEmail = supportEmail;
+        metadata.socialPinterest = pinterest;
       }
 
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -249,6 +253,8 @@ const Signup = () => {
           social_kick: kick,
           social_discord: discord,
           social_bio_link: bioLink,
+          support_email: supportEmail,
+          social_pinterest: pinterest,
           status: 'pending'
         };
 
@@ -320,11 +326,11 @@ const Signup = () => {
       case 0:
         return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={email} />;
       case 1:
-        return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} disabled={loading} />;
+        return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} supportEmail={supportEmail} setSupportEmail={setSupportEmail} pinterest={pinterest} setPinterest={setPinterest} disabled={loading} />;
       case 2:
         return <Step3CompanyDetails companyTaxNumber={companyTaxNumber} setCompanyTaxNumber={setCompanyTaxNumber} companyType={companyType} setCompanyType={setCompanyType} companyAddress={companyAddress} setCompanyAddress={setCompanyAddress} companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
       case 3:
-        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyTaxNumber={companyTaxNumber} companyType={companyType} companyAddress={companyAddress} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} logoUrl={logoUrl} sites={sites || []} />;
+        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyTaxNumber={companyTaxNumber} companyType={companyType} companyAddress={companyAddress} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} supportEmail={supportEmail} pinterest={pinterest} logoUrl={logoUrl} sites={sites || []} />;
       default:
         return null;
     }

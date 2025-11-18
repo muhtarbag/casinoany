@@ -1673,9 +1673,11 @@ export type Database = {
           social_instagram: string | null
           social_kick: string | null
           social_linkedin: string | null
+          social_pinterest: string | null
           social_telegram_channel: string | null
           social_twitter: string | null
           social_youtube: string | null
+          support_email: string | null
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"]
           username: string | null
@@ -1713,9 +1715,11 @@ export type Database = {
           social_instagram?: string | null
           social_kick?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
+          support_email?: string | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
@@ -1753,9 +1757,11 @@ export type Database = {
           social_instagram?: string | null
           social_kick?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
+          support_email?: string | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
@@ -2221,10 +2227,12 @@ export type Database = {
           social_instagram: string | null
           social_kick: string | null
           social_linkedin: string | null
+          social_pinterest: string | null
           social_telegram_channel: string | null
           social_twitter: string | null
           social_youtube: string | null
           status: string | null
+          support_email: string | null
           user_id: string
         }
         Insert: {
@@ -2252,10 +2260,12 @@ export type Database = {
           social_instagram?: string | null
           social_kick?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
           status?: string | null
+          support_email?: string | null
           user_id: string
         }
         Update: {
@@ -2283,10 +2293,12 @@ export type Database = {
           social_instagram?: string | null
           social_kick?: string | null
           social_linkedin?: string | null
+          social_pinterest?: string | null
           social_telegram_channel?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
           status?: string | null
+          support_email?: string | null
           user_id?: string
         }
         Relationships: [

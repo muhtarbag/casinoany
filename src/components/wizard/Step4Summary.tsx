@@ -26,6 +26,8 @@ interface Step4SummaryProps {
   kick: string;
   discord: string;
   bioLink: string;
+  supportEmail: string;
+  pinterest: string;
   logoUrl: string;
   sites: any[];
 }
@@ -164,7 +166,7 @@ export const Step4Summary = (props: Step4SummaryProps) => {
 
       {/* Social Media */}
       {(props.facebook || props.twitter || props.instagram || props.linkedin || props.youtube || 
-        props.telegramChannel || props.kick || props.discord || props.bioLink) && (
+        props.telegramChannel || props.kick || props.discord || props.bioLink || props.supportEmail || props.pinterest) && (
         <Card>
           <CardContent className="pt-6">
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
@@ -177,6 +179,8 @@ export const Step4Summary = (props: Step4SummaryProps) => {
               {props.telegramChannel && <Badge variant="outline">Telegram Kanal</Badge>}
               {props.kick && <Badge variant="outline">Kick</Badge>}
               {props.discord && <Badge variant="outline">Discord</Badge>}
+              {props.pinterest && <Badge variant="outline">Pinterest</Badge>}
+              {props.supportEmail && <Badge variant="outline">Destek Mail</Badge>}
               {props.bioLink && <Badge variant="outline">Bio Link</Badge>}
             </div>
           </CardContent>
