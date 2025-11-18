@@ -29,7 +29,9 @@ export const LazyNewsManagement = lazyWithRetry(() =>
 );
 
 export const LazyNotificationManagement = lazyWithRetry(() => 
-  import('@/components/NotificationManagement')
+  import('@/components/NotificationManagement').then(module => ({ 
+    default: module.NotificationManagement 
+  }))
 );
 
 export const LazyAffiliateManagement = lazyWithRetry(() => import('@/components/AffiliateManagement').then(m => ({ default: m.AffiliateManagement })));
