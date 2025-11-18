@@ -43,9 +43,6 @@ const Signup = () => {
   const [companyName, setCompanyName] = useState('');
   const [description, setDescription] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
-  const [companyTaxNumber, setCompanyTaxNumber] = useState('');
-  const [companyType, setCompanyType] = useState('');
-  const [companyAddress, setCompanyAddress] = useState('');
   const [companyWebsite, setCompanyWebsite] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -130,18 +127,6 @@ const Signup = () => {
         }
         return true;
       case 2:
-        if (!companyTaxNumber.trim()) {
-          toast({ title: 'Hata', description: 'Lütfen vergi numaranızı girin', variant: 'destructive' });
-          return false;
-        }
-        if (!companyType) {
-          toast({ title: 'Hata', description: 'Lütfen şirket tipini seçin', variant: 'destructive' });
-          return false;
-        }
-        if (!companyAddress.trim()) {
-          toast({ title: 'Hata', description: 'Lütfen şirket adresini girin', variant: 'destructive' });
-          return false;
-        }
         return true;
       default:
         return true;
@@ -201,9 +186,6 @@ const Signup = () => {
       } else {
         metadata.companyName = companyName;
         metadata.companyDescription = description;
-        metadata.companyTaxNumber = companyTaxNumber;
-        metadata.companyType = companyType;
-        metadata.companyAddress = companyAddress;
         metadata.companyWebsite = companyWebsite;
         metadata.contactPersonName = contactName;
         metadata.contactEmail = contactEmail;
@@ -328,9 +310,9 @@ const Signup = () => {
       case 1:
         return <Step2ContactSocial contactName={contactName} setContactName={setContactName} contactEmail={contactEmail} setContactEmail={setContactEmail} contactTeams={contactTeams} setContactTeams={setContactTeams} contactTelegram={contactTelegram} setContactTelegram={setContactTelegram} contactWhatsapp={contactWhatsapp} setContactWhatsapp={setContactWhatsapp} facebook={facebook} setFacebook={setFacebook} twitter={twitter} setTwitter={setTwitter} instagram={instagram} setInstagram={setInstagram} linkedin={linkedin} setLinkedin={setLinkedin} youtube={youtube} setYoutube={setYoutube} telegramChannel={telegramChannel} setTelegramChannel={setTelegramChannel} kick={kick} setKick={setKick} discord={discord} setDiscord={setDiscord} bioLink={bioLink} setBioLink={setBioLink} supportEmail={supportEmail} setSupportEmail={setSupportEmail} pinterest={pinterest} setPinterest={setPinterest} disabled={loading} />;
       case 2:
-        return <Step3CompanyDetails companyTaxNumber={companyTaxNumber} setCompanyTaxNumber={setCompanyTaxNumber} companyType={companyType} setCompanyType={setCompanyType} companyAddress={companyAddress} setCompanyAddress={setCompanyAddress} companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
+        return <Step3CompanyDetails companyWebsite={companyWebsite} setCompanyWebsite={setCompanyWebsite} disabled={loading} />;
       case 3:
-        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyTaxNumber={companyTaxNumber} companyType={companyType} companyAddress={companyAddress} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} supportEmail={supportEmail} pinterest={pinterest} logoUrl={logoUrl} sites={sites || []} />;
+        return <Step4Summary selectedSite={selectedSite} newSiteName={newSiteName} companyName={companyName} description={description} companyWebsite={companyWebsite} contactName={contactName} contactEmail={contactEmail} contactTeams={contactTeams} contactTelegram={contactTelegram} contactWhatsapp={contactWhatsapp} facebook={facebook} twitter={twitter} instagram={instagram} linkedin={linkedin} youtube={youtube} telegramChannel={telegramChannel} kick={kick} discord={discord} bioLink={bioLink} supportEmail={supportEmail} pinterest={pinterest} logoUrl={logoUrl} sites={sites || []} />;
       default:
         return null;
     }
