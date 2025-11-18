@@ -364,6 +364,7 @@ export type Database = {
           logo_url: string | null
           name: string
           owner_id: string | null
+          ownership_verified: boolean | null
           pros: string[] | null
           rating: number | null
           review_count: number | null
@@ -407,6 +408,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           owner_id?: string | null
+          ownership_verified?: boolean | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
@@ -450,6 +452,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           owner_id?: string | null
+          ownership_verified?: boolean | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
@@ -1490,6 +1493,50 @@ export type Database = {
           },
         ]
       }
+      ownership_verifications: {
+        Row: {
+          application_id: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          metadata: Json | null
+          updated_at: string | null
+          verification_code: string
+          verification_type: string
+          verified_at: string | null
+        }
+        Insert: {
+          application_id: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          metadata?: Json | null
+          updated_at?: string | null
+          verification_code: string
+          verification_type: string
+          verified_at?: string | null
+        }
+        Update: {
+          application_id?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          metadata?: Json | null
+          updated_at?: string | null
+          verification_code?: string
+          verification_type?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ownership_verifications_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "site_owners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_views: {
         Row: {
           browser: string | null
@@ -2150,6 +2197,7 @@ export type Database = {
       }
       site_owners: {
         Row: {
+          admin_notes: string | null
           approved_at: string | null
           approved_by: string | null
           company_name: string | null
@@ -2165,6 +2213,7 @@ export type Database = {
           infrastructure_provider: string | null
           logo_url: string | null
           new_site_name: string | null
+          ownership_verified: boolean | null
           site_id: string | null
           social_bio_link: string | null
           social_discord: string | null
@@ -2179,6 +2228,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_name?: string | null
@@ -2194,6 +2244,7 @@ export type Database = {
           infrastructure_provider?: string | null
           logo_url?: string | null
           new_site_name?: string | null
+          ownership_verified?: boolean | null
           site_id?: string | null
           social_bio_link?: string | null
           social_discord?: string | null
@@ -2208,6 +2259,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_name?: string | null
@@ -2223,6 +2275,7 @@ export type Database = {
           infrastructure_provider?: string | null
           logo_url?: string | null
           new_site_name?: string | null
+          ownership_verified?: boolean | null
           site_id?: string | null
           social_bio_link?: string | null
           social_discord?: string | null
