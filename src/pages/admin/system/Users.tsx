@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, Mail, MessageSquare, Send, Phone } from 'lucide-react';
+import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
+import { EnhancedTablePagination } from '@/components/table/EnhancedTablePagination';
 import {
   Table,
   TableBody,
@@ -32,23 +34,89 @@ const Users = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('individual');
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  
+  // Pagination & Filtering States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [verificationFilter, setVerificationFilter] = useState('all');
+
+  // Fetch total count for pagination
+  const { data: totalCount } = useQuery({
+    queryKey: ['admin-users-count', activeTab, searchQuery, roleFilter, statusFilter, verificationFilter],
+    queryFn: async () => {
+      let query = supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true });
+
+      // User type filter based on active tab
+      if (activeTab === 'individual') {
+        query = query.eq('user_type', 'individual');
+      } else {
+        query = query.eq('user_type', 'corporate');
+      }
+
+      // Search filter
+      if (searchQuery) {
+        query = query.or(`email.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`);
+      }
+
+      // Verification filter (only for corporate)
+      if (activeTab === 'corporate' && verificationFilter !== 'all') {
+        query = query.eq('is_verified', verificationFilter === 'verified');
+      }
+
+      const { count } = await query;
+      return count || 0;
+    },
+    enabled: isAdmin,
+  });
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ['admin-users'],
+    queryKey: ['admin-users', currentPage, pageSize, activeTab, searchQuery, roleFilter, statusFilter, verificationFilter],
     queryFn: async () => {
-      const { data: profiles, error: profilesError } = await supabase
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      let profileQuery = supabase
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      // User type filter based on active tab
+      if (activeTab === 'individual') {
+        profileQuery = profileQuery.eq('user_type', 'individual');
+      } else {
+        profileQuery = profileQuery.eq('user_type', 'corporate');
+      }
+
+      // Search filter
+      if (searchQuery) {
+        profileQuery = profileQuery.or(`email.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`);
+      }
+
+      // Verification filter (only for corporate)
+      if (activeTab === 'corporate' && verificationFilter !== 'all') {
+        profileQuery = profileQuery.eq('is_verified', verificationFilter === 'verified');
+      }
+
+      const { data: profiles, error: profilesError } = await profileQuery;
       
       if (profilesError) throw profilesError;
       if (!profiles) return [];
 
+      const profileIds = profiles.map(p => p.id);
+
+      // Fetch roles for these profiles
       const { data: roles } = await supabase
         .from('user_roles')
-        .select('*');
+        .select('*')
+        .in('user_id', profileIds);
 
-      // Site owners verilerini çek
+      // Fetch site owners
       const { data: siteOwners } = await supabase
         .from('site_owners')
         .select(`
@@ -58,9 +126,10 @@ const Users = () => {
             name,
             slug
           )
-        `);
+        `)
+        .in('user_id', profileIds);
 
-      return profiles.map(profile => {
+      let filteredProfiles = profiles.map(profile => {
         const role = roles?.find(r => r.user_id === profile.id);
         const siteOwner = siteOwners?.find(so => so.user_id === profile.id);
         
@@ -77,6 +146,18 @@ const Users = () => {
           site_owner: siteOwner || null
         };
       });
+
+      // Role filter (client-side for now since role is in different table)
+      if (roleFilter !== 'all') {
+        filteredProfiles = filteredProfiles.filter(u => u.role === roleFilter);
+      }
+
+      // Status filter (client-side)
+      if (statusFilter !== 'all') {
+        filteredProfiles = filteredProfiles.filter(u => u.status === statusFilter);
+      }
+
+      return filteredProfiles;
     },
     enabled: isAdmin,
   });
@@ -174,16 +255,38 @@ const Users = () => {
     );
   }
 
-  // Kullanıcıları user_type'a göre ayır - varsayılan 'individual'
-  const individualUsers = users?.filter(u => {
-    const userType = u.profile?.user_type || 'individual';
-    return userType === 'individual';
-  }) || [];
-  
-  const corporateUsers = users?.filter(u => {
-    const userType = u.profile?.user_type;
-    return userType === 'corporate';
-  }) || [];
+  const totalPages = Math.ceil((totalCount || 0) / pageSize);
+  const currentUsers = users || [];
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setRoleFilter('all');
+    setStatusFilter('all');
+    setVerificationFilter('all');
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setCurrentPage(1);
+    setSearchQuery('');
+    setRoleFilter('all');
+    setStatusFilter('all');
+    setVerificationFilter('all');
+  };
+
+  // Stats
+  const individualCount = activeTab === 'individual' ? (totalCount || 0) : 0;
+  const corporateCount = activeTab === 'corporate' ? (totalCount || 0) : 0;
 
   const renderIndividualTable = () => (
     <Table>
@@ -200,8 +303,8 @@ const Users = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {individualUsers.length > 0 ? (
-          individualUsers.map((user: any) => (
+        {currentUsers.length > 0 ? (
+          currentUsers.map((user: any) => (
             <TableRow 
               key={user.id}
               className="cursor-pointer hover:bg-muted/50"
@@ -302,8 +405,8 @@ const Users = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {corporateUsers.length > 0 ? (
-          corporateUsers.map((user: any) => {
+        {currentUsers.length > 0 ? (
+          currentUsers.map((user: any) => {
             const so = user.site_owner;
             const siteName = so?.betting_sites?.name || so?.new_site_name || '-';
             
@@ -430,8 +533,10 @@ const Users = () => {
           })
         ) : (
           <TableRow>
-            <TableCell colSpan={8} className="text-center text-muted-foreground">
-              Henüz kurumsal kullanıcı bulunmuyor
+            <TableCell colSpan={10} className="text-center text-muted-foreground">
+              {searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || verificationFilter !== 'all'
+                ? 'Filtrelere uygun kullanıcı bulunamadı' 
+                : 'Henüz kurumsal kullanıcı bulunmuyor'}
             </TableCell>
           </TableRow>
         )}
@@ -461,7 +566,7 @@ const Users = () => {
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{users?.length || 0}</div>
+              <div className="text-2xl font-bold">{totalCount || 0}</div>
             </CardContent>
           </Card>
           
@@ -471,7 +576,7 @@ const Users = () => {
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{individualUsers.length}</div>
+              <div className="text-2xl font-bold">{activeTab === 'individual' ? (totalCount || 0) : '-'}</div>
             </CardContent>
           </Card>
 
@@ -481,10 +586,7 @@ const Users = () => {
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{corporateUsers.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {corporateUsers.filter(u => u.profile && 'is_verified' in u.profile && u.profile.is_verified).length} doğrulandı
-              </p>
+              <div className="text-2xl font-bold">{activeTab === 'corporate' ? (totalCount || 0) : '-'}</div>
             </CardContent>
           </Card>
         </div>
@@ -496,32 +598,95 @@ const Users = () => {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="individual" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Bireysel Kullanıcılar
-                    <Badge variant="secondary" className="ml-2">
-                      {individualUsers.length}
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger value="corporate" className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Kurumsal Kullanıcılar
-                    <Badge variant="secondary" className="ml-2">
-                      {corporateUsers.length}
-                    </Badge>
-                  </TabsTrigger>
-                </TabsList>
+              <>
+                <EnhancedTableToolbar
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  statusFilter={statusFilter}
+                  onStatusFilterChange={setStatusFilter}
+                  ratingFilter={roleFilter}
+                  onRatingFilterChange={setRoleFilter}
+                  totalItems={totalCount || 0}
+                  filteredItems={currentUsers.length}
+                  onClearFilters={handleClearFilters}
+                  searchPlaceholder="Email, ad, soyad veya şirket adı ile ara..."
+                  statusOptions={[
+                    { value: 'all', label: 'Tüm Durumlar' },
+                    { value: 'approved', label: 'Onaylı' },
+                    { value: 'pending', label: 'Beklemede' },
+                    { value: 'rejected', label: 'Reddedildi' },
+                  ]}
+                  ratingOptions={[
+                    { value: 'all', label: 'Tüm Roller' },
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'user', label: 'Kullanıcı' },
+                    { value: 'site_owner', label: 'Site Sahibi' },
+                  ]}
+                />
 
-                <TabsContent value="individual" className="mt-6">
-                  {renderIndividualTable()}
-                </TabsContent>
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="individual" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Bireysel Kullanıcılar
+                    </TabsTrigger>
+                    <TabsTrigger value="corporate" className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      Kurumsal Kullanıcılar
+                      {activeTab === 'corporate' && verificationFilter !== 'all' && (
+                        <Badge variant="secondary" className="ml-2">
+                          {verificationFilter === 'verified' ? 'Doğrulanmış' : 'Doğrulanmamış'}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="corporate" className="mt-6">
-                  {renderCorporateTable()}
-                </TabsContent>
-              </Tabs>
+                  <TabsContent value="individual" className="mt-6">
+                    {renderIndividualTable()}
+                  </TabsContent>
+
+                  <TabsContent value="corporate" className="mt-6 space-y-4">
+                    {activeTab === 'corporate' && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant={verificationFilter === 'all' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('all')}
+                        >
+                          Tümü
+                        </Button>
+                        <Button
+                          variant={verificationFilter === 'verified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('verified')}
+                        >
+                          <Shield className="w-4 h-4 mr-2" />
+                          Doğrulanmış
+                        </Button>
+                        <Button
+                          variant={verificationFilter === 'unverified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('unverified')}
+                        >
+                          Doğrulanmamış
+                        </Button>
+                      </div>
+                    )}
+                    {renderCorporateTable()}
+                  </TabsContent>
+                </Tabs>
+
+                {totalPages > 1 && (
+                  <EnhancedTablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalItems={totalCount || 0}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
+                )}
+              </>
             )}
           </CardContent>
         </Card>
