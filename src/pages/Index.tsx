@@ -7,6 +7,7 @@ import { Hero } from '@/components/Hero';
 import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
+import { PremiumSitesCarousel } from '@/components/PremiumSitesCarousel';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,26 +106,47 @@ const Index = () => {
       <main>
         <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
-        <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-          <PixelGrid searchTerm={searchTerm} />
-        </div>
-
-        {/* Featured Casino Reviews Section */}
-        <section className="container mx-auto px-4 py-8 md:py-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              Öne Çıkan Casino İncelemeleri
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
-              Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
-            </p>
-          </div>
+        {/* Premium Sites Carousel - Top Tier (display_order 1-5) */}
+        {!searchTerm && <PremiumSitesCarousel />}
         
-        <FeaturedSitesSection searchTerm={searchTerm} />
+        {/* Featured Casino Reviews Section - Mid Tier (is_featured=true) */}
+        {!searchTerm && (
+          <section className="container mx-auto px-4 py-8 md:py-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Öne Çıkan Casino İncelemeleri
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
+                Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
+              </p>
+            </div>
+            <FeaturedSitesSection searchTerm={searchTerm} />
+          </section>
+        )}
+        
+        {/* All Sites Grid - Standard Tier */}
+        <section id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
+          <div className="text-center mb-8">
+            <div className="flex items-center gap-3 justify-center mb-2">
+              <div className="h-px flex-1 max-w-32 bg-gradient-to-r from-transparent to-border" />
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                {searchTerm ? 'Arama Sonuçları' : 'Tüm Casino Siteleri'}
+              </h2>
+              <div className="h-px flex-1 max-w-32 bg-gradient-to-l from-transparent to-border" />
+            </div>
+            {!searchTerm && (
+              <p className="text-sm text-muted-foreground">
+                113 aktif bahis sitesi arasından seçim yapın
+              </p>
+            )}
+          </div>
+          <PixelGrid searchTerm={searchTerm} />
+        </section>
 
-          {/* Bonus CTA */}
-          <div className="text-center mt-8">
+        {/* Bonus CTA */}
+        {!searchTerm && (
+          <div className="text-center pb-8 md:pb-12">
             <Link 
               to="/deneme-bonusu"
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
@@ -134,7 +156,7 @@ const Index = () => {
               <span>→</span>
             </Link>
           </div>
-        </section>
+        )}
       </main>
 
       <Footer />
