@@ -10,7 +10,7 @@ export function normalizeWhatsAppUrl(value: string | null | undefined): string |
   
   // Zaten tam URL ise numarayı çıkar
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    // wa.me/PHONE veya web.whatsapp.com/send?phone=PHONE formatından numarayı çıkar
+    // wa.me/PHONE veya send?phone=PHONE formatından numarayı çıkar
     const match = value.match(/(?:wa\.me\/|phone=)(\+?[\d]+)/);
     if (match) {
       phoneNumber = match[1];
@@ -19,11 +19,12 @@ export function normalizeWhatsAppUrl(value: string | null | undefined): string |
     }
   }
   
-  // Telefon numarasını temizle: + karakterini ve boşlukları kaldır
-  const cleanNumber = phoneNumber.replace(/[\s+]/g, '');
+  // Telefon numarasını tamamen temizle: +, boşluk, tire vb. tüm özel karakterleri kaldır
+  const cleanNumber = phoneNumber.replace(/[^\d]/g, '');
   
-  // web.whatsapp.com formatını kullan (daha güvenilir, engelleme riski düşük)
-  return `https://web.whatsapp.com/send?phone=${cleanNumber}`;
+  // wa.me formatını kullan - WhatsApp'ın resmi ve en güvenilir kısa linki
+  // + karakteri KULLANMA, sadece rakamlar
+  return `https://wa.me/${cleanNumber}`;
 }
 
 export function normalizeTelegramUrl(value: string | null | undefined): string | null {
