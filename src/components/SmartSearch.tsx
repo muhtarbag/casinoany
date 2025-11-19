@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, TrendingUp, Flame } from 'lucide-react';
@@ -10,10 +9,10 @@ import { Badge } from '@/components/ui/badge';
 interface SmartSearchProps {
   onSearch: (searchTerm: string) => void;
   searchTerm: string;
+  onNavigate?: (slug: string) => void;
 }
 
-export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
-  const navigate = useNavigate();
+export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchProps) => {
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showPopular, setShowPopular] = useState(false);
@@ -145,7 +144,11 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     trackSearch(siteName);
     setShowSuggestions(false);
     setShowPopular(false);
-    navigate(`/${siteSlug}`);
+    if (onNavigate) {
+      onNavigate(siteSlug);
+    } else {
+      window.location.href = `/${siteSlug}`;
+    }
   };
 
   const handlePopularClick = (term: string) => {
