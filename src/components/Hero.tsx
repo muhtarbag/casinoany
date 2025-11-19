@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,6 +17,7 @@ interface HeroProps {
 }
 
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
+  const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [animationType, setAnimationType] = useState<string>('slide');
   const [autoScrollDuration, setAutoScrollDuration] = useState<number>(2500);
@@ -219,7 +221,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
           </p>
-          <SmartSearch onSearch={onSearch} searchTerm={localSearch} />
+          <SmartSearch 
+            onSearch={onSearch} 
+            searchTerm={localSearch} 
+            onNavigate={(slug) => navigate(`/${slug}`)}
+          />
           <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6 pt-4 md:pt-6">
             <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
               <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-primary flex-shrink-0" />
