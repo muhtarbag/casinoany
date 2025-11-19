@@ -160,7 +160,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
     <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
       <div className="flex flex-col sm:flex-row gap-2 sm:relative">
         <div className="relative flex-1" ref={suggestionsRef}>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
+          <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10" />
           <Input
             type="text"
             placeholder="Bahis sitesi ara..."
@@ -181,7 +181,7 @@ export const SmartSearch = ({ onSearch, searchTerm }: SmartSearchProps) => {
                 setShowPopular(false);
               }, 300);
             }}
-            className="pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
+            className="pl-10 sm:pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
           
           {/* Popular Searches Dropdown */}
