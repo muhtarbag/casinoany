@@ -836,6 +836,7 @@ export type Database = {
           primary_site_id: string | null
           published_at: string | null
           read_time: number | null
+          scheduled_publish_at: string | null
           slug: string
           tags: string[] | null
           title: string
@@ -859,6 +860,7 @@ export type Database = {
           primary_site_id?: string | null
           published_at?: string | null
           read_time?: number | null
+          scheduled_publish_at?: string | null
           slug: string
           tags?: string[] | null
           title: string
@@ -882,6 +884,7 @@ export type Database = {
           primary_site_id?: string | null
           published_at?: string | null
           read_time?: number | null
+          scheduled_publish_at?: string | null
           slug?: string
           tags?: string[] | null
           title?: string

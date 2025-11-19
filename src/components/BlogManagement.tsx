@@ -33,6 +33,7 @@ interface BlogPost {
   meta_keywords?: string[];
   is_published: boolean;
   published_at?: string;
+  scheduled_publish_at?: string; // Zamanlı yayınlama
   view_count: number;
   read_time?: number;
   category?: string;
@@ -54,6 +55,7 @@ interface BlogFormData {
   tags: string;
   read_time: string;
   is_published: boolean;
+  scheduled_publish_at: string; // Zamanlı yayınlama
   primary_site_id: string;
   category_id: string;
 }
@@ -838,10 +840,29 @@ export const BlogManagement = () => {
                 <Switch
                   id="is_published"
                   checked={formData.is_published}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked, scheduled_publish_at: checked ? '' : formData.scheduled_publish_at })}
                 />
-                <Label htmlFor="is_published">Yayınla</Label>
+                <Label htmlFor="is_published">Hemen Yayınla</Label>
               </div>
+
+              {!formData.is_published && (
+                <div className="space-y-2">
+                  <Label htmlFor="scheduled_publish_at" className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Zamanlanmış Yayınlama Tarihi (İsteğe Bağlı)
+                  </Label>
+                  <Input
+                    id="scheduled_publish_at"
+                    type="datetime-local"
+                    value={formData.scheduled_publish_at}
+                    onChange={(e) => setFormData({ ...formData, scheduled_publish_at: e.target.value })}
+                    placeholder="Belirli bir tarihte yayınlamak için seçin"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Boş bırakırsanız taslak olarak kalır. Tarih seçerseniz o tarihte otomatik yayınlanır.
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
