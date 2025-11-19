@@ -45,6 +45,30 @@ verify_jwt = false
 [functions.sitemap]
 verify_jwt = false
 
+[functions.sitemap-pages]
+verify_jwt = false
+
+[functions.sitemap-casinos]
+verify_jwt = false
+
+[functions.sitemap-blogs]
+verify_jwt = false
+
+[functions.sitemap-bonuses]
+verify_jwt = false
+
+[functions.sitemap-news]
+verify_jwt = false
+
+[functions.sitemap-static]
+verify_jwt = false
+
+[functions.sitemap-complaints]
+verify_jwt = false
+
+[functions.sitemap-images]
+verify_jwt = false
+
 [functions.robots]
 verify_jwt = false
 
