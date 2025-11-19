@@ -10,14 +10,31 @@ const corsHeaders = {
 };
 
 // Rate limiting helper
-async function checkRateLimit(supabase: any, ip: string, functionName: string): Promise<{ allowed: boolean; retryAfter?: number }> {
+function isTrustedBot(userAgent: string): boolean {
+  const trustedBots = [
+    'Googlebot',
+    'Google-InspectionTool',
+    'Bingbot',
+    'YandexBot',
+    'AhrefsBot',
+    'SemrushBot'
+  ];
+  return trustedBots.some(bot => userAgent.includes(bot));
+}
+
+async function checkRateLimit(supabase: any, ip: string, functionName: string, userAgent: string): Promise<{ allowed: boolean; retryAfter?: number }> {
+  // Whitelist trusted bots
+  if (isTrustedBot(userAgent)) {
+    return { allowed: true };
+  }
+
   const now = new Date();
   const { data: banned } = await supabase.from('api_rate_limits').select('banned_until').eq('ip_address', ip).eq('function_name', functionName).gte('banned_until', now.toISOString()).maybeSingle();
   if (banned) return { allowed: false, retryAfter: Math.ceil((new Date(banned.banned_until).getTime() - now.getTime()) / 1000) };
   const windowStart = new Date(now.getTime() - 60000);
   const { data: existing } = await supabase.from('api_rate_limits').select('*').eq('ip_address', ip).eq('function_name', functionName).gte('window_start', windowStart.toISOString()).maybeSingle();
   if (existing) {
-    if (existing.request_count >= 60) {
+    if (existing.request_count >= 120) {
       await supabase.from('api_rate_limits').update({ banned_until: new Date(now.getTime() + 60000).toISOString(), updated_at: now.toISOString() }).eq('id', existing.id);
       return { allowed: false, retryAfter: 60 };
     }
@@ -35,6 +52,7 @@ Deno.serve(async (req) => {
 
   // Rate limit check
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip') || 'unknown';
+  const userAgent = req.headers.get('user-agent') || '';
 
   try {
     const supabase = createClient(
@@ -42,7 +60,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY')!
     );
 
-    const rateLimit = await checkRateLimit(supabase, ip, 'sitemap');
+    const rateLimit = await checkRateLimit(supabase, ip, 'sitemap', userAgent);
     if (!rateLimit.allowed) {
       return new Response('Too Many Requests', {
         status: 429,
