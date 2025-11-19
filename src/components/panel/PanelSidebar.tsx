@@ -8,7 +8,8 @@ import {
   MessageCircle,
   Building2,
   Gift,
-  User
+  User,
+  Home
 } from 'lucide-react';
 import {
   Sidebar,
@@ -23,6 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { SiteData } from '@/types/site';
+import { Link } from 'react-router-dom';
 
 interface PanelSidebarProps {
   siteData: SiteData;
@@ -114,7 +116,7 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b px-4 py-3">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           {siteData?.logo_url && !isCollapsed && (
             <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
               <img 
@@ -124,7 +126,11 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
               />
             </div>
           )}
-          {!isCollapsed && (
+          {isCollapsed ? (
+            <div className="flex items-center justify-center w-full">
+              <Home className="h-5 w-5 text-primary" />
+            </div>
+          ) : (
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -133,7 +139,7 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
               <p className="text-xs text-muted-foreground">Kurumsal Panel</p>
             </div>
           )}
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
