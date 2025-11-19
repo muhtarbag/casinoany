@@ -201,6 +201,25 @@ export function RoleManagement() {
     },
   });
 
+  // Remove role from user
+  const removeRoleMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles-status'] });
+      showSuccessToast('Rol başarıyla geri alındı');
+    },
+    onError: (error) => {
+      showErrorToast(error, 'Rol geri alınırken hata oluştu');
+    },
+  });
+
   const UserCard = ({ user }: { user: UserWithRole }) => {
     const StatusIcon = STATUS_CONFIG[user.status].icon;
     const isPending = user.status === 'pending';
@@ -304,6 +323,23 @@ export function RoleManagement() {
                   Reddet
                 </Button>
               </>
+            )}
+
+            {isApproved && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => removeRoleMutation.mutate(user.user_id)}
+                disabled={removeRoleMutation.isPending}
+                className="flex-1"
+              >
+                {removeRoleMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <XCircle className="w-4 h-4 mr-2" />
+                )}
+                Rolü Geri Al
+              </Button>
             )}
             
             {user.status === 'rejected' && (
