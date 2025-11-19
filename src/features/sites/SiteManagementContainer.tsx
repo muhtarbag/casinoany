@@ -8,6 +8,7 @@ import { SiteFormWrapper } from './SiteFormWrapper';
 import { EnhancedSiteList } from './EnhancedSiteList';
 import { SiteBulkActions } from './SiteBulkActions';
 import { SiteListSkeleton } from './SiteListSkeleton';
+import { QuickAddSites } from '@/components/admin/QuickAddSites';
 
 export function SiteManagementContainer() {
   const queryClient = useQueryClient();
@@ -128,6 +129,9 @@ export function SiteManagementContainer() {
         <CardDescription>Bahis sitelerini ekleyin, düzenleyin ve yönetin</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Quick Add Sites */}
+        <QuickAddSites onSitesAdded={() => queryClient.invalidateQueries({ queryKey: ['betting-sites'] })} />
+
         {/* Site Form */}
         <SiteFormWrapper
           editingId={editingId}
