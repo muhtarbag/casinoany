@@ -58,7 +58,6 @@ const Users = () => {
   const [showBulkRejectDialog, setShowBulkRejectDialog] = useState(false);
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [showBulkVerifyDialog, setShowBulkVerifyDialog] = useState(false);
-  const [isCreatingTestUsers, setIsCreatingTestUsers] = useState(false);
 
   // Fetch total count for pagination
   const { data: totalCount } = useQuery({
@@ -438,47 +437,6 @@ const Users = () => {
     setCurrentPage(1);
   };
 
-  const createTestCorporateUsers = async () => {
-    setIsCreatingTestUsers(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-test-corporate-users', {
-        body: {}
-      });
-
-      if (error) throw error;
-
-      showSuccessToast(`${data.successCount} kurumsal test kullanıcısı oluşturuldu!`);
-      
-      // Kullanıcı listesini yenile
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
-
-      // Sonuçları göster
-      if (data.results && data.results.length > 0) {
-        const successResults = data.results.filter((r: any) => r.success);
-        toast({
-          title: 'Test Kullanıcıları Oluşturuldu',
-          description: (
-            <div className="space-y-2 text-xs">
-              {successResults.map((result: any) => (
-                <div key={result.email} className="p-2 bg-muted/50 rounded">
-                  <p className="font-semibold">{result.company}</p>
-                  <p>Email: {result.email}</p>
-                  <p>Şifre: {result.password}</p>
-                </div>
-              ))}
-            </div>
-          ),
-          duration: 10000,
-        });
-      }
-    } catch (error: any) {
-      console.error('Error creating test users:', error);
-      showErrorToast('Test kullanıcıları oluşturulurken hata: ' + error.message);
-    } finally {
-      setIsCreatingTestUsers(false);
-    }
-  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -807,31 +765,11 @@ const Users = () => {
       />
 
       <div className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Kullanıcı Yönetimi</h1>
-            <p className="text-muted-foreground mt-2">
-              Bireysel ve kurumsal kullanıcıları yönetin
-            </p>
-          </div>
-          <Button 
-            onClick={createTestCorporateUsers}
-            disabled={isCreatingTestUsers}
-            variant="outline"
-            className="gap-2"
-          >
-            {isCreatingTestUsers ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Oluşturuluyor...
-              </>
-            ) : (
-              <>
-                <UserCog className="w-4 h-4" />
-                Test Kullanıcıları Oluştur (5)
-              </>
-            )}
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Kullanıcı Yönetimi</h1>
+          <p className="text-muted-foreground mt-2">
+            Bireysel ve kurumsal kullanıcıları yönetin
+          </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
