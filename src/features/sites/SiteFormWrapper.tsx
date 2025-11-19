@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteFormSchema, SiteFormData, generateSlug } from '@/schemas/siteValidation';
@@ -34,6 +34,7 @@ export function SiteFormWrapper({
   const editingSite = sites.find((s) => s.id === editingId);
   const updateCategoriesMutation = useUpdateSiteCategories();
   const [isFormReady, setIsFormReady] = useState(false);
+  const lastSuccessTimestampRef = useRef<number>(0);
 
   const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
@@ -132,7 +133,12 @@ export function SiteFormWrapper({
   }, [editingSite, form, onLogoFileChange, onLogoPreviewChange]);
 
   useEffect(() => {
-    if (createSiteMutation.isSuccess || updateSiteMutation.isSuccess) {
+    const currentTimestamp = Date.now();
+    const isNewSuccess = (createSiteMutation.isSuccess || updateSiteMutation.isSuccess) && 
+                         currentTimestamp > lastSuccessTimestampRef.current;
+    
+    if (isNewSuccess) {
+      lastSuccessTimestampRef.current = currentTimestamp;
       form.reset();
       onLogoFileChange(null);
       onLogoPreviewChange(null);
