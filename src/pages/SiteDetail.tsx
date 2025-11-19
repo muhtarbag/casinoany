@@ -531,7 +531,7 @@ export default function SiteDetail() {
       </main>
       
       {/* Sticky Floating CTA */}
-      <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ${
+      <div className={`fixed bottom-0 left-0 right-0 z-40 md:z-50 transition-all duration-500 pb-16 md:pb-0 ${
         showStickyCTA ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}>
         <div className="bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-sm border-t border-border/50 shadow-2xl">
