@@ -9,25 +9,22 @@ export function normalizeWhatsAppUrl(value: string | null | undefined): string |
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Telefon numarasını temizle
-  let phoneNumber = trimmedValue;
-  
-  // Zaten tam URL ise numarayı çıkar
+  // Zaten tam URL ise (resmi WhatsApp veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // wa.me/PHONE veya send?phone=PHONE formatından numarayı çıkar
-    const match = trimmedValue.match(/(?:wa\.me\/|phone=)(\+?[\d]+)/);
-    if (match) {
-      phoneNumber = match[1];
-    } else {
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
       return null;
     }
+    return trimmedValue;
   }
+  
+  // Telefon numarasını temizle
+  const phoneNumber = trimmedValue;
   
   // Telefon numarasını tamamen temizle: +, boşluk, tire vb. tüm özel karakterleri kaldır
   const cleanNumber = phoneNumber.replace(/[^\d]/g, '');
   
   // Güvenlik: Telefon numarası uzunluk kontrolü (minimum 5, maksimum 15 rakam)
-  // Bu, geçersiz veya kötü niyetli girişleri engeller
   if (cleanNumber.length < 5 || cleanNumber.length > 15) {
     return null;
   }
@@ -38,7 +35,6 @@ export function normalizeWhatsAppUrl(value: string | null | undefined): string |
   }
   
   // wa.me formatını kullan - WhatsApp'ın resmi ve en güvenilir kısa linki
-  // + karakteri KULLANMA, sadece rakamlar
   return `https://wa.me/${cleanNumber}`;
 }
 
@@ -49,13 +45,13 @@ export function normalizeTelegramUrl(value: string | null | undefined): string |
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Zaten tam URL ise güvenlik kontrolü yap
+  // Zaten tam URL ise (resmi Telegram veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // Sadece t.me domainini kabul et
-    if (trimmedValue.includes('t.me/')) {
-      return trimmedValue;
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
+      return null;
     }
-    return null;
+    return trimmedValue;
   }
   
   // @ ile başlıyorsa kaldır
@@ -76,13 +72,13 @@ export function normalizeTwitterUrl(value: string | null | undefined): string | 
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Zaten tam URL ise güvenlik kontrolü yap
+  // Zaten tam URL ise (resmi Twitter/X veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // Sadece twitter.com ve x.com domainlerini kabul et
-    if (trimmedValue.includes('twitter.com/') || trimmedValue.includes('x.com/')) {
-      return trimmedValue;
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
+      return null;
     }
-    return null;
+    return trimmedValue;
   }
   
   // @ ile başlıyorsa kaldır
@@ -103,13 +99,13 @@ export function normalizeInstagramUrl(value: string | null | undefined): string 
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Zaten tam URL ise güvenlik kontrolü yap
+  // Zaten tam URL ise (resmi Instagram veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // Sadece instagram.com domainini kabul et
-    if (trimmedValue.includes('instagram.com/')) {
-      return trimmedValue;
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
+      return null;
     }
-    return null;
+    return trimmedValue;
   }
   
   // @ ile başlıyorsa kaldır
@@ -130,13 +126,13 @@ export function normalizeFacebookUrl(value: string | null | undefined): string |
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Zaten tam URL ise güvenlik kontrolü yap
+  // Zaten tam URL ise (resmi Facebook veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // Sadece facebook.com ve fb.com domainlerini kabul et
-    if (trimmedValue.includes('facebook.com/') || trimmedValue.includes('fb.com/')) {
-      return trimmedValue;
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
+      return null;
     }
-    return null;
+    return trimmedValue;
   }
   
   // Güvenlik: Kullanıcı adı/sayfa validasyonu (5-50 karakter, alfanumerik, nokta ve alt çizgi)
@@ -154,13 +150,13 @@ export function normalizeYouTubeUrl(value: string | null | undefined): string | 
   const trimmedValue = value.trim();
   if (!trimmedValue) return null;
   
-  // Zaten tam URL ise güvenlik kontrolü yap
+  // Zaten tam URL ise (resmi YouTube veya özel kısa link)
   if (trimmedValue.startsWith('http://') || trimmedValue.startsWith('https://')) {
-    // Sadece youtube.com ve youtu.be domainlerini kabul et
-    if (trimmedValue.includes('youtube.com/') || trimmedValue.includes('youtu.be/')) {
-      return trimmedValue;
+    // XSS koruması: Sadece güvenli karakterler
+    if (!/^https?:\/\/[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/.test(trimmedValue)) {
+      return null;
     }
-    return null;
+    return trimmedValue;
   }
   
   // @ ile başlıyorsa YouTube handle formatı
