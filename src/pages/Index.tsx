@@ -109,22 +109,6 @@ const Index = () => {
         {/* Premium Sites Carousel - Top Tier (display_order 1-5) */}
         {!searchTerm && <PremiumSitesCarousel />}
         
-        {/* Featured Casino Reviews Section - Mid Tier (is_featured=true) */}
-        {!searchTerm && (
-          <section className="container mx-auto px-4 py-8 md:py-12">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                Öne Çıkan Casino İncelemeleri
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
-                Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
-              </p>
-            </div>
-            <FeaturedSitesSection searchTerm={searchTerm} />
-          </section>
-        )}
-        
         {/* All Sites Grid - Standard Tier */}
         <section id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
           <div className="text-center mb-8">
@@ -156,6 +140,22 @@ const Index = () => {
               <span>→</span>
             </Link>
           </div>
+        )}
+        
+        {/* Featured Casino Reviews Section - Mid Tier (is_featured=true) - FOOTER ÖNCESİ */}
+        {!searchTerm && (
+          <section className="container mx-auto px-4 py-8 md:py-12 mb-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                Öne Çıkan Casino İncelemeleri
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
+                Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
+              </p>
+            </div>
+            <FeaturedSitesSection searchTerm={searchTerm} />
+          </section>
         )}
       </main>
 
