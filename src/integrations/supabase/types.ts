@@ -1184,6 +1184,35 @@ export type Database = {
         }
         Relationships: []
       }
+      complaint_likes: {
+        Row: {
+          complaint_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_likes_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "site_complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       complaint_responses: {
         Row: {
           complaint_id: string
