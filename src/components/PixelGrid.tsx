@@ -18,7 +18,7 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating, is_featured')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
@@ -43,30 +43,20 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
     },
   });
 
-  // Filter sites based on search term and exclude premium/featured when no search
+  // Filter sites based on search term
   const filteredSites = useMemo(() => {
-    if (!sites) return [];
-    
-    let result = sites;
-    
-    // If no search term, exclude premium (display_order 1-5) and featured sites
-    if (!searchTerm.trim()) {
-      result = sites.filter(site => 
-        (site.display_order > 5 || !site.display_order) && !site.is_featured
-      );
-    } else {
-      // If searching, include all active sites
-      const searchLower = searchTerm.toLowerCase().trim();
-      result = sites.filter(site =>
-        site.name.toLowerCase().includes(searchLower) ||
-        site.bonus?.toLowerCase().includes(searchLower) ||
-        site.features?.some((feature: string) => 
-          feature.toLowerCase().includes(searchLower)
-        )
-      );
+    if (!sites || !searchTerm.trim()) {
+      return sites || [];
     }
-    
-    return result;
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return sites.filter(site =>
+      site.name.toLowerCase().includes(searchLower) ||
+      site.bonus?.toLowerCase().includes(searchLower) ||
+      site.features?.some((feature: string) => 
+        feature.toLowerCase().includes(searchLower)
+      )
+    );
   }, [sites, searchTerm]);
 
   if (isLoading) {
