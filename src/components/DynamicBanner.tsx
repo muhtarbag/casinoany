@@ -17,7 +17,7 @@ export const DynamicBanner = ({ imageUrl, mobileImageUrl, altText, targetUrl, ti
       <OptimizedImage
         src={desktopImage}
         alt={altText || title}
-        className="w-full h-auto aspect-[16/9] sm:aspect-[20/9] md:aspect-[24/9]"
+        className="w-full h-full object-cover"
         objectFit="cover"
         width={1920}
         height={720}
