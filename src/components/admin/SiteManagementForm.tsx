@@ -143,38 +143,37 @@ export function SiteManagementForm({
 
           <div className="space-y-2">
             <Label htmlFor="rating">Rating (0-10) *</Label>
-              <Input
-                id="rating"
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                {...register('rating', { valueAsNumber: true })}
-                placeholder="9.5"
-                className={errors.rating ? 'border-destructive' : ''}
-              />
-              {errors.rating && (
-                <p className="text-sm text-destructive">{errors.rating.message}</p>
-              )}
-            </div>
+            <Input
+              id="rating"
+              type="number"
+              step="0.1"
+              min="0"
+              max="10"
+              {...register('rating', { valueAsNumber: true })}
+              placeholder="9.5"
+              className={errors.rating ? 'border-destructive' : ''}
+            />
+            {errors.rating && (
+              <p className="text-sm text-destructive">{errors.rating.message}</p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="bonus">Bonus</Label>
-              <Input
-                id="bonus"
-                {...register('bonus')}
-                placeholder="3000 TL + 200 Free Spin"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="bonus">Bonus</Label>
+            <Input
+              id="bonus"
+              {...register('bonus')}
+              placeholder="3000 TL + 200 Free Spin"
+            />
+          </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="features">Özellikler (virgülle ayır)</Label>
-              <Input
-                id="features"
-                {...register('features')}
-                placeholder="Canlı Casino, Spor Bahisleri, Canlı Destek"
-              />
-            </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="features">Özellikler (virgülle ayır)</Label>
+            <Input
+              id="features"
+              {...register('features')}
+              placeholder="Canlı Casino, Spor Bahisleri, Canlı Destek"
+            />
           </div>
 
           {/* Affiliate Management Section - ALWAYS VISIBLE */}
