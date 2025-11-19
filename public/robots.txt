@@ -16,18 +16,18 @@ Allow: /
 # =============================================================================
 # SITEMAP INDEX - Optimized Structure
 # =============================================================================
-# Main sitemap index
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap
+# Main sitemap index pointing to your domain
+Sitemap: https://www.casinoany.com/sitemap.xml
 
 # Individual sitemaps for better indexing
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-news
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images
+Sitemap: https://www.casinoany.com/sitemap-pages.xml
+Sitemap: https://www.casinoany.com/sitemap-casinos.xml
+Sitemap: https://www.casinoany.com/sitemap-blogs.xml
+Sitemap: https://www.casinoany.com/sitemap-bonuses.xml
+Sitemap: https://www.casinoany.com/sitemap-news.xml
+Sitemap: https://www.casinoany.com/sitemap-static.xml
+Sitemap: https://www.casinoany.com/sitemap-complaints.xml
+Sitemap: https://www.casinoany.com/sitemap-images.xml
 
 # =============================================================================
 # CRAWL RATE OPTIMIZATION - Search Engine Specific
