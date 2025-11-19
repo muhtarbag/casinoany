@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { X, Mail, Phone, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
-import { SiDiscord, SiPinterest, SiKick } from 'react-icons/si';
+import { X, Mail, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { SiDiscord, SiPinterest, SiKick, SiWhatsapp } from 'react-icons/si';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { siteBasicInfoSchema, type SiteBasicInfoFormData } from '@/lib/validation/siteInfoSchema';
@@ -523,7 +523,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <SiWhatsapp className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="whatsapp"
                   value={state.whatsapp}
