@@ -77,6 +77,7 @@ export const BlogRelatedSites = ({ postId }: BlogRelatedSitesProps) => {
                       src={site.logo_url}
                       alt={site.name}
                       className="max-w-full max-h-full object-contain p-2"
+                      loading="lazy"
                     />
                   ) : (
                     <span className="text-xl font-bold text-muted-foreground">
