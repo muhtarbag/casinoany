@@ -60,18 +60,76 @@ const ComplaintDetail = () => {
     },
   });
 
+  // Check if user has liked this complaint
+  const { data: userLike } = useQuery({
+    queryKey: ['complaint-like', id, user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from('complaint_likes')
+        .select('id')
+        .eq('complaint_id', id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Get total like count
+  const { data: likeCount } = useQuery({
+    queryKey: ['complaint-likes-count', id],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('complaint_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('complaint_id', id);
+      
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+
   const isOwnerOfThisSite = complaint && isSiteOwner && ownedSites.includes(complaint.site_id);
 
   const upvoteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('site_complaints')
-        .update({ upvotes: (complaint?.upvotes || 0) + 1 })
-        .eq('id', id);
-      if (error) throw error;
+      if (!user) {
+        throw new Error('Like yapmak için giriş yapmalısınız');
+      }
+
+      if (userLike) {
+        // Unlike - remove the like
+        const { error } = await supabase
+          .from('complaint_likes')
+          .delete()
+          .eq('complaint_id', id)
+          .eq('user_id', user.id);
+        if (error) throw error;
+      } else {
+        // Like - add the like
+        const { error } = await supabase
+          .from('complaint_likes')
+          .insert({
+            complaint_id: id,
+            user_id: user.id,
+          });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-like', id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', id] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Bir hata oluştu',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -350,13 +408,14 @@ const ComplaintDetail = () => {
 
             <div className="flex items-center gap-4 pt-4 border-t">
               <Button
-                variant="outline"
+                variant={userLike ? "default" : "outline"}
                 size="sm"
                 onClick={() => upvoteMutation.mutate()}
-                disabled={upvoteMutation.isPending}
+                disabled={upvoteMutation.isPending || !user}
+                className={userLike ? "bg-primary" : ""}
               >
-                <ThumbsUp className="w-4 h-4 mr-1" />
-                {complaint.upvotes}
+                <ThumbsUp className={`w-4 h-4 mr-1 ${userLike ? "fill-current" : ""}`} />
+                {likeCount || 0}
               </Button>
               <span className="text-sm text-muted-foreground">
                 <MessageSquare className="w-4 h-4 inline mr-1" />
