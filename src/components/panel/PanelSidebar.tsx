@@ -7,7 +7,8 @@ import {
   Bell, 
   MessageCircle,
   Building2,
-  Gift
+  Gift,
+  User
 } from 'lucide-react';
 import {
   Sidebar,
@@ -65,6 +66,12 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
           title: "Bonuslar",
           icon: Gift,
           description: "Bonus ve kampanyalar"
+        },
+        {
+          id: "profile",
+          title: "Profil Ayarları",
+          icon: User,
+          description: "Sosyal medya ve iletişim"
         }
       ]
     },
