@@ -31,6 +31,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
+import { UserNotificationBell } from '@/components/panel/UserNotificationBell';
 import logo from '@/assets/casinodoo-logo.svg';
 
 interface ProfileLayoutProps {
@@ -188,7 +189,10 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
             <img src={logo} alt="CasinoAny.com" className="h-8 w-auto" loading="eager" />
           </Link>
 
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <UserNotificationBell />
+            
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
                 <Avatar className="h-8 w-8">
@@ -221,6 +225,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 

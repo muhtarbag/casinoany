@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { PanelSidebar } from './PanelSidebar';
 import { NotificationBell } from './notifications/NotificationBell';
+import { UserNotificationBell } from './UserNotificationBell';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Kbd } from '@/components/ui/kbd';
@@ -72,6 +73,7 @@ export function PanelLayout({
                 <Kbd>?</Kbd>
                 <span>basın</span>
               </div>
+              <UserNotificationBell />
               {siteId && <NotificationBell siteId={siteId} />}
             </div>
           </header>
