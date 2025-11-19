@@ -184,7 +184,7 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                 setShowPopular(false);
               }, 300);
             }}
-            className="pl-11 sm:pl-12 py-4 sm:py-6 sm:pr-24 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
+            className="pl-11 pr-4 sm:pl-12 sm:pr-28 py-4 sm:py-6 text-base sm:text-lg rounded-lg border-2 border-border focus:border-primary w-full"
           />
           
           {/* Popular Searches Dropdown */}
@@ -271,8 +271,9 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
         </div>
         <Button
           type="submit"
-          className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-4 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full sm:w-auto"
+          className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-4 sm:py-3 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-all duration-200 w-full sm:w-auto font-semibold"
         >
+          <Search className="w-4 h-4 sm:hidden mr-2" />
           Ara
         </Button>
       </div>
