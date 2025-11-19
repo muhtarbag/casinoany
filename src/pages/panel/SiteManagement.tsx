@@ -16,6 +16,7 @@ import { NotificationCenter } from '@/components/panel/NotificationCenter';
 import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
 import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
+import { SiteOwnerProfileEditor } from '@/components/panel/SiteOwnerProfileEditor';
 
 const SiteManagement = () => {
   const { user, isAdmin, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
@@ -162,7 +163,8 @@ const SiteManagement = () => {
       'complaints': 'Şikayetler',
       'feedback': 'Geri Bildirimler',
       'notifications': 'Bildirimler',
-      'reports': 'Raporlar ve İstatistikler'
+      'reports': 'Raporlar ve İstatistikler',
+      'profile': 'Profil Ayarları'
     };
     
     return [{ label: breadcrumbMap[activeTab] || 'Dashboard' }];
@@ -204,6 +206,8 @@ const SiteManagement = () => {
             siteData={siteData}
           />
         );
+      case 'profile':
+        return <SiteOwnerProfileEditor />;
       default:
         return (
           <SiteOwnerDashboard 
