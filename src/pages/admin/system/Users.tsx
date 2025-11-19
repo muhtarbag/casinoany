@@ -392,6 +392,13 @@ const Users = () => {
     
     toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
     
+    // Kullanıcı tipine göre yönlendir
+    if (profile?.user_type === 'corporate') {
+      navigate('/panel/dashboard');
+    } else {
+      navigate('/profile/dashboard');
+    }
+    
     // Kullanıcı tipine göre doğru panele yönlendir
     if (profile?.user_type === 'corporate') {
       navigate('/panel/site-management');
