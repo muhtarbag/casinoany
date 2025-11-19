@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Heart } from 'lucide-react';
-import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
+import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { useToast } from '@/hooks/use-toast';
@@ -171,7 +171,7 @@ const BettingSiteCardComponent = ({
     { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1', platform: 'email' },
     { 
       url: whatsapp, 
-      icon: MessageCircle, 
+      icon: FaWhatsapp, 
       label: 'WhatsApp', 
       href: normalizeWhatsAppUrl(whatsapp) || '', 
       color: '#25D366', 
@@ -179,7 +179,7 @@ const BettingSiteCardComponent = ({
     },
     { 
       url: telegram, 
-      icon: Send, 
+      icon: FaTelegramPlane, 
       label: 'Telegram', 
       href: normalizeTelegramUrl(telegram) || '', 
       color: '#0088cc', 
