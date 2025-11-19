@@ -14,7 +14,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
@@ -93,6 +93,57 @@ const ComplaintDetail = () => {
   });
 
   const isOwnerOfThisSite = complaint && isSiteOwner && ownedSites.includes(complaint.site_id);
+
+  // Realtime subscriptions for complaint updates and responses
+  useEffect(() => {
+    if (!id) return;
+
+    const channel = supabase
+      .channel(`complaint-detail-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_complaints',
+          filter: `id=eq.${id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_responses',
+          filter: `complaint_id=eq.${id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint-responses', id] });
+          queryClient.invalidateQueries({ queryKey: ['complaint', id] }); // Update response count
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_likes',
+          filter: `complaint_id=eq.${id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', id] });
+          queryClient.invalidateQueries({ queryKey: ['complaint-like', id, user?.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, user?.id, queryClient]);
 
   const upvoteMutation = useMutation({
     mutationFn: async () => {
