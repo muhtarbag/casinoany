@@ -2,6 +2,14 @@ import { Mail } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { trackSocialClick } from '@/lib/socialTracking';
+import { 
+  normalizeWhatsAppUrl, 
+  normalizeTelegramUrl, 
+  normalizeTwitterUrl, 
+  normalizeInstagramUrl, 
+  normalizeFacebookUrl, 
+  normalizeYouTubeUrl 
+} from '@/lib/socialMediaHelpers';
 
 interface SiteDetailContactProps {
   site: any;
@@ -12,6 +20,14 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
                         site.twitter || site.instagram || site.facebook || site.youtube;
 
   if (!hasContactInfo) return null;
+
+  // Normalize all social media URLs
+  const whatsappUrl = normalizeWhatsAppUrl(site.whatsapp);
+  const telegramUrl = normalizeTelegramUrl(site.telegram);
+  const twitterUrl = normalizeTwitterUrl(site.twitter);
+  const instagramUrl = normalizeInstagramUrl(site.instagram);
+  const facebookUrl = normalizeFacebookUrl(site.facebook);
+  const youtubeUrl = normalizeYouTubeUrl(site.youtube);
 
   return (
     <Card>
@@ -36,13 +52,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.whatsapp && (
+          {whatsappUrl && (
             <a 
-              href={
-                site.whatsapp.startsWith('http') 
-                  ? site.whatsapp 
-                  : `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`
-              }
+              href={whatsappUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -55,13 +67,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.telegram && (
+          {telegramUrl && (
             <a 
-              href={
-                site.telegram.startsWith('http') 
-                  ? site.telegram 
-                  : `https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`
-              }
+              href={telegramUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -74,9 +82,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.twitter && (
+          {twitterUrl && (
             <a 
-              href={site.twitter} 
+              href={twitterUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -89,9 +97,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.instagram && (
+          {instagramUrl && (
             <a 
-              href={site.instagram} 
+              href={instagramUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -104,9 +112,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.facebook && (
+          {facebookUrl && (
             <a 
-              href={site.facebook} 
+              href={facebookUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -119,9 +127,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.youtube && (
+          {youtubeUrl && (
             <a 
-              href={site.youtube} 
+              href={youtubeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"

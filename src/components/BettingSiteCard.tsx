@@ -13,6 +13,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/hooks/useFavorites';
 import { cn } from '@/lib/utils';
 import { trackSocialClick } from '@/lib/socialTracking';
+import { 
+  normalizeWhatsAppUrl, 
+  normalizeTelegramUrl, 
+  normalizeTwitterUrl, 
+  normalizeInstagramUrl, 
+  normalizeFacebookUrl, 
+  normalizeYouTubeUrl 
+} from '@/lib/socialMediaHelpers';
 
 // Helper function to generate consistent random number from site ID
 const getRandomBaseFromId = (id: string | undefined, min: number, max: number): number => {
@@ -165,7 +173,7 @@ const BettingSiteCardComponent = ({
       url: whatsapp, 
       icon: MessageCircle, 
       label: 'WhatsApp', 
-      href: whatsapp?.startsWith('http') ? whatsapp : `https://wa.me/${whatsapp}`, 
+      href: normalizeWhatsAppUrl(whatsapp) || '', 
       color: '#25D366', 
       platform: 'whatsapp' 
     },
@@ -173,14 +181,14 @@ const BettingSiteCardComponent = ({
       url: telegram, 
       icon: Send, 
       label: 'Telegram', 
-      href: telegram?.startsWith('http') ? telegram : `https://t.me/${telegram}`, 
+      href: normalizeTelegramUrl(telegram) || '', 
       color: '#0088cc', 
       platform: 'telegram' 
     },
-    { url: twitter, icon: FaTwitter, label: 'Twitter', href: twitter, color: '#1DA1F2', platform: 'twitter' },
-    { url: instagram, icon: FaInstagram, label: 'Instagram', href: instagram, color: '#E4405F', platform: 'instagram' },
-    { url: facebook, icon: FaFacebook, label: 'Facebook', href: facebook, color: '#1877F2', platform: 'facebook' },
-    { url: youtube, icon: FaYoutube, label: 'YouTube', href: youtube, color: '#FF0000', platform: 'youtube' },
+    { url: twitter, icon: FaTwitter, label: 'Twitter', href: normalizeTwitterUrl(twitter) || '', color: '#1DA1F2', platform: 'twitter' },
+    { url: instagram, icon: FaInstagram, label: 'Instagram', href: normalizeInstagramUrl(instagram) || '', color: '#E4405F', platform: 'instagram' },
+    { url: facebook, icon: FaFacebook, label: 'Facebook', href: normalizeFacebookUrl(facebook) || '', color: '#1877F2', platform: 'facebook' },
+    { url: youtube, icon: FaYoutube, label: 'YouTube', href: normalizeYouTubeUrl(youtube) || '', color: '#FF0000', platform: 'youtube' },
   ].filter(link => link.url), [email, whatsapp, telegram, twitter, instagram, facebook, youtube]);
 
   return (
