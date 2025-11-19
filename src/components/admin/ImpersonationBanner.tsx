@@ -32,7 +32,7 @@ export const ImpersonationBanner = () => {
     : 'Unknown User';
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[70] bg-warning/5 border-b border-warning/20 backdrop-blur-sm">
+    <div className="fixed top-0 left-0 right-0 z-[100] bg-warning/5 border-b border-warning/20 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <AlertCircle className="h-3.5 w-3.5 text-warning" />
