@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Plus, ThumbsUp, MessageSquare, AlertCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -18,14 +18,44 @@ import { ComplaintFilters } from '@/components/complaints/ComplaintFilters';
 import { EnhancedComplaintCard } from '@/components/complaints/EnhancedComplaintCard';
 import { ComplaintAnalytics } from '@/components/complaints/ComplaintAnalytics';
 import { LoadingState } from '@/components/ui/loading-state';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const Complaints = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [siteFilter, setSiteFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+
+  // Get current user
+  const { data: { user } = {} } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data;
+    },
+  });
+
+  // Fetch user's likes
+  const { data: userLikes = [] } = useQuery({
+    queryKey: ['user-complaint-likes', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('complaint_likes')
+        .select('complaint_id')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      return data.map(like => like.complaint_id);
+    },
+    enabled: !!user?.id,
+  });
 
   const { data: complaints, isLoading } = useQuery({
     queryKey: ['complaints', searchTerm, categoryFilter, statusFilter, siteFilter, sortBy],
@@ -75,6 +105,59 @@ const Complaints = () => {
     },
   });
 
+  // Like/unlike mutation
+  const likeMutation = useMutation({
+    mutationFn: async (complaintId: string) => {
+      if (!user?.id) {
+        throw new Error('Beğenmek için giriş yapmalısınız');
+      }
+
+      const isLiked = userLikes.includes(complaintId);
+
+      if (isLiked) {
+        // Unlike
+        const { error } = await supabase
+          .from('complaint_likes')
+          .delete()
+          .eq('complaint_id', complaintId)
+          .eq('user_id', user.id);
+        if (error) throw error;
+      } else {
+        // Like
+        const { error } = await supabase
+          .from('complaint_likes')
+          .insert({
+            complaint_id: complaintId,
+            user_id: user.id,
+          });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-complaint-likes', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['complaints'] });
+    },
+    onError: (error: any) => {
+      if (error.message.includes('giriş yap')) {
+        toast({
+          title: 'Giriş Yapın',
+          description: 'Şikayetleri beğenmek için giriş yapmalısınız',
+          action: (
+            <Button size="sm" onClick={() => navigate('/login')}>
+              Giriş Yap
+            </Button>
+          ),
+        });
+      } else {
+        toast({
+          title: 'Hata',
+          description: error.message || 'Bir hata oluştu',
+          variant: 'destructive',
+        });
+      }
+    },
+  });
+
   // Realtime subscription for new complaints and responses
   useEffect(() => {
     const complaintsChannel = supabase
@@ -102,12 +185,24 @@ const Complaints = () => {
           queryClient.invalidateQueries({ queryKey: ['complaints'] });
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_likes',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['user-complaint-likes', user?.id] });
+          queryClient.invalidateQueries({ queryKey: ['complaints'] });
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(complaintsChannel);
     };
-  }, [queryClient]);
+  }, [queryClient, user?.id]);
 
   const categoryLabels: Record<string, string> = {
     odeme: 'Ödeme',
@@ -245,10 +340,25 @@ const Complaints = () => {
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <ThumbsUp className="w-4 h-4" />
-                            {complaint.upvotes}
-                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "flex items-center gap-1 h-auto p-1",
+                              userLikes.includes(complaint.id) && "text-primary"
+                            )}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              likeMutation.mutate(complaint.id);
+                            }}
+                            disabled={likeMutation.isPending}
+                          >
+                            <ThumbsUp className={cn(
+                              "w-4 h-4",
+                              userLikes.includes(complaint.id) && "fill-current"
+                            )} />
+                            {complaint.helpful_count || 0}
+                          </Button>
                           <span className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
                             {complaint.response_count || 0} cevap
