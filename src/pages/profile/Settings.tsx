@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { useState, useEffect } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
+import { TelegramSettings } from '@/components/panel/TelegramSettings';
 
 // Türkiye İlleri
 const TURKISH_CITIES = [
@@ -429,6 +430,9 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Telegram Bildirimleri */}
+          <TelegramSettings />
 
           <Card className="border-destructive">
             <CardHeader>
