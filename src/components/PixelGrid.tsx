@@ -1,4 +1,4 @@
-import { memo, Fragment } from 'react';
+import { memo, Fragment, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
@@ -8,7 +8,11 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 
-export const PixelGrid = () => {
+interface PixelGridProps {
+  searchTerm?: string;
+}
+
+export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
   const { data: sites, isLoading } = useQuery({
     queryKey: ['betting-sites-active'],
     queryFn: async () => {
@@ -39,11 +43,36 @@ export const PixelGrid = () => {
     },
   });
 
+  // Filter sites based on search term
+  const filteredSites = useMemo(() => {
+    if (!sites || !searchTerm.trim()) {
+      return sites || [];
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return sites.filter(site =>
+      site.name.toLowerCase().includes(searchLower) ||
+      site.bonus?.toLowerCase().includes(searchLower) ||
+      site.features?.some((feature: string) => 
+        feature.toLowerCase().includes(searchLower)
+      )
+    );
+  }, [sites, searchTerm]);
+
   if (isLoading) {
     return <LoadingSpinner size="lg" text="Siteler yükleniyor..." fullScreen={false} className="py-20" />;
   }
 
-  if (!sites || sites.length === 0) {
+  if (!filteredSites || filteredSites.length === 0) {
+    if (searchTerm.trim()) {
+      return (
+        <EmptyState
+          icon={Search}
+          title={`"${searchTerm}" için Sonuç Bulunamadı`}
+          description="Farklı bir arama terimi deneyin veya filtreleri temizleyin."
+        />
+      );
+    }
     return (
       <EmptyState
         icon={Search}
@@ -111,7 +140,7 @@ export const PixelGrid = () => {
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site: any, index: number) => {
+        {filteredSites.map((site: any, index: number) => {
           const isPriority = index < 6;
           // Find banners for this position
           const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
@@ -158,4 +187,4 @@ export const PixelGrid = () => {
       </div>
     </div>
   );
-};
+});
