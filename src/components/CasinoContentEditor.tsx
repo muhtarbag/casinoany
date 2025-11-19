@@ -186,7 +186,7 @@ export const CasinoContentEditor = ({
                 Kategori Ekle
               </Button>
               {Object.entries(gameCategories).map(([key, value], index) => (
-                <div key={`game-cat-${key}-${index}`} className="grid grid-cols-2 gap-2">
+                <div key={`game-${index}`} className="grid grid-cols-2 gap-2">
                   <Input
                     value={key}
                     onChange={(e) => updateGameCategory(key, e.target.value, value)}
