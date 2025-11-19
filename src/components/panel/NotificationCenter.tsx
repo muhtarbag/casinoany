@@ -128,7 +128,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
             <CardTitle className="text-sm font-medium text-muted-foreground">Yeni Yorumlar</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{notifications?.reviews.length || 0}</div>
+            <div className="text-2xl font-bold text-blue-600">{reviews.length}</div>
             <p className="text-xs text-muted-foreground">Son 7 gün</p>
           </CardContent>
         </Card>
