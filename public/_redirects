@@ -1,0 +1,8 @@
+# Netlify/Cloudflare Pages redirects
+# Static files should be served directly
+/robots.txt /robots.txt 200
+/sitemap.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap 200
+/sitemap-*.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-:splat 200
+
+# SPA fallback
+/* /index.html 200
