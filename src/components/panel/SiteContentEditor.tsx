@@ -45,6 +45,51 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     enabled: !!siteId,
   });
 
+  // ✅ Real-time updates for content changes
+  useEffect(() => {
+    if (!siteId) return;
+
+    const channel = supabase
+      .channel('site-content-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'betting_sites',
+          filter: `id=eq.${siteId}`
+        },
+        (payload) => {
+          // Update local state with new data
+          const newData = payload.new as any;
+          if (newData) {
+            setPros(newData.pros || []);
+            setCons(newData.cons || []);
+            setVerdict(newData.verdict || '');
+            setExpertReview(newData.expert_review || '');
+            setGameCategories(newData.game_categories || {});
+            setLoginGuide(newData.login_guide || '');
+            setWithdrawalGuide(newData.withdrawal_guide || '');
+            setFaq(newData.faq || []);
+            setBlockStyles(newData.block_styles || {});
+            
+            // Invalidate query to ensure consistency
+            queryClient.invalidateQueries({ queryKey: ['site-content', siteId] });
+            
+            toast({
+              title: "İçerik Güncellendi",
+              description: "Site içeriği real-time olarak güncellendi.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [siteId, queryClient, toast]);
+
   // Load content when fetched
   useEffect(() => {
     if (siteContent) {

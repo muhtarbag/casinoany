@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import { Loader2 } from 'lucide-react';
@@ -20,6 +20,7 @@ import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/pane
 const SiteManagement = () => {
   const { user, isAdmin, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -90,6 +91,32 @@ const SiteManagement = () => {
     },
     enabled: !!effectiveUserId && (isSiteOwner || isAdmin) && ownedSites.length > 0,
   });
+
+  // ✅ Real-time updates for site changes
+  useEffect(() => {
+    if (!ownedSites[0]) return;
+
+    const channel = supabase
+      .channel('site-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'betting_sites',
+          filter: `id=eq.${ownedSites[0]}`
+        },
+        () => {
+          // Refetch site data when changes occur
+          queryClient.invalidateQueries({ queryKey: ['owned-site-full', effectiveUserId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [ownedSites, effectiveUserId, queryClient]);
 
   if (!user || (!isSiteOwner && !isAdmin)) {
     return (

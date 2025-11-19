@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -59,6 +59,42 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
     },
     enabled: !!siteId,
   });
+
+  // ✅ Real-time updates for complaints and responses
+  useEffect(() => {
+    if (!siteId) return;
+
+    const channel = supabase
+      .channel('complaints-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_complaints',
+          filter: `site_id=eq.${siteId}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['site-complaints', siteId] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_responses'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['site-complaints', siteId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [siteId, queryClient]);
 
   // Add response mutation
   const addResponseMutation = useMutation({
