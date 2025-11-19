@@ -188,6 +188,7 @@ const AppContent = () => {
           <Route path="/sitemap.xml" element={<Sitemap />} />
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/about" element={<About />} />
+          <Route path="/hakkimizda" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/cookies" element={<Cookies />} />
