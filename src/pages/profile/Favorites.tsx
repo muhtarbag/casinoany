@@ -16,7 +16,7 @@ const Favorites = () => {
   const queryClient = useQueryClient();
 
   const { data: favorites, isLoading, error: queryError } = useQuery({
-    queryKey: ['user-favorites', user?.id],
+    queryKey: ['user-favorites-detail', user?.id],
     queryFn: async () => {
       if (!user) return [];
       
@@ -57,6 +57,8 @@ const Favorites = () => {
       return validFavorites;
     },
     enabled: !!user,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
 
   // Log query error if exists
@@ -74,7 +76,8 @@ const Favorites = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites'] }); // Global favorites hook
       queryClient.invalidateQueries({ queryKey: ['user-stats'] }); // Also refresh stats
       toast({
         title: 'Başarılı',
