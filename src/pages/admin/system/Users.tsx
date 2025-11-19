@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/dialog';
 
 const Users = () => {
-  const { isAdmin, impersonateUser } = useAuth();
+  const { isAdmin, impersonateUser, stopImpersonation } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -384,6 +384,10 @@ const Users = () => {
     try {
       console.log('🔍 Impersonation başlatılıyor...', { userId, userName });
       
+      // CRITICAL: Önce mevcut impersonation'ı temizle
+      stopImpersonation();
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Impersonate edilen kullanıcının profilini çek
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -409,7 +413,7 @@ const Users = () => {
       console.log('👤 User Type:', profile.user_type);
       
       // State'in güncellenmesi için bekleme
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Kullanıcı tipine göre yönlendir
       const targetPath = profile.user_type === 'corporate' 
