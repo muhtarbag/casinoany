@@ -332,6 +332,39 @@ export type Database = {
         }
         Relationships: []
       }
+      api_rate_limits: {
+        Row: {
+          banned_until: string | null
+          created_at: string | null
+          function_name: string
+          id: string
+          ip_address: string
+          request_count: number | null
+          updated_at: string | null
+          window_start: string | null
+        }
+        Insert: {
+          banned_until?: string | null
+          created_at?: string | null
+          function_name: string
+          id?: string
+          ip_address: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          banned_until?: string | null
+          created_at?: string | null
+          function_name?: string
+          id?: string
+          ip_address?: string
+          request_count?: number | null
+          updated_at?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       betting_sites: {
         Row: {
           affiliate_commission_percentage: number | null
@@ -3029,6 +3062,7 @@ export type Database = {
     }
     Functions: {
       can_view_site_stats: { Args: never; Returns: boolean }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_site_notification: {
         Args: {
           p_action_url?: string
