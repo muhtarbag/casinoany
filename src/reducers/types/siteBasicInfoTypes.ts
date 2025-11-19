@@ -15,6 +15,11 @@ export interface SiteBasicInfoState {
   instagram: string;
   facebook: string;
   youtube: string;
+  linkedin: string;
+  telegram_channel: string;
+  kick: string;
+  discord: string;
+  pinterest: string;
   
   // Validation & tracking
   errors: Record<string, string>;
@@ -33,6 +38,11 @@ export interface SiteBasicInfoData {
   instagram: string;
   facebook: string;
   youtube: string;
+  linkedin: string;
+  telegram_channel: string;
+  kick: string;
+  discord: string;
+  pinterest: string;
 }
 
 // Action types

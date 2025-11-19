@@ -349,6 +349,7 @@ export type Database = {
           bonus: string | null
           cons: string[] | null
           created_at: string | null
+          discord: string | null
           display_order: number | null
           email: string | null
           expert_review: string | null
@@ -360,16 +361,20 @@ export type Database = {
           instagram: string | null
           is_active: boolean | null
           is_featured: boolean | null
+          kick: string | null
+          linkedin: string | null
           login_guide: string | null
           logo_url: string | null
           name: string
           owner_id: string | null
           ownership_verified: boolean | null
+          pinterest: string | null
           pros: string[] | null
           rating: number | null
           review_count: number | null
           slug: string
           telegram: string | null
+          telegram_channel: string | null
           twitter: string | null
           updated_at: string | null
           verdict: string | null
@@ -393,6 +398,7 @@ export type Database = {
           bonus?: string | null
           cons?: string[] | null
           created_at?: string | null
+          discord?: string | null
           display_order?: number | null
           email?: string | null
           expert_review?: string | null
@@ -404,16 +410,20 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean | null
           is_featured?: boolean | null
+          kick?: string | null
+          linkedin?: string | null
           login_guide?: string | null
           logo_url?: string | null
           name: string
           owner_id?: string | null
           ownership_verified?: boolean | null
+          pinterest?: string | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
           slug: string
           telegram?: string | null
+          telegram_channel?: string | null
           twitter?: string | null
           updated_at?: string | null
           verdict?: string | null
@@ -437,6 +447,7 @@ export type Database = {
           bonus?: string | null
           cons?: string[] | null
           created_at?: string | null
+          discord?: string | null
           display_order?: number | null
           email?: string | null
           expert_review?: string | null
@@ -448,16 +459,20 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean | null
           is_featured?: boolean | null
+          kick?: string | null
+          linkedin?: string | null
           login_guide?: string | null
           logo_url?: string | null
           name?: string
           owner_id?: string | null
           ownership_verified?: boolean | null
+          pinterest?: string | null
           pros?: string[] | null
           rating?: number | null
           review_count?: number | null
           slug?: string
           telegram?: string | null
+          telegram_channel?: string | null
           twitter?: string | null
           updated_at?: string | null
           verdict?: string | null

@@ -14,6 +14,11 @@ export const createInitialState = (): SiteBasicInfoState => ({
   instagram: '',
   facebook: '',
   youtube: '',
+  linkedin: '',
+  telegram_channel: '',
+  kick: '',
+  discord: '',
+  pinterest: '',
   errors: {},
   initialData: null,
   lastSaved: undefined,
@@ -87,6 +92,11 @@ export const siteBasicInfoReducer = (
         instagram: state.initialData.instagram,
         facebook: state.initialData.facebook,
         youtube: state.initialData.youtube,
+        linkedin: state.initialData.linkedin,
+        telegram_channel: state.initialData.telegram_channel,
+        kick: state.initialData.kick,
+        discord: state.initialData.discord,
+        pinterest: state.initialData.pinterest,
         logoFile: null,
         errors: {},
       };
@@ -103,6 +113,11 @@ export const siteBasicInfoReducer = (
         instagram: action.data.instagram,
         facebook: action.data.facebook,
         youtube: action.data.youtube,
+        linkedin: action.data.linkedin,
+        telegram_channel: action.data.telegram_channel,
+        kick: action.data.kick,
+        discord: action.data.discord,
+        pinterest: action.data.pinterest,
         logoPreview: action.logoUrl || '',
         initialData: action.data,
       };
@@ -140,6 +155,11 @@ export const isStateDirty = (state: SiteBasicInfoState): boolean => {
     state.instagram !== state.initialData.instagram ||
     state.facebook !== state.initialData.facebook ||
     state.youtube !== state.initialData.youtube ||
+    state.linkedin !== state.initialData.linkedin ||
+    state.telegram_channel !== state.initialData.telegram_channel ||
+    state.kick !== state.initialData.kick ||
+    state.discord !== state.initialData.discord ||
+    state.pinterest !== state.initialData.pinterest ||
     state.logoFile !== null
   );
 };

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { X, Mail, MessageCircle, Send, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { X, Mail, MessageCircle, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { siteBasicInfoSchema, type SiteBasicInfoFormData } from '@/lib/validation/siteInfoSchema';
@@ -45,7 +45,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         twitter: siteData.twitter || '',
         instagram: siteData.instagram || '',
         facebook: siteData.facebook || '',
-        youtube: siteData.youtube || ''
+        youtube: siteData.youtube || '',
+        linkedin: siteData.linkedin || '',
+        telegram_channel: siteData.telegram_channel || '',
+        kick: siteData.kick || '',
+        discord: siteData.discord || '',
+        pinterest: siteData.pinterest || ''
       };
       
       dispatch({
@@ -82,7 +87,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
               twitter: newData.twitter || '',
               instagram: newData.instagram || '',
               facebook: newData.facebook || '',
-              youtube: newData.youtube || ''
+              youtube: newData.youtube || '',
+              linkedin: newData.linkedin || '',
+              telegram_channel: newData.telegram_channel || '',
+              kick: newData.kick || '',
+              discord: newData.discord || '',
+              pinterest: newData.pinterest || ''
             };
             
             dispatch({
@@ -144,7 +154,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       }
       return false;
     }
-  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube]);
+  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube, state.linkedin, state.telegram_channel, state.kick, state.discord, state.pinterest]);
 
   // Upload logo mutation
   const uploadLogoMutation = useMutation({
@@ -189,6 +199,11 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
           bonus: state.bonus,
           features: state.features,
           logo_url: logoUrl,
+          linkedin: state.linkedin || null,
+          telegram_channel: state.telegram_channel || null,
+          kick: state.kick || null,
+          discord: state.discord || null,
+          pinterest: state.pinterest || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', siteId);
@@ -230,7 +245,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
           twitter: state.twitter,
           instagram: state.instagram,
           facebook: state.facebook,
-          youtube: state.youtube
+          youtube: state.youtube,
+          linkedin: state.linkedin,
+          telegram_channel: state.telegram_channel,
+          kick: state.kick,
+          discord: state.discord,
+          pinterest: state.pinterest
         },
         logoUrl: data.logoUrl
       });
@@ -553,6 +573,69 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
                 />
               </div>
               <FormFieldError error={state.errors.youtube} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn</Label>
+              <div className="relative">
+                <Linkedin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="linkedin"
+                  value={state.linkedin}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'linkedin', value: e.target.value })}
+                  placeholder="https://linkedin.com/company/..."
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.linkedin} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telegram_channel">Telegram Kanalı</Label>
+              <div className="relative">
+                <Send className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="telegram_channel"
+                  value={state.telegram_channel}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'telegram_channel', value: e.target.value })}
+                  placeholder="https://t.me/channel"
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.telegram_channel} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="kick">Kick</Label>
+              <Input
+                id="kick"
+                value={state.kick}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'kick', value: e.target.value })}
+                placeholder="https://kick.com/channel"
+              />
+              <FormFieldError error={state.errors.kick} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discord">Discord</Label>
+              <Input
+                id="discord"
+                value={state.discord}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'discord', value: e.target.value })}
+                placeholder="Discord sunucu davet linki"
+              />
+              <FormFieldError error={state.errors.discord} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="pinterest">Pinterest</Label>
+              <Input
+                id="pinterest"
+                value={state.pinterest}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'pinterest', value: e.target.value })}
+                placeholder="https://pinterest.com/..."
+              />
+              <FormFieldError error={state.errors.pinterest} />
             </div>
           </div>
         </CardContent>
