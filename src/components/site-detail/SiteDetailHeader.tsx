@@ -30,12 +30,10 @@ export const SiteDetailHeader = ({
         <div className="flex flex-col items-center text-center gap-1">
           {logoUrl && (
             <div className="flex-shrink-0 relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-secondary/20 to-transparent rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="absolute inset-0 bg-primary/5 rounded-lg animate-[pulse_4s_ease-in-out_infinite]" />
               <img 
                 src={logoUrl} 
                 alt={`${site.name} logo`} 
-                className="w-48 h-48 md:w-72 md:h-72 object-contain rounded-lg bg-card/50 p-4 relative z-10 transition-all duration-500 group-hover:scale-105"
+                className="w-64 h-64 md:w-96 md:h-96 object-contain relative z-10 transition-all duration-500 group-hover:scale-105"
                 loading="eager"
               />
             </div>
