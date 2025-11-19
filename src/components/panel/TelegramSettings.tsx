@@ -150,7 +150,7 @@ export const TelegramSettings = () => {
           <AlertTitle>Telegram Bot Kurulumu</AlertTitle>
           <AlertDescription className="mt-2 space-y-2 text-sm">
             <ol className="list-decimal list-inside space-y-1">
-              <li>Telegram'da <strong>@BettingPlatformBot</strong> botunu bulun ve başlatın</li>
+              <li>Telegram'da <strong>@casinoany_bot</strong> botunu bulun ve başlatın</li>
               <li><code>/start</code> komutunu gönderin</li>
               <li>Bot size özel Chat ID'nizi gönderecek</li>
               <li>Chat ID'yi aşağıdaki alana yapıştırın</li>
