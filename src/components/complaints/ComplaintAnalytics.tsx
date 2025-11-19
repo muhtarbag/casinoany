@@ -60,14 +60,14 @@ export const ComplaintAnalytics = () => {
   const COLORS = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#6366f1'];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-6">
       {/* Category Distribution */}
       <Card>
-        <CardHeader>
-          <CardTitle>Kategori Dağılımı</CardTitle>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg">Kategori Dağılımı</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+        <CardContent className="p-4 md:p-6 pt-0">
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={analyticsData?.categoryData}
@@ -92,11 +92,11 @@ export const ComplaintAnalytics = () => {
 
       {/* Status Distribution */}
       <Card>
-        <CardHeader>
-          <CardTitle>Durum Dağılımı</CardTitle>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg">Durum Dağılımı</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+        <CardContent className="p-4 md:p-6 pt-0">
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={analyticsData?.statusData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="name" className="text-xs" />
@@ -116,11 +116,11 @@ export const ComplaintAnalytics = () => {
 
       {/* Trend Chart (Full Width) */}
       <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Son 7 Gün Trend</CardTitle>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg">Son 7 Gün Trend</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
+        <CardContent className="p-4 md:p-6 pt-0">
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={analyticsData?.trendData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="date" className="text-xs" />
