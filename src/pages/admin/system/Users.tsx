@@ -381,19 +381,32 @@ const Users = () => {
   };
 
   const handleImpersonate = async (userId: string, userName: string) => {
-    impersonateUser(userId);
-    
-    // Impersonate edilen kullanıcının profilini çek ve tipine göre yönlendir
+    // Impersonate edilen kullanıcının profilini çek
     const { data: profile } = await supabase
       .from('profiles')
       .select('user_type')
       .eq('id', userId)
       .single();
     
+    if (!profile) {
+      toast({ 
+        title: 'Hata', 
+        description: 'Kullanıcı profili bulunamadı',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    // Impersonation'ı başlat
+    impersonateUser(userId);
+    
     toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
     
+    // State'in güncellenmesi için kısa bir bekleme
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Kullanıcı tipine göre yönlendir
-    if (profile?.user_type === 'corporate') {
+    if (profile.user_type === 'corporate') {
       navigate('/panel/dashboard');
     } else {
       navigate('/profile/dashboard');
