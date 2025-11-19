@@ -18,7 +18,7 @@ export const siteFormSchema = z.object({
     .max(5, 'Rating en fazla 5 olabilir'),
   
   bonus: z.string()
-    .max(500, 'Bonus bilgisi en fazla 500 karakter olabilir')
+    .max(50, 'Bonus bilgisi en fazla 50 karakter olabilir')
     .optional()
     .default(''),
   
