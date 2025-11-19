@@ -8,7 +8,7 @@ export const SlotBanner = () => {
         <OptimizedImage
           src={slotBannerImage}
           alt="Kazandıran Slot Dünyasını Keşfet - CasinoAny"
-          className="w-full h-full"
+          className="w-full h-full object-cover"
           objectFit="cover"
           width={1920}
           height={720}

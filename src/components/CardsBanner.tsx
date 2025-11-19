@@ -8,7 +8,7 @@ export const CardsBanner = () => {
         <OptimizedImage
           src={cardsBannerImage}
           alt="Full House, Royal Flush - Kartların Gücünü Hisset"
-          className="w-full h-full"
+          className="w-full h-full object-cover"
           objectFit="cover"
           width={1920}
           height={720}
