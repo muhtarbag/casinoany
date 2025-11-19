@@ -205,9 +205,9 @@ export const useAdminSiteManagement = () => {
       }
 
       // Update all site data including social media and affiliate info
+      // NOTE: slug is NOT included in updates as it's unique and should never change
       const updateData: {
         name: string;
-        slug: string;
         affiliate_link: string;
         bonus: string;
         rating: number;
@@ -231,7 +231,6 @@ export const useAdminSiteManagement = () => {
         logo_url?: string;
       } = {
         name: formData.name,
-        slug: formData.slug,
         affiliate_link: formData.affiliate_link,
         bonus: formData.bonus,
         rating: formData.rating,
