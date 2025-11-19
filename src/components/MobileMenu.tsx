@@ -26,7 +26,7 @@ export const MobileMenu = () => {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[280px] sm:w-[350px]">
+      <SheetContent side="right" className="w-[280px] sm:w-[350px] z-[80]">
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center gap-3">
             <img src={logo} alt="CasinoAny.com" className="h-6 w-auto" />
