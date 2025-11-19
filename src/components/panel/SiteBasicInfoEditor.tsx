@@ -137,7 +137,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         twitter: state.twitter,
         instagram: state.instagram,
         facebook: state.facebook,
-        youtube: state.youtube
+        youtube: state.youtube,
+        linkedin: state.linkedin,
+        telegram_channel: state.telegram_channel,
+        kick: state.kick,
+        discord: state.discord,
+        pinterest: state.pinterest
       };
 
       siteBasicInfoSchema.parse(formData);
