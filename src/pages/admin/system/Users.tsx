@@ -1087,20 +1087,8 @@ const Users = () => {
                         <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_name || '-'}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Vergi/TC No</label>
-                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_tax_number || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Şirket Tipi</label>
-                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_type || '-'}</p>
-                      </div>
-                      <div>
                         <label className="text-sm font-medium">Yetkili Kişi</label>
                         <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_authorized_person || selectedUser.profile?.contact_person_name || '-'}</p>
-                      </div>
-                      <div className="col-span-2">
-                        <label className="text-sm font-medium">Adres</label>
-                        <p className="text-sm text-muted-foreground">{selectedUser.profile?.company_address || '-'}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium">Web Sitesi</label>
