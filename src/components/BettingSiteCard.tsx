@@ -161,8 +161,22 @@ const BettingSiteCardComponent = ({
 
   const socialLinks = useMemo(() => [
     { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1', platform: 'email' },
-    { url: whatsapp, icon: MessageCircle, label: 'WhatsApp', href: whatsapp?.startsWith('http') ? whatsapp : `https://wa.me/${whatsapp}`, color: '#25D366', platform: 'whatsapp' },
-    { url: telegram, icon: Send, label: 'Telegram', href: telegram, color: '#0088cc', platform: 'telegram' },
+    { 
+      url: whatsapp, 
+      icon: MessageCircle, 
+      label: 'WhatsApp', 
+      href: whatsapp?.startsWith('http') ? whatsapp : `https://wa.me/${whatsapp}`, 
+      color: '#25D366', 
+      platform: 'whatsapp' 
+    },
+    { 
+      url: telegram, 
+      icon: Send, 
+      label: 'Telegram', 
+      href: telegram?.startsWith('http') ? telegram : `https://t.me/${telegram}`, 
+      color: '#0088cc', 
+      platform: 'telegram' 
+    },
     { url: twitter, icon: FaTwitter, label: 'Twitter', href: twitter, color: '#1DA1F2', platform: 'twitter' },
     { url: instagram, icon: FaInstagram, label: 'Instagram', href: instagram, color: '#E4405F', platform: 'instagram' },
     { url: facebook, icon: FaFacebook, label: 'Facebook', href: facebook, color: '#1877F2', platform: 'facebook' },
