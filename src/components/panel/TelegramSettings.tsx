@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { Send, Info, CheckCircle, XCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -71,11 +71,11 @@ export const TelegramSettings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['telegram-settings', user?.id] });
-      toast.success('Telegram ayarları kaydedildi');
+      showSuccessToast('✓ Telegram ayarları başarıyla kaydedildi');
     },
     onError: (error) => {
       console.error('Save error:', error);
-      toast.error('Ayarlar kaydedilemedi');
+      showErrorToast(error, 'Ayarlar kaydedilemedi');
     },
   });
 
@@ -96,17 +96,17 @@ export const TelegramSettings = () => {
       return data;
     },
     onSuccess: () => {
-      toast.success('Test bildirimi gönderildi! Telegram\'ı kontrol edin.');
+      showSuccessToast('✓ Test bildirimi gönderildi! Telegram\'ı kontrol edin.');
     },
     onError: (error) => {
       console.error('Test error:', error);
-      toast.error('Test bildirimi gönderilemedi');
+      showErrorToast(error, 'Test bildirimi gönderilemedi');
     },
   });
 
   const handleTest = async () => {
     if (!telegramChatId) {
-      toast.error('Lütfen önce Chat ID girin');
+      showErrorToast(new Error('Chat ID eksik'), 'Lütfen önce Chat ID girin');
       return;
     }
 
