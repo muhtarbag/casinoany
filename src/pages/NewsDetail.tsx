@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet-async";
 import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQueries";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
+import DOMPurify from 'dompurify';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -175,7 +176,12 @@ export default function NewsDetail() {
 
           <div
             className="prose prose-lg max-w-none mb-8"
-            dangerouslySetInnerHTML={{ __html: enrichedContent }}
+            dangerouslySetInnerHTML={{ 
+              __html: DOMPurify.sanitize(enrichedContent, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'img', 'div', 'span'],
+                ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'class', 'id', 'data-site-id', 'data-link-id']
+              })
+            }}
           />
 
           {article.tags && article.tags.length > 0 && (
