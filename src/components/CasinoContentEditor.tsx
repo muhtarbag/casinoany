@@ -116,7 +116,7 @@ export const CasinoContentEditor = ({
                   </Button>
                 </div>
                 {pros.map((pro, index) => (
-                  <div key={`pro-edit-${pro.slice(0, 15)}-${index}`} className="flex gap-2">
+                  <div key={`pro-${index}`} className="flex gap-2">
                     <Input
                       value={pro}
                       onChange={(e) => updatePro(index, e.target.value)}
@@ -138,7 +138,7 @@ export const CasinoContentEditor = ({
                   </Button>
                 </div>
                 {cons.map((con, index) => (
-                  <div key={`con-edit-${con.slice(0, 15)}-${index}`} className="flex gap-2">
+                  <div key={`con-${index}`} className="flex gap-2">
                     <Input
                       value={con}
                       onChange={(e) => updateCon(index, e.target.value)}
@@ -240,7 +240,7 @@ export const CasinoContentEditor = ({
                 Soru Ekle
               </Button>
               {faq.map((item, index) => (
-                <div key={`faq-edit-${item.question.slice(0, 15)}-${index}`} className="space-y-2 p-4 border rounded-lg">
+                <div key={`faq-${index}`} className="space-y-2 p-4 border rounded-lg">
                   <div className="flex justify-between items-start">
                     <Label>Soru {index + 1}</Label>
                     <Button type="button" size="icon" variant="ghost" onClick={() => removeFaq(index)}>
