@@ -14,11 +14,11 @@ export const Header = () => {
   return (
     <header className={cn(
       "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
-      "backdrop-blur-xl backdrop-saturate-150 sticky shadow-sm",
+      "backdrop-blur-xl backdrop-saturate-150 fixed w-full shadow-sm",
       "transition-all duration-500 ease-in-out",
-      isImpersonating ? "top-[52px]" : "top-0",
+      isImpersonating ? "top-[44px]" : "top-0",
       isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
-      "z-[60]"
+      "z-50"
     )}>
         <div className="container mx-auto px-4 py-4 md:py-5">
           <nav className="flex items-center justify-between">
