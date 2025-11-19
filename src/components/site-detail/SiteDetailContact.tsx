@@ -57,7 +57,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
           
           {site.telegram && (
             <a 
-              href={`https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
+              href={
+                site.telegram.startsWith('http') 
+                  ? site.telegram 
+                  : `https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`
+              }
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
