@@ -1,26 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, MessageSquare, ThumbsUp, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ComplaintStats } from '@/components/complaints/ComplaintStats';
+import { ComplaintFilters } from '@/components/complaints/ComplaintFilters';
+import { EnhancedComplaintCard } from '@/components/complaints/EnhancedComplaintCard';
+import { ComplaintAnalytics } from '@/components/complaints/ComplaintAnalytics';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const Complaints = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [siteFilter, setSiteFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
 
   const { data: complaints, isLoading } = useQuery({
-    queryKey: ['complaints', searchTerm, categoryFilter, statusFilter],
+    queryKey: ['complaints', searchTerm, categoryFilter, statusFilter, siteFilter, sortBy],
     queryFn: async () => {
       let query = supabase
         .from('site_complaints')
@@ -28,8 +29,7 @@ const Complaints = () => {
           *,
           betting_sites (name, slug, logo_url)
         `)
-        .eq('is_public', true)
-        .order('created_at', { ascending: false });
+        .eq('is_public', true);
 
       if (categoryFilter !== 'all') {
         query = query.eq('category', categoryFilter);
@@ -39,8 +39,27 @@ const Complaints = () => {
         query = query.eq('status', statusFilter);
       }
 
+      if (siteFilter !== 'all') {
+        query = query.eq('site_id', siteFilter);
+      }
+
       if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
+          break;
+        case 'most_responses':
+          query = query.order('response_count', { ascending: false });
+          break;
+        case 'most_helpful':
+          query = query.order('helpful_count', { ascending: false });
+          break;
+        default: // newest
+          query = query.order('created_at', { ascending: false });
       }
 
       const { data, error } = await query;
@@ -48,6 +67,30 @@ const Complaints = () => {
       return data;
     },
   });
+
+  // Realtime subscription for new complaints
+  useEffect(() => {
+    const channel = supabase
+      .channel('complaints-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_complaints',
+          filter: 'is_public=eq.true',
+        },
+        () => {
+          // Refetch when changes occur
+          window.location.reload();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const categoryLabels: Record<string, string> = {
     odeme: 'Ödeme',
