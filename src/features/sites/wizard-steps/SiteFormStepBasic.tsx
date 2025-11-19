@@ -125,7 +125,12 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
               label="Bonus"
               helpText="Sitenin sunduğu hoşgeldin bonusu"
             >
-              <Input placeholder="%100 Hoşgeldin Bonusu" maxLength={50} {...field} />
+              <div className="space-y-1">
+                <Input placeholder="%100 Hoşgeldin Bonusu" maxLength={50} {...field} />
+                <p className="text-xs text-muted-foreground text-right">
+                  {field.value?.length || 0}/50 karakter
+                </p>
+              </div>
             </FormFieldWrapper>
           )}
         />

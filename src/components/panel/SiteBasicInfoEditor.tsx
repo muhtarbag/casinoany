@@ -446,9 +446,14 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
               maxLength={50}
             />
             <FormFieldError error={state.errors.bonus} />
-            <p className="text-xs text-muted-foreground">
-              Kullanıcıları cezbedecek şekilde bonus bilgisini yazın
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">
+                Kullanıcıları cezbedecek şekilde bonus bilgisini yazın
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {state.bonus.length}/50 karakter
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
