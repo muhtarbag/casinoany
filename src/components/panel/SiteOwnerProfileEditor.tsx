@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Save, Facebook, Twitter, Instagram, Linkedin, Youtube, MessageCircle, Users } from 'lucide-react';
+import { Loader2, Save, Facebook, Twitter, Instagram, Linkedin, Youtube, MessageCircle, Users, Phone, Send, Circle } from 'lucide-react';
+import { SiDiscord, SiPinterest } from 'react-icons/si';
 
 const profileSchema = z.object({
   contact_teams: z.string().optional(),
@@ -151,7 +152,7 @@ export function SiteOwnerProfileEditor() {
 
           <div className="space-y-2">
             <Label htmlFor="contact_whatsapp">
-              <MessageCircle className="inline-block w-4 h-4 mr-2" />
+              <Phone className="inline-block w-4 h-4 mr-2" />
               WhatsApp
             </Label>
             <Input
@@ -233,7 +234,7 @@ export function SiteOwnerProfileEditor() {
 
           <div className="space-y-2">
             <Label htmlFor="social_telegram_channel">
-              <MessageCircle className="inline-block w-4 h-4 mr-2" />
+              <Send className="inline-block w-4 h-4 mr-2" />
               Telegram Kanalı
             </Label>
             <Input
@@ -244,7 +245,10 @@ export function SiteOwnerProfileEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="social_kick">Kick</Label>
+            <Label htmlFor="social_kick" className="flex items-center gap-2">
+              <Circle className="w-4 h-4 text-green-500" />
+              Kick
+            </Label>
             <Input
               id="social_kick"
               placeholder="https://kick.com/kullaniciadi"
@@ -253,7 +257,10 @@ export function SiteOwnerProfileEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="social_discord">Discord</Label>
+            <Label htmlFor="social_discord" className="flex items-center gap-2">
+              <SiDiscord className="w-4 h-4 text-[#5865F2]" />
+              Discord
+            </Label>
             <Input
               id="social_discord"
               placeholder="Discord sunucu davet linki"
@@ -262,7 +269,10 @@ export function SiteOwnerProfileEditor() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="social_pinterest">Pinterest</Label>
+            <Label htmlFor="social_pinterest" className="flex items-center gap-2">
+              <SiPinterest className="w-4 h-4 text-[#E60023]" />
+              Pinterest
+            </Label>
             <Input
               id="social_pinterest"
               placeholder="https://pinterest.com/kullaniciadi"

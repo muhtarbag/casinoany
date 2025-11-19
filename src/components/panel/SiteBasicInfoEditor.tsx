@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { X, Mail, MessageCircle, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { X, Mail, Phone, Send, Facebook, Twitter, Instagram, Youtube, Linkedin, Circle } from 'lucide-react';
+import { SiDiscord, SiPinterest } from 'react-icons/si';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { siteBasicInfoSchema, type SiteBasicInfoFormData } from '@/lib/validation/siteInfoSchema';
@@ -487,7 +488,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="relative">
-                <MessageCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="whatsapp"
                   value={state.whatsapp}
@@ -606,7 +607,10 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="kick">Kick</Label>
+              <Label htmlFor="kick" className="flex items-center gap-2">
+                <Circle className="w-4 h-4 text-green-500" />
+                Kick
+              </Label>
               <Input
                 id="kick"
                 value={state.kick}
@@ -617,7 +621,10 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="discord">Discord</Label>
+              <Label htmlFor="discord" className="flex items-center gap-2">
+                <SiDiscord className="w-4 h-4 text-[#5865F2]" />
+                Discord
+              </Label>
               <Input
                 id="discord"
                 value={state.discord}
@@ -628,7 +635,10 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pinterest">Pinterest</Label>
+              <Label htmlFor="pinterest" className="flex items-center gap-2">
+                <SiPinterest className="w-4 h-4 text-[#E60023]" />
+                Pinterest
+              </Label>
               <Input
                 id="pinterest"
                 value={state.pinterest}
