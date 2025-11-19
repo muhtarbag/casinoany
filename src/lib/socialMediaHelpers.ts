@@ -5,14 +5,15 @@
 export function normalizeWhatsAppUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   
-  // Zaten tam URL ise direkt kullan
+  // Zaten tam URL ise, + karakterini kaldırıp kullan
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    return value;
+    // URL'deki + karakterini kaldır (WhatsApp API bunu kabul etmiyor)
+    return value.replace(/\+/g, '');
   }
   
   // Telefon numarası ise wa.me formatına çevir
-  // + ile başlıyorsa veya sadece rakamlarsa
-  const cleanNumber = value.replace(/\s/g, ''); // boşlukları temizle
+  // + karakterini ve boşlukları temizle
+  const cleanNumber = value.replace(/[\s+]/g, '');
   return `https://wa.me/${cleanNumber}`;
 }
 
@@ -47,12 +48,13 @@ export function normalizeInstagramUrl(value: string | null | undefined): string 
   
   // Zaten tam URL ise direkt kullan
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    return value;
+    // www kullanımını kaldır
+    return value.replace('www.instagram.com', 'instagram.com');
   }
   
   // @ ile başlıyorsa kaldır
   const username = value.startsWith('@') ? value.substring(1) : value;
-  return `https://www.instagram.com/${username}`;
+  return `https://instagram.com/${username}`;
 }
 
 export function normalizeFacebookUrl(value: string | null | undefined): string | null {
@@ -71,14 +73,15 @@ export function normalizeYouTubeUrl(value: string | null | undefined): string | 
   
   // Zaten tam URL ise direkt kullan
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    return value;
+    // www.youtube.com yerine youtube.com kullan (bazı ağlarda www engelli olabilir)
+    return value.replace('www.youtube.com', 'youtube.com');
   }
   
   // @ ile başlıyorsa YouTube handle formatı
   if (value.startsWith('@')) {
-    return `https://www.youtube.com/${value}`;
+    return `https://youtube.com/${value}`;
   }
   
   // Kanal ID veya kullanıcı adı
-  return `https://www.youtube.com/${value}`;
+  return `https://youtube.com/${value}`;
 }
