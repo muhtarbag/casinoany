@@ -81,69 +81,26 @@ Deno.serve(async (req) => {
       'sitemap-images.xml',
     ];
 
-    const robotsTxt = `# CasinoAny - Dynamic Robots.txt
-# Güncelleme: ${new Date().toISOString().split('T')[0]}
-
+    const robotsTxt = `# CasinoAny Robots.txt
 User-agent: *
 Allow: /
 
-# Multi-sitemap index
+# Sitemaps
 ${sitemaps.map(s => `Sitemap: https://${domain}/${s}`).join('\n')}
 
-# Crawl rate optimization
-User-agent: Googlebot
-Crawl-delay: 1
-
-User-agent: Bingbot
-Crawl-delay: 2
-
-User-agent: YandexBot
-Crawl-delay: 3
-
-# Block SEO scrapers
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: BLEXBot
-Disallow: /
-
-# Sensitive paths
+# Admin areas
 Disallow: /admin/
-Disallow: /login
-Disallow: /signup
+Disallow: /panel/
+Disallow: /auth/
 Disallow: /api/
-
-# Clean tracking params (Yandex specific)
-User-agent: YandexBot
-Clean-param: utm_source&utm_medium&utm_campaign&fbclid&gclid
-
-# Allow all static assets for better indexing
-Allow: /*.css$
-Allow: /*.js$
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.gif$
-Allow: /*.svg$
-Allow: /*.webp$
-Allow: /assets/
-Allow: /public/
-Allow: /logos/
-Allow: /cdn/
-Allow: /images/
 `;
 
     return new Response(robotsTxt, {
+      status: 200,
       headers: {
         ...corsHeaders,
         'Cache-Control': 'public, max-age=3600',
-      },
+      }
     });
 
   } catch (error) {
