@@ -16,7 +16,7 @@ export const Header = () => {
       "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
       "backdrop-blur-xl backdrop-saturate-150 sticky shadow-sm",
       "transition-all duration-500 ease-in-out",
-      isImpersonating ? "top-[44px]" : "top-0",
+      isImpersonating ? "top-[52px]" : "top-0",
       isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
       "z-[60]"
     )}>
