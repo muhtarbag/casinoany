@@ -456,7 +456,6 @@ const Users = () => {
       // Sonuçları göster
       if (data.results && data.results.length > 0) {
         const successResults = data.results.filter((r: any) => r.success);
-        console.log('Oluşturulan kullanıcılar:', successResults);
         toast({
           title: 'Test Kullanıcıları Oluşturuldu',
           description: (

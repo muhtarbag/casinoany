@@ -20,8 +20,6 @@ const Favorites = () => {
     queryFn: async () => {
       if (!user) return [];
       
-      console.log('🔍 Fetching favorites for user:', user.id);
-      
       const { data, error } = await supabase
         .from('user_favorite_sites')
         .select(`
@@ -43,8 +41,6 @@ const Favorites = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       
-      console.log('📊 Favorites query result:', { data, error, count: data?.length });
-      
       if (error) {
         console.error('❌ Favorites query error:', error);
         throw error;
@@ -52,7 +48,6 @@ const Favorites = () => {
       
       // Filter out favorites where betting_sites is null (inactive sites)
       const validFavorites = data?.filter(fav => fav.betting_sites) || [];
-      console.log('✅ Valid favorites (with active sites):', validFavorites.length);
       
       return validFavorites;
     },
