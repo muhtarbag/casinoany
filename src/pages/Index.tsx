@@ -103,7 +103,7 @@ const Index = () => {
       <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
       
-      <main>
+      <main className="relative z-10 pt-16 md:pt-20">
         <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
         {/* Premium Sites Carousel - Top Tier (display_order 1-5) */}
