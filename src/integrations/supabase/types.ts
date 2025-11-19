@@ -1678,6 +1678,8 @@ export type Database = {
           social_twitter: string | null
           social_youtube: string | null
           support_email: string | null
+          telegram_chat_id: string | null
+          telegram_notifications_enabled: boolean | null
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"]
           username: string | null
@@ -1720,6 +1722,8 @@ export type Database = {
           social_twitter?: string | null
           social_youtube?: string | null
           support_email?: string | null
+          telegram_chat_id?: string | null
+          telegram_notifications_enabled?: boolean | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
@@ -1762,6 +1766,8 @@ export type Database = {
           social_twitter?: string | null
           social_youtube?: string | null
           support_email?: string | null
+          telegram_chat_id?: string | null
+          telegram_notifications_enabled?: boolean | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
           username?: string | null
@@ -2147,6 +2153,42 @@ export type Database = {
           trigger_type?: string | null
           updated_at?: string
           user_segments?: string[] | null
+        }
+        Relationships: []
+      }
+      site_owner_notification_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          notify_on_complaint: boolean | null
+          notify_on_review: boolean | null
+          notify_on_system_message: boolean | null
+          telegram_chat_id: string | null
+          telegram_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notify_on_complaint?: boolean | null
+          notify_on_review?: boolean | null
+          notify_on_system_message?: boolean | null
+          telegram_chat_id?: string | null
+          telegram_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notify_on_complaint?: boolean | null
+          notify_on_review?: boolean | null
+          notify_on_system_message?: boolean | null
+          telegram_chat_id?: string | null
+          telegram_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
