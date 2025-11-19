@@ -132,18 +132,19 @@ const Complaints = () => {
       />
       <Header />
       <div className="min-h-screen bg-gradient-dark">
-        <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Şikayetler</h1>
-            <p className="text-muted-foreground">
+        <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
+          <div className="flex-1">
+            <h1 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">Şikayetler</h1>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Bahis siteleri hakkındaki kullanıcı deneyimleri ve şikayetler
             </p>
           </div>
-          <Button asChild>
+          <Button asChild className="w-full sm:w-auto h-10 md:h-11" size="sm">
             <Link to="/sikayetler/yeni">
-              <Plus className="w-4 h-4 mr-2" />
-              Şikayet Et
+              <Plus className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Şikayet Et</span>
+              <span className="sm:hidden">Yeni Şikayet</span>
             </Link>
           </Button>
         </div>
@@ -183,17 +184,17 @@ const Complaints = () => {
         </Card>
 
         {isLoading ? (
-          <div className="grid gap-4">
+          <div className="grid gap-3 md:gap-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-24 bg-muted rounded" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="h-20 md:h-24 bg-muted rounded" />
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : complaints && complaints.length > 0 ? (
-          <div className="grid gap-4">
+          <div className="grid gap-3 md:gap-4">
             {complaints.map((complaint: any) => (
               <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
