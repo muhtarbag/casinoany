@@ -2062,6 +2062,7 @@ export type Database = {
           category: string
           created_at: string | null
           description: string
+          helpful_count: number | null
           id: string
           is_public: boolean | null
           resolved_at: string | null
@@ -2080,6 +2081,7 @@ export type Database = {
           category: string
           created_at?: string | null
           description: string
+          helpful_count?: number | null
           id?: string
           is_public?: boolean | null
           resolved_at?: string | null
@@ -2098,6 +2100,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           description?: string
+          helpful_count?: number | null
           id?: string
           is_public?: boolean | null
           resolved_at?: string | null
