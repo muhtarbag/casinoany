@@ -115,29 +115,34 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
 
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="border-b px-4 py-3">
-        <Link to={`/${siteData?.slug || ''}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          {siteData?.logo_url && !isCollapsed && (
-            <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
-              <img 
-                src={siteData.logo_url} 
-                alt={siteData.name}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
+      <SidebarHeader className="border-b">
+        <Link 
+          to={`/${siteData?.slug || ''}`} 
+          className={`flex items-center hover:opacity-80 transition-opacity ${
+            isCollapsed ? 'justify-center py-4' : 'gap-3 px-4 py-3'
+          }`}
+        >
           {isCollapsed ? (
-            <div className="flex items-center justify-center w-full">
-              <Home className="h-5 w-5 text-primary" />
-            </div>
+            <Home className="h-5 w-5 text-primary" />
           ) : (
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <p className="text-sm font-semibold truncate">{siteData?.name}</p>
+            <>
+              {siteData?.logo_url && (
+                <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
+                  <img 
+                    src={siteData.logo_url} 
+                    alt={siteData.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <p className="text-sm font-semibold truncate">{siteData?.name}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Site Detayına Git</p>
               </div>
-              <p className="text-xs text-muted-foreground">Site Detayına Git</p>
-            </div>
+            </>
           )}
         </Link>
       </SidebarHeader>
