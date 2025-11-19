@@ -6,16 +6,25 @@ import { Menu, Home, Info, FileText, Shield, LogOut, Gift, Folder, AlertTriangle
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/casinodoo-logo.svg';
 
-export const MobileMenu = () => {
+interface MobileMenuProps {
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const MobileMenu = ({ onOpenChange }: MobileMenuProps) => {
   const [open, setOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    onOpenChange?.(newOpen);
+  };
+
   const handleNavClick = () => {
-    setOpen(false);
+    handleOpenChange(false);
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button 
           variant="ghost" 
