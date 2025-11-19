@@ -16,9 +16,6 @@
   RewriteRule ^sitemap-static\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static [P,L]
   RewriteRule ^sitemap-complaints\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints [P,L]
   RewriteRule ^sitemap-images\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images [P,L]
-  
-  # Robots.txt proxy (if needed)
-  RewriteRule ^robots\.txt$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/robots [P,L]
 </IfModule>
 
 # Enable compression
