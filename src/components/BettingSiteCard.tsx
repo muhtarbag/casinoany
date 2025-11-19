@@ -167,29 +167,41 @@ const BettingSiteCardComponent = ({
     window.open(affiliateUrl, '_blank');
   }, [trackClickMutation, affiliateUrl]);
 
-  const socialLinks = useMemo(() => [
-    { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1', platform: 'email' },
-    { 
-      url: whatsapp, 
-      icon: FaWhatsapp, 
-      label: 'WhatsApp', 
-      href: normalizeWhatsAppUrl(whatsapp) || '', 
-      color: '#25D366', 
-      platform: 'whatsapp' 
-    },
-    { 
-      url: telegram, 
-      icon: FaTelegramPlane, 
-      label: 'Telegram', 
-      href: normalizeTelegramUrl(telegram) || '', 
-      color: '#0088cc', 
-      platform: 'telegram' 
-    },
-    { url: twitter, icon: FaTwitter, label: 'Twitter', href: normalizeTwitterUrl(twitter) || '', color: '#1DA1F2', platform: 'twitter' },
-    { url: instagram, icon: FaInstagram, label: 'Instagram', href: normalizeInstagramUrl(instagram) || '', color: '#E4405F', platform: 'instagram' },
-    { url: facebook, icon: FaFacebook, label: 'Facebook', href: normalizeFacebookUrl(facebook) || '', color: '#1877F2', platform: 'facebook' },
-    { url: youtube, icon: FaYoutube, label: 'YouTube', href: normalizeYouTubeUrl(youtube) || '', color: '#FF0000', platform: 'youtube' },
-  ].filter(link => link.url), [email, whatsapp, telegram, twitter, instagram, facebook, youtube]);
+  const socialLinks = useMemo(() => {
+    const links = [
+      { url: email, icon: Mail, label: 'Email', href: `mailto:${email}`, color: '#6366f1', platform: 'email' },
+      { 
+        url: whatsapp, 
+        icon: FaWhatsapp, 
+        label: 'WhatsApp', 
+        href: normalizeWhatsAppUrl(whatsapp) || '', 
+        color: '#25D366', 
+        platform: 'whatsapp' 
+      },
+      { 
+        url: telegram, 
+        icon: FaTelegramPlane, 
+        label: 'Telegram', 
+        href: normalizeTelegramUrl(telegram) || '', 
+        color: '#0088cc', 
+        platform: 'telegram' 
+      },
+      { url: twitter, icon: FaTwitter, label: 'Twitter', href: normalizeTwitterUrl(twitter) || '', color: '#1DA1F2', platform: 'twitter' },
+      { url: instagram, icon: FaInstagram, label: 'Instagram', href: normalizeInstagramUrl(instagram) || '', color: '#E4405F', platform: 'instagram' },
+      { url: facebook, icon: FaFacebook, label: 'Facebook', href: normalizeFacebookUrl(facebook) || '', color: '#1877F2', platform: 'facebook' },
+      { url: youtube, icon: FaYoutube, label: 'YouTube', href: normalizeYouTubeUrl(youtube) || '', color: '#FF0000', platform: 'youtube' },
+    ].filter(link => link.url);
+    
+    // Debug: Log all social links
+    console.log('🔗 Social Links for', name, ':', {
+      whatsapp: { raw: whatsapp, normalized: normalizeWhatsAppUrl(whatsapp) },
+      instagram: { raw: instagram, normalized: normalizeInstagramUrl(instagram) },
+      youtube: { raw: youtube, normalized: normalizeYouTubeUrl(youtube) },
+      telegram: { raw: telegram, normalized: normalizeTelegramUrl(telegram) }
+    });
+    
+    return links;
+  }, [email, whatsapp, telegram, twitter, instagram, facebook, youtube, name]);
 
   return (
     <Card 
