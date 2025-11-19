@@ -155,7 +155,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
+        .select('id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('rating', { ascending: false })
@@ -269,7 +269,8 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                           className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-opacity duration-300"
                         >
                           <BettingSiteCard 
-                            id={site.id} 
+                            id={site.id}
+                            slug={site.slug}
                             name={site.name} 
                             logo={site.logo_url || undefined} 
                             rating={Number(site.rating) || 0} 
