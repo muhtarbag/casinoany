@@ -1,21 +1,25 @@
 # robots.txt for CasinoAny - Turkish Betting Sites Comparison Platform
-# Last Updated: 2025-11-16
+# Last Updated: 2025-01-19
+# Auto-optimized for Google, Bing, Yandex crawlers
 
 # =============================================================================
 # PREFERRED DOMAIN
 # =============================================================================
-Host: https://casinoany.com
+Host: https://www.casinoany.com
 
 # =============================================================================
-# GENERAL CRAWLERS - Allow all content
+# GENERAL CRAWLERS - Full Access
 # =============================================================================
 User-agent: *
 Allow: /
 
 # =============================================================================
-# SITEMAP LOCATIONS - Edge Functions
+# SITEMAP INDEX - Optimized Structure
 # =============================================================================
+# Main sitemap index
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap
+
+# Individual sitemaps for better indexing
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs
@@ -26,93 +30,104 @@ Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaint
 Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images
 
 # =============================================================================
-# CRAWL RATE OPTIMIZATION
+# CRAWL RATE OPTIMIZATION - Search Engine Specific
 # =============================================================================
-# Google crawler-specific settings
+# Google - Maximum speed, smart crawling
 User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Googlebot-Mobile
 Crawl-delay: 0
-# No restrictions for Google - they have smart crawling
+Allow: /
 
-# Bing crawler settings
+# Bing - Optimized for performance
 User-agent: Bingbot
+User-agent: BingPreview
 Crawl-delay: 1
-# Slightly slower for Bing to avoid overload
+Allow: /
 
-# Yandex crawler settings (popular in Turkey/Russia)
+# Yandex - Popular in Turkey and CIS
 User-agent: YandexBot
+User-agent: YandexImages
 Crawl-delay: 2
+Allow: /
 
-# General crawlers - moderate rate
+# Yahoo/DuckDuckGo
 User-agent: Slurp
 Crawl-delay: 2
+Allow: /
 
 # =============================================================================
-# BLOCK BAD BOTS & SCRAPERS
+# BLOCK UNWANTED BOTS - SEO Tools & AI Scrapers
 # =============================================================================
+# SEO crawler tools (use our API instead)
 User-agent: AhrefsBot
-Disallow: /
-
 User-agent: SemrushBot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
 User-agent: MJ12bot
-Disallow: /
-
+User-agent: DotBot
 User-agent: BLEXBot
-Disallow: /
-
 User-agent: DataForSeoBot
-Disallow: /
-
 User-agent: PetalBot
 Disallow: /
 
+# AI scraping bots
 User-agent: GPTBot
-Disallow: /
-
 User-agent: ChatGPT-User
-Disallow: /
-
 User-agent: CCBot
-Disallow: /
-
 User-agent: anthropic-ai
-Disallow: /
-
 User-agent: Claude-Web
+User-agent: cohere-ai
+User-agent: Omgilibot
+User-agent: FacebookBot
+Disallow: /
+
+# Aggressive scrapers
+User-agent: SurveyBot
+User-agent: Screaming Frog
+User-agent: Barkrowler
+User-agent: voltron
 Disallow: /
 
 # =============================================================================
-# DISALLOW SPECIFIC PATHS
+# DISALLOW SENSITIVE & DUPLICATE CONTENT
 # =============================================================================
-# Admin and authentication pages
-Disallow: /admin
+# Authentication & Admin
+Disallow: /admin/
 Disallow: /login
 Disallow: /signup
-Disallow: /auth
+Disallow: /giris
+Disallow: /kayit
+Disallow: /auth/
+Disallow: /panel/
+Disallow: /profil/
 
-# API endpoints (if exposed)
+# API endpoints
 Disallow: /api/
 Disallow: /_next/
+Disallow: /_supabase/
 
-# Filter/sort parameter pages (avoid duplicate content)
+# Prevent duplicate content from URL parameters
 Disallow: /*?sort=*
 Disallow: /*?filter=*
 Disallow: /*?page=*
 Disallow: /*?ref=*
 Disallow: /*?utm_*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+Disallow: /*?search=*
 
-# Redirect pages
+# Redirect & tracking pages
 Disallow: /redirect
 Disallow: /r/
+Disallow: /track/
+
+# User-specific pages
+Disallow: /favorites
+Disallow: /settings
 
 # =============================================================================
-# ALLOW IMPORTANT RESOURCES
+# ALLOW CRITICAL RESOURCES - For Proper Rendering
 # =============================================================================
-# Allow CSS, JS, images for proper page rendering
+# Allow all bots to access static assets
 User-agent: *
 Allow: /*.css$
 Allow: /*.js$
@@ -122,12 +137,34 @@ Allow: /*.png$
 Allow: /*.gif$
 Allow: /*.webp$
 Allow: /*.svg$
+Allow: /*.ico$
+Allow: /*.woff$
+Allow: /*.woff2$
+Allow: /*.ttf$
 Allow: /assets/
 Allow: /public/
 Allow: /logos/
+Allow: /images/
+Allow: /fonts/
+
+# Allow important SEO pages
+Allow: /sitemap.xml
+Allow: /sitemap-*.xml
+Allow: /manifest.json
+Allow: /.well-known/
 
 # =============================================================================
-# YANDEX SPECIFIC
+# YANDEX SPECIFIC OPTIMIZATIONS
 # =============================================================================
-# Clean tracking parameters
-Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&ref&gclid&fbclid
+User-agent: YandexBot
+# Clean tracking parameters for better indexing
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&ref&gclid&fbclid&yclid
+
+# =============================================================================
+# ADDITIONAL SEO HINTS
+# =============================================================================
+# Request limit - prevent aggressive crawling
+Request-rate: 1/1
+
+# Visit time - prefer daytime crawling (Turkish time)
+Visit-time: 0800-2200
