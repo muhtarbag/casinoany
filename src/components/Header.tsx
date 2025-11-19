@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,13 +9,14 @@ import { cn } from '@/lib/utils';
 
 export const Header = () => {
   const { user, isAdmin, isSiteOwner, signOut, isImpersonating } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <header className={cn(
       "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
       "backdrop-blur-xl backdrop-saturate-150 sticky z-[60] shadow-sm",
-      "transition-all duration-300",
-      isImpersonating ? "top-[41px]" : "top-0"
+      "transition-all duration-500 ease-in-out",
+      isImpersonating ? (isMobileMenuOpen ? "-top-full" : "top-[41px]") : (isMobileMenuOpen ? "-top-full" : "top-0")
     )}>
         <div className="container mx-auto px-4 py-4 md:py-5">
           <nav className="flex items-center justify-between">
@@ -153,7 +155,7 @@ export const Header = () => {
           </div>
 
           {/* Mobile Menu */}
-          <MobileMenu />
+          <MobileMenu onOpenChange={setIsMobileMenuOpen} />
         </nav>
       </div>
     </header>
