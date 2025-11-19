@@ -2871,6 +2871,86 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_reads: {
+        Row: {
+          id: string
+          notification_id: string
+          read_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_id: string
+          read_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_id?: string
+          read_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "user_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_notifications: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          message: string
+          notification_type: string
+          priority: string
+          target_audience: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          message: string
+          notification_type?: string
+          priority?: string
+          target_audience?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          notification_type?: string
+          priority?: string
+          target_audience?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_role_cache: {
         Row: {
           cached_at: string
@@ -3156,6 +3236,10 @@ export type Database = {
           target_page: string
         }[]
       }
+      get_unread_notification_count: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       get_user_role_status: {
         Args: { p_user_id: string }
         Returns: {
@@ -3227,6 +3311,10 @@ export type Database = {
           p_user_id?: string
         }
         Returns: string
+      }
+      mark_notification_as_read: {
+        Args: { p_notification_id: string; p_user_id: string }
+        Returns: undefined
       }
       refresh_all_materialized_views: { Args: never; Returns: undefined }
       refresh_daily_site_metrics: { Args: never; Returns: undefined }
