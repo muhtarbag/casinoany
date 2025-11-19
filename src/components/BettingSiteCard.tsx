@@ -192,14 +192,6 @@ const BettingSiteCardComponent = ({
       { url: youtube, icon: FaYoutube, label: 'YouTube', href: normalizeYouTubeUrl(youtube) || '', color: '#FF0000', platform: 'youtube' },
     ].filter(link => link.url);
     
-    // Debug: Log all social links
-    console.log('🔗 Social Links for', name, ':', {
-      whatsapp: { raw: whatsapp, normalized: normalizeWhatsAppUrl(whatsapp) },
-      instagram: { raw: instagram, normalized: normalizeInstagramUrl(instagram) },
-      youtube: { raw: youtube, normalized: normalizeYouTubeUrl(youtube) },
-      telegram: { raw: telegram, normalized: normalizeTelegramUrl(telegram) }
-    });
-    
     return links;
   }, [email, whatsapp, telegram, twitter, instagram, facebook, youtube, name]);
 
