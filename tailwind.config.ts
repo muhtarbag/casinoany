@@ -135,24 +135,6 @@ export default {
             transform: "translateX(100%)",
           },
         },
-        "pulse-slow": {
-          "0%, 100%": {
-            opacity: "1",
-          },
-          "50%": {
-            opacity: "0.7",
-          },
-        },
-        "ripple": {
-          "0%": {
-            transform: "scale(0)",
-            opacity: "0.5",
-          },
-          "100%": {
-            transform: "scale(4)",
-            opacity: "0",
-          },
-        },
         "glow": {
           "0%, 100%": {
             opacity: "0.6",
@@ -176,8 +158,6 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "shimmer": "shimmer 3s ease-in-out infinite",
-        "pulse-slow": "pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "ripple": "ripple 0.6s ease-out",
         "glow": "glow 3s ease-in-out infinite",
         "fade-in": "fade-in 0.3s ease-out",
       },
