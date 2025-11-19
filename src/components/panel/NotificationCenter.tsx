@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TelegramSettings } from './TelegramSettings';
 
 interface NotificationCenterProps {
   siteId: string;
@@ -221,6 +222,9 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Telegram Settings */}
+      <TelegramSettings />
 
       {/* Notifications List */}
       <Card>
