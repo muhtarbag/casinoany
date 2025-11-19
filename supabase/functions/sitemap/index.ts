@@ -30,6 +30,7 @@ Deno.serve(async (req) => {
       'sitemap-bonuses.xml',
       'sitemap-news.xml',
       'sitemap-static.xml',
+      'sitemap-complaints.xml',
       'sitemap-images.xml',
     ];
 

@@ -13,12 +13,17 @@ User-agent: *
 Allow: /
 
 # =============================================================================
-# SITEMAP LOCATIONS
+# SITEMAP LOCATIONS - Edge Functions
 # =============================================================================
-Sitemap: https://casinoany.com/sitemap.xml
-Sitemap: https://www.casinoany.com/sitemap.xml
-Sitemap: https://casinoany.com/image-sitemap.xml
-Sitemap: https://www.casinoany.com/image-sitemap.xml
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-news
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images
 
 # =============================================================================
 # CRAWL RATE OPTIMIZATION
