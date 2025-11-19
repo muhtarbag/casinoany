@@ -60,7 +60,24 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
   }, [sites, searchTerm]);
 
   if (isLoading) {
-    return <LoadingSpinner size="lg" text="Siteler yükleniyor..." fullScreen={false} className="py-20" />;
+    return (
+      <div className="py-20 space-y-8 animate-fade-in">
+        <div className="container mx-auto px-4">
+          {/* Clean loading skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-xl border border-border/40 bg-card/50 p-6 space-y-4">
+                <div className="w-24 h-24 bg-muted/20 rounded-lg mx-auto animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-6 bg-muted/20 rounded animate-pulse" />
+                  <div className="h-4 bg-muted/20 rounded w-3/4 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!filteredSites || filteredSites.length === 0) {

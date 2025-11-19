@@ -107,12 +107,30 @@ import DenemeBonusu from "./pages/DenemeBonusuDynamic";
 // PWA Install page - imported directly
 import Install from "./pages/Install";
 
-// Loading fallback component
+// Loading fallback component - Clean and minimal
 const PageLoader = () => (
-  <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
-    <div className="container mx-auto px-4 space-y-4">
-      <Skeleton className="h-16 w-full max-w-2xl mx-auto" />
-      <Skeleton className="h-96 w-full max-w-4xl mx-auto" />
+  <div className="min-h-screen bg-gradient-to-b from-background via-muted/10 to-background flex items-center justify-center">
+    <div className="container mx-auto px-4 space-y-8 animate-fade-in">
+      {/* Header skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-12 w-48 mx-auto bg-muted/20" />
+        <Skeleton className="h-6 w-64 mx-auto bg-muted/20" />
+      </div>
+      
+      {/* Content skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-64 w-full bg-muted/20" />
+        ))}
+      </div>
+      
+      {/* Loading indicator */}
+      <div className="text-center">
+        <div className="inline-flex items-center gap-2 text-muted-foreground">
+          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <span className="text-sm">Yükleniyor...</span>
+        </div>
+      </div>
     </div>
   </div>
 );
