@@ -5,7 +5,7 @@ import { createSocialUrlSchema, safeTextSchema } from './common';
 const socialUrlSchema = (platform: string, domain: string) => createSocialUrlSchema(platform, domain);
 
 export const siteBasicInfoSchema = z.object({
-  bonus: safeTextSchema(1, 500, 'Bonus bilgisi'),
+  bonus: safeTextSchema(1, 50, 'Bonus bilgisi'),
   
   features: z.array(
     safeTextSchema(1, 100, 'Özellik')

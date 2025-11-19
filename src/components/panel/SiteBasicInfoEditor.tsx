@@ -443,7 +443,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
               value={state.bonus}
               onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'bonus', value: e.target.value })}
               placeholder="Örn: %100 Hoş Geldin Bonusu + 100 Free Spin"
-              maxLength={500}
+              maxLength={50}
             />
             <FormFieldError error={state.errors.bonus} />
             <p className="text-xs text-muted-foreground">
