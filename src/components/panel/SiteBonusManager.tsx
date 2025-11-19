@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,6 +78,31 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
     },
     enabled: !!siteId,
   });
+
+  // ✅ Real-time updates for bonus changes
+  useEffect(() => {
+    if (!siteId) return;
+
+    const channel = supabase
+      .channel('bonus-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bonus_offers',
+          filter: `site_id=eq.${siteId}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['site-bonuses', siteId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [siteId, queryClient]);
 
   // Create/Update mutation
   const saveMutation = useMutation({

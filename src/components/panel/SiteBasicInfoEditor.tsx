@@ -56,6 +56,55 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
     }
   }, [siteData]);
 
+  // ✅ Real-time updates for basic info changes
+  useEffect(() => {
+    if (!siteId) return;
+
+    const channel = supabase
+      .channel('site-basic-info-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'betting_sites',
+          filter: `id=eq.${siteId}`
+        },
+        (payload) => {
+          const newData = payload.new as any;
+          if (newData) {
+            const data = {
+              bonus: newData.bonus || '',
+              features: newData.features || [],
+              email: newData.email || '',
+              whatsapp: newData.whatsapp || '',
+              telegram: newData.telegram || '',
+              twitter: newData.twitter || '',
+              instagram: newData.instagram || '',
+              facebook: newData.facebook || '',
+              youtube: newData.youtube || ''
+            };
+            
+            dispatch({
+              type: 'SET_INITIAL_DATA',
+              data,
+              logoUrl: newData.logo_url || ''
+            });
+            
+            toast({
+              title: "Bilgiler Güncellendi",
+              description: "Site bilgileri real-time olarak güncellendi.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [siteId, toast]);
+
   // Check if form is dirty
   const isDirty = useMemo(() => isStateDirty(state), [state]);
 
