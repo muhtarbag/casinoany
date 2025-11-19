@@ -135,6 +135,7 @@ const Favorites = () => {
                         src={fav.betting_sites.logo_url}
                         alt={fav.betting_sites.name}
                         className="w-16 h-16 object-contain rounded"
+                        loading="lazy"
                       />
                     )}
                     <div className="flex-1 min-w-0">

@@ -216,6 +216,7 @@ const Memberships = () => {
                                 src={site.logo_url} 
                                 alt={site.name}
                                 className="w-5 h-5 object-contain"
+                                loading="lazy"
                               />
                             )}
                             <span>{site.name}</span>
@@ -291,6 +292,7 @@ const Memberships = () => {
                         src={membership.betting_sites.logo_url}
                         alt={membership.betting_sites.name}
                         className="w-32 h-32 sm:w-36 sm:h-36 object-contain rounded mx-auto sm:mx-0"
+                        loading="lazy"
                       />
                     )}
                     <div className="flex-1 w-full">
