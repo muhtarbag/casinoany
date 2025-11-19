@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -11,8 +12,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const handleSearch = (term: string) => {
-    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setSearchTerm(term);
+    // Scroll to results after state update
+    setTimeout(() => {
+      document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   // Fetch featured sites for ItemList schema
@@ -96,10 +103,10 @@ const Index = () => {
       <Header />
       
       <main>
-        <Hero onSearch={handleSearch} searchTerm="" />
+        <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
         <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-          <PixelGrid />
+          <PixelGrid searchTerm={searchTerm} />
         </div>
 
         {/* Featured Casino Reviews Section */}
@@ -113,8 +120,8 @@ const Index = () => {
               Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
             </p>
           </div>
-          
-          <FeaturedSitesSection />
+        
+        <FeaturedSitesSection searchTerm={searchTerm} />
 
           {/* Bonus CTA */}
           <div className="text-center mt-8">

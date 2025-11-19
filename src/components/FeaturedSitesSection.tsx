@@ -3,8 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from './LoadingSpinner';
 import { OptimizedImage } from '@/components/OptimizedImage';
+import { useMemo } from 'react';
 
-export const FeaturedSitesSection = () => {
+interface FeaturedSitesSectionProps {
+  searchTerm?: string;
+}
+
+export const FeaturedSitesSection = ({ searchTerm = '' }: FeaturedSitesSectionProps) => {
   const { data: featuredSites, isLoading } = useQuery({
     queryKey: ['featured-sites-for-homepage'],
     queryFn: async () => {
@@ -21,6 +26,19 @@ export const FeaturedSitesSection = () => {
     },
   });
 
+  // Filter sites based on search term
+  const filteredSites = useMemo(() => {
+    if (!featuredSites || !searchTerm.trim()) {
+      return featuredSites || [];
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return featuredSites.filter(site =>
+      site.name.toLowerCase().includes(searchLower) ||
+      site.bonus?.toLowerCase().includes(searchLower)
+    );
+  }, [featuredSites, searchTerm]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -29,16 +47,25 @@ export const FeaturedSitesSection = () => {
     );
   }
 
-  if (!featuredSites || featuredSites.length === 0) {
+  if (!filteredSites || filteredSites.length === 0) {
+    if (searchTerm.trim()) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg">
+            "{searchTerm}" için sonuç bulunamadı.
+          </p>
+        </div>
+      );
+    }
     return null;
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      {featuredSites.map((site) => (
+      {filteredSites.map((site) => (
         <Link 
           key={site.slug}
-          to={`/site/${site.slug}`}
+          to={`/${site.slug}`}
           className="group bg-card border border-border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
         >
           <div className="flex items-center gap-4 mb-4">

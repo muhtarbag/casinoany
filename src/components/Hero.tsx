@@ -19,6 +19,11 @@ interface HeroProps {
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState(searchTerm);
+  
+  // Sync local search with prop changes
+  useEffect(() => {
+    setLocalSearch(searchTerm);
+  }, [searchTerm]);
   const [animationType, setAnimationType] = useState<string>('slide');
   const [autoScrollDuration, setAutoScrollDuration] = useState<number>(2500);
   const [isDragging, setIsDragging] = useState(false);
