@@ -176,17 +176,20 @@ const Signup = () => {
         metadata.interests = interests.join(',');
         metadata.favoriteGameProviders = favoriteGameProviders.join(',');
       } else {
+        // Kurumsal üyelik metadata - handle_new_user ile uyumlu field isimleri
         metadata.companyName = companyName;
         metadata.companyDescription = description;
         metadata.companyWebsite = companyWebsite;
         metadata.contactPersonName = contactName;
-        metadata.siteEmail = siteEmail;
-        metadata.siteTelegram = siteTelegram;
-        metadata.siteWhatsapp = siteWhatsapp;
-        metadata.siteFacebook = siteFacebook;
-        metadata.siteTwitter = siteTwitter;
-        metadata.siteInstagram = siteInstagram;
-        metadata.siteYoutube = siteYoutube;
+        // İletişim bilgileri - doğru field isimleri
+        metadata.supportEmail = siteEmail; // profiles.support_email
+        metadata.contactTelegram = siteTelegram;
+        metadata.contactWhatsapp = siteWhatsapp;
+        // Sosyal medya - doğru field isimleri
+        metadata.socialFacebook = siteFacebook;
+        metadata.socialTwitter = siteTwitter;
+        metadata.socialInstagram = siteInstagram;
+        metadata.socialYoutube = siteYoutube;
       }
 
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -206,13 +209,15 @@ const Signup = () => {
           description: description,
           logo_url: logoUrl,
           contact_person_name: contactName,
-          site_email: siteEmail,
-          site_telegram: siteTelegram,
-          site_whatsapp: siteWhatsapp,
-          site_facebook: siteFacebook,
-          site_twitter: siteTwitter,
-          site_instagram: siteInstagram,
-          site_youtube: siteYoutube,
+          // Site_owners tablosundaki doğru kolon isimleri
+          contact_email: siteEmail,
+          contact_telegram: siteTelegram,
+          contact_whatsapp: siteWhatsapp,
+          social_facebook: siteFacebook,
+          social_twitter: siteTwitter,
+          social_instagram: siteInstagram,
+          social_youtube: siteYoutube,
+          support_email: siteEmail, // Profiles ile tutarlılık için
           status: 'pending'
         };
 
