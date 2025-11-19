@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { X, Mail, MessageCircle, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { X, Mail, Phone, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { SiDiscord, SiPinterest, SiKick } from 'react-icons/si';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { siteBasicInfoSchema, type SiteBasicInfoFormData } from '@/lib/validation/siteInfoSchema';
@@ -487,7 +488,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="relative">
-                <MessageCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="whatsapp"
                   value={state.whatsapp}
@@ -607,34 +608,46 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
 
             <div className="space-y-2">
               <Label htmlFor="kick">Kick</Label>
-              <Input
-                id="kick"
-                value={state.kick}
-                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'kick', value: e.target.value })}
-                placeholder="https://kick.com/channel"
-              />
+              <div className="relative">
+                <SiKick className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="kick"
+                  value={state.kick}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'kick', value: e.target.value })}
+                  placeholder="https://kick.com/channel"
+                  className="pl-10"
+                />
+              </div>
               <FormFieldError error={state.errors.kick} />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="discord">Discord</Label>
-              <Input
-                id="discord"
-                value={state.discord}
-                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'discord', value: e.target.value })}
-                placeholder="Discord sunucu davet linki"
-              />
+              <div className="relative">
+                <SiDiscord className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="discord"
+                  value={state.discord}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'discord', value: e.target.value })}
+                  placeholder="Discord sunucu davet linki"
+                  className="pl-10"
+                />
+              </div>
               <FormFieldError error={state.errors.discord} />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="pinterest">Pinterest</Label>
-              <Input
-                id="pinterest"
-                value={state.pinterest}
-                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'pinterest', value: e.target.value })}
-                placeholder="https://pinterest.com/..."
-              />
+              <div className="relative">
+                <SiPinterest className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="pinterest"
+                  value={state.pinterest}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'pinterest', value: e.target.value })}
+                  placeholder="https://pinterest.com/..."
+                  className="pl-10"
+                />
+              </div>
               <FormFieldError error={state.errors.pinterest} />
             </div>
           </div>
