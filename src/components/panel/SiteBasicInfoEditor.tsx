@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useMemo, useCallback } from 'react';
+import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,8 @@ interface SiteBasicInfoEditorProps {
 export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef(true);
   
   // Reducer-based state management
   const [state, dispatch] = useReducer(siteBasicInfoReducer, createInitialState());
@@ -264,8 +266,8 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       dispatch({ type: 'SET_LAST_SAVED', date: new Date() });
       
       toast({
-        title: 'Başarılı',
-        description: 'Site bilgileri kaydedildi',
+        title: '✓ Otomatik Kaydedildi',
+        description: 'Değişiklikler siteye yansıtıldı',
       });
     },
     onError: (error: any) => {
@@ -284,6 +286,34 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       }
     },
   });
+
+  // Auto-save effect - saves 2 seconds after last change
+  useEffect(() => {
+    // Skip auto-save on initial load
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Only auto-save if there are changes and no validation errors
+    if (isDirty && Object.keys(state.errors).length === 0) {
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        saveMutation.mutate();
+      }, 2000); // 2 seconds debounce
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube, state.linkedin, state.telegram_channel, state.kick, state.discord, state.pinterest, isDirty, state.errors]);
 
   const handleSave = useCallback(() => {
     saveMutation.mutate();
@@ -668,6 +698,16 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         onCancel={handleCancel}
         variant="fixed"
       />
+      
+      {/* Auto-save indicator */}
+      {isDirty && !saveMutation.isPending && Object.keys(state.errors).length === 0 && (
+        <div className="fixed bottom-20 right-8 z-50 animate-in fade-in slide-in-from-bottom-2">
+          <Badge variant="secondary" className="gap-2 shadow-lg">
+            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+            2 saniye içinde otomatik kaydedilecek...
+          </Badge>
+        </div>
+      )}
     </div>
   );
 };
