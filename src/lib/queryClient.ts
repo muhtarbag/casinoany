@@ -191,23 +191,59 @@ export const createAppQueryClient = () => {
         // ✅ FIX: Enable structural sharing to prevent unnecessary re-renders
         structuralSharing: true,
         
-        // Retry stratejisi
+        // Retry stratejisi (geliştirilmiş)
         retry: (failureCount, error: any) => {
           // 404 hatalarında retry yapma
           if (error?.status === 404) return false;
           // 401, 403 gibi auth hatalarında retry yapma
           if (error?.status === 401 || error?.status === 403) return false;
-          // Diğer hatalar için max 2 retry
-          return failureCount < 2;
+          // 4xx client errors'da retry yapma
+          if (error?.status >= 400 && error?.status < 500) return false;
+          // 5xx server errors ve network issues için max 3 retry
+          return failureCount < 3;
         },
         
-        // Retry delay (exponential backoff)
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        // Retry delay (exponential backoff with 429 handling)
+        retryDelay: (attemptIndex, error: any) => {
+          // Rate limit için Retry-After header'ı kullan
+          if (error?.status === 429) {
+            const retryAfter = error?.headers?.get?.('Retry-After');
+            if (retryAfter) {
+              return parseInt(retryAfter) * 1000;
+            }
+          }
+          // Exponential backoff: 1s, 2s, 4s, max 30s
+          return Math.min(1000 * 2 ** attemptIndex, 30000);
+        },
       },
       
       mutations: {
-        // ✅ FIX: Critical mutations should retry once
-        retry: 1,
+        // Gelişmiş retry stratejisi
+        retry: (failureCount, error: any) => {
+          // 429 Rate Limit - 2 retry
+          if (error?.status === 429) {
+            return failureCount < 2;
+          }
+          // 4xx client errors - retry yapma
+          if (error?.status >= 400 && error?.status < 500) {
+            return false;
+          }
+          // 5xx server errors - 1 retry
+          return failureCount < 1;
+        },
+        
+        // Retry delay with 429 handling
+        retryDelay: (attemptIndex, error: any) => {
+          // Rate limit için Retry-After header'ı kullan
+          if (error?.status === 429) {
+            const retryAfter = error?.headers?.get?.('Retry-After');
+            if (retryAfter) {
+              return parseInt(retryAfter) * 1000;
+            }
+          }
+          // Exponential backoff
+          return Math.min(1000 * 2 ** attemptIndex, 30000);
+        },
         
         // Network mode
         networkMode: 'online',
