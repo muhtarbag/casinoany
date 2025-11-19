@@ -34,7 +34,9 @@ export function SiteFormWrapper({
   const editingSite = sites.find((s) => s.id === editingId);
   const updateCategoriesMutation = useUpdateSiteCategories();
   const [isFormReady, setIsFormReady] = useState(false);
-  const lastSuccessTimestampRef = useRef<number>(0);
+  
+  // Track previous success state to detect new successful mutations
+  const prevIsSuccessRef = useRef(false);
 
   const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
@@ -132,18 +134,20 @@ export function SiteFormWrapper({
     loadSiteData();
   }, [editingSite, form, onLogoFileChange, onLogoPreviewChange]);
 
+  // Reset form and logo states only when mutation just succeeded (transition from false to true)
   useEffect(() => {
-    const currentTimestamp = Date.now();
-    const isNewSuccess = (createSiteMutation.isSuccess || updateSiteMutation.isSuccess) && 
-                         currentTimestamp > lastSuccessTimestampRef.current;
+    const isCurrentlySuccess = createSiteMutation.isSuccess || updateSiteMutation.isSuccess;
+    const justSucceeded = isCurrentlySuccess && !prevIsSuccessRef.current;
     
-    if (isNewSuccess) {
-      lastSuccessTimestampRef.current = currentTimestamp;
+    if (justSucceeded) {
       form.reset();
       onLogoFileChange(null);
       onLogoPreviewChange(null);
       onEditingIdChange(null);
     }
+    
+    // Update ref to track state for next render
+    prevIsSuccessRef.current = isCurrentlySuccess;
   }, [createSiteMutation.isSuccess, updateSiteMutation.isSuccess, form, onLogoFileChange, onLogoPreviewChange, onEditingIdChange]);
 
   const onSubmit = useCallback(async (data: SiteFormData) => {
