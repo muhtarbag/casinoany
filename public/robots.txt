@@ -1,170 +1,20 @@
-# robots.txt for CasinoAny - Turkish Betting Sites Comparison Platform
-# Last Updated: 2025-01-19
-# Auto-optimized for Google, Bing, Yandex crawlers
+# robots.txt for CasinoAny
+# Simplified for Google indexing
 
-# =============================================================================
-# PREFERRED DOMAIN
-# =============================================================================
-Host: https://www.casinoany.com
-
-# =============================================================================
-# GENERAL CRAWLERS - Full Access
-# =============================================================================
+# Allow all search engines
 User-agent: *
 Allow: /
 
-# =============================================================================
-# SITEMAP INDEX - Optimized Structure
-# =============================================================================
-# Main sitemap index pointing to your domain
+# Sitemaps
 Sitemap: https://www.casinoany.com/sitemap.xml
-
-# Individual sitemaps for better indexing
 Sitemap: https://www.casinoany.com/sitemap-pages.xml
 Sitemap: https://www.casinoany.com/sitemap-casinos.xml
 Sitemap: https://www.casinoany.com/sitemap-blogs.xml
 Sitemap: https://www.casinoany.com/sitemap-bonuses.xml
 Sitemap: https://www.casinoany.com/sitemap-news.xml
-Sitemap: https://www.casinoany.com/sitemap-static.xml
-Sitemap: https://www.casinoany.com/sitemap-complaints.xml
-Sitemap: https://www.casinoany.com/sitemap-images.xml
 
-# =============================================================================
-# CRAWL RATE OPTIMIZATION - Search Engine Specific
-# =============================================================================
-# Google - Maximum speed, smart crawling
-User-agent: Googlebot
-User-agent: Googlebot-Image
-User-agent: Googlebot-Mobile
-Crawl-delay: 0
-Allow: /
-
-# Bing - Optimized for performance
-User-agent: Bingbot
-User-agent: BingPreview
-Crawl-delay: 1
-Allow: /
-
-# Yandex - Popular in Turkey and CIS
-User-agent: YandexBot
-User-agent: YandexImages
-Crawl-delay: 2
-Allow: /
-
-# Yahoo/DuckDuckGo
-User-agent: Slurp
-Crawl-delay: 2
-Allow: /
-
-# =============================================================================
-# BLOCK UNWANTED BOTS - SEO Tools & AI Scrapers
-# =============================================================================
-# SEO crawler tools (use our API instead)
-User-agent: AhrefsBot
-User-agent: SemrushBot
-User-agent: MJ12bot
-User-agent: DotBot
-User-agent: BLEXBot
-User-agent: DataForSeoBot
-User-agent: PetalBot
-Disallow: /
-
-# AI scraping bots
-User-agent: GPTBot
-User-agent: ChatGPT-User
-User-agent: CCBot
-User-agent: anthropic-ai
-User-agent: Claude-Web
-User-agent: cohere-ai
-User-agent: Omgilibot
-User-agent: FacebookBot
-Disallow: /
-
-# Aggressive scrapers
-User-agent: SurveyBot
-User-agent: Screaming Frog
-User-agent: Barkrowler
-User-agent: voltron
-Disallow: /
-
-# =============================================================================
-# DISALLOW SENSITIVE & DUPLICATE CONTENT
-# =============================================================================
-# Authentication & Admin
+# Disallow admin and private areas
 Disallow: /admin/
-Disallow: /login
-Disallow: /signup
-Disallow: /giris
-Disallow: /kayit
-Disallow: /auth/
 Disallow: /panel/
-Disallow: /profil/
-
-# API endpoints
+Disallow: /auth/
 Disallow: /api/
-Disallow: /_next/
-Disallow: /_supabase/
-
-# Prevent duplicate content from URL parameters
-Disallow: /*?sort=*
-Disallow: /*?filter=*
-Disallow: /*?page=*
-Disallow: /*?ref=*
-Disallow: /*?utm_*
-Disallow: /*?fbclid=*
-Disallow: /*?gclid=*
-Disallow: /*?search=*
-
-# Redirect & tracking pages
-Disallow: /redirect
-Disallow: /r/
-Disallow: /track/
-
-# User-specific pages
-Disallow: /favorites
-Disallow: /settings
-
-# =============================================================================
-# ALLOW CRITICAL RESOURCES - For Proper Rendering
-# =============================================================================
-# Allow all bots to access static assets
-User-agent: *
-Allow: /*.css$
-Allow: /*.js$
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.gif$
-Allow: /*.webp$
-Allow: /*.svg$
-Allow: /*.ico$
-Allow: /*.woff$
-Allow: /*.woff2$
-Allow: /*.ttf$
-Allow: /assets/
-Allow: /public/
-Allow: /logos/
-Allow: /images/
-Allow: /fonts/
-
-# Allow important SEO pages
-Allow: /sitemap.xml
-Allow: /sitemap-*.xml
-Allow: /manifest.json
-Allow: /.well-known/
-
-# =============================================================================
-# YANDEX SPECIFIC OPTIMIZATIONS
-# =============================================================================
-User-agent: YandexBot
-# Clean tracking parameters for better indexing
-Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&ref&gclid&fbclid&yclid
-
-# =============================================================================
-# ADDITIONAL SEO HINTS
-# =============================================================================
-# Request limit - prevent aggressive crawling
-Request-rate: 1/1
-
-# Visit time - prefer daytime crawling (Turkish time)
-Visit-time: 0800-2200
