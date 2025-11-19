@@ -220,6 +220,7 @@ export const BlogManagement = () => {
         read_time: parseInt(data.read_time) || 5,
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null,
+        scheduled_publish_at: !data.is_published && data.scheduled_publish_at ? data.scheduled_publish_at : null,
         author_id: user?.id,
         primary_site_id: data.primary_site_id || null,
       };
@@ -293,6 +294,7 @@ export const BlogManagement = () => {
         read_time: parseInt(data.read_time) || 5,
         is_published: data.is_published,
         published_at: data.is_published ? new Date().toISOString() : null,
+        scheduled_publish_at: !data.is_published && data.scheduled_publish_at ? data.scheduled_publish_at : null,
         primary_site_id: data.primary_site_id || null,
       };
       const { error } = await supabase.from('blog_posts').update(postData).eq('id', id);
@@ -1038,6 +1040,11 @@ export const BlogManagement = () => {
                     <h3 className="text-xl font-semibold">{post.title}</h3>
                     {post.is_published ? (
                       <Badge variant="default">Yayında</Badge>
+                    ) : post.scheduled_publish_at ? (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        Zamanlanmış: {format(new Date(post.scheduled_publish_at), 'dd MMM yyyy HH:mm', { locale: tr })}
+                      </Badge>
                     ) : (
                       <Badge variant="secondary">Taslak</Badge>
                     )}
