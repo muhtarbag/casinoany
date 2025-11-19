@@ -11,82 +11,110 @@ export const Header = () => {
 
   return (
     <header className={cn(
-      "border-b border-border bg-card/50 backdrop-blur-sm sticky z-[60]",
+      "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
+      "backdrop-blur-xl backdrop-saturate-150 sticky z-[60] shadow-sm",
+      "transition-all duration-300",
       isImpersonating ? "top-[41px]" : "top-0"
     )}>
-        <div className="container mx-auto px-4 py-3 md:py-4">
+        <div className="container mx-auto px-4 py-4 md:py-5">
           <nav className="flex items-center justify-between">
-            <NavLink to="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <img src={logo} alt="CasinoAny.com" className="h-6 md:h-8 w-auto" loading="eager" />
+            <NavLink to="/" className="group flex items-center transition-all duration-300 hover:scale-105">
+              <div className="relative">
+                <div className="absolute -inset-2 bg-primary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <img 
+                  src={logo} 
+                  alt="CasinoAny.com" 
+                  className="h-7 md:h-9 w-auto relative z-10 drop-shadow-sm" 
+                  loading="eager" 
+                />
+              </div>
             </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2 md:gap-6">
+          <div className="hidden md:flex items-center gap-1 lg:gap-2">
             <NavLink 
               to="/" 
-              className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Ana Sayfa
+              <span className="relative z-10">Ana Sayfa</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
               to="/deneme-bonusu" 
-              className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Deneme Bonusu
+              <span className="relative z-10">Deneme Bonusu</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
               to="/kategoriler" 
-              className="text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Kategoriler
+              <span className="relative z-10">Kategoriler</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
               to="/blog" 
-              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="hidden lg:flex relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Blog
+              <span className="relative z-10">Blog</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
               to="/sikayetler" 
-              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="hidden lg:flex relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Şikayetler
+              <span className="relative z-10">Şikayetler</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
               to="/about" 
-              className="hidden lg:block text-muted-foreground hover:text-foreground transition-colors text-sm md:text-base"
-              activeClassName="text-primary font-semibold"
+              className="hidden xl:flex relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              activeClassName="text-primary"
             >
-              Hakkımızda
+              <span className="relative z-10">Hakkımızda</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
 
-            <div className="flex items-center gap-1.5 md:gap-3">
+            <div className="flex items-center gap-2 ml-2 lg:ml-4 pl-2 lg:pl-4 border-l border-border/40">
               {user ? (
                 <>
                   <NavLink to="/profile/dashboard">
-                    <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
-                      <Shield className="w-3 h-3 md:w-4 md:h-4" />
-                      <span className="hidden sm:inline">Hesabım</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 text-sm px-3 py-2 border-border/60 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 shadow-sm hover:shadow-md"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden sm:inline font-medium">Hesabım</span>
                     </Button>
                   </NavLink>
                   {isAdmin && (
                     <NavLink to="/admin">
-                      <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
-                        <Shield className="w-3 h-3 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">Admin</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2 text-sm px-3 py-2 border-primary/40 text-primary hover:bg-primary/10 transition-all duration-300 shadow-sm hover:shadow-md"
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span className="hidden sm:inline font-medium">Admin</span>
                       </Button>
                     </NavLink>
                   )}
                   {isSiteOwner && (
                     <NavLink to="/panel/dashboard">
-                      <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
-                        <Shield className="w-3 h-3 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">Panel</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2 text-sm px-3 py-2 border-border/60 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 shadow-sm hover:shadow-md"
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span className="hidden sm:inline font-medium">Panel</span>
                       </Button>
                     </NavLink>
                   )}
@@ -94,21 +122,28 @@ export const Header = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={signOut}
-                    className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3"
+                    className="gap-2 text-sm px-3 py-2 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
                   >
-                    <LogOut className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="hidden sm:inline">Çıkış</span>
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline font-medium">Çıkış</span>
                   </Button>
                 </>
               ) : (
                 <>
                   <NavLink to="/login">
-                    <Button variant="ghost" size="sm" className="text-xs md:text-sm px-2 md:px-3">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-sm px-4 py-2 font-medium hover:bg-primary/5 transition-all duration-300"
+                    >
                       Giriş Yap
                     </Button>
                   </NavLink>
                   <NavLink to="/signup">
-                    <Button size="sm" className="text-xs md:text-sm px-2 md:px-3">
+                    <Button 
+                      size="sm"
+                      className="text-sm px-4 py-2 font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all duration-300"
+                    >
                       Kayıt Ol
                     </Button>
                   </NavLink>
