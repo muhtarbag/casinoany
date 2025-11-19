@@ -6,7 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { Skeleton } from "@/components/ui/skeleton";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -17,6 +17,7 @@ import { SEOSnippets } from "@/components/seo/SEOSnippets";
 import { createAppQueryClient } from "@/lib/queryClient";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
+import { cn } from "@/lib/utils";
 
 // Create queryClient once outside component to avoid React dispatcher issues
 const queryClient = createAppQueryClient();
@@ -137,10 +138,15 @@ const PageLoader = () => (
 
 const AppContent = () => {
   usePageTracking();
+  const { isImpersonating } = useAuth();
   
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <div className={cn(
+      "transition-all duration-300",
+      isImpersonating ? "pt-[44px]" : "pt-0"
+    )}>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -234,6 +240,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+    </div>
   );
 };
 
