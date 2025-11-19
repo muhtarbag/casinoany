@@ -38,7 +38,11 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
           
           {site.whatsapp && (
             <a 
-              href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
+              href={
+                site.whatsapp.startsWith('http') 
+                  ? site.whatsapp 
+                  : `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`
+              }
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
