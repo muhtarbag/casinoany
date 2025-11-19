@@ -13,6 +13,7 @@ const initialFormData: BlogFormData = {
   tags: '',
   read_time: '5',
   is_published: false,
+  scheduled_publish_at: '', // Zamanlı yayınlama
   primary_site_id: '',
   category_id: '',
 };
@@ -136,6 +137,7 @@ export const blogManagementReducer = (
           tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
           read_time: post.read_time?.toString() || '5',
           is_published: post.is_published || false,
+          scheduled_publish_at: post.scheduled_publish_at || '', // Zamanlı yayınlama
           primary_site_id: post.primary_site_id || '',
           category_id: post.category_id || '',
         },
