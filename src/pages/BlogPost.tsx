@@ -17,6 +17,7 @@ import { tr } from 'date-fns/locale';
 import { useEffect, useRef, useMemo } from 'react';
 import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
+import DOMPurify from 'dompurify';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -287,7 +288,12 @@ export default function BlogPost() {
                 prose-blockquote:border-l-primary
                 prose-blockquote:text-muted-foreground
                 prose-li:text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: enrichedContent }}
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(enrichedContent, {
+                  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'img', 'div', 'span'],
+                  ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'class', 'id', 'data-site-id', 'data-link-id']
+                })
+              }}
             />
           </Card>
 
