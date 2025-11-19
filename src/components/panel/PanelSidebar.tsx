@@ -116,7 +116,7 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b px-4 py-3">
-        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <Link to={`/${siteData?.slug || ''}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           {siteData?.logo_url && !isCollapsed && (
             <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
               <img 
@@ -136,7 +136,7 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
                 <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <p className="text-sm font-semibold truncate">{siteData?.name}</p>
               </div>
-              <p className="text-xs text-muted-foreground">Kurumsal Panel</p>
+              <p className="text-xs text-muted-foreground">Site Detayına Git</p>
             </div>
           )}
         </Link>
