@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import { ComplaintAnalytics } from '@/components/complaints/ComplaintAnalytics';
 import { LoadingState } from '@/components/ui/loading-state';
 
 const Complaints = () => {
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -74,9 +75,9 @@ const Complaints = () => {
     },
   });
 
-  // Realtime subscription for new complaints
+  // Realtime subscription for new complaints and responses
   useEffect(() => {
-    const channel = supabase
+    const complaintsChannel = supabase
       .channel('complaints-changes')
       .on(
         'postgres_changes',
@@ -87,16 +88,26 @@ const Complaints = () => {
           filter: 'is_public=eq.true',
         },
         () => {
-          // Refetch when changes occur
-          window.location.reload();
+          queryClient.invalidateQueries({ queryKey: ['complaints'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_responses',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaints'] });
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(complaintsChannel);
     };
-  }, []);
+  }, [queryClient]);
 
   const categoryLabels: Record<string, string> = {
     odeme: 'Ödeme',
@@ -240,7 +251,7 @@ const Complaints = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
-                            {complaint.complaint_responses?.[0]?.count || 0} cevap
+                            {complaint.response_count || 0} cevap
                           </span>
                           <span>
                             {format(new Date(complaint.created_at), 'dd MMM yyyy', { locale: tr })}
