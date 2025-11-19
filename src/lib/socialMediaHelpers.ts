@@ -5,16 +5,25 @@
 export function normalizeWhatsAppUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   
-  // Zaten tam URL ise, + karakterini kaldırıp kullan
+  // Telefon numarasını temizle
+  let phoneNumber = value;
+  
+  // Zaten tam URL ise numarayı çıkar
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    // URL'deki + karakterini kaldır (WhatsApp API bunu kabul etmiyor)
-    return value.replace(/\+/g, '');
+    // wa.me/PHONE veya web.whatsapp.com/send?phone=PHONE formatından numarayı çıkar
+    const match = value.match(/(?:wa\.me\/|phone=)(\+?[\d]+)/);
+    if (match) {
+      phoneNumber = match[1];
+    } else {
+      return null;
+    }
   }
   
-  // Telefon numarası ise wa.me formatına çevir
-  // + karakterini ve boşlukları temizle
-  const cleanNumber = value.replace(/[\s+]/g, '');
-  return `https://wa.me/${cleanNumber}`;
+  // Telefon numarasını temizle: + karakterini ve boşlukları kaldır
+  const cleanNumber = phoneNumber.replace(/[\s+]/g, '');
+  
+  // web.whatsapp.com formatını kullan (daha güvenilir, engelleme riski düşük)
+  return `https://web.whatsapp.com/send?phone=${cleanNumber}`;
 }
 
 export function normalizeTelegramUrl(value: string | null | undefined): string | null {
