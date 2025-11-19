@@ -46,15 +46,14 @@ export function normalizeTwitterUrl(value: string | null | undefined): string | 
 export function normalizeInstagramUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   
-  // Zaten tam URL ise direkt kullan
+  // Zaten tam URL ise direkt kullan (www dahil aynen bırak)
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    // www kullanımını kaldır
-    return value.replace('www.instagram.com', 'instagram.com');
+    return value;
   }
   
   // @ ile başlıyorsa kaldır
   const username = value.startsWith('@') ? value.substring(1) : value;
-  return `https://instagram.com/${username}`;
+  return `https://www.instagram.com/${username}`;
 }
 
 export function normalizeFacebookUrl(value: string | null | undefined): string | null {
@@ -71,17 +70,16 @@ export function normalizeFacebookUrl(value: string | null | undefined): string |
 export function normalizeYouTubeUrl(value: string | null | undefined): string | null {
   if (!value) return null;
   
-  // Zaten tam URL ise direkt kullan
+  // Zaten tam URL ise direkt kullan (www dahil aynen bırak)
   if (value.startsWith('http://') || value.startsWith('https://')) {
-    // www.youtube.com yerine youtube.com kullan (bazı ağlarda www engelli olabilir)
-    return value.replace('www.youtube.com', 'youtube.com');
+    return value;
   }
   
   // @ ile başlıyorsa YouTube handle formatı
   if (value.startsWith('@')) {
-    return `https://youtube.com/${value}`;
+    return `https://www.youtube.com/${value}`;
   }
   
   // Kanal ID veya kullanıcı adı
-  return `https://youtube.com/${value}`;
+  return `https://www.youtube.com/${value}`;
 }
