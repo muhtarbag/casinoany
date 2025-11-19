@@ -143,7 +143,7 @@ const AppContent = () => {
   return (
     <div className={cn(
       "transition-all duration-300",
-      isImpersonating ? "pt-[44px]" : "pt-0"
+      isImpersonating ? "pt-[44px]" : ""
     )}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
