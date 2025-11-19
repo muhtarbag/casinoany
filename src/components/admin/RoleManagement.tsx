@@ -201,19 +201,23 @@ export function RoleManagement() {
     },
   });
 
-  // Remove role from user
+  // Remove role from user (moves to pending status)
   const removeRoleMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase
         .from('user_roles')
-        .delete()
+        .update({ 
+          status: 'pending',
+          approved_at: null,
+          approved_by: null
+        })
         .eq('user_id', userId);
       
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users-with-roles-status'] });
-      showSuccessToast('Rol başarıyla geri alındı');
+      showSuccessToast('Rol geri alındı. Kullanıcı bekleyenler listesine taşındı');
     },
     onError: (error) => {
       showErrorToast(error, 'Rol geri alınırken hata oluştu');
