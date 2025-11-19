@@ -381,42 +381,56 @@ const Users = () => {
   };
 
   const handleImpersonate = async (userId: string, userName: string) => {
-    // Impersonate edilen kullanıcının profilini çek
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', userId)
-      .single();
-    
-    if (!profile) {
+    try {
+      console.log('🔍 Impersonation başlatılıyor...', { userId, userName });
+      
+      // Impersonate edilen kullanıcının profilini çek
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type, email, company_name')
+        .eq('id', userId)
+        .single();
+      
+      console.log('📋 Profile bilgileri:', profile, 'Error:', profileError);
+      
+      if (!profile || profileError) {
+        toast({ 
+          title: 'Hata', 
+          description: 'Kullanıcı profili bulunamadı',
+          variant: 'destructive'
+        });
+        return;
+      }
+      
+      // Impersonation'ı başlat
+      impersonateUser(userId);
+      
+      console.log('✅ Impersonation aktif:', userId);
+      console.log('👤 User Type:', profile.user_type);
+      
+      // State'in güncellenmesi için bekleme
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Kullanıcı tipine göre yönlendir
+      const targetPath = profile.user_type === 'corporate' 
+        ? '/panel/dashboard' 
+        : '/profile/dashboard';
+      
+      console.log('🎯 Yönlendirme yapılıyor:', targetPath);
+      
       toast({ 
-        title: 'Hata', 
-        description: 'Kullanıcı profili bulunamadı',
+        title: 'Başarılı', 
+        description: `${userName} (${profile.user_type === 'corporate' ? 'Kurumsal' : 'Bireysel'}) olarak görüntüleniyorsunuz` 
+      });
+      
+      navigate(targetPath);
+    } catch (error) {
+      console.error('❌ Impersonation hatası:', error);
+      toast({
+        title: 'Hata',
+        description: 'Bir hata oluştu',
         variant: 'destructive'
       });
-      return;
-    }
-    
-    // Impersonation'ı başlat
-    impersonateUser(userId);
-    
-    toast({ title: 'Başarılı', description: `${userName} olarak görüntüleniyorsunuz` });
-    
-    // State'in güncellenmesi için kısa bir bekleme
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Kullanıcı tipine göre yönlendir
-    if (profile.user_type === 'corporate') {
-      navigate('/panel/dashboard');
-    } else {
-      navigate('/profile/dashboard');
-    }
-    
-    // Kullanıcı tipine göre doğru panele yönlendir
-    if (profile?.user_type === 'corporate') {
-      navigate('/panel/site-management');
-    } else {
-      navigate('/profile/dashboard');
     }
   };
 
