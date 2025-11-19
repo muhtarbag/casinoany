@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, MessageSquare, Send, Filter, Search, AlertCircle, CheckCircle2, Clock, Inbox } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -32,6 +33,7 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
   const queryClient = useQueryClient();
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [responseText, setResponseText] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<SearchQuery>({ term: '' });
 
   // Fetch complaints
@@ -95,6 +97,39 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
       supabase.removeChannel(channel);
     };
   }, [siteId, queryClient]);
+
+  // Update status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ complaintId, status }: { complaintId: string; status: string }) => {
+      const updateData: any = { status };
+      
+      // If marking as resolved, set resolved_at timestamp
+      if (status === 'resolved') {
+        updateData.resolved_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('site_complaints')
+        .update(updateData)
+        .eq('id', complaintId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-complaints', siteId] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet durumu güncellendi',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Durum güncellenemedi',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Add response mutation
   const addResponseMutation = useMutation({
@@ -306,7 +341,10 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedComplaint(complaint)}
+                          onClick={() => {
+                            setSelectedComplaint(complaint);
+                            setSelectedStatus(complaint.status);
+                          }}
                         >
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Detay & Cevapla
@@ -368,7 +406,52 @@ export const SiteComplaintsManager = ({ siteId }: SiteComplaintsManagerProps) =>
                             </div>
                           )}
 
-                          <div>
+                          <div className="border-t pt-4">
+                            <h4 className="font-semibold mb-3">Durum Yönetimi</h4>
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor="status">Şikayet Durumu</Label>
+                                <Select
+                                  value={selectedStatus}
+                                  onValueChange={setSelectedStatus}
+                                >
+                                  <SelectTrigger id="status">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="open">Açık</SelectItem>
+                                    <SelectItem value="in_review">İnceleniyor</SelectItem>
+                                    <SelectItem value="resolved">Çözüldü</SelectItem>
+                                    <SelectItem value="closed">Kapalı</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              {selectedStatus !== complaint.status && (
+                                <Button
+                                  onClick={() => {
+                                    updateStatusMutation.mutate({
+                                      complaintId: complaint.id,
+                                      status: selectedStatus,
+                                    });
+                                  }}
+                                  disabled={updateStatusMutation.isPending}
+                                  variant="secondary"
+                                  className="w-full"
+                                >
+                                  {updateStatusMutation.isPending ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Güncelleniyor...
+                                    </>
+                                  ) : (
+                                    'Durumu Güncelle'
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="border-t pt-4">
                             <h4 className="font-semibold mb-2">Cevabınız</h4>
                             <Textarea
                               placeholder="Şikayete cevabınızı yazın..."
