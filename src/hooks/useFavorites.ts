@@ -86,6 +86,9 @@ export const useFavorites = () => {
       toast.error(error.message || 'Bir hata oluştu');
     },
     onSuccess: (data) => {
+      // Invalidate user stats to update counters in profile layout
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites-detail'] });
       toast.success(data.isFavorite ? 'Favorilere eklendi' : 'Favorilerden çıkarıldı');
     },
   });
