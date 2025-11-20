@@ -119,54 +119,87 @@ serve(async (req) => {
 
     // 2. Fetch and sync standings
     console.log('Fetching standings...');
-    const standingsResponse = await fetch(`${API_BASE}/lookuptable.php?l=${SUPER_LIG_ID}&s=2024-2025`);
-    const standingsData = await standingsResponse.json();
-    const standings = standingsData.table as Standing[];
+    try {
+      const standingsResponse = await fetch(`${API_BASE}/lookuptable.php?l=${SUPER_LIG_ID}&s=2024-2025`);
+      const standingsText = await standingsResponse.text();
+      
+      if (!standingsText || standingsText.trim() === '') {
+        console.log('No standings data available for 2024-2025 season, skipping...');
+      } else {
+        const standingsData = JSON.parse(standingsText);
+        const standings = standingsData.table as Standing[];
 
-    if (standings && standings.length > 0) {
-      for (const standing of standings) {
-        try {
-          const teamId = teamIdMap[standing.idTeam];
-          if (!teamId) continue;
+        if (standings && standings.length > 0) {
+          for (const standing of standings) {
+            try {
+              const teamId = teamIdMap[standing.idTeam];
+              if (!teamId) continue;
 
-          await supabase
-            .from('super_lig_standings')
-            .upsert({
-              team_id: teamId,
-              season: '2024-2025',
-              position: parseInt(standing.intRank),
-              played: parseInt(standing.intPlayed),
-              won: parseInt(standing.intWin),
-              drawn: parseInt(standing.intDraw),
-              lost: parseInt(standing.intLoss),
-              goals_for: parseInt(standing.intGoalsFor),
-              goals_against: parseInt(standing.intGoalsAgainst),
-              goal_difference: parseInt(standing.intGoalDifference),
-              points: parseInt(standing.intPoints),
-            }, {
-              onConflict: 'team_id,season'
-            });
-        } catch (error) {
-          console.error('Error syncing standing:', error);
+              await supabase
+                .from('super_lig_standings')
+                .upsert({
+                  team_id: teamId,
+                  season: '2024-2025',
+                  position: parseInt(standing.intRank),
+                  played: parseInt(standing.intPlayed),
+                  won: parseInt(standing.intWin),
+                  drawn: parseInt(standing.intDraw),
+                  lost: parseInt(standing.intLoss),
+                  goals_for: parseInt(standing.intGoalsFor),
+                  goals_against: parseInt(standing.intGoalsAgainst),
+                  goal_difference: parseInt(standing.intGoalDifference),
+                  points: parseInt(standing.intPoints),
+                }, {
+                  onConflict: 'team_id,season'
+                });
+            } catch (error) {
+              console.error('Error syncing standing:', error);
+            }
+          }
+          console.log(`Synced ${standings.length} standings`);
+        } else {
+          console.log('Standings array is empty');
         }
       }
-      console.log(`Synced ${standings.length} standings`);
+    } catch (error) {
+      console.error('Error fetching/parsing standings:', error);
+      console.log('Continuing without standings data...');
     }
 
     // 3. Fetch and sync fixtures (last 15 and next 15 matches)
     console.log('Fetching fixtures...');
     
+    let allMatches: Event[] = [];
+    
     // Get last 15 matches
-    const lastMatchesResponse = await fetch(`${API_BASE}/eventspastleague.php?id=${SUPER_LIG_ID}`);
-    const lastMatchesData = await lastMatchesResponse.json();
-    const lastMatches = (lastMatchesData.events || []).slice(0, 15) as Event[];
+    try {
+      const lastMatchesResponse = await fetch(`${API_BASE}/eventspastleague.php?id=${SUPER_LIG_ID}`);
+      const lastMatchesText = await lastMatchesResponse.text();
+      
+      if (lastMatchesText && lastMatchesText.trim() !== '') {
+        const lastMatchesData = JSON.parse(lastMatchesText);
+        const lastMatches = (lastMatchesData.events || []).slice(0, 15) as Event[];
+        allMatches = [...allMatches, ...lastMatches];
+        console.log(`Fetched ${lastMatches.length} past matches`);
+      }
+    } catch (error) {
+      console.error('Error fetching past matches:', error);
+    }
 
     // Get next 15 matches
-    const nextMatchesResponse = await fetch(`${API_BASE}/eventsnextleague.php?id=${SUPER_LIG_ID}`);
-    const nextMatchesData = await nextMatchesResponse.json();
-    const nextMatches = (nextMatchesData.events || []).slice(0, 15) as Event[];
-
-    const allMatches = [...lastMatches, ...nextMatches];
+    try {
+      const nextMatchesResponse = await fetch(`${API_BASE}/eventsnextleague.php?id=${SUPER_LIG_ID}`);
+      const nextMatchesText = await nextMatchesResponse.text();
+      
+      if (nextMatchesText && nextMatchesText.trim() !== '') {
+        const nextMatchesData = JSON.parse(nextMatchesText);
+        const nextMatches = (nextMatchesData.events || []).slice(0, 15) as Event[];
+        allMatches = [...allMatches, ...nextMatches];
+        console.log(`Fetched ${nextMatches.length} upcoming matches`);
+      }
+    } catch (error) {
+      console.error('Error fetching upcoming matches:', error);
+    }
 
     for (const match of allMatches) {
       try {
@@ -229,13 +262,19 @@ serve(async (req) => {
 
     console.log(`Synced ${allMatches.length} fixtures`);
 
+    // Get final standings count
+    const { count: standingsCount } = await supabase
+      .from('super_lig_standings')
+      .select('*', { count: 'exact', head: true })
+      .eq('season', '2024-2025');
+
     return new Response(
       JSON.stringify({
         success: true,
         message: 'Super Lig data synced successfully',
         stats: {
           teams: teams.length,
-          standings: standings?.length || 0,
+          standings: standingsCount || 0,
           fixtures: allMatches.length,
         }
       }),
