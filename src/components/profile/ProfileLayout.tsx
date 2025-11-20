@@ -149,11 +149,6 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       href: '/profile/achievements'
     },
     {
-      icon: Trophy,
-      label: 'Sadakat Puanları',
-      href: '/profile/loyalty'
-    },
-    {
       icon: Users,
       label: 'Arkadaşını Davet Et',
       href: '/profile/referrals'
@@ -174,7 +169,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     },
     {
       icon: LayoutDashboard,
-      label: 'Genel Bakış',
+      label: 'Panel',
       href: '/profile/dashboard'
     },
     {
@@ -184,10 +179,19 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       badgeKey: undefined
     },
     {
-      icon: Gift,
-      label: 'Bonuslar',
-      href: '/profile/bonus-tracking',
-      badgeKey: 'bonuses' as const
+      icon: Trophy,
+      label: 'Puanlar',
+      href: '/profile/loyalty-points'
+    },
+    {
+      icon: Award,
+      label: 'Rozetler',
+      href: '/profile/achievements'
+    },
+    {
+      icon: User,
+      label: 'Ayarlar',
+      href: '/profile/settings'
     },
   ];
 
@@ -347,7 +351,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
       {/* Mobile Bottom Navigation - Optimized for Touch */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl safe-area-inset-bottom" style={{ zIndex: 9999 }}>
-        <div className="grid grid-cols-4 px-2 py-3">
+        <div className="grid grid-cols-6 px-2 py-3">
           {mobileBottomNavItems.map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
