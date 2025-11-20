@@ -201,7 +201,7 @@ const AppContent = () => {
           <Route path="/profile/complaints" element={<ProfileComplaints />} />
           <Route path="/profile/bonus-tracking" element={<BonusTracking />} />
           <Route path="/profile/notifications" element={<ProfileNotifications />} />
-          <Route path="/profile/loyalty" element={<LoyaltyPoints />} />
+          <Route path="/profile/loyalty-points" element={<LoyaltyPoints />} />
           <Route path="/profile/referrals" element={<Referrals />} />
           <Route path="/profile/achievements" element={<Achievements />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
