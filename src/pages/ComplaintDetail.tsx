@@ -53,6 +53,16 @@ const ComplaintDetail = () => {
       
       if (error) throw error;
       if (!data) throw new Error('Complaint not found');
+      
+      // Check if user can view this complaint
+      const canView = isAdmin || 
+                      data.user_id === user?.id || 
+                      data.approval_status === 'approved';
+      
+      if (!canView) {
+        throw new Error('Bu şikayet henüz yayınlanmamış');
+      }
+      
       return data;
     },
   });
@@ -298,6 +308,18 @@ const ComplaintDetail = () => {
     closed: 'Kapalı',
   };
 
+  const approvalLabels: Record<string, string> = {
+    pending: 'İnceleme Bekliyor',
+    approved: 'Yayında',
+    rejected: 'Reddedildi',
+  };
+
+  const approvalColors: Record<string, 'default' | 'destructive' | 'secondary'> = {
+    pending: 'default',
+    approved: 'secondary',
+    rejected: 'destructive',
+  };
+
   const severityLabels: Record<string, string> = {
     low: 'Düşük',
     normal: 'Normal',
@@ -456,6 +478,11 @@ const ComplaintDetail = () => {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {(isAdmin || isOwnComplaint) && (
+                    <Badge variant={approvalColors[complaint.approval_status || 'pending']}>
+                      {approvalLabels[complaint.approval_status || 'pending']}
+                    </Badge>
+                  )}
                   <Badge variant={getStatusVariant(complaint.status)}>
                     {statusLabels[complaint.status]}
                   </Badge>

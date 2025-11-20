@@ -66,7 +66,8 @@ const Complaints = () => {
           *,
           betting_sites (name, slug, logo_url)
         `)
-        .eq('is_public', true);
+        .eq('is_public', true)
+        .eq('approval_status', 'approved');
 
       if (categoryFilter !== 'all') {
         query = query.eq('category', categoryFilter);
