@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ReviewCard from '@/components/ReviewCard';
 import ReviewForm from '@/components/ReviewForm';
 
@@ -51,9 +53,21 @@ export const SiteDetailReviews = ({
               <ReviewCard key={review.id} review={review} />
             ))
           ) : (
-            <p className="text-muted-foreground text-center py-8">
-              İlk yorumu siz yapın! 🎉
-            </p>
+            <div className="text-center py-8 space-y-4">
+              <p className="text-muted-foreground">
+                İlk yorumu siz yapın! 🎉
+              </p>
+              {!user && (
+                <div className="flex gap-2 justify-center">
+                  <Button asChild variant="default">
+                    <Link to="/login">Giriş Yap</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/signup">Kayıt Ol</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </CardContent>
