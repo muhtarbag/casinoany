@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, MessageSquare, AlertTriangle, Gift, User, Bell, Settings, ChevronRight } from 'lucide-react';
+import { Heart, MessageSquare, AlertTriangle, Gift, User, Bell, Settings, ChevronRight, Award } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
@@ -10,6 +10,8 @@ import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
+import { useAchievements } from '@/hooks/useAchievements';
+import { AchievementBadge } from '@/components/AchievementBadge';
 
 export default function Dashboard() {
   const { user, isSiteOwner, loading, impersonatedUserId, isImpersonating } = useAuth();
@@ -17,6 +19,9 @@ export default function Dashboard() {
 
   // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
   const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
+
+  // Fetch achievements
+  const { recentAchievements, earnedCount, totalCount, isLoading: isLoadingAchievements } = useAchievements(effectiveUserId);
 
   // Redirect site owners to their management panel
   useEffect(() => {
@@ -147,6 +152,46 @@ export default function Dashboard() {
       />
       <ProfileLayout>
         <div className="flex flex-col gap-5">
+          {/* Achievements Preview */}
+          {!isLoadingAchievements && recentAchievements.length > 0 && (
+            <Card className="border-l-4 border-yellow-500">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-yellow-500" />
+                    <h3 className="font-semibold">Son Rozetlerim</h3>
+                  </div>
+                  <Link to="/profile/achievements">
+                    <Button variant="ghost" size="sm">
+                      Tümünü Gör
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-2">
+                    {recentAchievements.slice(0, 5).map((achievement) => (
+                      <AchievementBadge
+                        key={achievement.id}
+                        icon={achievement.achievement?.icon || 'Award'}
+                        name={achievement.achievement?.name || ''}
+                        description={achievement.achievement?.description || ''}
+                        color={achievement.achievement?.color || '#3b82f6'}
+                        isEarned={true}
+                        earnedAt={achievement.earned_at}
+                        size="md"
+                      />
+                    ))}
+                  </div>
+                  <div className="ml-auto text-right">
+                    <p className="text-2xl font-bold">{earnedCount}/{totalCount}</p>
+                    <p className="text-xs text-muted-foreground">rozet</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {menuItems.map((item) => (
             <Link key={item.href} to={item.href} className="block">
               <Card className={cn(
