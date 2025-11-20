@@ -143,6 +143,11 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       href: '/profile/loyalty'
     },
     {
+      icon: Users,
+      label: 'Arkadaşını Davet Et',
+      href: '/profile/referrals'
+    },
+    {
       icon: Settings,
       label: 'Ayarlar',
       href: '/profile/settings'
