@@ -102,7 +102,7 @@ const Index = () => {
       <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
       
-      <main>
+      <main className="pt-4 md:pt-0">
         <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
         <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
