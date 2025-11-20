@@ -9,10 +9,11 @@ import { KeywordTrackingTable } from '@/components/panel/analytics/KeywordTracki
 import { UserBehaviorChart } from '@/components/panel/analytics/UserBehaviorChart';
 import { Shield, TrendingUp, Search, Users } from 'lucide-react';
 
-export const AdvancedAnalytics = () => {
-  // Site owner'ın sitesini almak için gerçek implementasyonda useParams veya context kullanılacak
-  const siteId = 'YOUR_SITE_ID'; // Dinamik olarak alınmalı
+interface AdvancedAnalyticsProps {
+  siteId: string;
+}
 
+export const AdvancedAnalytics = ({ siteId }: AdvancedAnalyticsProps) => {
   return (
     <div className="space-y-6">
       <div>
