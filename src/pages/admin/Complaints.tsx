@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Search, Eye, EyeOff, MessageSquare, CheckCircle, XCircle, Clock, Filter, Check, Ban } from 'lucide-react';
+import { Search, Eye, EyeOff, MessageSquare, CheckCircle, XCircle, Clock, Filter, Check, Ban, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -152,6 +152,24 @@ export default function AdminComplaints() {
       toast({
         title: 'Başarılı',
         description: 'Şikayet reddedildi',
+      });
+      setSelectedComplaint(null);
+    },
+  });
+
+  const deleteComplaintMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('site_complaints')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet silindi',
       });
       setSelectedComplaint(null);
     },
@@ -450,6 +468,20 @@ export default function AdminComplaints() {
                         onClick={() => setSelectedComplaint(complaint)}
                       >
                         Detaylar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm('Bu şikayeti silmek istediğinize emin misiniz?')) {
+                            deleteComplaintMutation.mutate(complaint.id);
+                          }
+                        }}
+                        disabled={deleteComplaintMutation.isPending}
+                        className="gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Sil
                       </Button>
                       <Select
                         value={complaint.status}
