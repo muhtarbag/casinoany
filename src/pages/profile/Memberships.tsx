@@ -456,6 +456,24 @@ const Memberships = () => {
             </DialogHeader>
             
             <div className="flex-1 overflow-y-auto py-4">
+              {/* Site Ekle Button - First Item */}
+              <div className="mb-4">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2 h-auto py-4 border-dashed border-2"
+                  onClick={() => {
+                    setIsSiteSelectionOpen(false);
+                    setIsSiteRequestOpen(true);
+                  }}
+                >
+                  <Plus className="w-5 h-5" />
+                  <div className="text-left">
+                    <p className="font-semibold">Aradığınız Site Yok mu?</p>
+                    <p className="text-xs text-muted-foreground">Site ekleme talebi gönderin</p>
+                  </div>
+                </Button>
+              </div>
+
               {allSites && allSites.length > 0 ? (
                 <div className="grid gap-3">
                   {allSites.map((site) => {
