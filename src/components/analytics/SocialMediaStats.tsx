@@ -19,13 +19,17 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
 
   // Calculate total clicks per platform
   const platformTotals: Record<string, number> = socialPlatforms.reduce((acc, platform) => {
-    acc[platform.key] = statsData.reduce((sum, stat) => sum + (stat[platform.key] || 0), 0);
+    const total = statsData.reduce((sum, stat) => {
+      const value = stat[platform.key] || 0;
+      return sum + value;
+    }, 0);
+    acc[platform.key] = total;
     return acc;
   }, {} as Record<string, number>);
 
-  const totalSocialClicks = Object.values(platformTotals).reduce((sum, val) => sum + val, 0);
+  const totalSocialClicks = Object.values(platformTotals).reduce((sum: number, val: number) => sum + val, 0);
 
-  const engagementRate = totalSocialClicks > 0 
+  const engagementRate = totalSocialClicks > 0 && statsData.length > 0
     ? ((totalSocialClicks / statsData.length) * 100).toFixed(1) 
     : '0';
 
@@ -40,7 +44,7 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalSocialClicks.toLocaleString()}</div>
+            <div className="text-3xl font-bold">{totalSocialClicks}</div>
           </CardContent>
         </Card>
         
@@ -88,7 +92,7 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
                 <div key={platform.key} className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
                   <Icon className="w-6 h-6" style={{ color: platform.color }} />
                   <span className="text-sm font-medium">{platform.label}</span>
-                  <span className="text-2xl font-bold">{clicks.toLocaleString()}</span>
+                  <span className="text-2xl font-bold">{clicks}</span>
                   <span className="text-xs text-muted-foreground">%{percentage}</span>
                 </div>
               );

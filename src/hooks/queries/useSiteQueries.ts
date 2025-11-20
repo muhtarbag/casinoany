@@ -86,7 +86,8 @@ export const useSiteStats = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 30000, // 30 saniye
+    refetchOnMount: true,
   });
 };
 

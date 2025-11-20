@@ -4252,15 +4252,23 @@ export type Database = {
         Row: {
           clicks: number | null
           created_at: string | null
+          email_clicks: number | null
+          facebook_clicks: number | null
           id: string | null
+          instagram_clicks: number | null
           site_bonus: string | null
           site_id: string | null
           site_is_active: boolean | null
+          site_logo_url: string | null
           site_name: string | null
           site_rating: number | null
           site_slug: string | null
+          telegram_clicks: number | null
+          twitter_clicks: number | null
           updated_at: string | null
           views: number | null
+          whatsapp_clicks: number | null
+          youtube_clicks: number | null
         }
         Relationships: [
           {
