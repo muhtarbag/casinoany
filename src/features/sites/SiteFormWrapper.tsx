@@ -120,7 +120,10 @@ export function SiteFormWrapper({
           affiliate_commission_percentage: editingSite.affiliate_commission_percentage || undefined,
           category_ids: categoryIds,
         });
-        if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
+        // Only load existing logo if user hasn't selected a new one
+        if (editingSite.logo_url && !logoFile) {
+          onLogoPreviewChange(editingSite.logo_url);
+        }
       } else {
         form.reset();
         onLogoFileChange(null);
