@@ -28,7 +28,7 @@ export const Header = () => {
                 <img 
                   src={logo} 
                   alt="CasinoAny.com" 
-                  className="h-7 md:h-9 w-auto relative z-10 drop-shadow-sm" 
+                  className="h-9 md:h-11 w-auto relative z-10 drop-shadow-sm" 
                   loading="eager" 
                 />
               </div>
@@ -66,6 +66,14 @@ export const Header = () => {
               activeClassName="text-primary"
             >
               <span className="relative z-10">Blog</span>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </NavLink>
+            <NavLink 
+              to="/sikayetler" 
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
+              activeClassName="text-primary"
+            >
+              <span className="relative z-10">Şikayetler</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
