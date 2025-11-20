@@ -429,7 +429,7 @@ const Complaints = () => {
                           </span>
                         </div>
                         <Button variant="outline" size="sm" asChild>
-                          <Link to={`/sikayetler/${complaint.id}`}>
+                          <Link to={`/sikayetler/${complaint.slug || complaint.id}`}>
                             Detay Gör
                           </Link>
                         </Button>
