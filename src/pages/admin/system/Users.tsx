@@ -195,12 +195,30 @@ const Users = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // Önce user_roles'u onayla
-      const { error: roleError } = await supabase
+      // user_roles kaydını kontrol et ve varsa güncelle, yoksa oluştur
+      const { data: existingRole } = await supabase
         .from('user_roles')
-        .update({ status: 'approved' })
-        .eq('user_id', userId);
-      if (roleError) throw roleError;
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingRole) {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .update({ status: 'approved' })
+          .eq('user_id', userId);
+        if (roleError) throw roleError;
+      } else {
+        // Kullanıcının rolü yoksa, varsayılan rol oluştur
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({ 
+            user_id: userId, 
+            role: 'user',
+            status: 'approved' 
+          });
+        if (roleError) throw roleError;
+      }
 
       // Kurumsal kullanıcı ise profile'ı da doğrulanmış olarak işaretle
       const { error: profileError } = await supabase
@@ -210,12 +228,13 @@ const Users = () => {
         .eq('user_type', 'corporate');
       if (profileError) throw profileError;
 
-      // site_owners tablosundaki kaydı da onayla
+      // site_owners tablosundaki kaydı da onayla (varsa)
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError) throw new Error('Oturum bilgisi alınamadı');
       
-      const { error: siteOwnerError } = await (supabase as any)
+      // site_owners kaydı varsa güncelle, hata olsa bile devam et
+      await (supabase as any)
         .from('site_owners')
         .update({ 
           status: 'approved',
@@ -223,25 +242,55 @@ const Users = () => {
           approved_by: user?.id
         })
         .eq('user_id', userId);
-      if (siteOwnerError) throw siteOwnerError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
+      setSelectedUser(null);
       toast({ title: 'Başarılı', description: 'Kullanıcı onaylandı ve doğrulandı' });
+    },
+    onError: (error: any) => {
+      console.error('Approve mutation error:', error);
+      showErrorToast(error, 'Kullanıcı onaylanırken bir hata oluştu');
     },
   });
 
   const rejectMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
+      // user_roles kaydını kontrol et ve varsa güncelle, yoksa oluştur
+      const { data: existingRole } = await supabase
         .from('user_roles')
-        .update({ status: 'rejected' })
-        .eq('user_id', userId);
-      if (error) throw error;
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingRole) {
+        const { error } = await supabase
+          .from('user_roles')
+          .update({ status: 'rejected' })
+          .eq('user_id', userId);
+        if (error) throw error;
+      } else {
+        // Kullanıcının rolü yoksa, varsayılan rol oluştur
+        const { error } = await supabase
+          .from('user_roles')
+          .insert({ 
+            user_id: userId, 
+            role: 'user',
+            status: 'rejected' 
+          });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-users-count'] });
+      setSelectedUser(null);
       toast({ title: 'Başarılı', description: 'Kullanıcı reddedildi' });
+    },
+    onError: (error: any) => {
+      console.error('Reject mutation error:', error);
+      showErrorToast(error, 'Kullanıcı reddedilirken bir hata oluştu');
     },
   });
 
