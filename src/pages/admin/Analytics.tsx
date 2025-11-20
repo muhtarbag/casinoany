@@ -31,6 +31,8 @@ export default function Analytics() {
       if (error) throw error;
       return data || [];
     },
+    staleTime: 30000, // 30 saniye cache
+    refetchOnMount: true,
   });
 
   // Fetch active sites with their social media stats for sorting
