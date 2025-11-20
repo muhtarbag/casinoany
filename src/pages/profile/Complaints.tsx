@@ -18,12 +18,14 @@ import { tr } from 'date-fns/locale';
 import { useState } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 
 export default function Complaints() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showAdditionDialog, setShowAdditionDialog] = useState(false);
   const [formData, setFormData] = useState({
     site_id: '',
     title: '',
@@ -166,7 +168,19 @@ export default function Complaints() {
                       <SelectTrigger>
                         <SelectValue placeholder="Site seçin" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border z-50 max-h-[300px] overflow-y-auto">
+                        <div className="border-b border-border mb-2 pb-2 px-2 pt-2">
+                          <button
+                            type="button"
+                            className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
+                            onClick={() => {
+                              setShowAdditionDialog(true);
+                            }}
+                          >
+                            <span className="text-lg font-bold">+</span>
+                            <span>Sitemi bulamıyorum, eklemek istiyorum</span>
+                          </button>
+                        </div>
                         {sites?.map((site) => (
                           <SelectItem key={site.id} value={site.id}>
                             {site.name}
@@ -304,6 +318,10 @@ export default function Complaints() {
             </Card>
           )}
       </ProfileLayout>
+      <SiteAdditionRequestDialog 
+        open={showAdditionDialog} 
+        onOpenChange={setShowAdditionDialog} 
+      />
     </>
   );
 }
