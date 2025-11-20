@@ -15,7 +15,7 @@ interface SiteManagementFormProps {
   editingId: string | null;
   initialData?: SiteFormData;
   logoPreview: string | null;
-  onLogoFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onLogoFileChange: (file: File | null) => void;
   onClearLogo: () => void;
   onSubmit: (data: SiteFormData) => void;
   onCancel: () => void;
