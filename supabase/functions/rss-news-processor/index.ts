@@ -25,6 +25,15 @@ async function checkRateLimit(supabase: any, ip: string, functionName: string): 
 }
 
 const RSS_FEEDS = [
+  // Türkiye Spor Haberleri (öncelikli)
+  'https://www.spormaraton.com/rss/anasayfa/',
+  'https://www.fanatik.com.tr/rss/mansetxml.xml',
+  'https://www.ntvspor.net/rss',
+  'https://www.hurriyet.com.tr/rss/spor',
+  'https://www.milliyet.com.tr/rss/rssnew/sporrss.xml',
+  'https://www.sporx.com/rss.xml',
+  'https://www.fotomac.com.tr/rss/anasayfa.xml',
+  
   // iGaming Global Feeds
   'https://igamingbusiness.com/feed/',
   'https://sbcnews.co.uk/feed/',
@@ -36,9 +45,6 @@ const RSS_FEEDS = [
   'https://igamingbusiness.com/category/casino/feed/',
   'https://coinjournal.net/news/feed/',
   'https://cryptoslate.com/feed/',
-  
-  // Türkiye Spor Haberleri
-  'https://www.spormaraton.com/rss/anasayfa/',
 ];
 
 interface RSSItem {
