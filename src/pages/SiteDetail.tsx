@@ -646,11 +646,11 @@ export default function SiteDetail() {
 
           {/* Reviews Tab */}
           <TabsContent value="comments">
-            {!reviewsLoading && !complaintsLoading && reviews && complaints ? (
+            {!reviewsLoading && !complaintsLoading ? (
               <SiteDetailReviews 
                 site={site} 
-                reviews={reviews}
-                complaints={complaints}
+                reviews={reviews || []}
+                complaints={complaints || []}
                 user={user} 
                 averageRating={averageRating} 
               />
