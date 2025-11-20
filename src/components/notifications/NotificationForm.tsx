@@ -39,15 +39,15 @@ export function NotificationForm({
   isEditing,
 }: NotificationFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('manual');
 
   const handleChange = (field: keyof NotificationFormData, value: any) => {
     onChange({ ...formData, [field]: value });
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    if (!templateId) {
-      setSelectedTemplate('');
+    if (!templateId || templateId === 'manual') {
+      setSelectedTemplate('manual');
       return;
     }
 
@@ -107,7 +107,7 @@ export function NotificationForm({
                 <SelectValue placeholder="Tema seç veya manuel ayarla" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Manuel Ayarlama</SelectItem>
+                <SelectItem value="manual">Manuel Ayarlama</SelectItem>
                 {exitIntentTemplates.map((template) => (
                   <SelectItem key={template.id} value={template.id}>
                     <div className="flex flex-col items-start">
