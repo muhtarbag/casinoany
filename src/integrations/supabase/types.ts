@@ -2912,8 +2912,10 @@ export type Database = {
           expires_at: string | null
           icon: string | null
           id: string
+          image_url: string | null
           is_active: boolean | null
           message: string
+          metadata: Json | null
           notification_type: string
           priority: string
           target_audience: string
@@ -2928,8 +2930,10 @@ export type Database = {
           expires_at?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           message: string
+          metadata?: Json | null
           notification_type?: string
           priority?: string
           target_audience?: string
@@ -2944,8 +2948,10 @@ export type Database = {
           expires_at?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           message?: string
+          metadata?: Json | null
           notification_type?: string
           priority?: string
           target_audience?: string
