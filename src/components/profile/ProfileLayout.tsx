@@ -34,6 +34,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
 import { NotificationBell } from '@/components/profile/NotificationBell';
+import { MobileProfileMenu } from '@/components/profile/MobileProfileMenu';
 import logo from '@/assets/casinodoo-logo.svg';
 
 interface ProfileLayoutProps {
@@ -160,7 +161,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     }
   ];
 
-  // Mobile bottom nav items (most important only) - Simplified for better UX
+  // Mobile bottom nav items - World-class approach (max 5 items)
   const mobileBottomNavItems = [
     {
       icon: Home,
@@ -175,24 +176,13 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     {
       icon: Heart,
       label: 'Favoriler',
-      href: '/profile/favorites',
-      badgeKey: undefined
+      href: '/profile/favorites'
     },
     {
       icon: Trophy,
       label: 'Puanlar',
       href: '/profile/loyalty-points'
-    },
-    {
-      icon: Award,
-      label: 'Rozetler',
-      href: '/profile/achievements'
-    },
-    {
-      icon: User,
-      label: 'Ayarlar',
-      href: '/profile/settings'
-    },
+    }
   ];
 
   const getInitials = () => {
@@ -351,11 +341,10 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
       {/* Mobile Bottom Navigation - Optimized for Touch */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl safe-area-inset-bottom" style={{ zIndex: 9999 }}>
-        <div className="grid grid-cols-6 px-2 py-3">
+        <div className="grid grid-cols-5 px-2 py-3">
           {mobileBottomNavItems.map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
-            const badgeCount = item.badgeKey ? getBadgeCount(item.badgeKey) : null;
 
             return (
               <Link
@@ -369,16 +358,6 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
                 )}
                 style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                {/* Badge Notification */}
-                {badgeCount && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute top-1 right-1/4 h-5 min-w-5 p-0 flex items-center justify-center text-[10px] font-bold animate-pulse z-10 pointer-events-none"
-                  >
-                    {badgeCount > 99 ? '99+' : badgeCount}
-                  </Badge>
-                )}
-
                 {/* Icon */}
                 <div className={cn(
                   "h-7 w-7 flex items-center justify-center transition-all",
@@ -405,6 +384,9 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
               </Link>
             );
           })}
+          
+          {/* Menu Button - 5th item */}
+          <MobileProfileMenu badges={badges} currentPath={location.pathname} />
         </div>
       </nav>
     </div>
