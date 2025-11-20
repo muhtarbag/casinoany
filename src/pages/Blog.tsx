@@ -53,7 +53,7 @@ const Blog = () => {
   }, [posts, searchTerm, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-dark">
+    <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
       <SEO
         title="Blog - Bahis Siteleri Haberleri ve İpuçları"
         description="Bahis siteleri hakkında en güncel haberler, bonus kampanyaları, strateji ipuçları ve sektör analizleri. Kazancınızı artırın!"

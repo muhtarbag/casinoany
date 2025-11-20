@@ -12,7 +12,7 @@ const KVKK = () => {
         description="CasinoAny.com KVKK kapsamında kişisel verilerinizin işlenmesi, korunması ve haklarınız hakkında detaylı bilgi edinin."
         canonical="/kvkk"
       />
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90 pt-[72px] md:pt-[84px]">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <Breadcrumb 

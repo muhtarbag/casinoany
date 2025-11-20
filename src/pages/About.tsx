@@ -77,7 +77,7 @@ const About = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-dark">
+    <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
       <SEO
         title="Hakkımızda - Türkiye'nin En Kapsamlı Bahis Siteleri Karşılaştırma Platformu"
         description="CasinoAny.com olarak 2020'den beri güvenilir, lisanslı bahis sitelerini inceleyen ve karşılaştıran bağımsız bir platformuz. Uzman ekibimiz, detaylı analizler ve kullanıcı yorumlarıyla en iyi bahis deneyimi için objektif bilgiler sunuyor."

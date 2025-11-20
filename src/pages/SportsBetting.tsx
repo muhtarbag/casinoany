@@ -33,7 +33,7 @@ export default function SportsBetting() {
         keywords={["spor bahisleri", "canlı bahis", "yüksek oranlar", "iddaa siteleri", "bahis oranları"]}
       />
       
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <Header />
         
         <main className="container mx-auto px-4 py-8">

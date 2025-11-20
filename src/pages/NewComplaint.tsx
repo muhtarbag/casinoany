@@ -35,7 +35,7 @@ const NewComplaint = () => {
       <>
         <SEO title="Giriş Gerekli" description="Şikayet oluşturmak için giriş yapmalısınız" />
         <Header />
-        <div className="min-h-screen bg-gradient-dark">
+        <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
           <div className="container mx-auto px-4 py-8 max-w-3xl">
             <Card>
               <CardContent className="pt-6 text-center py-12">
@@ -133,7 +133,7 @@ const NewComplaint = () => {
         description="Bahis siteleri hakkında şikayetinizi paylaşın"
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">

@@ -47,7 +47,7 @@ const DenemeBonusu = () => {
     return (
       <>
         <Header />
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center pt-[72px] md:pt-[84px]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
         <Footer />
@@ -98,7 +98,7 @@ const DenemeBonusu = () => {
       />
 
       <Header />
-      <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20">
+      <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <BonusPageTemplate
           pageTitle="🎁 Deneme Bonusu Veren Siteler 2025"
           pageDescription="En yüksek deneme bonusu kampanyalarını karşılaştırın. Yatırım yapmadan bedava bonus kazanın! Güncel bonus kodları ve çevrim şartları ile."

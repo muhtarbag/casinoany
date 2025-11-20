@@ -13,7 +13,7 @@ export default function Categories() {
   const { data: categories, isLoading } = useCategories({ isActive: true });
 
   return (
-    <div className="min-h-screen bg-gradient-dark flex flex-col">
+    <div className="min-h-screen bg-gradient-dark flex flex-col pt-[72px] md:pt-[84px]">
       <SEO
         title="Kategoriler | En İyi Bahis Siteleri"
         description="Bahis sitelerini kategorilere göre keşfedin. Deneme bonusu, free spin, spor bahisleri, kripto siteler ve daha fazlası."

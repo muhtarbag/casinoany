@@ -320,7 +320,7 @@ const ComplaintDetail = () => {
       <>
         <SEO title="Şikayet Bulunamadı" description="Aradığınız şikayet bulunamadı" />
         <Header />
-        <div className="min-h-screen bg-gradient-dark">
+        <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
           <div className="container mx-auto px-4 py-8">
             <Card>
               <CardContent className="pt-6 text-center">
@@ -344,7 +344,7 @@ const ComplaintDetail = () => {
         description={complaint.description.substring(0, 160)}
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">

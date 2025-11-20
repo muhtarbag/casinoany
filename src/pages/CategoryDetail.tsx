@@ -21,7 +21,7 @@ export default function CategoryDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center pt-[72px] md:pt-[84px]">
         <LoadingSpinner />
       </div>
     );
@@ -38,7 +38,7 @@ export default function CategoryDetail() {
     `${category.name} kategorisindeki en iyi bahis sitelerini keşfedin.`;
 
   return (
-    <div className="min-h-screen bg-gradient-dark flex flex-col">
+    <div className="min-h-screen bg-gradient-dark flex flex-col pt-[72px] md:pt-[84px]">
       <SEO
         title={seoTitle}
         description={seoDescription}

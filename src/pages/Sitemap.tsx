@@ -41,7 +41,7 @@ export default function Sitemap() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
@@ -56,7 +56,7 @@ export default function Sitemap() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card>
@@ -79,7 +79,7 @@ export default function Sitemap() {
   const urls = Array.from(xmlDoc.getElementsByTagName('url'));
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">

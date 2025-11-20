@@ -237,7 +237,7 @@ const Complaints = () => {
         description="Bahis siteleri hakkındaki kullanıcı şikayetlerini görüntüleyin"
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark pt-20">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
           <div className="flex-1">
