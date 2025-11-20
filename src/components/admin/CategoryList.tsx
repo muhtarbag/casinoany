@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -16,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Edit, Trash2, Grip, ExternalLink } from 'lucide-react';
+import { Edit, Trash2, Grip, ExternalLink, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -48,9 +49,10 @@ interface SortableItemProps {
   onEdit: (category: CategoryWithStats) => void;
   onToggle: (id: string, isActive: boolean) => void;
   onDelete: (id: string) => void;
+  onManageSites: (slug: string) => void;
 }
 
-function SortableItem({ category, onEdit, onToggle, onDelete }: SortableItemProps) {
+function SortableItem({ category, onEdit, onToggle, onDelete, onManageSites }: SortableItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: category.id });
 
@@ -111,8 +113,18 @@ function SortableItem({ category, onEdit, onToggle, onDelete }: SortableItemProp
 
       {/* Actions */}
       <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onManageSites(category.slug)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Settings className="h-4 w-4 mr-1" />
+          Siteler
+        </Button>
+
         <a
-          href={`/kategori/${category.slug}`}
+          href={`/${category.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -150,12 +162,17 @@ function SortableItem({ category, onEdit, onToggle, onDelete }: SortableItemProp
 }
 
 export function CategoryList({ categories, onEdit }: CategoryListProps) {
+  const navigate = useNavigate();
   const [items, setItems] = useState(categories);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const updateMutation = useUpdateCategory();
   const deleteMutation = useDeleteCategory();
   const updateOrderMutation = useUpdateCategoryOrder();
+
+  const handleManageSites = (slug: string) => {
+    navigate(`/admin/content/categories/${slug}/sites`);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -231,6 +248,7 @@ export function CategoryList({ categories, onEdit }: CategoryListProps) {
                 onEdit={onEdit}
                 onToggle={handleToggle}
                 onDelete={handleDelete}
+                onManageSites={handleManageSites}
               />
             ))}
           </div>

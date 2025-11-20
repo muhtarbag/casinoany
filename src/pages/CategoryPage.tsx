@@ -4,7 +4,6 @@ import { Footer } from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import { LoadingState } from '@/components/ui/loading-state';
 import { useCategory } from '@/hooks/queries/useCategoryQueries';
-import { useSites } from '@/hooks/queries/useSiteQueries';
 import { BettingSiteCard } from '@/components/BettingSiteCard';
 import {
   Breadcrumb,
@@ -15,11 +14,41 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+interface CategorySite {
+  id: string;
+  site_id: string;
+  display_order: number;
+  betting_sites: any;
+}
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: category, isLoading: categoryLoading } = useCategory(slug || '');
-  const { data: sites, isLoading: sitesLoading } = useSites();
+
+  // Fetch category-specific sites
+  const { data: categorySites, isLoading: sitesLoading } = useQuery({
+    queryKey: ['category-sites-frontend', category?.id],
+    queryFn: async () => {
+      if (!category?.id) return [];
+      const { data, error } = await supabase
+        .from('site_categories')
+        .select(`
+          id,
+          site_id,
+          display_order,
+          betting_sites:site_id (*)
+        `)
+        .eq('category_id', category.id)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as CategorySite[];
+    },
+    enabled: !!category?.id,
+  });
 
   if (categoryLoading) return <LoadingState variant="skeleton" rows={8} />;
   if (!category) return <div className="min-h-screen flex items-center justify-center">Kategori bulunamadı</div>;
@@ -64,34 +93,37 @@ export default function CategoryPage() {
             />
           )}
 
-          {!sitesLoading && sites && sites.length > 0 && (
+          {!sitesLoading && categorySites && categorySites.length > 0 && (
             <section className="space-y-6">
               <h2 className="text-3xl font-bold text-center">Önerilen Siteler</h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {sites.slice(0, 6).map((site) => (
-                  <BettingSiteCard
-                    key={site.id}
-                    id={site.id}
-                    slug={site.slug}
-                    name={site.name}
-                    logo={site.logo_url}
-                    rating={site.rating}
-                    bonus={site.bonus}
-                    features={site.features}
-                    affiliateUrl={site.affiliate_link}
-                    email={site.email}
-                    whatsapp={site.whatsapp}
-                    telegram={site.telegram}
-                    twitter={site.twitter}
-                    instagram={site.instagram}
-                    facebook={site.facebook}
-                    youtube={site.youtube}
-                    views={0}
-                    clicks={0}
-                    reviewCount={site.review_count || 0}
-                    avgRating={site.avg_rating || 0}
-                  />
-                ))}
+                {categorySites.map((item) => {
+                  const site = item.betting_sites;
+                  return (
+                    <BettingSiteCard
+                      key={site.id}
+                      id={site.id}
+                      slug={site.slug}
+                      name={site.name}
+                      logo={site.logo_url}
+                      rating={site.rating}
+                      bonus={site.bonus}
+                      features={site.features}
+                      affiliateUrl={site.affiliate_link}
+                      email={site.email}
+                      whatsapp={site.whatsapp}
+                      telegram={site.telegram}
+                      twitter={site.twitter}
+                      instagram={site.instagram}
+                      facebook={site.facebook}
+                      youtube={site.youtube}
+                      views={0}
+                      clicks={0}
+                      reviewCount={site.review_count || 0}
+                      avgRating={site.avg_rating || 0}
+                    />
+                  );
+                })}
               </div>
             </section>
           )}
