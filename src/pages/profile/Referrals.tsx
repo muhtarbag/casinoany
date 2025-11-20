@@ -14,6 +14,7 @@ export default function Referrals() {
     referralData,
     referralHistory,
     isLoading,
+    isLoadingHistory,
     getReferralLink,
     copyReferralLink,
     shareViaWhatsApp,
@@ -21,11 +22,16 @@ export default function Referrals() {
     shareViaEmail
   } = useReferralProgram();
 
+  // Show skeleton only for main referral data (fast load)
   if (isLoading) {
     return (
       <ProfileLayout>
         <div className="space-y-6">
-          <Skeleton className="h-48 w-full" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
           <Skeleton className="h-64 w-full" />
         </div>
       </ProfileLayout>
@@ -161,18 +167,24 @@ export default function Referrals() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {referralHistory.length === 0 ? (
+            {isLoadingHistory ? (
+              <div className="space-y-3">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            ) : referralHistory.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Share2 className="h-12 w-12 mx-auto mb-4 opacity-20" />
                 <p>Henüz kimseyi davet etmedin</p>
                 <p className="text-sm mt-1">Yukarıdaki linki paylaşarak başla!</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
                 {referralHistory.map((referral) => (
                   <div
                     key={referral.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">

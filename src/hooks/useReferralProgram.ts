@@ -69,28 +69,43 @@ export const useReferralProgram = () => {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Fetch referral history (limited to last 100)
+  // Fetch referral history - optimized with pagination
   const { data: referralHistory = [], isLoading: isLoadingHistory } = useQuery({
     queryKey: ['referral-history', user?.id],
     queryFn: async () => {
       if (!user) return [];
 
+      // Only fetch necessary fields and limit to 50 most recent
       const { data, error } = await supabase
         .from('referral_history')
-        .select(`
-          *,
-          referred_user:profiles!referral_history_referred_id_fkey(username, email)
-        `)
+        .select('id, referrer_id, referred_id, referral_code, status, points_awarded, created_at, completed_at')
         .eq('referrer_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(100);
+        .limit(50); // Reduced from 100 to 50
 
       if (error) throw error;
+      
+      // Fetch user details separately for better performance
+      if (data && data.length > 0) {
+        const userIds = data.map(r => r.referred_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username, email')
+          .in('id', userIds);
+        
+        const profileMap = new Map(profiles?.map(p => [p.id, p]));
+        
+        return data.map(item => ({
+          ...item,
+          referred_user: profileMap.get(item.referred_id)
+        })) as ReferralHistory[];
+      }
+      
       return data as ReferralHistory[];
     },
-    enabled: !!user,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user && !!referralData, // Wait for referralData first
+    staleTime: 5 * 60 * 1000, // Increased to 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Process referral code for new users
@@ -164,7 +179,8 @@ export const useReferralProgram = () => {
   return {
     referralData,
     referralHistory,
-    isLoading: isLoadingReferral || isLoadingHistory,
+    isLoading: isLoadingReferral, // Only wait for main data
+    isLoadingHistory, // Separate loading state for history
     getReferralLink,
     copyReferralLink,
     shareViaWhatsApp,
