@@ -1,17 +1,17 @@
 # robots.txt for CasinoAny
-# Simplified for Google indexing
+# SEO-optimized for search engines
 
 # Allow all search engines
 User-agent: *
 Allow: /
 
-# Sitemaps
+# Primary Sitemap (Index)
+Sitemap: https://casinoany.com/sitemap.xml
+
+# Alternative domains
 Sitemap: https://www.casinoany.com/sitemap.xml
-Sitemap: https://www.casinoany.com/sitemap-pages.xml
-Sitemap: https://www.casinoany.com/sitemap-casinos.xml
-Sitemap: https://www.casinoany.com/sitemap-blogs.xml
-Sitemap: https://www.casinoany.com/sitemap-bonuses.xml
-Sitemap: https://www.casinoany.com/sitemap-news.xml
+Sitemap: https://casinoany.net/sitemap.xml
+Sitemap: https://casinoany.bet/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/
