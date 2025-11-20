@@ -165,6 +165,18 @@ const NewComplaint = () => {
                     <SelectValue placeholder="Şikayet edeceğiniz siteyi seçin" />
                   </SelectTrigger>
                   <SelectContent className="bg-background border border-border z-50 max-h-[300px] overflow-y-auto">
+                    <div className="border-b border-border mb-2 pb-2 px-2 pt-2">
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
+                        onClick={() => {
+                          setShowAdditionDialog(true);
+                        }}
+                      >
+                        <span className="text-lg font-bold">+</span>
+                        <span>Sitemi bulamıyorum, eklemek istiyorum</span>
+                      </button>
+                    </div>
                     {sites?.map((site) => (
                       <SelectItem key={site.id} value={site.id}>
                         <div className="flex items-center gap-3">
@@ -183,18 +195,6 @@ const NewComplaint = () => {
                         </div>
                       </SelectItem>
                     ))}
-                    <div className="border-t border-border mt-2 pt-2 px-2 pb-2">
-                      <button
-                        type="button"
-                        className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
-                        onClick={() => {
-                          setShowAdditionDialog(true);
-                        }}
-                      >
-                        <span className="text-lg font-bold">+</span>
-                        <span>Sitemi bulamıyorum, eklemek istiyorum</span>
-                      </button>
-                    </div>
                   </SelectContent>
                 </Select>
               </div>
