@@ -98,7 +98,7 @@ const DenemeBonusu = () => {
       />
 
       <Header />
-      <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-20 md:pt-24">
+      <main className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-24 md:pt-28">
         <BonusPageTemplate
           pageTitle="🎁 Deneme Bonusu Veren Siteler 2025"
           pageDescription="En yüksek deneme bonusu kampanyalarını karşılaştırın. Yatırım yapmadan bedava bonus kazanın! Güncel bonus kodları ve çevrim şartları ile."
