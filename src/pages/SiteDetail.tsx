@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Heart } from "lucide-react";
+import { Star, ExternalLink, Mail, MessageCircle, Send, ChevronRight, Heart, Award, FileText, Gift } from "lucide-react";
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from 'react-icons/fa';
 import { toast } from "sonner";
 import RecommendedSites from "@/components/RecommendedSites";
@@ -497,15 +497,30 @@ export default function SiteDetail() {
 
         {/* Content Tabs */}
         <Tabs defaultValue="review" className="mb-2">
-          <TabsList className="w-full justify-start mb-4">
-            <TabsTrigger value="review">Casino İncelemesi</TabsTrigger>
-            <TabsTrigger value="comments">
-              Kullanıcı Yorumları
+          <TabsList className="w-full justify-start overflow-x-auto mb-4 flex-nowrap">
+            <TabsTrigger value="review" className="flex items-center gap-2 whitespace-nowrap">
+              <Award className="w-4 h-4" />
+              <span className="hidden sm:inline">Casino İncelemesi</span>
+              <span className="sm:hidden">İnceleme</span>
+            </TabsTrigger>
+            <TabsTrigger value="bonus" className="flex items-center gap-2 whitespace-nowrap">
+              <Gift className="w-4 h-4" />
+              <span className="hidden sm:inline">Bonuslar & Kampanyalar</span>
+              <span className="sm:hidden">Bonuslar</span>
+            </TabsTrigger>
+            <TabsTrigger value="comments" className="flex items-center gap-2 whitespace-nowrap">
+              <MessageCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Kullanıcı Yorumları</span>
+              <span className="sm:hidden">Yorumlar</span>
               {reviews && reviews.length > 0 && (
-                <Badge variant="secondary" className="ml-2">{reviews.length}</Badge>
+                <Badge variant="secondary" className="ml-1">{reviews.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="blog">İlgili Blog Yazıları</TabsTrigger>
+            <TabsTrigger value="blog" className="flex items-center gap-2 whitespace-nowrap">
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">İlgili Blog Yazıları</span>
+              <span className="sm:hidden">Blog</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Casino Review Tab */}
@@ -521,6 +536,65 @@ export default function SiteDetail() {
               withdrawalGuide={enrichedWithdrawalGuide}
               faq={site.faq}
             />
+          </TabsContent>
+
+          {/* Bonus Tab */}
+          <TabsContent value="bonus">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-primary" />
+                  Aktif Bonuslar ve Kampanyalar
+                </CardTitle>
+                <CardDescription>
+                  {site.name} sitesinde geçerli olan bonus teklifleri
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {site.bonus && (
+                  <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                    <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                      <Star className="w-5 h-5 text-gold" />
+                      Hoş Geldin Bonusu
+                    </h3>
+                    <p className="text-muted-foreground mb-4">{site.bonus}</p>
+                    <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Bonusu Talep Et
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="grid gap-4">
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">💰 Çevrim Koşulları</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Bonus çevrim şartları ve detayları için {site.name} sitesini ziyaret edin.
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">🎯 Özel Kampanyalar</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Sadakat programı, cashback ve diğer kampanyalar için siteyi kontrol edin.
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">📅 Güncel Promosyonlar</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Haftalık ve aylık özel promosyonlar için {site.name} sitesini takip edin.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <p className="text-xs text-muted-foreground">
+                    ⚠️ Bonus şartları ve koşulları değişebilir. Güncel bilgi için lütfen {site.name} sitesini ziyaret edin.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Reviews Tab */}
