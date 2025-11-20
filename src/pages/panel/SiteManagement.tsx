@@ -209,7 +209,7 @@ const SiteManagement = () => {
           />
         );
       case 'advanced-analytics':
-        return <AdvancedAnalytics />;
+        return <AdvancedAnalytics siteId={siteData.id} />;
       case 'profile':
         return <SiteOwnerProfileEditor />;
       default:
