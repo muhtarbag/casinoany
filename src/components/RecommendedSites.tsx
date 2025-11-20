@@ -1,12 +1,12 @@
-import { memo, useMemo, useEffect, useRef } from "react";
+import { memo, useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Eye, MousePointerClick, TrendingUp, ArrowRight } from "lucide-react";
+import { Star, Eye, MousePointerClick, TrendingUp, ArrowRight, CheckCircle2, Zap, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { OptimizedImage } from "./OptimizedImage";
 import { useSiteStats } from "@/hooks/queries/useSiteQueries";
 
@@ -79,81 +79,47 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
 
   const { data: siteStats } = useSiteStats();
 
-  // Memoize recommended sites selection - only recalculate when dependencies change
+  // Carousel state
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  // Memoize recommended sites
   const recommendedSites = useMemo(() => {
     if (!allSites || allSites.length === 0) return [];
-    
     const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 15); // 15 sites for 3 rows (5 per row)
+    return shuffled.slice(0, 15);
   }, [allSites]);
 
-  // Split sites into 3 rows
-  const siteRows = useMemo(() => {
-    if (!recommendedSites || recommendedSites.length === 0) return [[], [], []];
-    
-    const row1 = recommendedSites.filter((_, idx) => idx % 3 === 0);
-    const row2 = recommendedSites.filter((_, idx) => idx % 3 === 1);
-    const row3 = recommendedSites.filter((_, idx) => idx % 3 === 2);
-    
-    return [row1, row2, row3];
-  }, [recommendedSites]);
-
-  // Auto-scroll functionality
-  const scrollRefs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)];
-
+  // Auto-play carousel
   useEffect(() => {
-    const intervals = scrollRefs.map((ref, index) => {
-      if (!ref.current) return null;
-      
-      const container = ref.current;
-      const scrollWidth = container.scrollWidth;
-      const clientWidth = container.clientWidth;
-      
-      if (scrollWidth <= clientWidth) return null;
-      
-      const interval = setInterval(() => {
-        if (!container) return;
-        
-        const maxScroll = scrollWidth - clientWidth;
-        const currentScroll = container.scrollLeft;
-        
-        // Smooth scroll to next position
-        if (currentScroll >= maxScroll - 10) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          container.scrollBy({ left: 300, behavior: 'smooth' });
-        }
-      }, 2200);
-      
-      return interval;
-    });
+    if (!isAutoPlaying || recommendedSites.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % recommendedSites.length);
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, recommendedSites.length]);
 
-    return () => {
-      intervals.forEach(interval => {
-        if (interval) clearInterval(interval);
-      });
-    };
-  }, [siteRows]);
+  const handlePrevious = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev - 1 + recommendedSites.length) % recommendedSites.length);
+  };
+
+  const handleNext = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev + 1) % recommendedSites.length);
+  };
 
   if (isLoading) {
     return (
-      <Card className="overflow-hidden">
-        <CardHeader>
-          <CardTitle>Önerilen Siteler</CardTitle>
-          <CardDescription>Kullanıcılar bu sitelere de baktı</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[0, 1, 2].map((row) => (
-              <div key={row} className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-muted">
-                {[...Array(8)].map((_, i) => (
-                  <Skeleton key={i} className="min-w-[280px] h-[140px] flex-shrink-0" />
-                ))}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-primary/5 p-8 border-2 border-primary/10">
+        <div className="text-center space-y-4 mb-8">
+          <Skeleton className="h-8 w-48 mx-auto" />
+          <Skeleton className="h-4 w-64 mx-auto" />
+        </div>
+        <Skeleton className="h-[400px] w-full rounded-xl" />
+      </div>
     );
   }
 
@@ -161,135 +127,231 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     return null;
   }
 
-  const renderSiteCard = (site: any) => {
+  const renderSiteCard = (site: any, index: number) => {
     const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
     const views = stats?.views || 0;
     const clicks = stats?.clicks || 0;
+    const isActive = index === currentIndex;
+    const isPrev = index === (currentIndex - 1 + recommendedSites.length) % recommendedSites.length;
+    const isNext = index === (currentIndex + 1) % recommendedSites.length;
     
     return (
       <div
         key={site.id}
-        className="min-w-[300px] flex-shrink-0"
+        className={`absolute w-full transition-all duration-700 ease-out ${
+          isActive 
+            ? 'opacity-100 scale-100 translate-x-0 z-20' 
+            : isPrev
+            ? 'opacity-0 -translate-x-full scale-95 z-10'
+            : isNext
+            ? 'opacity-0 translate-x-full scale-95 z-10'
+            : 'opacity-0 scale-90 z-0'
+        }`}
       >
-        <Card className="h-full border-2 hover:border-primary hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm group">
-          <CardContent className="p-4">
-            <div className="flex gap-4">
-              {/* Logo Section */}
-              <div className="flex-shrink-0">
-                <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-border group-hover:border-primary transition-colors bg-background shadow-sm">
-                  {site.logo_url ? (
-                    <OptimizedImage
-                      src={site.logo_url}
-                      alt={`${site.name} logo`}
-                      className="w-full h-full object-contain p-2"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl font-bold bg-primary/10 text-primary">
-                      {site.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
-              </div>
+        <Card className="border-2 border-primary/20 bg-gradient-to-br from-card via-card/95 to-primary/5 backdrop-blur-xl shadow-2xl overflow-hidden group hover:border-primary/40 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          <div className="relative p-6 md:p-8">
+            {/* Trust Badge */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 gap-1 shadow-lg">
+                <CheckCircle2 className="h-3 w-3" />
+                Doğrulanmış
+              </Badge>
+              {site.rating >= 4.5 && (
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 gap-1 shadow-lg">
+                  <Award className="h-3 w-3" />
+                  Top Site
+                </Badge>
+              )}
+            </div>
 
-              {/* Content Section */}
-              <div className="flex-1 min-w-0 space-y-2">
-                <div>
-                  <h3 className="font-semibold text-base line-clamp-1 group-hover:text-primary transition-colors">
+            <div className="grid md:grid-cols-2 gap-8 items-center mt-12 md:mt-0">
+              {/* Left: Logo & Name */}
+              <div className="text-center md:text-left space-y-6">
+                <div className="inline-block relative">
+                  <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+                  <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto md:mx-0 rounded-3xl overflow-hidden border-4 border-primary/30 bg-background shadow-2xl group-hover:scale-105 group-hover:border-primary/50 transition-all duration-500">
+                    {site.logo_url ? (
+                      <OptimizedImage
+                        src={site.logo_url}
+                        alt={`${site.name} logo`}
+                        className="w-full h-full object-contain p-4"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl font-bold bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
+                        {site.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                     {site.name}
                   </h3>
                   {site.bonus && (
-                    <p className="text-xs text-muted-foreground line-clamp-1">
+                    <p className="text-sm md:text-base text-muted-foreground font-medium flex items-center gap-2 justify-center md:justify-start">
+                      <Zap className="h-4 w-4 text-primary animate-pulse" />
                       {site.bonus}
                     </p>
                   )}
                 </div>
 
-                {/* Social Proof */}
-                <div className="flex flex-wrap gap-2">
+                {/* Social Proof - Large & Prominent */}
+                <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                   {site.rating && (
-                    <Badge variant="secondary" className="gap-1 text-xs">
-                      <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                      <span className="font-semibold">{site.rating}</span>
-                    </Badge>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-full border border-amber-500/20">
+                      <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
+                      <span className="font-bold text-lg">{site.rating}</span>
+                      <span className="text-xs text-muted-foreground">/5.0</span>
+                    </div>
                   )}
                   
                   {views > 0 && (
-                    <Badge variant="outline" className="gap-1 text-xs">
-                      <Eye className="h-3 w-3" />
-                      <span>{views > 1000 ? `${(views / 1000).toFixed(1)}k` : views}</span>
-                    </Badge>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
+                      <Eye className="h-4 w-4 text-primary" />
+                      <span className="font-semibold">{views > 1000 ? `${(views / 1000).toFixed(1)}k` : views}</span>
+                      <span className="text-xs text-muted-foreground">görüntülenme</span>
+                    </div>
                   )}
                   
                   {clicks > 0 && (
-                    <Badge variant="outline" className="gap-1 text-xs">
-                      <MousePointerClick className="h-3 w-3" />
-                      <span>{clicks > 1000 ? `${(clicks / 1000).toFixed(1)}k` : clicks}</span>
-                    </Badge>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
+                      <MousePointerClick className="h-4 w-4 text-primary" />
+                      <span className="font-semibold">{clicks > 1000 ? `${(clicks / 1000).toFixed(1)}k` : clicks}</span>
+                      <span className="text-xs text-muted-foreground">tıklama</span>
+                    </div>
                   )}
                 </div>
+              </div>
 
-                {/* Features Preview */}
+              {/* Right: Features & CTA */}
+              <div className="space-y-6">
+                {/* Features */}
                 {site.features && site.features.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {site.features.slice(0, 2).map((feature: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                    {site.features.length > 2 && (
-                      <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
-                        +{site.features.length - 2}
-                      </span>
-                    )}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      Öne Çıkan Özellikler
+                    </h4>
+                    <div className="grid gap-2">
+                      {site.features.slice(0, 4).map((feature: string, idx: number) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/10 hover:bg-primary/10 hover:border-primary/20 transition-all duration-300"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="text-sm font-medium">{feature}</span>
+                        </div>
+                      ))}
+                      {site.features.length > 4 && (
+                        <p className="text-xs text-muted-foreground text-center py-2">
+                          +{site.features.length - 4} özellik daha
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
+
+                {/* CTA Button */}
+                <Link to={`/${site.slug}`} className="block">
+                  <Button 
+                    size="lg"
+                    className="w-full text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 group/btn h-14"
+                  >
+                    <span>Siteyi İncele</span>
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  Detaylı bilgi için tıklayın
+                </p>
               </div>
             </div>
-
-            {/* Action Button */}
-            <Link to={`/${site.slug}`} className="block mt-3">
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="w-full group-hover:shadow-md transition-shadow"
-              >
-                Detaya Git
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-          </CardContent>
+          </div>
         </Card>
       </div>
     );
   };
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          Önerilen Siteler
-        </CardTitle>
-        <CardDescription>Kullanıcılar bu sitelere de baktı</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4 animate-fade-in">
-          {siteRows.map((rowSites, rowIndex) => (
-            <div
-              key={rowIndex}
-              ref={scrollRefs[rowIndex]}
-              className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-muted scroll-smooth"
-              style={{ scrollBehavior: 'smooth' }}
-            >
-              {rowSites.map((site: any) => renderSiteCard(site))}
-            </div>
-          ))}
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-primary/5 p-6 md:p-8 border-2 border-primary/10 animate-fade-in">
+      {/* Header */}
+      <div className="text-center space-y-2 mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 mb-2">
+          <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
+          <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+            Editörün Seçimi
+          </span>
         </div>
-      </CardContent>
-    </Card>
+        <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent">
+          Önerilen Bahis Siteleri
+        </h2>
+        <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
+          Güvenilir, lisanslı ve kullanıcılar tarafından en çok tercih edilen platformlar
+        </p>
+      </div>
+
+      {/* Carousel */}
+      <div className="relative h-[500px] md:h-[400px] mb-8">
+        {recommendedSites.map((site: any, index: number) => renderSiteCard(site, index))}
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-center gap-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrevious}
+          className="rounded-full border-2 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+
+        {/* Dots */}
+        <div className="flex gap-2">
+          {recommendedSites.slice(0, 10).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentIndex(index);
+                setIsAutoPlaying(false);
+              }}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex 
+                  ? 'w-8 bg-primary' 
+                  : 'w-2 bg-primary/20 hover:bg-primary/40'
+              }`}
+            />
+          ))}
+          {recommendedSites.length > 10 && (
+            <span className="text-xs text-muted-foreground self-center">
+              +{recommendedSites.length - 10}
+            </span>
+          )}
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          className="rounded-full border-2 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="mt-6 text-center">
+        <p className="text-xs text-muted-foreground">
+          <span className="font-semibold text-primary">{currentIndex + 1}</span>
+          {' / '}
+          <span>{recommendedSites.length}</span>
+          {' önerilen site'}
+        </p>
+      </div>
+    </div>
   );
 };
 
