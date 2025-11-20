@@ -48,6 +48,7 @@ import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { ScrollProgress } from '@/components/site-detail/ScrollProgress';
 
 import { CollapsibleFeatures } from '@/components/site-detail/CollapsibleFeatures';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SiteDetail() {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -494,37 +495,57 @@ export default function SiteDetail() {
           </CardContent>
         </Card>
 
-        {/* Casino Review Core Content */}
-        <div className="mb-2">
-          <CasinoReviewCoreContent
-            siteName={site.name}
-            pros={site.pros}
-            cons={site.cons}
-            verdict={enrichedVerdict}
-            expertReview={enrichedExpertReview}
-            gameCategories={site.game_categories}
-            loginGuide={enrichedLoginGuide}
-            withdrawalGuide={enrichedWithdrawalGuide}
-            faq={site.faq}
-          />
-        </div>
+        {/* Content Tabs */}
+        <Tabs defaultValue="review" className="mb-2">
+          <TabsList className="w-full justify-start mb-4">
+            <TabsTrigger value="review">Casino İncelemesi</TabsTrigger>
+            <TabsTrigger value="comments">
+              Kullanıcı Yorumları
+              {reviews && reviews.length > 0 && (
+                <Badge variant="secondary" className="ml-2">{reviews.length}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="blog">İlgili Blog Yazıları</TabsTrigger>
+          </TabsList>
 
-        {/* Reviews Section */}
-        {!reviewsLoading && reviews && (
-          <div className="mb-2">
-            <SiteDetailReviews 
-              site={site} 
-              reviews={reviews} 
-              user={user} 
-              averageRating={averageRating} 
+          {/* Casino Review Tab */}
+          <TabsContent value="review">
+            <CasinoReviewCoreContent
+              siteName={site.name}
+              pros={site.pros}
+              cons={site.cons}
+              verdict={enrichedVerdict}
+              expertReview={enrichedExpertReview}
+              gameCategories={site.game_categories}
+              loginGuide={enrichedLoginGuide}
+              withdrawalGuide={enrichedWithdrawalGuide}
+              faq={site.faq}
             />
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Site Blog Section */}
-        <div className="mb-2">
-          <SiteBlogSection siteId={site.id} siteName={site.name} />
-        </div>
+          {/* Reviews Tab */}
+          <TabsContent value="comments">
+            {!reviewsLoading && reviews ? (
+              <SiteDetailReviews 
+                site={site} 
+                reviews={reviews} 
+                user={user} 
+                averageRating={averageRating} 
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <Skeleton className="h-32 w-full" />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Blog Tab */}
+          <TabsContent value="blog">
+            <SiteBlogSection siteId={site.id} siteName={site.name} />
+          </TabsContent>
+        </Tabs>
 
         {/* Recommended Sites */}
         <RecommendedSites currentSiteId={site.id} currentSiteFeatures={site.features || []} />
