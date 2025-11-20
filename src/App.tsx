@@ -47,6 +47,7 @@ import AdminNotifications from "./pages/admin/Notifications";
 import AdminNews from "./pages/admin/News";
 import AdminCasinoContent from "./pages/admin/content/CasinoContent";
 import AdminCategoryManagement from "./pages/admin/content/CategoryManagement";
+import AdminCategorySites from "./pages/admin/content/CategorySites";
 import AdminBonusRequests from "./pages/admin/finance/BonusRequests";
 import AdminContentPlanner from "./pages/admin/content/ContentPlanner";
 import AdminChangeHistory from "./pages/admin/system/ChangeHistory";
@@ -187,8 +188,9 @@ const AppContent = () => {
             <Route path="complaints" element={<AdminComplaints />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
-            <Route path="content/casino" element={<AdminCasinoContent />} />
+          <Route path="content/casino" element={<AdminCasinoContent />} />
             <Route path="content/categories" element={<AdminCategoryManagement />} />
+            <Route path="content/categories/:slug/sites" element={<AdminCategorySites />} />
             <Route path="content/planner" element={<AdminContentPlanner />} />
             <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
             <Route path="finance/bonus" element={<AdminBonusManagement />} />
