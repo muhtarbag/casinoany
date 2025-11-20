@@ -208,12 +208,13 @@ const Memberships = () => {
                     <Label htmlFor="site">Site Seçin *</Label>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => setIsSiteRequestOpen(true)}
-                      className="h-auto p-0 text-xs text-primary hover:underline"
+                      className="gap-1.5"
                     >
-                      Listede yok mu? Ekle
+                      <Plus className="w-3.5 h-3.5" />
+                      Site Ekle
                     </Button>
                   </div>
                   <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
