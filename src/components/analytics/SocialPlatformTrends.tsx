@@ -18,6 +18,9 @@ export const SocialPlatformTrends = ({ statsData }: SocialPlatformTrendsProps) =
     return acc;
   }, {} as Record<string, number>);
 
+  // Calculate total clicks across all platforms
+  const totalClicks = (Object.values(platformTotals) as number[]).reduce((sum, val) => sum + val, 0);
+
   const chartData = [
     { name: 'Email', clicks: platformTotals.email || 0, fill: '#3b82f6' },
     { name: 'WhatsApp', clicks: platformTotals.whatsapp || 0, fill: '#22c55e' },
@@ -28,7 +31,7 @@ export const SocialPlatformTrends = ({ statsData }: SocialPlatformTrendsProps) =
     { name: 'YouTube', clicks: platformTotals.youtube || 0, fill: '#ef4444' },
   ].filter(item => item.clicks > 0);
 
-  if (chartData.length === 0) {
+  if (chartData.length === 0 || totalClicks === 0) {
     return (
       <Card>
         <CardHeader>
@@ -36,7 +39,10 @@ export const SocialPlatformTrends = ({ statsData }: SocialPlatformTrendsProps) =
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-8">
-            Henüz sosyal medya tıklama verisi bulunmuyor
+            Henüz sosyal medya tıklama verisi bulunmuyor. Sosyal medya linkleri kullanıldıkça buraya veriler yansıyacak.
+          </p>
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            Veri sayısı: {statsData.length} site
           </p>
         </CardContent>
       </Card>
@@ -46,7 +52,12 @@ export const SocialPlatformTrends = ({ statsData }: SocialPlatformTrendsProps) =
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Platform Trend Analizi</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <span>Platform Trend Analizi</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            Toplam: {totalClicks} tıklama
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
