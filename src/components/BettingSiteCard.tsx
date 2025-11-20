@@ -204,7 +204,7 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-48 h-32 sm:w-56 sm:h-36 md:w-64 md:h-40 lg:w-72 lg:h-44 bg-card dark:bg-card rounded-xl flex items-center justify-center overflow-hidden border-2 border-border hover:border-primary/70 shadow-md hover:shadow-xl ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
+          <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-card dark:bg-card rounded-xl flex items-center justify-center overflow-hidden border-2 border-border hover:border-primary/70 shadow-md hover:shadow-xl ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
             {/* Loading Skeleton */}
             {isLoading && !showFallback && (
               <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse" />
@@ -214,11 +214,11 @@ const BettingSiteCardComponent = ({
               <OptimizedImage
                 src={logoUrl!}
                 alt={`${name} logo`}
-                className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 object-contain p-1 transition-all duration-300 group-hover/logo:scale-105 ${
+                className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain p-1 transition-all duration-300 group-hover/logo:scale-105 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
                 }`}
-                width={144}
-                height={144}
+                width={112}
+                height={112}
                 objectFit="contain"
                 fetchPriority={priority ? 'high' : 'auto'}
                 priority={priority}
@@ -227,7 +227,7 @@ const BettingSiteCardComponent = ({
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center animate-scale-in">
-                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
                   {name.charAt(0)}
                 </span>
               </div>
