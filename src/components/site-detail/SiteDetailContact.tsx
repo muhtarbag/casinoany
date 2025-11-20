@@ -1,6 +1,12 @@
-import { Mail } from 'lucide-react';
+import { Mail, ChevronDown } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { trackSocialClick } from '@/lib/socialTracking';
 import { 
   normalizeWhatsAppUrl, 
@@ -29,16 +35,28 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
   const facebookUrl = normalizeFacebookUrl(site.facebook);
   const youtubeUrl = normalizeYouTubeUrl(site.youtube);
 
+  // Count active channels
+  const activeChannels = [
+    site.email, whatsappUrl, telegramUrl, twitterUrl, 
+    instagramUrl, facebookUrl, youtubeUrl
+  ].filter(Boolean).length;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="w-5 h-5" />
-          İletişim Bilgileri
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-4 items-center justify-center">
+    <Accordion type="single" collapsible className="w-full">
+      <AccordionItem value="contact" className="border rounded-lg px-4 bg-card">
+        <AccordionTrigger className="hover:no-underline py-4">
+          <div className="flex items-center justify-between w-full pr-4">
+            <div className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-primary" />
+              <span className="font-semibold">İletişim & Sosyal Medya</span>
+            </div>
+            <Badge variant="secondary" className="mr-2">
+              {activeChannels} kanal
+            </Badge>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="flex flex-wrap gap-4 items-center justify-center py-4">
           {site.email && (
             <a 
               href={`mailto:${site.email}`} 
@@ -141,8 +159,9 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
               <FaYoutube className="w-10 h-10 text-[#FF0000] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
