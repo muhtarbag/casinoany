@@ -84,6 +84,7 @@ import AMPBlogPost from "./pages/amp/AMPBlogPost";
 import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
 import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
+import FAQ from "./pages/FAQ";
 
 // User profile pages - all imported directly
 import Favorites from "./pages/profile/Favorites";
@@ -227,6 +228,8 @@ const AppContent = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/kvkk" element={<KVKK />} />
+          <Route path="/sss" element={<FAQ />} />
+          <Route path="/sik-sorulan-sorular" element={<FAQ />} />
           <Route path="/casino-siteleri" element={<CasinoSites />} />
           <Route path="/spor-bahisleri" element={<SportsBetting />} />
           <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />

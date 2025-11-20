@@ -128,6 +128,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/sss" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ❓ Sıkça Sorulan Sorular
+                </Link>
+              </li>
+              <li>
                 <Link to="/sitemap.xml" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🗺️ Site Haritası
                 </Link>
