@@ -161,15 +161,27 @@ const NewComplaint = () => {
               <div className="space-y-2">
                 <Label htmlFor="site">Site Seçimi *</Label>
                 <Select value={siteId} onValueChange={setSiteId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background border-input">
                     <SelectValue placeholder="Şikayet edeceğiniz siteyi seçin" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background border border-border z-50 max-h-[300px] overflow-y-auto">
                     {sites?.map((site) => (
                       <SelectItem key={site.id} value={site.id}>
                         {site.name}
                       </SelectItem>
                     ))}
+                    <div className="border-t border-border mt-2 pt-2 px-2 pb-2">
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
+                        onClick={() => {
+                          setShowAdditionDialog(true);
+                        }}
+                      >
+                        <span className="text-lg font-bold">+</span>
+                        <span>Sitemi bulamıyorum, eklemek istiyorum</span>
+                      </button>
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
