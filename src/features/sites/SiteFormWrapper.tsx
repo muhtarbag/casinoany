@@ -14,7 +14,7 @@ interface SiteFormWrapperProps {
   sites: any[];
   logoFile: File | null;
   logoPreview: string | null;
-  onLogoFileChange: (file: File | null) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onLogoPreviewChange: (preview: string | null) => void;
   createSiteMutation: UseMutationResult<void, Error, { formData: SiteFormData; logoFile: File | null }>;
   updateSiteMutation: UseMutationResult<void, Error, { id: string; formData: SiteFormData; logoFile: File | null }>;

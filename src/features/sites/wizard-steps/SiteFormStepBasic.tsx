@@ -15,7 +15,7 @@ interface SiteFormStepBasicProps {
   form: UseFormReturn<SiteFormData>;
   logoFile: File | null;
   logoPreview: string | null;
-  onLogoFileChange: (file: File | null) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onLogoPreviewChange: (preview: string | null) => void;
 }
 
@@ -38,9 +38,14 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
         e.target.value = '';
         return;
       }
-      onLogoFileChange(file);
+      
+      // Önce dosyayı oku ve preview oluştur
       const reader = new FileReader();
-      reader.onloadend = () => onLogoPreviewChange(reader.result as string);
+      reader.onloadend = () => {
+        const preview = reader.result as string;
+        onLogoFileChange(file, preview);
+        onLogoPreviewChange(preview);
+      };
       reader.readAsDataURL(file);
     }
   };

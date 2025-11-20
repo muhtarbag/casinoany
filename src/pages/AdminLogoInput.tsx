@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 interface AdminLogoInputProps {
   logoPreview: string | null;
-  onLogoChange: (file: File | null) => void;
+  onLogoChange: (file: File | null, preview?: string) => void;
   onClearLogo: () => void;
 }
 
@@ -33,15 +33,25 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
     if (files.length > 0) {
       const file = files[0];
       if (file.type.startsWith('image/')) {
-        onLogoChange(file);
+        // Önce dosyayı oku ve preview oluştur
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onLogoChange(file, reader.result as string);
+        };
+        reader.readAsDataURL(file);
       }
     }
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      onLogoChange(file);
+    if (file && file.type.startsWith('image/')) {
+      // Önce dosyayı oku ve preview oluştur
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onLogoChange(file, reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
