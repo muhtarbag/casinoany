@@ -62,7 +62,7 @@ export default function Complaints() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, slug')
+        .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
 
@@ -183,7 +183,20 @@ export default function Complaints() {
                         </div>
                         {sites?.map((site) => (
                           <SelectItem key={site.id} value={site.id}>
-                            {site.name}
+                            <div className="flex items-center gap-3">
+                              {site.logo_url ? (
+                                <img 
+                                  src={site.logo_url} 
+                                  alt={site.name}
+                                  className="w-6 h-6 object-contain rounded"
+                                />
+                              ) : (
+                                <div className="w-6 h-6 bg-muted rounded flex items-center justify-center text-xs font-bold">
+                                  {site.name.charAt(0)}
+                                </div>
+                              )}
+                              <span>{site.name}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
