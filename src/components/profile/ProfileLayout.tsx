@@ -31,7 +31,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
-import { UserNotificationBell } from '@/components/panel/UserNotificationBell';
+import { NotificationBell } from '@/components/profile/NotificationBell';
 import logo from '@/assets/casinodoo-logo.svg';
 
 interface ProfileLayoutProps {
@@ -190,7 +190,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </Link>
 
           <div className="flex items-center gap-2">
-            <UserNotificationBell />
+            <NotificationBell />
             
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
