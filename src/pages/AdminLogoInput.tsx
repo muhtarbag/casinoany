@@ -45,11 +45,22 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('🔍 AdminLogoInput - handleFileChange:', { file });
+    
     if (file && file.type.startsWith('image/')) {
       // Önce dosyayı oku ve preview oluştur
       const reader = new FileReader();
       reader.onloadend = () => {
-        onLogoChange(file, reader.result as string);
+        const preview = reader.result as string;
+        console.log('✅ AdminLogoInput - FileReader completed:', { 
+          fileName: file.name, 
+          previewLength: preview?.length || 0,
+          previewStart: preview?.substring(0, 50)
+        });
+        onLogoChange(file, preview);
+      };
+      reader.onerror = () => {
+        console.error('❌ AdminLogoInput - FileReader error');
       };
       reader.readAsDataURL(file);
     }
@@ -97,6 +108,11 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
                   src={logoPreview}
                   alt="Logo önizleme"
                   className="w-40 h-40 object-contain bg-white rounded-lg border-2 border-border p-4 shadow-sm"
+                  onLoad={() => console.log('✅ Logo preview loaded:', logoPreview?.substring(0, 50))}
+                  onError={(e) => {
+                    console.error('❌ Logo preview failed to load:', logoPreview?.substring(0, 50));
+                    console.error('Error event:', e);
+                  }}
                 />
                 <Button
                   type="button"
@@ -104,6 +120,7 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
                   size="icon"
                   onClick={(e) => {
                     e.stopPropagation();
+                    console.log('🗑️ Clearing logo');
                     onClearLogo();
                   }}
                   className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
