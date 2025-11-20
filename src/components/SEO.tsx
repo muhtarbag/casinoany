@@ -29,11 +29,12 @@ export const SEO = ({
   article,
   structuredData,
 }: SEOProps) => {
-  const siteUrl = window.location.origin;
+  // Always use https://casinoany.com as primary domain for canonical and OG
+  const siteUrl = 'https://casinoany.com';
   const currentPath = window.location.pathname;
   
-  // Use canonical engine for clean URLs
-  const currentUrl = canonical || buildCanonical(currentPath);
+  // Use canonical engine for clean URLs - always absolute URLs
+  const currentUrl = canonical || buildCanonical(currentPath, { baseUrl: siteUrl });
   
   // Determine if page should be noindexed
   const robotsTag = getRobotsMetaTag(currentPath);

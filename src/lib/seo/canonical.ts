@@ -13,7 +13,8 @@ export function buildCanonical(path: string, options?: {
   removeParams?: boolean;
   baseUrl?: string;
 }): string {
-  const baseUrl = options?.baseUrl || import.meta.env.VITE_SITE_URL || 'https://www.casinoany.com';
+  // Always use https://casinoany.com as the primary canonical domain
+  const baseUrl = options?.baseUrl || 'https://casinoany.com';
   
   // Remove query parameters if specified (default: true)
   const removeParams = options?.removeParams !== false;
@@ -35,6 +36,7 @@ export function buildCanonical(path: string, options?: {
     cleanPath = '/' + cleanPath;
   }
   
+  // Always return absolute URL with https protocol
   return `${baseUrl}${cleanPath}`;
 }
 
