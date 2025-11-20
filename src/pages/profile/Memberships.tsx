@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { UserCheck, ExternalLink, Trash2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -40,6 +41,8 @@ const Memberships = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSiteRequestOpen, setIsSiteRequestOpen] = useState(false);
+  const [isSiteSelectionOpen, setIsSiteSelectionOpen] = useState(false);
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState('');
   const [username, setUsername] = useState('');
   const [notes, setNotes] = useState('');
@@ -159,6 +162,53 @@ const Memberships = () => {
       });
     },
   });
+
+  const addBulkMembershipsMutation = useMutation({
+    mutationFn: async (siteIds: string[]) => {
+      if (!user || siteIds.length === 0) {
+        throw new Error('Kullanıcı veya site seçimi eksik');
+      }
+
+      const memberships = siteIds.map(siteId => ({
+        user_id: user.id,
+        site_id: siteId,
+        username: '', // Empty for bulk add
+        is_active: true,
+        registration_date: new Date().toISOString().split('T')[0],
+      }));
+
+      const { error } = await (supabase as any)
+        .from('user_site_memberships')
+        .insert(memberships);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
+      setIsSiteSelectionOpen(false);
+      setSelectedSiteIds([]);
+      toast({
+        title: 'Başarılı',
+        description: `${selectedSiteIds.length} site başarıyla eklendi`,
+      });
+    },
+    onError: (error: any) => {
+      console.error('Bulk add membership error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Siteler eklenirken bir hata oluştu',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const toggleSiteSelection = (siteId: string) => {
+    setSelectedSiteIds(prev =>
+      prev.includes(siteId)
+        ? prev.filter(id => id !== siteId)
+        : [...prev, siteId]
+    );
+  };
 
   if (!user) {
     return (
@@ -388,14 +438,99 @@ const Memberships = () => {
               <p className="text-muted-foreground mb-4">
                 Henüz kayıtlı olduğunuz site yok
               </p>
-              <Button asChild>
-                <Link to="/">Siteleri Keşfet</Link>
+              <Button onClick={() => setIsSiteSelectionOpen(true)}>
+                Siteleri Keşfet
               </Button>
             </CardContent>
           </Card>
         )}
         
-        <SiteAdditionRequestDialog 
+        {/* Bulk Site Selection Dialog */}
+        <Dialog open={isSiteSelectionOpen} onOpenChange={setIsSiteSelectionOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle>Kayıtlı Olduğunuz Siteleri Seçin</DialogTitle>
+              <DialogDescription>
+                Sistemdeki tüm sitelerden kayıtlı olduklarınızı seçin
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-y-auto py-4">
+              {allSites && allSites.length > 0 ? (
+                <div className="grid gap-3">
+                  {allSites.map((site) => {
+                    const isAlreadyMember = memberships?.some(
+                      (m: any) => m.betting_sites.id === site.id
+                    );
+                    const isSelected = selectedSiteIds.includes(site.id);
+                    
+                    return (
+                      <div
+                        key={site.id}
+                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                          isAlreadyMember
+                            ? 'opacity-50 cursor-not-allowed bg-muted'
+                            : isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'hover:bg-muted/50'
+                        }`}
+                        onClick={() => !isAlreadyMember && toggleSiteSelection(site.id)}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={isAlreadyMember}
+                          onCheckedChange={() => toggleSiteSelection(site.id)}
+                          className="pointer-events-none"
+                        />
+                        {site.logo_url && (
+                          <img
+                            src={site.logo_url}
+                            alt={site.name}
+                            className="w-12 h-12 object-contain rounded"
+                            loading="lazy"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{site.name}</p>
+                          {isAlreadyMember && (
+                            <p className="text-xs text-muted-foreground">Zaten kayıtlısınız</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Site bulunamadı
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsSiteSelectionOpen(false);
+                  setSelectedSiteIds([]);
+                }}
+              >
+                İptal
+              </Button>
+              <Button
+                onClick={() => addBulkMembershipsMutation.mutate(selectedSiteIds)}
+                disabled={selectedSiteIds.length === 0 || addBulkMembershipsMutation.isPending}
+              >
+                {addBulkMembershipsMutation.isPending
+                  ? 'Ekleniyor...'
+                  : `${selectedSiteIds.length} Siteyi Ekle`}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        <SiteAdditionRequestDialog
           open={isSiteRequestOpen} 
           onOpenChange={setIsSiteRequestOpen}
         />
