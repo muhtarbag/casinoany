@@ -3,9 +3,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSuperLigStandings } from '@/hooks/queries/useSuperLigQueries';
 import { Trophy } from 'lucide-react';
+import { SuperLigSyncButton } from './SuperLigSyncButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function SuperLigStandings() {
   const { data: standings, isLoading } = useSuperLigStandings();
+  const { isAdmin } = useAuth();
 
   if (isLoading) {
     return (
@@ -23,13 +26,18 @@ export function SuperLigStandings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-primary" />
-          Süper Lig Puan Durumu 2024-2025
-        </CardTitle>
-        <CardDescription>
-          Güncel puan durumu ve takım istatistikleri
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              Süper Lig Puan Durumu 2024-2025
+            </CardTitle>
+            <CardDescription>
+              Güncel puan durumu ve takım istatistikleri
+            </CardDescription>
+          </div>
+          {isAdmin && <SuperLigSyncButton />}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
