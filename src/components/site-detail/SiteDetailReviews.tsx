@@ -61,35 +61,36 @@ export const SiteDetailReviews = ({
   const renderItem = (item: any) => {
     if (item.type === 'review') {
       return (
-        <div key={item.id} className="relative">
-          <Badge 
-            variant="secondary" 
-            className="absolute -top-2 -right-2 z-10 bg-primary/10 text-primary border-primary/20"
-          >
-            <MessageCircle className="w-3 h-3 mr-1" />
-            Yorum
-          </Badge>
+        <div key={item.id} className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="secondary" 
+              className="bg-primary/10 text-primary border-primary/20"
+            >
+              <MessageCircle className="w-3 h-3 mr-1" />
+              Yorum
+            </Badge>
+          </div>
           <ReviewCard review={item} />
         </div>
       );
     } else {
       // Complaint card
       return (
-        <div key={item.id} className="relative">
-          <Badge 
-            variant="destructive" 
-            className="absolute -top-2 -right-2 z-10"
-          >
-            <AlertCircle className="w-3 h-3 mr-1" />
-            Şikayet
-          </Badge>
+        <div key={item.id} className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge variant="destructive">
+              <AlertCircle className="w-3 h-3 mr-1" />
+              Şikayet
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              {item.severity === 'high' ? 'Yüksek' : item.severity === 'medium' ? 'Orta' : 'Düşük'}
+            </Badge>
+          </div>
           <Card className="border-destructive/20">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
+              <CardTitle className="text-base">
                 {item.title}
-                <Badge variant="outline" className="text-xs">
-                  {item.severity === 'high' ? 'Yüksek' : item.severity === 'medium' ? 'Orta' : 'Düşük'}
-                </Badge>
               </CardTitle>
               <CardDescription>
                 {item.profiles?.username || 'Anonim'} • {new Date(item.created_at).toLocaleDateString('tr-TR')}
