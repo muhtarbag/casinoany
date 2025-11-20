@@ -115,6 +115,13 @@ export default function AdminComplaints() {
 
   const approveComplaintMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Get complaint details for notification
+      const { data: complaint } = await supabase
+        .from('site_complaints')
+        .select('user_id, title')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('site_complaints')
         .update({ 
@@ -125,12 +132,24 @@ export default function AdminComplaints() {
         })
         .eq('id', id);
       if (error) throw error;
+
+      // Send notification to user
+      if (complaint?.user_id) {
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: complaint.user_id,
+            notification_type: 'complaint_approved',
+            title: 'Şikayetiniz Onaylandı',
+            message: `"${complaint.title}" başlıklı şikayetiniz onaylanarak yayınlandı.`
+          });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
       toast({
         title: 'Başarılı',
-        description: 'Şikayet yayınlandı',
+        description: 'Şikayet yayınlandı ve kullanıcıya bildirim gönderildi',
       });
       setSelectedComplaint(null);
     },
@@ -138,6 +157,13 @@ export default function AdminComplaints() {
 
   const rejectComplaintMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Get complaint details for notification
+      const { data: complaint } = await supabase
+        .from('site_complaints')
+        .select('user_id, title')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('site_complaints')
         .update({ 
@@ -146,12 +172,24 @@ export default function AdminComplaints() {
         })
         .eq('id', id);
       if (error) throw error;
+
+      // Send notification to user
+      if (complaint?.user_id) {
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: complaint.user_id,
+            notification_type: 'complaint_rejected',
+            title: 'Şikayetiniz İncelendi',
+            message: `"${complaint.title}" başlıklı şikayetiniz incelendi ancak yayınlanamadı. Detaylı bilgi için destek ekibimizle iletişime geçebilirsiniz.`
+          });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
       toast({
         title: 'Başarılı',
-        description: 'Şikayet reddedildi',
+        description: 'Şikayet reddedildi ve kullanıcıya bildirim gönderildi',
       });
       setSelectedComplaint(null);
     },
