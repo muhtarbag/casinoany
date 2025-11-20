@@ -2129,6 +2129,66 @@ export type Database = {
           },
         ]
       }
+      site_addition_requests: {
+        Row: {
+          created_at: string
+          created_site_id: string | null
+          description: string | null
+          id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          site_name: string
+          site_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_site_id?: string | null
+          description?: string | null
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          site_name: string
+          site_url: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_site_id?: string | null
+          description?: string | null
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          site_name?: string
+          site_url?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_addition_requests_created_site_id_fkey"
+            columns: ["created_site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_addition_requests_created_site_id_fkey"
+            columns: ["created_site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_badges: {
         Row: {
           badge_color: string

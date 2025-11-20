@@ -53,6 +53,7 @@ import AdminChangeHistory from "./pages/admin/system/ChangeHistory";
 import AdminBuildHealth from "./pages/admin/system/BuildHealth";
 import AdminFeaturedSites from "./pages/admin/sites/FeaturedSites";
 import AdminBannerManagement from "./pages/admin/sites/BannerManagement";
+import AdminSiteAdditionRequests from "./pages/admin/sites/SiteAdditionRequests";
 import AdminRecommendedSites from "./pages/admin/sites/RecommendedSites";
 import AdminSiteStats from "./pages/admin/sites/SiteStats";
 import AdminBlogStats from "./pages/admin/blog/BlogStats";
@@ -170,6 +171,7 @@ const AppContent = () => {
             <Route path="sites/banners" element={<AdminBannerManagement />} />
             <Route path="sites/recommended" element={<AdminRecommendedSites />} />
             <Route path="sites/stats" element={<AdminSiteStats />} />
+            <Route path="sites/addition-requests" element={<AdminSiteAdditionRequests />} />
             <Route path="blog" element={<AdminBlogManagement />} />
             <Route path="blog/stats" element={<AdminBlogStats />} />
             <Route path="blog/comments" element={<AdminBlogComments />} />

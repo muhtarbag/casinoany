@@ -63,6 +63,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       label: '📝 İçerik Hub',
       items: [
         { id: 'sites', icon: Globe, label: 'Siteler', route: '/admin/sites', roles: ['content_editor'], shortcut: 'g s' },
+        { id: 'site-requests', icon: Mail, label: 'Site Talepleri', route: '/admin/sites/addition-requests', roles: ['content_editor'] },
         { id: 'casino', icon: Gamepad2, label: 'Casino', route: '/admin/content/casino', roles: ['content_editor'], shortcut: 'g c' },
         { id: 'blog', icon: FileText, label: 'Blog', route: '/admin/blog', roles: ['content_editor'], shortcut: 'g b' },
         { id: 'categories', icon: Folder, label: 'Kategoriler', route: '/admin/content/categories', roles: ['content_editor'] },
