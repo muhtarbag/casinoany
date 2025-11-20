@@ -79,7 +79,7 @@ const Blog = () => {
       
       <Header />
       
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12 pb-24 md:pb-12">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
           <Breadcrumb items={[{ label: 'Blog' }]} />
