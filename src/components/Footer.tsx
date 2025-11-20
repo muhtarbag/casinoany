@@ -169,6 +169,11 @@ export const Footer = () => {
                   🎮 Canlı Casino
                 </Link>
               </li>
+              <li>
+                <Link to="/oyun-saglayicilari" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎲 Oyun Sağlayıcıları
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -89,6 +89,7 @@ import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
 import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
 import FAQ from "./pages/FAQ";
+import GameProviders from "./pages/GameProviders";
 
 // User profile pages - all imported directly
 import Favorites from "./pages/profile/Favorites";
@@ -255,6 +256,9 @@ const AppContent = () => {
           {/* Category pages */}
           <Route path="/kategoriler" element={<Categories />} />
           <Route path="/kategori/:slug" element={<CategoryDetail />} />
+          
+          {/* Game Providers */}
+          <Route path="/oyun-saglayicilari" element={<GameProviders />} />
           
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
