@@ -183,7 +183,7 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
           </div>
           <Input
             type="text"
-            placeholder="Site adı veya bonus ara..."
+            placeholder=""
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             onFocus={() => {
