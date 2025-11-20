@@ -23,11 +23,13 @@ export default function UserStatsManagement() {
           profiles:user_id(username, avatar_url, display_name)
         `)
         .order('lifetime_points', { ascending: false })
-        .limit(100);
+        .limit(50);
       
       if (error) throw error;
       return data;
-    }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: referralStats, isLoading: isLoadingReferrals } = useQuery({
@@ -40,22 +42,26 @@ export default function UserStatsManagement() {
           profiles:user_id(username, avatar_url, display_name)
         `)
         .order('total_referrals', { ascending: false })
-        .limit(50);
+        .limit(30);
       
       if (error) throw error;
       return data;
-    }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: achievements, isLoading: isLoadingAchievements } = useQuery({
     queryKey: ['user-achievements-stats'],
     queryFn: async () => {
+      // Fetch limited data and group on client
       const { data, error } = await supabase
         .from('user_achievements')
         .select(`
           user_id,
           profiles:user_id(username, avatar_url, display_name)
-        `);
+        `)
+        .limit(200);
       
       if (error) throw error;
       
@@ -73,8 +79,10 @@ export default function UserStatsManagement() {
         return acc;
       }, {});
       
-      return Object.values(grouped).sort((a: any, b: any) => b.count - a.count).slice(0, 50);
-    }
+      return Object.values(grouped).sort((a: any, b: any) => b.count - a.count).slice(0, 30) as any[];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const filteredLeaderboard = leaderboard?.filter((user: any) => {
@@ -239,7 +247,7 @@ export default function UserStatsManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {achievements?.map((user: any, index: number) => (
+                  {Array.isArray(achievements) && achievements.map((user: any, index: number) => (
                     <TableRow key={user.user_id}>
                       <TableCell className="font-bold">#{index + 1}</TableCell>
                       <TableCell>
