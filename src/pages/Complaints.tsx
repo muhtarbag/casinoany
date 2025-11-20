@@ -233,26 +233,86 @@ const Complaints = () => {
   return (
     <>
       <SEO 
-        title="Şikayetler"
-        description="Bahis siteleri hakkındaki kullanıcı şikayetlerini görüntüleyin"
+        title="Bahis Siteleri Şikayetleri 2025 | Kullanıcı Deneyimleri ve Çözümler"
+        description="Bahis sitelerinde yaşanan sorunlar ve kullanıcı şikayetleri. Gerçek deneyimler, çözüm önerileri ve şeffaf değerlendirmeler. Şikayetinizi paylaşın veya diğer kullanıcıların deneyimlerinden faydalanın."
+        keywords={[
+          'bahis siteleri şikayetleri',
+          'casino şikayetleri',
+          'bahis sitesi sorunları',
+          'para çekme şikayeti',
+          'bonus şikayeti',
+          'müşteri hizmetleri şikayeti',
+          'bahis sitesi dolandırıcılık',
+          'kullanıcı deneyimleri',
+          'bahis siteleri forum',
+          'güvenilir bahis siteleri'
+        ]}
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
+      <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-b from-card/50 via-background to-background border-b border-border/40">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] py-12 md:py-16 relative">
+            <div className="text-center space-y-6 max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+                <AlertCircle className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold">Kullanıcı Deneyimleri ve Şikayetler</span>
+              </div>
+              
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent leading-tight">
+                Bahis Siteleri Şikayetleri
+              </h1>
+              
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                Bahis sitelerinde yaşadığınız sorunları paylaşın, diğer kullanıcıların deneyimlerinden faydalanın. 
+                Şeffaf ve güvenilir bir topluluk için şikayetlerinizi bildirin, çözüm önerilerini keşfedin.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4 pt-4">
+                <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-card border border-border">
+                  <MessageSquare className="w-5 h-5 text-accent flex-shrink-0" />
+                  <div className="text-left">
+                    <div className="text-lg font-bold">{complaints?.length || 0}+</div>
+                    <div className="text-xs text-muted-foreground">Aktif Şikayet</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-card border border-border">
+                  <ThumbsUp className="w-5 h-5 text-success flex-shrink-0" />
+                  <div className="text-left">
+                    <div className="text-lg font-bold">%100</div>
+                    <div className="text-xs text-muted-foreground">Şeffaflık</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-card border border-border">
+                  <AlertCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div className="text-left">
+                    <div className="text-lg font-bold">7/24</div>
+                    <div className="text-xs text-muted-foreground">Destek</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <Button asChild size="lg" className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Link to="/sikayetler/yeni">
+                    <Plus className="w-5 h-5 mr-2" />
+                    Şikayetini Paylaş
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
           <div className="flex-1">
-            <h1 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">Şikayetler</h1>
+            <h2 className="text-xl md:text-2xl font-bold mb-1">Tüm Şikayetler</h2>
             <p className="text-xs md:text-sm text-muted-foreground">
-              Bahis siteleri hakkındaki kullanıcı deneyimleri ve şikayetler
+              Filtreleyerek aradığınız şikayeti bulabilirsiniz
             </p>
           </div>
-          <Button asChild className="w-full sm:w-auto h-10 md:h-11" size="sm">
-            <Link to="/sikayetler/yeni">
-              <Plus className="w-4 h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Şikayet Et</span>
-              <span className="sm:hidden">Yeni Şikayet</span>
-            </Link>
-          </Button>
         </div>
 
         <Card className="mb-6">
