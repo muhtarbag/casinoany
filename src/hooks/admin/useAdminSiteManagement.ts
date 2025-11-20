@@ -439,29 +439,17 @@ export const useAdminSiteManagement = () => {
   }, [state.selectedSites]);
 
   const setLogoFile = useCallback((file: File | null, preview?: string) => {
-    console.log('🔍 useAdminSiteManagement - setLogoFile:', { 
-      file: file?.name, 
-      previewProvided: !!preview,
-      previewLength: preview?.length || 0 
-    });
-    
     if (file) {
       if (preview) {
-        // Eğer preview zaten varsa direkt kullan
-        console.log('✅ Using provided preview');
         dispatch({ type: 'SET_LOGO', file, preview });
       } else {
-        // Preview yoksa oluştur (fallback)
-        console.log('⚠️ Preview not provided, creating one...');
         const reader = new FileReader();
         reader.onloadend = () => {
-          console.log('✅ FileReader completed in hook');
           dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
         };
         reader.readAsDataURL(file);
       }
     } else {
-      console.log('🗑️ Clearing logo in hook');
       dispatch({ type: 'CLEAR_LOGO' });
     }
   }, []);
