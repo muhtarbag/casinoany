@@ -15,6 +15,35 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { z } from 'zod';
+
+// URL normalization function
+const normalizeUrl = (url: string): string => {
+  let normalized = url.trim();
+  
+  // If URL doesn't start with http:// or https://, add https://
+  if (normalized && !normalized.match(/^https?:\/\//i)) {
+    normalized = 'https://' + normalized;
+  }
+  
+  return normalized;
+};
+
+// Validation schema
+const siteRequestSchema = z.object({
+  site_name: z.string()
+    .trim()
+    .min(1, 'Site adı gereklidir')
+    .max(100, 'Site adı en fazla 100 karakter olabilir'),
+  site_url: z.string()
+    .trim()
+    .min(1, 'Site URL gereklidir')
+    .url('Geçerli bir URL giriniz')
+    .max(500, 'URL en fazla 500 karakter olabilir'),
+  description: z.string()
+    .max(1000, 'Açıklama en fazla 1000 karakter olabilir')
+    .optional(),
+});
 
 interface SiteAdditionRequestDialogProps {
   open: boolean;
@@ -27,7 +56,7 @@ export function SiteAdditionRequestDialog({ open, onOpenChange }: SiteAdditionRe
   const [description, setDescription] = useState('');
 
   const createRequestMutation = useMutation({
-    mutationFn: async (data: { site_name: string; site_url: string; description: string }) => {
+    mutationFn: async (data: { site_name: string; site_url: string; description?: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Giriş yapmalısınız');
 
@@ -37,7 +66,7 @@ export function SiteAdditionRequestDialog({ open, onOpenChange }: SiteAdditionRe
           user_id: user.id,
           site_name: data.site_name,
           site_url: data.site_url,
-          description: data.description,
+          description: data.description || null,
         });
 
       if (error) throw error;
@@ -57,19 +86,45 @@ export function SiteAdditionRequestDialog({ open, onOpenChange }: SiteAdditionRe
     },
   });
 
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSiteUrl(value);
+  };
+
+  const handleUrlBlur = () => {
+    if (siteUrl.trim()) {
+      const normalized = normalizeUrl(siteUrl);
+      setSiteUrl(normalized);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!siteName.trim() || !siteUrl.trim()) {
-      toast.error('Site adı ve URL gereklidir');
-      return;
-    }
+    // Normalize URL before validation
+    const normalizedUrl = normalizeUrl(siteUrl);
+    
+    // Validate with zod
+    try {
+      const validatedData = siteRequestSchema.parse({
+        site_name: siteName,
+        site_url: normalizedUrl,
+        description: description || undefined,
+      });
 
-    createRequestMutation.mutate({
-      site_name: siteName,
-      site_url: siteUrl,
-      description: description,
-    });
+      createRequestMutation.mutate({
+        site_name: validatedData.site_name,
+        site_url: validatedData.site_url,
+        description: validatedData.description,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+      } else {
+        toast.error('Geçersiz veri');
+      }
+    }
   };
 
   return (
@@ -98,12 +153,16 @@ export function SiteAdditionRequestDialog({ open, onOpenChange }: SiteAdditionRe
             <Label htmlFor="site-url">Site URL/Domain *</Label>
             <Input
               id="site-url"
-              type="url"
+              type="text"
               value={siteUrl}
-              onChange={(e) => setSiteUrl(e.target.value)}
-              placeholder="Örn: https://ornek-site.com"
+              onChange={handleUrlChange}
+              onBlur={handleUrlBlur}
+              placeholder="Örn: www.ornek-site.com"
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Otomatik olarak https:// eklenecektir
+            </p>
           </div>
 
           <div className="space-y-2">
