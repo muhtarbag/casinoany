@@ -91,6 +91,7 @@ import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
 import FAQ from "./pages/FAQ";
 import GameProviders from "./pages/GameProviders";
+import CategoryPage from "./pages/CategoryPage";
 
 // User profile pages - all imported directly
 import Favorites from "./pages/profile/Favorites";
@@ -262,9 +263,11 @@ const AppContent = () => {
           {/* Game Providers */}
           <Route path="/oyun-saglayicilari" element={<GameProviders />} />
           
+          {/* Dynamic Category Pages - must be before catch-all */}
+          <Route path="/:slug" element={<CategoryPage />} />
+          
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
-          <Route path="/:slug" element={<SiteDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
