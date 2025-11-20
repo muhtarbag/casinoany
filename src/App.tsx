@@ -93,6 +93,7 @@ import ProfileComplaints from "./pages/profile/Complaints";
 import BonusTracking from "./pages/profile/BonusTracking";
 import ProfileSettings from "./pages/profile/Settings";
 import ProfileNotifications from "./pages/profile/Notifications";
+import LoyaltyPoints from "./pages/profile/LoyaltyPoints";
 
 // User panel pages - all imported directly
 import UserDashboard from "./pages/panel/Dashboard";
@@ -198,6 +199,7 @@ const AppContent = () => {
           <Route path="/profile/complaints" element={<ProfileComplaints />} />
           <Route path="/profile/bonus-tracking" element={<BonusTracking />} />
           <Route path="/profile/notifications" element={<ProfileNotifications />} />
+          <Route path="/profile/loyalty" element={<LoyaltyPoints />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
           
           <Route path="/about" element={<About />} />

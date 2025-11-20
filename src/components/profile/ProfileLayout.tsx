@@ -33,6 +33,7 @@ import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
 import { NotificationBell } from '@/components/profile/NotificationBell';
 import logo from '@/assets/casinodoo-logo.svg';
+import { Trophy } from 'lucide-react';
 
 interface ProfileLayoutProps {
   children: ReactNode;
@@ -135,6 +136,11 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       label: 'Bonus Takibi',
       href: '/profile/bonus-tracking',
       badgeKey: 'bonuses'
+    },
+    {
+      icon: Trophy,
+      label: 'Sadakat Puanları',
+      href: '/profile/loyalty'
     },
     {
       icon: Settings,
