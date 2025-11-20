@@ -384,7 +384,7 @@ export default function SiteDetail() {
 
   if (!site) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Site bulunamadı</h1>
@@ -396,7 +396,7 @@ export default function SiteDetail() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
       <ScrollProgress />
       <SEO
         title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}

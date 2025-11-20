@@ -60,7 +60,7 @@ export default function NewsDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
           <Skeleton className="h-12 w-3/4 mb-4" />
           <Skeleton className="h-6 w-1/2 mb-8" />
@@ -72,7 +72,7 @@ export default function NewsDetail() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-3xl font-bold mb-4">Haber bulunamadı</h1>
           <Link to="/haberler">
@@ -135,7 +135,7 @@ export default function NewsDetail() {
         { name: article.title, url: `${window.location.origin}/news/${article.slug}` }
       ]} />
 
-      <article className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <article className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
           <Link to="/haberler">
             <Button variant="ghost" className="mb-6">

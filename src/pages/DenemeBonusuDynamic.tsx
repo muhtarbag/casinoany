@@ -67,7 +67,7 @@ const DenemeBonusu = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-[72px] md:pt-[84px]">
         <LoadingSpinner />
       </div>
     );

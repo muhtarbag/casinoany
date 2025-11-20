@@ -53,7 +53,7 @@ const Install = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-dark flex flex-col">
+    <div className="min-h-screen bg-gradient-dark flex flex-col pt-[72px] md:pt-[84px]">
       <Header />
       <SEO 
         title="Uygulamayı Yükle"

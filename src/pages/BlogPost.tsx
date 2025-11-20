@@ -96,7 +96,7 @@ export default function BlogPost() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-dark">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="text-muted-foreground">Yükleniyor...</div>
@@ -108,7 +108,7 @@ export default function BlogPost() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gradient-dark">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl font-bold mb-4">Blog Yazısı Bulunamadı</h1>
@@ -124,7 +124,7 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-dark">
+    <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
       <SEO
         title={post.meta_title || post.title}
         description={post.meta_description || post.excerpt}

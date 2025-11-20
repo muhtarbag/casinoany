@@ -33,7 +33,7 @@ export default function BonusCampaigns() {
         keywords={["casino bonusu", "bahis bonusu", "hoş geldin bonusu", "freespin", "kayıp bonusu", "bonus kampanyaları"]}
       />
       
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <Header />
         
         <main className="container mx-auto px-4 py-8">
