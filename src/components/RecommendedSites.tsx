@@ -32,7 +32,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
           )
         `)
         .order("display_order")
-        .limit(8);
+        .limit(15);
 
       if (error) throw error;
       
