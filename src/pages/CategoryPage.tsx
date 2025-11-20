@@ -34,12 +34,20 @@ export default function CategoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, slug')
+        .select('id, slug, is_active, owner_id')
         .eq('slug', slug)
-        .eq('is_active', true)
         .maybeSingle();
       
       if (error) throw error;
+      
+      // If site exists but not active, check if current user is owner
+      if (data && !data.is_active) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || user.id !== data.owner_id) {
+          return null; // Hide inactive site from non-owners
+        }
+      }
+      
       return data;
     },
     enabled: !!slug,
