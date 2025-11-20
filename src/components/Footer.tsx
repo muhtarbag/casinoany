@@ -7,6 +7,7 @@ import { Input } from './ui/input';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { FooterCategories } from './footer/FooterCategories';
 
 export const Footer = () => {
   const [email, setEmail] = useState('');
@@ -140,42 +141,8 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Categories */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Kategoriler</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/casino-siteleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎰 Casino Siteleri
-                </Link>
-              </li>
-              <li>
-                <Link to="/spor-bahisleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  ⚽ Spor Bahisleri
-                </Link>
-              </li>
-              <li>
-                <Link to="/bonus-kampanyalari" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎁 Bonus Kampanyaları
-                </Link>
-              </li>
-              <li>
-                <Link to="/mobil-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  📱 Mobil Bahis
-                </Link>
-              </li>
-              <li>
-                <Link to="/canli-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎮 Canlı Casino
-                </Link>
-              </li>
-              <li>
-                <Link to="/oyun-saglayicilari" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎲 Oyun Sağlayıcıları
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Categories - Dynamic */}
+          <FooterCategories />
 
           {/* Contact & Social */}
           <div>

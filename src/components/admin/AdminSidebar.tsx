@@ -13,7 +13,8 @@ import {
   Bell,
   AlertTriangle,
   BarChart3,
-  Trophy
+  Trophy,
+  Link2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -102,6 +103,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
+        { id: 'footer', icon: Link2, label: 'Footer Yönetimi', route: '/admin/system/footer', roles: [] },
       ],
     },
   ].map(group => ({
