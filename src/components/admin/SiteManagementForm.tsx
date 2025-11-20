@@ -15,7 +15,7 @@ interface SiteManagementFormProps {
   editingId: string | null;
   initialData?: SiteFormData;
   logoPreview: string | null;
-  onLogoFileChange: (file: File | null) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onClearLogo: () => void;
   onSubmit: (data: SiteFormData) => void;
   onCancel: () => void;

@@ -438,13 +438,19 @@ export const useAdminSiteManagement = () => {
     }
   }, [state.selectedSites]);
 
-  const setLogoFile = useCallback((file: File | null) => {
+  const setLogoFile = useCallback((file: File | null, preview?: string) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      if (preview) {
+        // Eğer preview zaten varsa direkt kullan
+        dispatch({ type: 'SET_LOGO', file, preview });
+      } else {
+        // Preview yoksa oluştur (fallback)
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
+        };
+        reader.readAsDataURL(file);
+      }
     } else {
       dispatch({ type: 'CLEAR_LOGO' });
     }
