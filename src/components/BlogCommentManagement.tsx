@@ -32,15 +32,35 @@ export const BlogCommentManagement = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Get comment details for notification
+      const { data: comment } = await supabase
+        .from('blog_comments')
+        .select('user_id, comment, blog_posts(title)')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('blog_comments')
         .update({ is_approved: true })
         .eq('id', id);
       if (error) throw error;
+
+      // Send notification to user
+      if (comment?.user_id) {
+        const postTitle = (comment as any).blog_posts?.title || 'Blog yazısı';
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: comment.user_id,
+            notification_type: 'comment_approved',
+            title: 'Yorumunuz Onaylandı',
+            message: `"${postTitle}" yazısına yaptığınız yorum onaylanarak yayınlandı.`
+          });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-comments'] });
-      toast({ title: 'Yorum onaylandı' });
+      toast({ title: 'Yorum onaylandı ve kullanıcıya bildirim gönderildi' });
     },
     onError: (error: any) => {
       toast({ title: 'Hata', description: error.message, variant: 'destructive' });
@@ -49,15 +69,35 @@ export const BlogCommentManagement = () => {
 
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Get comment details for notification
+      const { data: comment } = await supabase
+        .from('blog_comments')
+        .select('user_id, comment, blog_posts(title)')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('blog_comments')
         .update({ is_approved: false })
         .eq('id', id);
       if (error) throw error;
+
+      // Send notification to user
+      if (comment?.user_id) {
+        const postTitle = (comment as any).blog_posts?.title || 'Blog yazısı';
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: comment.user_id,
+            notification_type: 'comment_rejected',
+            title: 'Yorumunuz İncelendi',
+            message: `"${postTitle}" yazısına yaptığınız yorum incelendi ancak yayınlanamadı.`
+          });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-comments'] });
-      toast({ title: 'Yorum reddedildi' });
+      toast({ title: 'Yorum reddedildi ve kullanıcıya bildirim gönderildi' });
     },
     onError: (error: any) => {
       toast({ title: 'Hata', description: error.message, variant: 'destructive' });

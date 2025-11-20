@@ -5,11 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserNotifications } from '@/hooks/useUserNotifications';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Bell, Check, CheckCheck, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
+import { useToast } from '@/hooks/use-toast';
 
 const getNotificationIcon = (type: string, icon?: string) => {
   if (icon) return icon;
@@ -64,14 +68,69 @@ const getTypeLabel = (type: string) => {
 
 export default function Notifications() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { notifications, unreadCount, markAsRead, markAllAsRead, isMarkingAsRead } = useUserNotifications();
 
-  const unreadNotifications = notifications.filter(n => !n.is_read);
-  const readNotifications = notifications.filter(n => n.is_read);
+  // Fetch user-specific status notifications
+  const { data: statusNotifications = [] } = useQuery({
+    queryKey: ['user-status-notifications', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_status_notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // Mark status notification as read
+  const markStatusAsReadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('user_status_notifications')
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-status-notifications'] });
+    },
+  });
+
+  // Combine both notification types
+  const allNotifications = [
+    ...notifications.map(n => ({ ...n, source: 'general' })),
+    ...statusNotifications.map(n => ({ 
+      ...n, 
+      source: 'status',
+      notification_type: n.notification_type || 'system',
+      priority: 'normal',
+      action_url: undefined,
+      action_label: undefined,
+      icon: undefined,
+      image_url: undefined,
+      expires_at: undefined,
+      is_active: true,
+      target_audience: 'individual'
+    }))
+  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const unreadNotifications = allNotifications.filter(n => !n.is_read);
+  const readNotifications = allNotifications.filter(n => n.is_read);
 
   const handleNotificationClick = (notification: any) => {
     if (!notification.is_read) {
-      markAsRead(notification.id);
+      if (notification.source === 'status') {
+        markStatusAsReadMutation.mutate(notification.id);
+      } else {
+        markAsRead(notification.id);
+      }
     }
     if (notification.action_url) {
       navigate(notification.action_url);
@@ -153,13 +212,13 @@ export default function Notifications() {
               Bildirimlerim
             </h1>
             <p className="text-muted-foreground mt-1">
-              {unreadCount > 0 
-                ? `${unreadCount} okunmamış bildiriminiz var` 
+              {unreadNotifications.length > 0 
+                ? `${unreadNotifications.length} okunmamış bildiriminiz var` 
                 : 'Tüm bildirimleriniz okundu'}
             </p>
           </div>
           
-          {unreadCount > 0 && (
+          {unreadNotifications.length > 0 && (
             <Button 
               onClick={() => markAllAsRead()}
               disabled={isMarkingAsRead}
@@ -176,17 +235,17 @@ export default function Notifications() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="all" className="relative">
               Tümü
-              {notifications.length > 0 && (
+              {allNotifications.length > 0 && (
                 <Badge variant="secondary" className="ml-2">
-                  {notifications.length}
+                  {allNotifications.length}
                 </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="unread" className="relative">
               Okunmamış
-              {unreadCount > 0 && (
+              {unreadNotifications.length > 0 && (
                 <Badge variant="destructive" className="ml-2">
-                  {unreadCount}
+                  {unreadNotifications.length}
                 </Badge>
               )}
             </TabsTrigger>
@@ -194,7 +253,7 @@ export default function Notifications() {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4 mt-6">
-            {notifications.length === 0 ? (
+            {allNotifications.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <Bell className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
@@ -202,7 +261,7 @@ export default function Notifications() {
                 </CardContent>
               </Card>
             ) : (
-              notifications.map(notification => (
+              allNotifications.map(notification => (
                 <NotificationCard key={notification.id} notification={notification} />
               ))
             )}
