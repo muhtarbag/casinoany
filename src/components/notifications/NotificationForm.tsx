@@ -12,7 +12,9 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Upload, X, ChevronDown } from 'lucide-react';
+import { Upload, X, ChevronDown, Sparkles } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { exitIntentTemplates, getTemplateById, type ExitIntentTemplate } from './exitIntentTemplates';
 import type { NotificationFormData } from './types';
 
 interface NotificationFormProps {
@@ -37,9 +39,28 @@ export function NotificationForm({
   isEditing,
 }: NotificationFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
   const handleChange = (field: keyof NotificationFormData, value: any) => {
     onChange({ ...formData, [field]: value });
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    if (!templateId) {
+      setSelectedTemplate('');
+      return;
+    }
+
+    const template = getTemplateById(templateId);
+    if (!template) return;
+
+    setSelectedTemplate(templateId);
+    
+    // Apply template config to form
+    onChange({
+      ...formData,
+      ...template.config,
+    });
   };
 
   const handleArrayChange = (field: 'display_pages' | 'user_segments', value: string) => {
@@ -72,6 +93,43 @@ export function NotificationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Exit Intent Templates */}
+      <Alert className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/30">
+        <Sparkles className="h-5 w-5 text-primary" />
+        <AlertDescription>
+          <div className="space-y-3">
+            <p className="font-semibold text-foreground">🎯 Exit Intent Hazır Temalar</p>
+            <p className="text-sm text-muted-foreground">
+              Kullanıcı sayfayı kapatmaya çalıştığında gösterilecek hazır popup tasarımları
+            </p>
+            <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+              <SelectTrigger className="w-full bg-background">
+                <SelectValue placeholder="Tema seç veya manuel ayarla" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Manuel Ayarlama</SelectItem>
+                {exitIntentTemplates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{template.name}</span>
+                      <span className="text-xs text-muted-foreground">{template.description}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedTemplate && (
+              <div className="p-3 bg-background rounded-md border">
+                <p className="text-sm font-medium mb-1">Önizleme:</p>
+                <p className="text-sm text-muted-foreground">
+                  {getTemplateById(selectedTemplate)?.preview}
+                </p>
+              </div>
+            )}
+          </div>
+        </AlertDescription>
+      </Alert>
+
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
@@ -182,6 +240,7 @@ export function NotificationForm({
           {[
             { value: 'all', label: 'Tüm Sayfalar' },
             { value: 'home', label: 'Ana Sayfa (/)' },
+            { value: 'site_detail', label: 'Site Detay' },
             { value: 'casino-sites', label: 'Casino Siteleri' },
             { value: 'sports-betting', label: 'Spor Bahisleri' },
             { value: 'live-casino', label: 'Canlı Casino' },
