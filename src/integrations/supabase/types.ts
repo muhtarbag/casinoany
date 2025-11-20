@@ -1472,6 +1472,90 @@ export type Database = {
           },
         ]
       }
+      loyalty_rewards: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          min_tier: string | null
+          points_cost: number
+          reward_type: string
+          reward_value: string | null
+          stock_quantity: number | null
+          terms: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          min_tier?: string | null
+          points_cost: number
+          reward_type: string
+          reward_value?: string | null
+          stock_quantity?: number | null
+          terms?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          min_tier?: string | null
+          points_cost?: number
+          reward_type?: string
+          reward_value?: string | null
+          stock_quantity?: number | null
+          terms?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_transactions: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          points: number
+          source: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          points: number
+          source: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          points?: number
+          source?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       news_articles: {
         Row: {
           category: string | null
@@ -2841,6 +2925,36 @@ export type Database = {
           },
         ]
       }
+      user_loyalty_points: {
+        Row: {
+          created_at: string
+          id: string
+          lifetime_points: number
+          tier: string
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_notification_preferences: {
         Row: {
           bonus_alerts: boolean | null
@@ -2959,6 +3073,56 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_reward_redemptions: {
+        Row: {
+          admin_notes: string | null
+          expires_at: string | null
+          id: string
+          notes: string | null
+          points_spent: number
+          processed_at: string | null
+          redeemed_at: string
+          redemption_code: string | null
+          reward_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent: number
+          processed_at?: string | null
+          redeemed_at?: string
+          redemption_code?: string | null
+          reward_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          points_spent?: number
+          processed_at?: string | null
+          redeemed_at?: string
+          redemption_code?: string | null
+          reward_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reward_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_rewards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_role_cache: {
         Row: {
@@ -3182,6 +3346,16 @@ export type Database = {
       }
     }
     Functions: {
+      award_loyalty_points: {
+        Args: {
+          p_description: string
+          p_metadata?: Json
+          p_points: number
+          p_source: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       can_view_site_stats: { Args: never; Returns: boolean }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_site_notification: {
