@@ -280,112 +280,220 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Kayıt Ol</CardTitle>
-          <CardDescription className="text-center">Hesap oluşturmak için bilgilerinizi girin</CardDescription>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
+      <Card className="w-full max-w-lg shadow-xl">
+        <CardHeader className="space-y-1 pb-4">
+          <CardTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Kayıt Ol
+          </CardTitle>
+          <CardDescription className="text-center text-sm">
+            Hesap oluşturmak için bilgilerinizi girin
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-3">
-              <Label>Hesap Tipi</Label>
-              <RadioGroup value={userType} onValueChange={(value) => { setUserType(value as 'user' | 'site_owner'); setCurrentStep(0); }} className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Hesap Tipi - Kompakt */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Hesap Tipi</Label>
+              <RadioGroup 
+                value={userType} 
+                onValueChange={(value) => { 
+                  setUserType(value as 'user' | 'site_owner'); 
+                  setCurrentStep(0); 
+                }} 
+                className="grid grid-cols-2 gap-3"
+              >
+                <div className={`relative flex items-center space-x-2 border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${userType === 'user' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                   <RadioGroupItem value="user" id="user" />
-                  <Label htmlFor="user" className="cursor-pointer flex-1">
-                    <div className="font-semibold">Bireysel Kullanıcı</div>
-                    <p className="text-xs text-muted-foreground mt-1">Site incelemesi yapabilir, yorum yazabilirsiniz</p>
+                  <Label htmlFor="user" className="cursor-pointer text-sm font-medium">
+                    Bireysel
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors">
+                <div className={`relative flex items-center space-x-2 border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${userType === 'site_owner' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
                   <RadioGroupItem value="site_owner" id="site_owner" />
-                  <Label htmlFor="site_owner" className="cursor-pointer flex-1">
-                    <div className="font-semibold">Site Sahibi</div>
-                    <p className="text-xs text-muted-foreground mt-1">Site ekleyebilir, yönetebilirsiniz</p>
+                  <Label htmlFor="site_owner" className="cursor-pointer text-sm font-medium">
+                    Site Sahibi
                   </Label>
                 </div>
               </RadioGroup>
             </div>
 
-            {userType === 'user' && (
-              <div className="space-y-1 pt-2 pb-3 border-b">
-                <h3 className="font-semibold text-base">Profil Bilgileri</h3>
-                <p className="text-sm text-muted-foreground">
-                  Diğer bilgilerinizi profilinizden istediğiniz zaman güncelleyebilirsiniz
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Ad *</Label>
-                  <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
+            {/* Form Alanları - Kompakt Grid Layout */}
+            <div className="space-y-3">
+              {/* Ad Soyad */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName" className="text-sm">Ad *</Label>
+                  <Input 
+                    id="firstName" 
+                    value={firstName} 
+                    onChange={(e) => setFirstName(e.target.value)} 
+                    required 
+                    disabled={loading}
+                    className="h-10"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Soyad *</Label>
-                  <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefon *</Label>
-                <Input id="phone" type="tel" placeholder="+90 5XX XXX XX XX" value={phone} onChange={(e) => setPhone(e.target.value)} required disabled={loading} />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">E-posta *</Label>
-                <Input id="email" type="email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} required disabled={loading} />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Şifre *</Label>
-                <div className="relative">
-                  <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
-                  <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowPassword(!showPassword)} disabled={loading}>
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName" className="text-sm">Soyad *</Label>
+                  <Input 
+                    id="lastName" 
+                    value={lastName} 
+                    onChange={(e) => setLastName(e.target.value)} 
+                    required 
+                    disabled={loading}
+                    className="h-10"
+                  />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Şifre Tekrar *</Label>
-                <div className="relative">
-                  <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} />
-                  <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={loading}>
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+              {/* Telefon Email Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-sm">Telefon *</Label>
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    placeholder="+90 5XX XXX XX XX" 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                    required 
+                    disabled={loading}
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-sm">E-posta *</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={userEmail} 
+                    onChange={(e) => setUserEmail(e.target.value)} 
+                    required 
+                    disabled={loading}
+                    className="h-10"
+                  />
+                </div>
+              </div>
+
+              {/* Kullanıcı Adı - Sadece bireysel için */}
+              {userType === 'user' && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="username" className="text-sm">Kullanıcı Adı *</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="kullaniciadi"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    disabled={loading}
+                    maxLength={20}
+                    className="h-10"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Sadece küçük harf, rakam ve alt çizgi
+                  </p>
+                </div>
+              )}
+
+              {/* Şifreler Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-sm">Şifre *</Label>
+                  <div className="relative">
+                    <Input 
+                      id="password" 
+                      type={showPassword ? 'text' : 'password'} 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)} 
+                      required 
+                      disabled={loading}
+                      className="h-10 pr-10"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-0 top-0 h-10 w-10" 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      disabled={loading}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-sm">Şifre Tekrar *</Label>
+                  <div className="relative">
+                    <Input 
+                      id="confirmPassword" 
+                      type={showConfirmPassword ? 'text' : 'password'} 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                      required 
+                      disabled={loading}
+                      className="h-10 pr-10"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-0 top-0 h-10 w-10" 
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                      disabled={loading}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {wizardSteps.length > 0 && <WizardProgress steps={wizardSteps} currentStep={currentStep} />}
+            {/* Wizard için */}
+            {wizardSteps.length > 0 && userType === 'site_owner' && (
+              <>
+                <WizardProgress steps={wizardSteps} currentStep={currentStep} />
+                <div className="min-h-[200px]">{renderWizardStep()}</div>
+              </>
+            )}
 
-            <div className="min-h-[300px]">{renderWizardStep()}</div>
-
-            <div className="flex gap-3">
+            {/* Submit Buttons */}
+            <div className="flex gap-3 pt-2">
               {userType === 'site_owner' && currentStep > 0 && (
-                <Button type="button" variant="outline" onClick={handleBack} disabled={loading}>
-                  <ChevronLeft className="w-4 h-4 mr-2" />Geri
+                <Button type="button" variant="outline" onClick={handleBack} disabled={loading} className="flex-1">
+                  <ChevronLeft className="w-4 h-4 mr-1" />Geri
                 </Button>
               )}
               
               {userType === 'site_owner' && currentStep < wizardSteps.length - 1 ? (
-                <Button type="button" onClick={handleNext} disabled={loading} className="ml-auto">
-                  İleri<ChevronRight className="w-4 h-4 ml-2" />
+                <Button type="button" onClick={handleNext} disabled={loading} className="flex-1 ml-auto">
+                  İleri<ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
-                <Button type="submit" disabled={loading} className="ml-auto">
-                  {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Kaydediliyor...</> : 'Kayıt Ol'}
+                <Button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 ml-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Kayıt Ediliyor...
+                    </>
+                  ) : (
+                    'Kayıt Ol'
+                  )}
                 </Button>
               )}
             </div>
-
-            <div className="text-center text-sm text-muted-foreground">
-              Zaten hesabınız var mı? <Link to="/login" className="text-primary hover:underline">Giriş Yap</Link>
-            </div>
           </form>
+
+          {/* Login Link */}
+          <div className="mt-4 text-center text-sm border-t pt-4">
+            <span className="text-muted-foreground">Zaten hesabınız var mı? </span>
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Giriş Yap
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
