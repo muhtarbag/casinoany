@@ -28,7 +28,7 @@ export const Header = () => {
                 <img 
                   src={logo} 
                   alt="CasinoAny.com" 
-                  className="h-9 md:h-11 w-auto relative z-10 drop-shadow-sm" 
+                  className="h-7 md:h-9 w-auto relative z-10 drop-shadow-sm" 
                   loading="eager" 
                 />
               </div>
