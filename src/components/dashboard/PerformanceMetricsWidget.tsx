@@ -30,6 +30,7 @@ export function PerformanceMetricsWidget({
 }: PerformanceMetricsProps) {
   
   const formatChange = (change: number, unit?: string) => {
+    if (change == null || isNaN(change)) return "0%";
     const sign = change >= 0 ? "+" : "";
     return `${sign}${change.toFixed(1)}${unit || "%"}`;
   };
