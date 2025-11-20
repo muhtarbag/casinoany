@@ -11,13 +11,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingState } from '@/components/ui/loading-state';
+import * as LucideIcons from 'lucide-react';
 
 export default function AchievementsManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAchievement, setEditingAchievement] = useState<any>(null);
+  const [isActive, setIsActive] = useState(true);
   const queryClient = useQueryClient();
 
   const { data: achievements, isLoading } = useQuery({
@@ -101,7 +103,7 @@ export default function AchievementsManagement() {
       requirement_value: formData.get('requirement_value') ? Number(formData.get('requirement_value')) : null,
       points_reward: Number(formData.get('points_reward')),
       display_order: Number(formData.get('display_order')),
-      is_active: formData.get('is_active') === 'true',
+      is_active: isActive,
     };
 
     if (editingAchievement) {
@@ -109,6 +111,17 @@ export default function AchievementsManagement() {
     } else {
       createMutation.mutate(achievement);
     }
+  };
+
+  const handleDialogOpen = (achievement: any = null) => {
+    setEditingAchievement(achievement);
+    setIsActive(achievement?.is_active ?? true);
+    setIsDialogOpen(true);
+  };
+
+  const getIconComponent = (iconName: string) => {
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon ? <Icon className="h-5 w-5 text-white" /> : <Trophy className="h-5 w-5 text-white" />;
   };
 
   if (isLoading) {
@@ -124,7 +137,7 @@ export default function AchievementsManagement() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingAchievement(null)}>
+            <Button onClick={() => handleDialogOpen()}>
               <Plus className="mr-2 h-4 w-4" />
               Yeni Başarı
             </Button>
@@ -210,7 +223,7 @@ export default function AchievementsManagement() {
               </div>
 
               <div className="flex items-center space-x-2">
-                <Switch id="is_active" name="is_active" defaultChecked={editingAchievement?.is_active ?? true} />
+                <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
                 <Label htmlFor="is_active">Aktif</Label>
               </div>
 
@@ -233,68 +246,82 @@ export default function AchievementsManagement() {
           <CardDescription>Tüm başarıların listesi ve detayları</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Başarı</TableHead>
-                <TableHead>Kategori</TableHead>
-                <TableHead>Puan</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead className="text-right">İşlemler</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {achievements?.map((achievement) => (
-                <TableRow key={achievement.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: achievement.color }}>
-                        <span className="text-white text-lg">{achievement.icon}</span>
-                      </div>
-                      <div>
-                        <p className="font-medium">{achievement.name}</p>
-                        <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{achievement.category}</Badge>
-                  </TableCell>
-                  <TableCell>{achievement.points_reward} puan</TableCell>
-                  <TableCell>
-                    <Badge variant={achievement.is_active ? 'default' : 'secondary'}>
-                      {achievement.is_active ? 'Aktif' : 'Pasif'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingAchievement(achievement);
-                          setIsDialogOpen(true);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (confirm('Bu başarıyı silmek istediğinizden emin misiniz?')) {
-                            deleteMutation.mutate(achievement.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {!achievements || achievements.length === 0 ? (
+            <div className="text-center py-12">
+              <Trophy className="h-16 w-16 mx-auto text-muted-foreground opacity-20 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Henüz başarı yok</h3>
+              <p className="text-muted-foreground mb-4">Kullanıcılarınız için ilk başarıyı oluşturun</p>
+              <Button onClick={() => handleDialogOpen()}>
+                <Plus className="mr-2 h-4 w-4" />
+                İlk Başarıyı Oluştur
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Başarı</TableHead>
+                    <TableHead>Kategori</TableHead>
+                    <TableHead>Puan</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead className="text-right">İşlemler</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {achievements.map((achievement) => (
+                    <TableRow key={achievement.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" 
+                            style={{ backgroundColor: achievement.color }}
+                          >
+                            {getIconComponent(achievement.icon)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{achievement.name}</p>
+                            <p className="text-sm text-muted-foreground truncate">{achievement.description}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{achievement.category}</Badge>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">{achievement.points_reward} puan</TableCell>
+                      <TableCell>
+                        <Badge variant={achievement.is_active ? 'default' : 'secondary'}>
+                          {achievement.is_active ? 'Aktif' : 'Pasif'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDialogOpen(achievement)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Bu başarıyı silmek istediğinizden emin misiniz?')) {
+                                deleteMutation.mutate(achievement.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
