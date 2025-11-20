@@ -232,33 +232,84 @@ export const NotificationPopup = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Exit intent tracking
+  // Exit intent tracking - Desktop & Mobile
   useEffect(() => {
     let exitIntentTriggered = false;
+    const isMobile = window.innerWidth <= 768;
 
+    // Desktop: Mouse leave from top
     const handleMouseLeave = (e: MouseEvent) => {
-      // Only trigger if mouse leaves from the top of the page (going to close tab/navigate away)
       if (e.clientY <= 0 && !exitIntentTriggered) {
         exitIntentTriggered = true;
-        
-        // Check if there's a notification with exit_intent trigger
-        if (notifications && notifications.length > 0) {
-          const exitNotification = notifications.find(n => n.trigger_type === 'exit_intent');
-          if (exitNotification && !openNotificationId) {
-            setShouldShow(true);
-            // Trigger check will handle the notification display
-          }
-        }
-        
-        // Reset after 5 seconds to allow re-trigger if user comes back
-        setTimeout(() => {
-          exitIntentTriggered = false;
-        }, 5000);
+        triggerExitIntent();
+        resetTrigger();
       }
     };
 
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+    // Mobile: Back button / browser back detection
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!exitIntentTriggered && isMobile) {
+        exitIntentTriggered = true;
+        triggerExitIntent();
+        // Note: Can't prevent default on mobile, but we still track the intent
+      }
+    };
+
+    // Mobile: Rapid scroll up detection (exit intent gesture)
+    let lastScrollY = window.scrollY;
+    let scrollUpCount = 0;
+    const handleScroll = () => {
+      if (!isMobile) return;
+      
+      const currentScrollY = window.scrollY;
+      
+      // User scrolled up rapidly while at the top of page
+      if (currentScrollY < lastScrollY && currentScrollY < 100) {
+        scrollUpCount++;
+        
+        // If user scrolled up 3 times quickly at top of page
+        if (scrollUpCount >= 3 && !exitIntentTriggered) {
+          exitIntentTriggered = true;
+          triggerExitIntent();
+          resetTrigger();
+          scrollUpCount = 0;
+        }
+      } else {
+        scrollUpCount = 0;
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    const triggerExitIntent = () => {
+      if (notifications && notifications.length > 0) {
+        const exitNotification = notifications.find(n => n.trigger_type === 'exit_intent');
+        if (exitNotification && !openNotificationId) {
+          setShouldShow(true);
+        }
+      }
+    };
+
+    const resetTrigger = () => {
+      setTimeout(() => {
+        exitIntentTriggered = false;
+        scrollUpCount = 0;
+      }, 5000);
+    };
+
+    // Attach listeners based on device
+    if (!isMobile) {
+      document.addEventListener('mouseleave', handleMouseLeave);
+    } else {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [notifications, openNotificationId]);
 
   useEffect(() => {
