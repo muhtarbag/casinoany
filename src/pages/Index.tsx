@@ -46,23 +46,23 @@ const Index = () => {
   const faqData = [
     {
       question: "Türkiye'nin en güvenilir casino siteleri hangileri?",
-      answer: "CasinoAny.com'da lisanslı, yüksek güvenlik standartlarına sahip ve hızlı ödeme yapan 50+ casino sitesini inceleyebilirsiniz. Tüm siteler detaylı analizlerle değerlendirilmiştir."
+      answer: "CasinoAny.com'da 50'den fazla lisanslı ve güvenilir casino sitesini detaylı olarak inceleyebilirsiniz. Her site yüksek güvenlik standartlarına sahip olup, Curacao, Malta Gaming Authority veya diğer uluslararası lisanslama kurumları tarafından denetlenmektedir. Platformumuzda her sitenin güvenlik sertifikaları, ödeme yöntemleri, para çekme süreleri ve kullanıcı yorumları detaylı şekilde listelenmiştir. En popüler siteler arasında Fenomenbet, BahisFanatik ve CepBahis bulunmaktadır. Tüm siteler düzenli olarak güvenlik denetimleri ile değerlendirilmekte ve kullanıcı geri bildirimlerine göre puanlanmaktadır."
     },
     {
-      question: "Casino bonusları nasıl kullanılır?",
-      answer: "Casino bonusları genellikle ilk üyelikte hoş geldin bonusu olarak verilir. Bonus kullanmadan önce çevrim şartlarını mutlaka okuyun. %500'e varan bonuslarımızı karşılaştırabilirsiniz."
+      question: "Casino bonusları nasıl kullanılır ve nelere dikkat edilmeli?",
+      answer: "Casino bonusları genellikle ilk üyelik sırasında hoş geldin bonusu olarak verilir ve hesabınıza otomatik olarak tanımlanır. Bonus kullanmadan önce mutlaka çevrim şartlarını okuyun. Çevrim şartı, bonusu nakite çevirmek için yapmanız gereken bahis miktarını belirtir. Örneğin, 1000 TL bonus ile 20x çevrim şartı varsa, 20.000 TL tutarında bahis yapmanız gerekir. Ayrıca bonus geçerlilik süresi, minimum bahis miktarları ve oyun kısıtlamalarına dikkat edin. Bazı oyunlar çevrim şartına %100 katkı sağlarken, bazıları daha düşük oranlarda katkı sağlar. CasinoAny.com'da her sitenin bonus detaylarını ve çevrim şartlarını karşılaştırarak size en uygun bonusu bulabilirsiniz."
     },
     {
       question: "Deneme bonusu veren siteler güvenilir mi?",
-      answer: "Evet, CasinoAny.com'da listelenen tüm deneme bonusu veren siteler güvenilir lisanslara sahiptir. Her sitenin detaylı incelemesini yaparak kullanıcılarımıza sunuyoruz."
+      answer: "Evet, CasinoAny.com'da listelenen tüm deneme bonusu veren siteler güvenilir uluslararası lisanslara sahiptir ve düzenli denetimlere tabidir. Deneme bonusu, sitenin oyun kalitesini ve hizmetlerini risk almadan test etmenizi sağlayan özel bir promosyondur. Ancak her deneme bonusu aynı değildir. Bazı siteler çevrim şartı olmayan (çevrimsiz) bonuslar sunarken, diğerleri belirli çevrim şartları ile birlikte gelir. Deneme bonusu alırken sitenin lisans bilgilerini, kullanıcı yorumlarını ve ödeme geçmişini mutlaka kontrol edin. CasinoAny.com'da her site için kapsamlı güvenlik analizi ve kullanıcı değerlendirmeleri bulabilirsiniz. En güvenilir deneme bonusu veren siteler arasında lisanslı ve yıllardır faaliyet gösteren operatörler bulunmaktadır."
     },
     {
-      question: "Casino sitelerinde para çekme ne kadar sürer?",
-      answer: "Güvenilir casino sitelerinde para çekme süresi ortalama 24-48 saat arasındadır. Bazı siteler anlık ödeme de yapabilmektedir. Her sitenin ödeme süresini incelemelerimizde bulabilirsiniz."
+      question: "Casino sitelerinde para çekme işlemi ne kadar sürer?",
+      answer: "Güvenilir casino sitelerinde para çekme süresi genellikle 24-48 saat arasında değişmektedir, ancak bu süre kullandığınız ödeme yöntemine ve sitenin işlem hızına göre farklılık gösterebilir. Papara ve Cepbank gibi hızlı ödeme yöntemleri ile bazı siteler anlık para çekme imkanı sunmaktadır. Banka havalesi (EFT) ile para çekme işlemleri genellikle 2-3 iş günü sürerken, kredi kartına iade işlemleri 5-7 iş günü arasında tamamlanabilir. Para çekme hızını etkileyen faktörler arasında hesap doğrulama durumu, çekilecek miktar ve sitenin günlük para çekme limitleri bulunur. İlk para çekme işleminizde kimlik doğrulama belgelerini (kimlik, adres belgesi) hazırlamanız işlemi hızlandıracaktır. CasinoAny.com'da her sitenin ortalama para çekme süreleri ve kullanıcı deneyimleri detaylı olarak listelenmiştir."
     },
     {
-      question: "Hangi casino oyunları en çok kazandırır?",
-      answer: "RTP (Return to Player) oranı yüksek olan slot oyunları, blackjack ve poker genellikle daha yüksek kazanç şansı sunar. Her sitenin oyun çeşitliliğini ve RTP oranlarını karşılaştırabilirsiniz."
+      question: "Hangi casino oyunları en çok kazandırır ve RTP oranı nedir?",
+      answer: "RTP (Return to Player) oranı, bir casino oyununun uzun vadede oyunculara geri ödeme yüzdesidir ve oyun seçiminde en önemli faktörlerden biridir. Genel olarak blackjack %99.5, video poker %99.5, baccarat %98.9 ve belirli slot oyunları %96-98 RTP oranına sahiptir. RTP oranı yüksek olan oyunlar teorik olarak daha fazla kazanç şansı sunar. Ancak RTP uzun vadeli bir istatistiktir ve kısa vadede şans faktörü önemlidir. Slot oyunlarında yüksek RTP'ye sahip popüler oyunlar arasında Blood Suckers (%98), Mega Joker (%99) ve Jackpot 6000 (%98.8) bulunmaktadır. Strateji gerektiren oyunlar (blackjack, poker) doğru oynandiğında daha yüksek kazanç şansı sağlar. CasinoAny.com'da her sitenin oyun çeşitliliğini, RTP oranlarını ve jackpot tutarlarını karşılaştırarak size en uygun oyunları bulabilirsiniz. Sorumlu oyun ilkelerine uygun olarak bütçenizi belirleyin ve kayıplarınızı takip edin."
     }
   ];
 
