@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ const Memberships = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSiteRequestOpen, setIsSiteRequestOpen] = useState(false);
   const [selectedSiteId, setSelectedSiteId] = useState('');
   const [username, setUsername] = useState('');
   const [notes, setNotes] = useState('');
@@ -202,7 +204,18 @@ const Memberships = () => {
               
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="site">Site Seçin *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="site">Site Seçin *</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsSiteRequestOpen(true)}
+                      className="h-auto p-0 text-xs text-primary hover:underline"
+                    >
+                      Listede yok mu? Ekle
+                    </Button>
+                  </div>
                   <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
                     <SelectTrigger id="site">
                       <SelectValue placeholder="Bir site seçin..." />
@@ -380,6 +393,11 @@ const Memberships = () => {
             </CardContent>
           </Card>
         )}
+        
+        <SiteAdditionRequestDialog 
+          open={isSiteRequestOpen} 
+          onOpenChange={setIsSiteRequestOpen}
+        />
       </ProfileLayout>
     </>
   );
