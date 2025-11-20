@@ -17,6 +17,7 @@ import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
 import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
 import { SiteOwnerProfileEditor } from '@/components/panel/SiteOwnerProfileEditor';
+import { AdvancedAnalytics } from './AdvancedAnalytics';
 
 const SiteManagement = () => {
   const { user, isAdmin, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
@@ -164,6 +165,7 @@ const SiteManagement = () => {
       'feedback': 'Geri Bildirimler',
       'notifications': 'Bildirimler',
       'reports': 'Raporlar ve İstatistikler',
+      'advanced-analytics': 'Gelişmiş Analitik',
       'profile': 'Profil Ayarları'
     };
     
@@ -206,6 +208,8 @@ const SiteManagement = () => {
             siteData={siteData}
           />
         );
+      case 'advanced-analytics':
+        return <AdvancedAnalytics />;
       case 'profile':
         return <SiteOwnerProfileEditor />;
       default:
