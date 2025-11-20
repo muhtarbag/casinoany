@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Star, Eye, MousePointerClick, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, Eye, MousePointerClick, TrendingUp, ArrowRight } from "lucide-react";
 import { OptimizedImage } from "./OptimizedImage";
 import { useSiteStats } from "@/hooks/queries/useSiteQueries";
 
@@ -83,7 +84,7 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     if (!allSites || allSites.length === 0) return [];
     
     const shuffled = [...allSites].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 24); // Get more sites for 3 rows
+    return shuffled.slice(0, 15); // 15 sites for 3 rows (5 per row)
   }, [allSites]);
 
   // Split sites into 3 rows
@@ -166,12 +167,11 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
     const clicks = stats?.clicks || 0;
     
     return (
-      <Link
+      <div
         key={site.id}
-        to={`/${site.slug}`}
-        className="group min-w-[280px] flex-shrink-0"
+        className="min-w-[300px] flex-shrink-0"
       >
-        <Card className="h-full border-2 hover:border-primary hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+        <Card className="h-full border-2 hover:border-primary hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm group">
           <CardContent className="p-4">
             <div className="flex gap-4">
               {/* Logo Section */}
@@ -248,9 +248,21 @@ const RecommendedSitesComponent = ({ currentSiteId, currentSiteFeatures }: Recom
                 )}
               </div>
             </div>
+
+            {/* Action Button */}
+            <Link to={`/${site.slug}`} className="block mt-3">
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="w-full group-hover:shadow-md transition-shadow"
+              >
+                Detaya Git
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
-      </Link>
+      </div>
     );
   };
 
