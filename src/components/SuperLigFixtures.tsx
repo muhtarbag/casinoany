@@ -7,10 +7,13 @@ import { useSuperLigFixtures } from '@/hooks/queries/useSuperLigQueries';
 import { Calendar, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { SuperLigSyncButton } from './SuperLigSyncButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function SuperLigFixtures() {
   const [selectedWeek, setSelectedWeek] = useState<number>(1);
   const { data: fixtures, isLoading } = useSuperLigFixtures('2024-2025', selectedWeek);
+  const { isAdmin } = useAuth();
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -41,12 +44,15 @@ export function SuperLigFixtures() {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Süper Lig Fikstürü
-            </CardTitle>
-            <CardDescription>Haftalık maç programı</CardDescription>
+          <div className="flex items-center gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Süper Lig Fikstürü
+              </CardTitle>
+              <CardDescription>Haftalık maç programı</CardDescription>
+            </div>
+            {isAdmin && <SuperLigSyncButton />}
           </div>
           <Select
             value={selectedWeek.toString()}
