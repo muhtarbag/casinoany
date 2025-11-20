@@ -32,11 +32,6 @@ const Signup = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const [username, setUsername] = useState('');
-  const [city, setCity] = useState('');
-  const [district, setDistrict] = useState('');
-  const [favoriteTeam, setFavoriteTeam] = useState('');
-  const [interests, setInterests] = useState<string[]>([]);
-  const [favoriteGameProviders, setFavoriteGameProviders] = useState<string[]>([]);
 
   const [selectedSite, setSelectedSite] = useState('');
   const [newSiteName, setNewSiteName] = useState('');
@@ -170,11 +165,6 @@ const Signup = () => {
 
       if (userType === 'user') {
         metadata.username = username;
-        metadata.city = city;
-        metadata.district = district;
-        metadata.favoriteTeam = favoriteTeam;
-        metadata.interests = interests.join(',');
-        metadata.favoriteGameProviders = favoriteGameProviders.join(',');
       } else {
         // Kurumsal üyelik metadata - handle_new_user ile uyumlu field isimleri
         metadata.companyName = companyName;
@@ -270,16 +260,6 @@ const Signup = () => {
         <StepIndividualProfile
           username={username}
           setUsername={setUsername}
-          city={city}
-          setCity={setCity}
-          district={district}
-          setDistrict={setDistrict}
-          favoriteTeam={favoriteTeam}
-          setFavoriteTeam={setFavoriteTeam}
-          interests={interests}
-          setInterests={setInterests}
-          favoriteGameProviders={favoriteGameProviders}
-          setFavoriteGameProviders={setFavoriteGameProviders}
           disabled={loading}
         />
       );
