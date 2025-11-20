@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 
 const ComplaintDetail = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathParts = location.pathname.split('/').filter(Boolean);
   // Get the slug/id part - everything after /sikayetler/
   const slugOrId = pathParts.slice(1).join('/'); // Join back for multi-part slugs
@@ -66,6 +67,16 @@ const ComplaintDetail = () => {
       return data;
     },
   });
+
+  // Redirect to slug-based URL if user came via UUID
+  useEffect(() => {
+    if (complaint?.slug && slugOrId !== complaint.slug) {
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+      if (isUUID) {
+        navigate(`/sikayetler/${complaint.slug}`, { replace: true });
+      }
+    }
+  }, [complaint, slugOrId, navigate]);
 
   const { data: responses } = useQuery({
     queryKey: ['complaint-responses', slugOrId],

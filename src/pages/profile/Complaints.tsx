@@ -278,7 +278,7 @@ export default function Complaints() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => navigate(`/sikayetler/${complaint.id}`)}
+                        onClick={() => navigate(`/sikayetler/${complaint.slug || complaint.id}`)}
                       >
                         {complaint.response_count > 0 
                           ? `${complaint.response_count} Cevap Görüntüle` 
