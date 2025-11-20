@@ -64,21 +64,4 @@ export const useCalculateReputationScore = () => {
   });
 };
 
-// Tüm sitelerin itibar skorunu hesapla (Admin)
-export const useCalculateAllReputationScores = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.rpc('calculate_all_reputation_scores');
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reputation-score'] });
-      toast.success('Tüm itibar skorları güncellendi');
-    },
-    onError: () => {
-      toast.error('İtibar skorları hesaplanamadı');
-    },
-  });
-};
+// This function has been removed - use individual site calculation instead
