@@ -135,7 +135,7 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
             // Get top 5 sites for this platform
             const topSites = statsData
               .map(stat => ({
-                name: stat.betting_sites?.name || 'Unknown',
+                name: stat.site_name || 'Bilinmeyen Site',
                 clicks: stat[platform.key] || 0,
               }))
               .filter(site => site.clicks > 0)
