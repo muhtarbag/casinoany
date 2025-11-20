@@ -1,11 +1,5 @@
-import { Mail, ChevronDown } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
-import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { trackSocialClick } from '@/lib/socialTracking';
 import { 
@@ -42,21 +36,17 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
   ].filter(Boolean).length;
 
   return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem value="contact" className="border rounded-lg px-4 bg-card">
-        <AccordionTrigger className="hover:no-underline py-4">
-          <div className="flex items-center justify-between w-full pr-4">
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-primary" />
-              <span className="font-semibold">İletişim & Sosyal Medya</span>
-            </div>
-            <Badge variant="secondary" className="mr-2">
-              {activeChannels} kanal
-            </Badge>
-          </div>
-        </AccordionTrigger>
-        <AccordionContent>
-          <div className="flex flex-wrap gap-4 items-center justify-center py-4">
+    <div className="w-full border rounded-lg px-4 py-4 bg-card">
+      <div className="flex items-center justify-between w-full mb-4">
+        <div className="flex items-center gap-3">
+          <Mail className="w-5 h-5 text-primary" />
+          <span className="font-semibold">İletişim & Sosyal Medya</span>
+        </div>
+        <Badge variant="secondary">
+          {activeChannels} kanal
+        </Badge>
+      </div>
+      <div className="flex flex-wrap gap-4 items-center justify-center">
           {site.email && (
             <a 
               href={`mailto:${site.email}`} 
@@ -160,8 +150,6 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    </div>
   );
 };
