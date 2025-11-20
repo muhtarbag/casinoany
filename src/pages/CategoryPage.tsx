@@ -16,6 +16,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import SiteDetail from './SiteDetail';
 
 interface CategorySite {
   id: string;
@@ -26,6 +27,24 @@ interface CategorySite {
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
+  
+  // First check if this slug belongs to a site
+  const { data: site, isLoading: siteLoading } = useQuery({
+    queryKey: ['site-check', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('id, slug')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!slug,
+  });
+
   const { data: category, isLoading: categoryLoading } = useCategory(slug || '');
 
   // Fetch category-specific sites
@@ -50,7 +69,12 @@ export default function CategoryPage() {
     enabled: !!category?.id,
   });
 
-  if (categoryLoading) return <LoadingState variant="skeleton" rows={8} />;
+  // If it's a site, render SiteDetail
+  if (site) {
+    return <SiteDetail />;
+  }
+
+  if (siteLoading || categoryLoading) return <LoadingState variant="skeleton" rows={8} />;
   if (!category) return <div className="min-h-screen flex items-center justify-center">Kategori bulunamadı</div>;
 
   return (
