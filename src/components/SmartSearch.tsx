@@ -175,12 +175,15 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
 
   return (
     <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
-      <div className="flex flex-col sm:flex-row gap-2 sm:relative">
-        <div className="relative flex-1" ref={suggestionsRef}>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10 pointer-events-none" />
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:relative">
+        <div className="relative flex-1 group" ref={suggestionsRef}>
+          {/* Mobile optimized search icon */}
+          <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+            <Search className="w-5 h-5 sm:w-5 sm:h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          </div>
           <Input
             type="text"
-            placeholder="Bahis sitesi ara..."
+            placeholder="Site adı veya bonus ara..."
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             onFocus={() => {
@@ -198,17 +201,17 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                 setShowPopular(false);
               }, 300);
             }}
-            className="pl-13 pr-4 sm:pl-14 sm:pr-28 py-4 sm:py-6 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/70 rounded-lg border-2 border-border focus:border-primary w-full font-normal"
+            className="pl-11 pr-4 sm:pl-14 sm:pr-28 py-5 sm:py-6 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/60 rounded-xl sm:rounded-lg border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 w-full font-normal transition-all shadow-sm focus:shadow-md bg-card"
           />
           
-          {/* Popular Searches Dropdown */}
+          {/* Mobile optimized Popular Searches Dropdown */}
           {showPopular && popularSearches && popularSearches.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
-              <div className="px-4 py-3 bg-primary/5 border-b border-border flex items-center gap-2">
-                <Flame className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Popüler Aramalar</span>
+            <div className="absolute top-full left-0 right-0 mt-3 bg-card border-2 border-border rounded-2xl sm:rounded-lg shadow-2xl z-50 overflow-hidden animate-fade-in max-h-[70vh] overflow-y-auto">
+              <div className="px-4 py-3.5 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border flex items-center gap-2 sticky top-0 backdrop-blur-sm">
+                <Flame className="w-5 h-5 text-primary" />
+                <span className="text-sm font-bold text-foreground">Popüler Aramalar</span>
               </div>
-              <div className="p-3 flex flex-wrap gap-2">
+              <div className="p-4 flex flex-wrap gap-2.5">
                 {popularSearches.map((search: any, index: number) => (
                   <button
                     key={search.id || `popular-${index}`}
@@ -218,11 +221,11 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                   >
                     <Badge
                       variant="secondary"
-                      className="cursor-pointer hover:bg-primary/20 hover:text-primary transition-all duration-200 flex items-center gap-2"
+                      className="cursor-pointer hover:bg-primary/20 hover:text-primary active:scale-95 transition-all duration-200 flex items-center gap-2 text-sm py-2 px-3 touch-manipulation"
                     >
-                      <span className="capitalize">{search.search_term}</span>
+                      <span className="capitalize font-medium">{search.search_term}</span>
                       {search.search_count > 5 && (
-                        <span className="text-xs bg-primary/20 px-1.5 py-0.5 rounded">
+                        <span className="text-xs bg-primary/30 px-2 py-0.5 rounded-full font-bold">
                           {search.search_count}
                         </span>
                       )}
@@ -230,17 +233,17 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                   </button>
                 ))}
               </div>
-              <div className="px-4 py-2 bg-muted/50 border-t border-border">
-                <p className="text-xs text-muted-foreground text-center">
-                  En çok aranan siteler ve özellikler
+              <div className="px-4 py-3 bg-muted/30 border-t border-border">
+                <p className="text-xs text-muted-foreground text-center font-medium">
+                  💡 En çok aranan siteler ve özellikler
                 </p>
               </div>
             </div>
           )}
 
-      {/* Suggestions Dropdown */}
+      {/* Mobile optimized Suggestions Dropdown */}
       {suggestions.length > 0 && showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in">
+            <div className="absolute top-full left-0 right-0 mt-3 bg-card border-2 border-border rounded-2xl sm:rounded-lg shadow-2xl z-50 overflow-hidden animate-fade-in max-h-[70vh] overflow-y-auto">
               {suggestions.map((site, index) => (
                 <button
                   key={site.id || `suggestion-${index}`}
@@ -249,33 +252,33 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                     e.preventDefault();
                     handleSuggestionClick(site.slug, site.name);
                   }}
-                  className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors border-b border-border last:border-b-0 flex items-center gap-3"
+                  className="w-full px-4 py-4 text-left hover:bg-primary/10 active:bg-primary/20 transition-all border-b border-border last:border-b-0 flex items-center gap-3 touch-manipulation"
                 >
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg p-2">
                     {index === 0 ? (
-                      <TrendingUp className="w-4 h-4 text-primary" />
+                      <TrendingUp className="w-5 h-5 text-primary" />
                     ) : (
-                      <Search className="w-4 h-4 text-muted-foreground" />
+                      <Search className="w-5 h-5 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">{site.name}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
+                    <p className="font-semibold text-foreground truncate text-base">{site.name}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                      <span className="flex items-center gap-1 bg-yellow-500/10 px-2 py-0.5 rounded-full">
                         <span className="text-yellow-500">★</span>
-                        {site.rating}
+                        <span className="font-medium">{site.rating}</span>
                       </span>
                       {site.bonus && (
                         <>
                           <span>•</span>
-                          <span className="truncate">{site.bonus}</span>
+                          <span className="truncate font-medium">{site.bonus}</span>
                         </>
                       )}
                     </div>
                   </div>
                   {index === 0 && (
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                      En İyi Eşleşme
+                    <span className="text-xs bg-gradient-to-r from-primary to-primary/80 text-white px-3 py-1.5 rounded-full font-bold shadow-sm">
+                      En İyi
                     </span>
                   )}
                 </button>
@@ -283,12 +286,13 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
             </div>
           )}
         </div>
+        {/* Mobile optimized search button */}
         <Button
           type="submit"
-          className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-4 sm:py-3 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-all duration-200 w-full sm:w-auto font-semibold"
+          className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 px-6 py-5 sm:py-3 rounded-xl sm:rounded-lg bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/80 active:scale-95 transition-all duration-200 w-full sm:w-auto font-bold shadow-lg hover:shadow-xl touch-manipulation text-base"
         >
-          <Search className="w-4 h-4 sm:hidden mr-2" />
-          Ara
+          <Search className="w-5 h-5 sm:hidden mr-2" />
+          <span>Ara</span>
         </Button>
       </div>
     </form>
