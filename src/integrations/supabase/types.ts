@@ -3445,6 +3445,158 @@ export type Database = {
           },
         ]
       }
+      super_lig_fixtures: {
+        Row: {
+          away_score: number | null
+          away_team_id: string
+          created_at: string
+          home_score: number | null
+          home_team_id: string
+          id: string
+          match_date: string | null
+          season: string
+          status: string
+          updated_at: string
+          venue: string | null
+          week: number
+        }
+        Insert: {
+          away_score?: number | null
+          away_team_id: string
+          created_at?: string
+          home_score?: number | null
+          home_team_id: string
+          id?: string
+          match_date?: string | null
+          season?: string
+          status?: string
+          updated_at?: string
+          venue?: string | null
+          week: number
+        }
+        Update: {
+          away_score?: number | null
+          away_team_id?: string
+          created_at?: string
+          home_score?: number | null
+          home_team_id?: string
+          id?: string
+          match_date?: string | null
+          season?: string
+          status?: string
+          updated_at?: string
+          venue?: string | null
+          week?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_lig_fixtures_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "super_lig_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "super_lig_fixtures_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "super_lig_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_lig_standings: {
+        Row: {
+          drawn: number
+          goal_difference: number
+          goals_against: number
+          goals_for: number
+          id: string
+          lost: number
+          played: number
+          points: number
+          position: number
+          season: string
+          team_id: string
+          updated_at: string
+          won: number
+        }
+        Insert: {
+          drawn?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          lost?: number
+          played?: number
+          points?: number
+          position: number
+          season?: string
+          team_id: string
+          updated_at?: string
+          won?: number
+        }
+        Update: {
+          drawn?: number
+          goal_difference?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          lost?: number
+          played?: number
+          points?: number
+          position?: number
+          season?: string
+          team_id?: string
+          updated_at?: string
+          won?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_lig_standings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "super_lig_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_lig_teams: {
+        Row: {
+          coach: string | null
+          created_at: string
+          founded_year: number | null
+          id: string
+          logo_url: string | null
+          name: string
+          short_name: string | null
+          stadium: string | null
+          updated_at: string
+        }
+        Insert: {
+          coach?: string | null
+          created_at?: string
+          founded_year?: number | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          short_name?: string | null
+          stadium?: string | null
+          updated_at?: string
+        }
+        Update: {
+          coach?: string | null
+          created_at?: string
+          founded_year?: number | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          short_name?: string | null
+          stadium?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_logs: {
         Row: {
           action: string

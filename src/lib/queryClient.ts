@@ -166,6 +166,17 @@ export const queryKeys = {
     logs: (filters?: Record<string, any>) => 
       [...queryKeys.admin.all, 'logs', filters] as const,
   },
+
+  // Süper Lig
+  superLig: {
+    all: ['superLig'] as const,
+    teams: ['superLig', 'teams'] as const,
+    standings: (season: string) => ['superLig', 'standings', season] as const,
+    fixtures: (season: string, week?: number) => 
+      week !== undefined 
+        ? ['superLig', 'fixtures', season, week] as const
+        : ['superLig', 'fixtures', season] as const,
+  },
 } as const;
 
 // Merkezi Query Client konfigürasyonu

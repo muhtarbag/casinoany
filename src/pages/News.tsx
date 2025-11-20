@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Eye, ExternalLink, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
@@ -15,9 +16,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNewsArticles } from "@/hooks/queries/useNewsQueries";
 import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
+import { SuperLigStandings } from "@/components/SuperLigStandings";
+import { SuperLigFixtures } from "@/components/SuperLigFixtures";
 
 const categories = [
   "Tümü",
+  "Spor Haberleri",
   "Slot Haberleri",
   "Regülasyon",
   "Kripto Casino",
@@ -76,9 +80,9 @@ export default function News() {
   return (
     <>
       <SEO
-        title="iGaming Haberleri - Casino ve Bahis Dünyasından Son Gelişmeler"
-        description="Online casino, bahis siteleri, slot oyunları ve iGaming sektöründen güncel haberler, analizler ve gelişmeler."
-        keywords={["casino haberleri", "bahis haberleri", "igaming", "slot haberleri", "casino güncel"]}
+        title="iGaming & Spor Haberleri - Casino, Bahis ve Futbol Dünyası"
+        description="Online casino, bahis siteleri, slot oyunları, Süper Lig ve iGaming sektöründen güncel haberler, analizler ve gelişmeler."
+        keywords={["casino haberleri", "bahis haberleri", "igaming", "slot haberleri", "süper lig", "futbol haberleri"]}
       />
       <Helmet>
         <link rel="canonical" href="https://casinoany.com/haberler" />
@@ -106,123 +110,164 @@ export default function News() {
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-12">
-          <div className="mb-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              iGaming Haberleri
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Casino ve bahis dünyasından en güncel haberler, analizler ve gelişmeler
-            </p>
-          </div>
+          <Tabs defaultValue="news" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsTrigger value="news">Haberler</TabsTrigger>
+              <TabsTrigger value="standings">Puan Durumu</TabsTrigger>
+              <TabsTrigger value="fixtures">Fikstür</TabsTrigger>
+            </TabsList>
 
-          <div className="mb-8 flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input
-                placeholder="Haber ara..."
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <TabsContent value="news">
+              <div className="mb-12 text-center">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  iGaming & Spor Haberleri
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Casino, bahis ve spor dünyasından en güncel haberler, analizler ve gelişmeler
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedArticles?.map((article) => (
-              <Link key={article.id} to={`/haber/${article.slug}`}>
-                <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary">{article.category}</Badge>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Eye className="w-4 h-4" />
-                        {article.view_count}
+              <div className="mb-8 flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Input
+                    placeholder="Haber ara..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                  <SelectTrigger className="w-full md:w-[200px]">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {paginatedArticles && paginatedArticles.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    {paginatedArticles.map((article: any) => (
+                      <Link key={article.id} to={`/news/${article.slug}`}>
+                        <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-primary/50">
+                          <CardHeader>
+                            <div className="flex items-center justify-between mb-3">
+                              {article.category && (
+                                <Badge variant="secondary">{article.category}</Badge>
+                              )}
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Eye className="w-4 h-4" />
+                                <span>{article.view_count || 0}</span>
+                              </div>
+                            </div>
+                            <CardTitle className="text-xl line-clamp-2 hover:text-primary transition-colors">
+                              {article.title}
+                            </CardTitle>
+                            <CardDescription className="flex items-center gap-2 text-sm">
+                              <Calendar className="w-4 h-4" />
+                              {format(new Date(article.published_at), 'dd MMMM yyyy', { locale: tr })}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            {article.excerpt && (
+                              <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                                {article.excerpt}
+                              </p>
+                            )}
+                            {article.tags && article.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {article.tags.slice(0, 3).map((tag: string, index: number) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Önceki
+                      </Button>
+                      <div className="flex gap-2">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let page;
+                          if (totalPages <= 5) {
+                            page = i + 1;
+                          } else if (currentPage <= 3) {
+                            page = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            page = totalPages - 4 + i;
+                          } else {
+                            page = currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className="min-w-[40px]"
+                            >
+                              {page}
+                            </Button>
+                          );
+                        })}
                       </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Sonraki
+                      </Button>
                     </div>
-                    <CardTitle className="line-clamp-2 text-xl">
-                      {article.title}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-2 text-xs">
-                      <Calendar className="w-3 h-3" />
-                      {format(new Date(article.published_at), "d MMMM yyyy", { locale: tr })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground line-clamp-3 mb-4">
-                      {article.excerpt}
-                    </p>
-                    {article.tags && article.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {article.tags.slice(0, 3).map((tag, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
+                  )}
+                </>
+              ) : (
+                <Card className="p-12 text-center">
+                  <div className="space-y-4">
+                    <Search className="w-16 h-16 mx-auto text-muted-foreground" />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">Haber Bulunamadı</h3>
+                      <p className="text-muted-foreground">
+                        {searchTerm || selectedCategory !== "Tümü" 
+                          ? "Arama kriterlerinize uygun haber bulunamadı. Lütfen farklı bir arama yapın."
+                          : "Henüz haber bulunmamaktadır."}
+                      </p>
+                    </div>
+                  </div>
                 </Card>
-              </Link>
-            ))}
-          </div>
+              )}
+            </TabsContent>
 
-          {(!filteredArticles || filteredArticles.length === 0) && !isLoading && (
-            <div className="text-center py-12 col-span-full">
-              <ExternalLink className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-xl text-muted-foreground">
-                {searchTerm || selectedCategory !== "Tümü" 
-                  ? "Arama kriterlerine uygun haber bulunamadı."
-                  : "Henüz haber bulunmamaktadır."}
-              </p>
-            </div>
-          )}
+            <TabsContent value="standings">
+              <SuperLigStandings />
+            </TabsContent>
+
+            <TabsContent value="fixtures">
+              <SuperLigFixtures />
+            </TabsContent>
+          </Tabs>
         </div>
-
-        {/* Pagination */}
-        {filteredArticles && filteredArticles.length > ITEMS_PER_PAGE && (
-          <div className="flex items-center justify-center gap-2 mt-12">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Önceki
-            </Button>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                  className="min-w-[40px]"
-                >
-                  {page}
-                </Button>
-              ))}
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Sonraki
-            </Button>
-          </div>
-        )}
       </div>
 
       <Footer />
