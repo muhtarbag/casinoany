@@ -227,6 +227,7 @@ export default function SiteDetail() {
         const profile = profilesData?.find((p: any) => p.id === review.user_id);
         return {
           ...review,
+          type: 'review',
           profiles: profile ? { username: profile.username || "Anonim", avatar_url: profile.avatar_url } : undefined,
         };
       });
@@ -235,6 +236,52 @@ export default function SiteDetail() {
     },
     enabled: !!site?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes - reviews don't change frequently
+  });
+
+  // Fetch complaints with profiles
+  const { data: complaints, isLoading: complaintsLoading } = useQuery({
+    queryKey: ["site-complaints", site?.id],
+    queryFn: async () => {
+      if (!site?.id) return [];
+      const { data: complaintsData, error: complaintsError } = await supabase
+        .from("site_complaints")
+        .select("*")
+        .eq("site_id", site.id)
+        .eq("is_public", true)
+        .order("created_at", { ascending: false });
+
+      if (complaintsError) throw complaintsError;
+
+      // Fetch profiles separately
+      const userIds = complaintsData
+        .map((c: any) => c.user_id)
+        .filter((id: string | null) => id !== null);
+      
+      let profilesData = [];
+      if (userIds.length > 0) {
+        const { data, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", userIds);
+
+        if (profilesError) throw profilesError;
+        profilesData = data || [];
+      }
+
+      // Combine complaints with profiles
+      const complaintsWithProfiles = complaintsData.map((complaint: any) => {
+        const profile = profilesData?.find((p: any) => p.id === complaint.user_id);
+        return {
+          ...complaint,
+          type: 'complaint',
+          profiles: profile ? { username: profile.username || "Anonim", avatar_url: profile.avatar_url } : undefined,
+        };
+      });
+
+      return complaintsWithProfiles;
+    },
+    enabled: !!site?.id,
+    staleTime: 5 * 60 * 1000,
   });
 
   // ✅ DÜZELTILDI: Thread-safe view tracking
@@ -510,10 +557,10 @@ export default function SiteDetail() {
             </TabsTrigger>
             <TabsTrigger value="comments" className="flex items-center gap-2 whitespace-nowrap">
               <MessageCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Kullanıcı Yorumları</span>
+              <span className="hidden sm:inline">Yorumlar & Şikayetler</span>
               <span className="sm:hidden">Yorumlar</span>
-              {reviews && reviews.length > 0 && (
-                <Badge variant="secondary" className="ml-1">{reviews.length}</Badge>
+              {reviews && complaints && (reviews.length + complaints.length) > 0 && (
+                <Badge variant="secondary" className="ml-1">{reviews.length + complaints.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="blog" className="flex items-center gap-2 whitespace-nowrap">
@@ -599,10 +646,11 @@ export default function SiteDetail() {
 
           {/* Reviews Tab */}
           <TabsContent value="comments">
-            {!reviewsLoading && reviews ? (
+            {!reviewsLoading && !complaintsLoading && reviews && complaints ? (
               <SiteDetailReviews 
                 site={site} 
-                reviews={reviews} 
+                reviews={reviews}
+                complaints={complaints}
                 user={user} 
                 averageRating={averageRating} 
               />
