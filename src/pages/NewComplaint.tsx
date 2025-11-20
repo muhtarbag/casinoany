@@ -17,6 +17,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Loader2, ArrowLeft, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 
 const NewComplaint = () => {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ const NewComplaint = () => {
   const [category, setCategory] = useState('');
   const [severity, setSeverity] = useState('normal');
   const [isPublic, setIsPublic] = useState('true');
+  const [showAdditionDialog, setShowAdditionDialog] = useState(false);
 
   // Redirect to login if not authenticated
   if (!user) {
@@ -260,11 +262,15 @@ const NewComplaint = () => {
             </form>
           </CardContent>
         </Card>
-        </div>
       </div>
-      <Footer />
-    </>
-  );
+    </div>
+    <Footer />
+    <SiteAdditionRequestDialog 
+      open={showAdditionDialog} 
+      onOpenChange={setShowAdditionDialog} 
+    />
+  </>
+);
 };
 
 export default NewComplaint;
