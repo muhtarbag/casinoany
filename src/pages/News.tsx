@@ -18,6 +18,8 @@ import { useNewsArticles } from "@/hooks/queries/useNewsQueries";
 import { BreadcrumbSchema, ItemListSchema } from "@/components/StructuredData";
 import { SuperLigStandings } from "@/components/SuperLigStandings";
 import { SuperLigFixtures } from "@/components/SuperLigFixtures";
+import { NewsRssSyncButton } from "@/components/NewsRssSyncButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const categories = [
   "Tümü",
@@ -35,6 +37,7 @@ export default function News() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [currentPage, setCurrentPage] = useState(1);
+  const { isAdmin } = useAuth();
 
   const { data: articles, isLoading } = useNewsArticles({ isPublished: true, limit: 50 });
 
@@ -119,9 +122,12 @@ export default function News() {
 
             <TabsContent value="news">
               <div className="mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  iGaming & Spor Haberleri
-                </h1>
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    iGaming & Spor Haberleri
+                  </h1>
+                  {isAdmin && <NewsRssSyncButton />}
+                </div>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   Casino, bahis ve spor dünyasından en güncel haberler, analizler ve gelişmeler
                 </p>
