@@ -30,31 +30,38 @@ export const SiteDetailHeader = ({
         <div className="flex flex-col items-center text-center gap-1">
           {logoUrl && (
             <div className="flex-shrink-0 relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img 
                 src={logoUrl} 
                 alt={`${site.name} logo`} 
-                className="w-64 h-64 md:w-96 md:h-96 object-contain relative z-10 transition-all duration-500 group-hover:scale-105"
+                className="w-80 h-80 md:w-[28rem] md:h-[28rem] object-contain relative z-10 transition-all duration-500 group-hover:scale-105"
                 loading="eager"
               />
             </div>
           )}
           
           <div className="w-full">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-1.5 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-2 bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent leading-tight">
               {site.name}
             </h1>
             
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
-              <div className="flex items-center gap-1.5">
-                <Star className="w-5 h-5 fill-gold text-gold" />
-                <span className="font-bold text-lg">{averageRating}</span>
-                <span className="text-sm text-foreground/70">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-gold/10 to-gold/5 px-4 py-2 rounded-full border border-gold/20">
+                <Star className="w-6 h-6 fill-gold text-gold drop-shadow-lg" />
+                <span className="font-bold text-xl text-gold drop-shadow-sm">{averageRating}</span>
+                <span className="text-sm text-foreground/80 font-medium">
                   ({reviewCount} değerlendirme)
                 </span>
               </div>
               
+              {site.ownership_verified && (
+                <Badge variant="outline" className="bg-gradient-to-r from-success/20 to-success/10 border-success text-success font-semibold px-3 py-1 text-sm shadow-lg shadow-success/20">
+                  ✓ Doğrulanmış Site
+                </Badge>
+              )}
+              
               {site.is_featured && (
-                <Badge variant="secondary" className="bg-gradient-secondary">
+                <Badge variant="secondary" className="bg-gradient-secondary shadow-lg">
                   ⭐ Öne Çıkan
                 </Badge>
               )}
@@ -68,13 +75,16 @@ export const SiteDetailHeader = ({
             </div>
             
             {site.bonus && (
-              <div className="bg-gradient-secondary/10 border border-secondary/30 rounded-lg p-2.5 mb-3 max-w-2xl mx-auto sticky top-20 z-10 md:relative md:top-auto backdrop-blur-sm">
-                <div className="flex items-center justify-center gap-2 mb-0.5">
-                  <span className="text-xl">🎁</span>
-                  <span className="font-bold text-base">Hoş Geldin Bonusu</span>
+              <div className="bg-gradient-to-br from-secondary/20 via-secondary/10 to-transparent border-2 border-secondary/40 rounded-xl p-4 mb-4 max-w-2xl mx-auto sticky top-20 z-10 md:relative md:top-auto backdrop-blur-md shadow-2xl shadow-secondary/20">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-2xl animate-bounce">🎁</span>
+                  <span className="font-bold text-lg bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">Hoş Geldin Bonusu</span>
                 </div>
-                <p className="text-lg font-bold text-secondary mb-1">{site.bonus}</p>
-                <p className="text-xs text-foreground/60">✓ 2 dakikada kayıt</p>
+                <p className="text-xl md:text-2xl font-bold text-secondary mb-2 drop-shadow-sm">{site.bonus}</p>
+                <div className="flex items-center justify-center gap-4 text-xs md:text-sm text-foreground/80">
+                  <span className="flex items-center gap-1">✓ 2 dakikada kayıt</span>
+                  <span className="flex items-center gap-1">✓ Anında bonus</span>
+                </div>
               </div>
             )}
             
