@@ -167,6 +167,12 @@ export const queryKeys = {
       [...queryKeys.admin.all, 'logs', filters] as const,
   },
 
+  // Footer
+  footer: {
+    all: ['footer'] as const,
+    bySection: (section: string) => [...queryKeys.footer.all, section] as const,
+  },
+
   // Süper Lig
   superLig: {
     all: ['superLig'] as const,

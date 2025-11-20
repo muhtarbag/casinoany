@@ -83,6 +83,7 @@ export default function AdminRoot() {
       'system/users': 'users',
       'system/roles': 'roles',
       'system/build-health': 'build-health',
+      'system/footer': 'footer',
     };
     
     return routeToTabMap[path] || path;
@@ -119,6 +120,7 @@ export default function AdminRoot() {
       'users': '/admin/system/users',
       'roles': '/admin/system/roles',
       'build-health': '/admin/system/build-health',
+      'footer': '/admin/system/footer',
     };
     
     const route = tabToRouteMap[tabId] || `/admin/${tabId}`;
@@ -165,6 +167,7 @@ export default function AdminRoot() {
       'build-health': 'Build Sağlığı',
       'categories': 'Kategoriler',
       'banners': 'Banner Yönetimi',
+      'footer': 'Footer Yönetimi',
     };
     
     const items = [];
