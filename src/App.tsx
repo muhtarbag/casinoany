@@ -212,10 +212,10 @@ const AppContent = () => {
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
           
-          {/* Complaint Routes */}
+          {/* Complaint Routes - Support both slug and ID for backward compatibility */}
           <Route path="/sikayetler" element={<Complaints />} />
           <Route path="/sikayetler/yeni" element={<NewComplaint />} />
-          <Route path="/sikayetler/:id" element={<ComplaintDetail />} />
+          <Route path="/sikayetler/*" element={<ComplaintDetail />} />
           
           <Route path="/sitemap.xml" element={<Sitemap />} />
           <Route path="/site/:id" element={<SiteRedirect />} />

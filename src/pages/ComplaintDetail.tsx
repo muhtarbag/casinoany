@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,23 +19,37 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 const ComplaintDetail = () => {
-  const { id } = useParams();
+  const location = useLocation();
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  // Get the slug/id part - everything after /sikayetler/
+  const slugOrId = pathParts.slice(1).join('/'); // Join back for multi-part slugs
+  
   const { user, isSiteOwner, ownedSites, isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [responseText, setResponseText] = useState('');
 
   const { data: complaint, isLoading } = useQuery({
-    queryKey: ['complaint', id],
+    queryKey: ['complaint', slugOrId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try to fetch by slug first, then by ID for backward compatibility
+      let query = supabase
         .from('site_complaints')
         .select(`
           *,
           betting_sites (name, slug, logo_url)
-        `)
-        .eq('id', id)
-        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
+        `);
+      
+      // Check if it looks like a UUID (ID) or a slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+      
+      if (isUUID) {
+        query = query.eq('id', slugOrId);
+      } else {
+        query = query.eq('slug', slugOrId);
+      }
+      
+      const { data, error } = await query.maybeSingle();
       
       if (error) throw error;
       if (!data) throw new Error('Complaint not found');
@@ -44,72 +58,76 @@ const ComplaintDetail = () => {
   });
 
   const { data: responses } = useQuery({
-    queryKey: ['complaint-responses', id],
+    queryKey: ['complaint-responses', slugOrId],
     queryFn: async () => {
+      if (!complaint?.id) return [];
       const { data, error } = await supabase
         .from('complaint_responses')
         .select(`
           *,
           profiles (username, email, first_name, last_name)
         `)
-        .eq('complaint_id', id)
+        .eq('complaint_id', complaint.id)
         .order('created_at', { ascending: true });
       
       if (error) throw error;
       return data;
     },
+    enabled: !!complaint?.id,
   });
 
   // Check if user has liked this complaint
   const { data: userLike } = useQuery({
-    queryKey: ['complaint-like', id, user?.id],
+    queryKey: ['complaint-like', slugOrId, user?.id],
     queryFn: async () => {
-      if (!user) return null;
+      if (!user || !complaint?.id) return null;
       const { data, error } = await supabase
         .from('complaint_likes')
         .select('id')
-        .eq('complaint_id', id)
+        .eq('complaint_id', complaint.id)
         .eq('user_id', user.id)
         .maybeSingle();
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!complaint?.id,
   });
 
   // Get total like count
   const { data: likeCount } = useQuery({
-    queryKey: ['complaint-likes-count', id],
+    queryKey: ['complaint-likes-count', slugOrId],
     queryFn: async () => {
+      if (!complaint?.id) return 0;
       const { count, error } = await supabase
         .from('complaint_likes')
         .select('*', { count: 'exact', head: true })
-        .eq('complaint_id', id);
+        .eq('complaint_id', complaint.id);
       
       if (error) throw error;
       return count || 0;
     },
+    enabled: !!complaint?.id,
   });
 
   const isOwnerOfThisSite = complaint && isSiteOwner && ownedSites.includes(complaint.site_id);
 
   // Realtime subscriptions for complaint updates and responses
   useEffect(() => {
-    if (!id) return;
+    if (!complaint?.id) return;
 
     const channel = supabase
-      .channel(`complaint-detail-${id}`)
+      .channel(`complaint-detail-${complaint.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'site_complaints',
-          filter: `id=eq.${id}`,
+          filter: `id=eq.${complaint.id}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+          queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
         }
       )
       .on(
@@ -118,11 +136,11 @@ const ComplaintDetail = () => {
           event: '*',
           schema: 'public',
           table: 'complaint_responses',
-          filter: `complaint_id=eq.${id}`,
+          filter: `complaint_id=eq.${complaint.id}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['complaint-responses', id] });
-          queryClient.invalidateQueries({ queryKey: ['complaint', id] }); // Update response count
+          queryClient.invalidateQueries({ queryKey: ['complaint-responses', slugOrId] });
+          queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] }); // Update response count
         }
       )
       .on(
@@ -131,11 +149,11 @@ const ComplaintDetail = () => {
           event: '*',
           schema: 'public',
           table: 'complaint_likes',
-          filter: `complaint_id=eq.${id}`,
+          filter: `complaint_id=eq.${complaint.id}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', id] });
-          queryClient.invalidateQueries({ queryKey: ['complaint-like', id, user?.id] });
+          queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', slugOrId] });
+          queryClient.invalidateQueries({ queryKey: ['complaint-like', slugOrId, user?.id] });
         }
       )
       .subscribe();
@@ -143,20 +161,21 @@ const ComplaintDetail = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [id, user?.id, queryClient]);
+  }, [complaint?.id, user?.id, queryClient, slugOrId]);
 
   const upvoteMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
         throw new Error('Like yapmak için giriş yapmalısınız');
       }
+      if (!complaint?.id) return;
 
       if (userLike) {
         // Unlike - remove the like
         const { error } = await supabase
           .from('complaint_likes')
           .delete()
-          .eq('complaint_id', id)
+          .eq('complaint_id', complaint.id)
           .eq('user_id', user.id);
         if (error) throw error;
       } else {
@@ -164,16 +183,16 @@ const ComplaintDetail = () => {
         const { error } = await supabase
           .from('complaint_likes')
           .insert({
-            complaint_id: id,
+            complaint_id: complaint.id,
             user_id: user.id,
           });
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
-      queryClient.invalidateQueries({ queryKey: ['complaint-like', id, user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-like', slugOrId, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', slugOrId] });
     },
     onError: (error: any) => {
       toast({
@@ -187,11 +206,12 @@ const ComplaintDetail = () => {
   const addResponseMutation = useMutation({
     mutationFn: async (text: string) => {
       if (!user) throw new Error('Giriş yapmalısınız');
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       
       const { error } = await supabase
         .from('complaint_responses')
         .insert({
-          complaint_id: id,
+          complaint_id: complaint.id,
           user_id: user.id,
           response_text: text,
           is_site_owner_response: isOwnerOfThisSite || false,
@@ -200,7 +220,7 @@ const ComplaintDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint-responses', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-responses', slugOrId] });
       setResponseText('');
       toast({
         title: 'Başarılı',
@@ -218,17 +238,18 @@ const ComplaintDetail = () => {
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       const { error } = await supabase
         .from('site_complaints')
         .update({ 
           status: newStatus,
           resolved_at: newStatus === 'resolved' ? new Date().toISOString() : null
         })
-        .eq('id', id);
+        .eq('id', complaint.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
       toast({
         title: 'Başarılı',
         description: 'Şikayet durumu güncellendi',
@@ -238,14 +259,15 @@ const ComplaintDetail = () => {
 
   const togglePublicMutation = useMutation({
     mutationFn: async (isPublic: boolean) => {
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       const { error } = await supabase
         .from('site_complaints')
         .update({ is_public: isPublic })
-        .eq('id', id);
+        .eq('id', complaint.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
       toast({
         title: 'Başarılı',
         description: 'Görünürlük ayarı güncellendi',
@@ -340,12 +362,21 @@ const ComplaintDetail = () => {
   return (
     <>
       <SEO 
-        title={complaint.title}
-        description={complaint.description.substring(0, 160)}
+        title={`${complaint.betting_sites?.name} Şikayeti: ${complaint.title} | Kullanıcı Deneyimi`}
+        description={complaint.description.substring(0, 155) + '...'}
+        keywords={[
+          complaint.betting_sites?.name || '',
+          'şikayet',
+          'kullanıcı deneyimi',
+          complaint.category,
+          'bahis sitesi şikayeti',
+          'casino şikayeti'
+        ]}
+        canonical={`https://casinoany.com/sikayetler/${complaint.slug || complaint.id}`}
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 py-8 max-w-4xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">
             <ArrowLeft className="w-4 h-4 mr-2" />
