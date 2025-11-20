@@ -25,6 +25,7 @@ async function checkRateLimit(supabase: any, ip: string, functionName: string): 
 }
 
 const RSS_FEEDS = [
+  // iGaming Global Feeds
   'https://igamingbusiness.com/feed/',
   'https://sbcnews.co.uk/feed/',
   'https://www.gamblinginsider.com/rss',
@@ -35,6 +36,9 @@ const RSS_FEEDS = [
   'https://igamingbusiness.com/category/casino/feed/',
   'https://coinjournal.net/news/feed/',
   'https://cryptoslate.com/feed/',
+  
+  // Türkiye Spor Haberleri
+  'https://www.spormaraton.com/rss/anasayfa/',
 ];
 
 interface RSSItem {
@@ -233,6 +237,12 @@ function slugify(text: string): string {
 function categorizeContent(content: string): string {
   const lower = content.toLowerCase();
   
+  // Spor içeriği kontrolü (önce)
+  if (lower.includes('futbol') || lower.includes('maç') || lower.includes('gol') || 
+      lower.includes('lig') || lower.includes('takım') || lower.includes('football') || 
+      lower.includes('soccer') || lower.includes('süper lig') || lower.includes('goal')) {
+    return 'Spor Haberleri';
+  }
   if (lower.includes('slot') || lower.includes('rtp') || lower.includes('provider')) {
     return 'Slot Haberleri';
   }
