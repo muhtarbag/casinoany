@@ -35,10 +35,10 @@ export const Header = () => {
             </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1 lg:gap-2">
+          <div className="hidden md:flex items-center gap-3 lg:gap-5 xl:gap-6">
             <NavLink 
               to="/" 
-              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Ana Sayfa</span>
@@ -46,7 +46,7 @@ export const Header = () => {
             </NavLink>
             <NavLink 
               to="/deneme-bonusu" 
-              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Deneme Bonusu</span>
@@ -54,7 +54,7 @@ export const Header = () => {
             </NavLink>
             <NavLink 
               to="/kategoriler" 
-              className="relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Kategoriler</span>
@@ -62,18 +62,18 @@ export const Header = () => {
             </NavLink>
             <NavLink 
               to="/blog" 
-              className="hidden lg:flex relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Blog</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
-              to="/sikayetler" 
-              className="hidden lg:flex relative px-3 lg:px-4 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group"
+              to="/hakkimizda" 
+              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
-              <span className="relative z-10">Şikayetler</span>
+              <span className="relative z-10">Hakkımızda</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
             <NavLink 
