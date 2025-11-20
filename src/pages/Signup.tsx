@@ -17,6 +17,7 @@ import { Step2ContactSocial } from '@/components/wizard/Step2ContactSocial';
 import { Step3CompanyDetails } from '@/components/wizard/Step3CompanyDetails';
 import { Step4Summary } from '@/components/wizard/Step4Summary';
 import { StepIndividualProfile } from '@/components/wizard/StepIndividualProfile';
+import logo from '@/assets/casinodoo-logo.svg';
 
 const Signup = () => {
   const [userEmail, setUserEmail] = useState('');
@@ -292,10 +293,11 @@ const Signup = () => {
         to="/" 
         className="fixed top-4 left-4 sm:absolute sm:top-6 sm:left-6 flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group z-10"
       >
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-          <span className="text-white font-bold text-base sm:text-lg">C</span>
-        </div>
-        <span className="font-semibold hidden sm:inline-block">CasinoAny</span>
+        <img 
+          src={logo} 
+          alt="CasinoAny Logo" 
+          className="h-8 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+        />
       </Link>
 
       <Card className="w-full max-w-lg shadow-2xl border-primary/10 backdrop-blur-sm bg-background/95 relative z-10 animate-scale-in mt-16 sm:mt-0">
