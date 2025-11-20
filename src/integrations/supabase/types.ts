@@ -4071,12 +4071,11 @@ export type Database = {
         }
         Returns: undefined
       }
-      calculate_all_reputation_scores: { Args: never; Returns: undefined }
       calculate_reputation_score: {
         Args: { p_site_id: string }
-        Returns: number
+        Returns: undefined
       }
-      calculate_seo_score: { Args: { p_site_id: string }; Returns: number }
+      calculate_seo_score: { Args: { p_site_id: string }; Returns: undefined }
       can_view_site_stats: { Args: never; Returns: boolean }
       check_and_award_achievements: {
         Args: { p_user_id: string }

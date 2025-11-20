@@ -145,6 +145,43 @@ export const TypedDB = {
       .select('*')
       .eq('site_id', siteId)
       .order('created_at', { ascending: false }),
+  
+  // ===== ADVANCED ANALYTICS =====
+  reputationScore: (siteId: string) =>
+    supabase.from('site_reputation_scores')
+      .select('*')
+      .eq('site_id', siteId)
+      .maybeSingle(),
+  
+  siteBadges: (siteId: string) =>
+    supabase.from('site_badges')
+      .select('*')
+      .eq('site_id', siteId)
+      .eq('is_active', true)
+      .order('display_order'),
+  
+  seoMetrics: (siteId: string) =>
+    supabase.from('site_seo_metrics')
+      .select('*')
+      .eq('site_id', siteId)
+      .maybeSingle(),
+  
+  siteKeywords: (siteId: string) =>
+    supabase.from('site_keywords')
+      .select('*')
+      .eq('site_id', siteId)
+      .order('priority', { ascending: false })
+      .order('current_rank', { ascending: true, nullsFirst: false }),
+  
+  reviewHighlights: (siteId: string) =>
+    supabase.from('site_review_highlights')
+      .select(`
+        *,
+        review:review_id(*)
+      `)
+      .eq('site_id', siteId)
+      .eq('is_active', true)
+      .order('display_order'),
 };
 
 /**
