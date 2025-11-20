@@ -55,8 +55,8 @@ export const SiteDetailReviews = ({
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  const visibleItems = allItems.slice(0, 3);
-  const hiddenItems = allItems.slice(3);
+  const visibleItems = allItems.slice(0, 5);
+  const hiddenItems = allItems.slice(5);
 
   const renderItem = (item: any) => {
     if (item.type === 'review') {
