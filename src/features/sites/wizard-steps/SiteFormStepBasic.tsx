@@ -31,20 +31,34 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
   
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('🔍 SiteFormStepBasic - handleLogoChange:', { 
+      file: file?.name,
+      type: file?.type 
+    });
+    
     if (file) {
       const validationError = validateLogoFile(file);
       if (validationError) {
         toast.error(validationError);
         e.target.value = '';
+        console.error('❌ Validation failed:', validationError);
         return;
       }
       
+      console.log('📖 Reading file...');
       // Önce dosyayı oku ve preview oluştur
       const reader = new FileReader();
       reader.onloadend = () => {
         const preview = reader.result as string;
+        console.log('✅ FileReader completed:', {
+          previewLength: preview?.length,
+          previewStart: preview?.substring(0, 50)
+        });
         onLogoFileChange(file, preview);
         onLogoPreviewChange(preview);
+      };
+      reader.onerror = (err) => {
+        console.error('❌ FileReader error:', err);
       };
       reader.readAsDataURL(file);
     }
@@ -212,7 +226,16 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
                 <img
                   src={logoPreview}
                   alt="Logo preview"
-                  className="h-20 w-auto rounded-lg border bg-muted"
+                  className="h-20 w-auto rounded-lg border bg-muted p-2"
+                  onLoad={() => {
+                    console.log('✅ SiteFormStepBasic - Logo preview loaded successfully');
+                  }}
+                  onError={(e) => {
+                    console.error('❌ SiteFormStepBasic - Logo preview failed:', {
+                      src: logoPreview?.substring(0, 100),
+                      error: e
+                    });
+                  }}
                 />
                 <Button
                   type="button"

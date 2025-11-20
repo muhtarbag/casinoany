@@ -59,6 +59,11 @@ export const adminSiteManagementReducer = (
       };
 
     case 'SET_LOGO':
+      console.log('📦 Reducer - SET_LOGO:', { 
+        fileName: action.file?.name,
+        previewLength: action.preview?.length || 0,
+        previewStart: action.preview?.substring(0, 50)
+      });
       return {
         ...state,
         logoFile: action.file,
