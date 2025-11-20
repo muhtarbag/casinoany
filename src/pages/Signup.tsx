@@ -280,62 +280,62 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-20 left-10 w-48 h-48 sm:w-72 sm:h-72 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-64 h-64 sm:w-96 sm:h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
       {/* Logo / Back to Home */}
       <Link 
         to="/" 
-        className="absolute top-6 left-6 flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group z-10"
+        className="fixed top-4 left-4 sm:absolute sm:top-6 sm:left-6 flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group z-10"
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-          <span className="text-white font-bold text-lg">C</span>
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+          <span className="text-white font-bold text-base sm:text-lg">C</span>
         </div>
         <span className="font-semibold hidden sm:inline-block">CasinoAny</span>
       </Link>
 
-      <Card className="w-full max-w-lg shadow-2xl border-primary/10 backdrop-blur-sm bg-background/95 relative z-10 animate-scale-in">
-        <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+      <Card className="w-full max-w-lg shadow-2xl border-primary/10 backdrop-blur-sm bg-background/95 relative z-10 animate-scale-in mt-16 sm:mt-0">
+        <CardHeader className="space-y-1 pb-3 sm:pb-4 px-4 sm:px-6">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
             Hoş Geldiniz
           </CardTitle>
-          <CardDescription className="text-center text-sm">
+          <CardDescription className="text-center text-xs sm:text-sm">
             Hesap oluşturarak topluluğumuza katılın
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Hesap Tipi - Modern Cards */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Üyelik Türü Seçin</Label>
+              <Label className="text-xs sm:text-sm font-medium">Üyelik Türü Seçin</Label>
               <RadioGroup 
                 value={userType} 
                 onValueChange={(value) => { 
                   setUserType(value as 'user' | 'site_owner'); 
                   setCurrentStep(0); 
                 }} 
-                className="grid grid-cols-2 gap-3"
+                className="grid grid-cols-2 gap-2 sm:gap-3"
               >
-                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'user' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
-                  <RadioGroupItem value="user" id="user" className="absolute top-3 right-3" />
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-2 shadow-lg">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-3 sm:p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'user' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
+                  <RadioGroupItem value="user" id="user" className="absolute top-2 right-2 sm:top-3 sm:right-3" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-1.5 sm:mb-2 shadow-lg">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
                   <Label htmlFor="user" className="cursor-pointer text-center">
-                    <div className="font-semibold text-sm">Bireysel</div>
-                    <p className="text-xs text-muted-foreground mt-0.5">Üye olun</p>
+                    <div className="font-semibold text-xs sm:text-sm">Bireysel</div>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Üye olun</p>
                   </Label>
                 </div>
-                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'site_owner' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
-                  <RadioGroupItem value="site_owner" id="site_owner" className="absolute top-3 right-3" />
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-2 shadow-lg">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-3 sm:p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'site_owner' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
+                  <RadioGroupItem value="site_owner" id="site_owner" className="absolute top-2 right-2 sm:top-3 sm:right-3" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-1.5 sm:mb-2 shadow-lg">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
@@ -348,11 +348,11 @@ const Signup = () => {
             </div>
 
             {/* Form Alanları - Premium Design */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
               {/* Ad Soyad */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="firstName" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="firstName" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     Ad
                   </Label>
@@ -362,12 +362,12 @@ const Signup = () => {
                     onChange={(e) => setFirstName(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
                     placeholder="Adınız"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="lastName" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="lastName" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     Soyad
                   </Label>
@@ -377,16 +377,16 @@ const Signup = () => {
                     onChange={(e) => setLastName(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
                     placeholder="Soyadınız"
                   />
                 </div>
               </div>
 
               {/* Telefon Email Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="phone" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
                     Telefon
                   </Label>
@@ -398,11 +398,11 @@ const Signup = () => {
                     onChange={(e) => setPhone(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="email" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
                     E-posta
                   </Label>
@@ -413,7 +413,7 @@ const Signup = () => {
                     onChange={(e) => setUserEmail(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
                     placeholder="ornek@email.com"
                   />
                 </div>
@@ -422,7 +422,7 @@ const Signup = () => {
               {/* Kullanıcı Adı - Sadece bireysel için */}
               {userType === 'user' && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="username" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
                     Kullanıcı Adı
                   </Label>
@@ -434,9 +434,9 @@ const Signup = () => {
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                     disabled={loading}
                     maxLength={20}
-                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
                   />
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -446,9 +446,9 @@ const Signup = () => {
               )}
 
               {/* Şifreler Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="password" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     Şifre
                   </Label>
@@ -460,23 +460,23 @@ const Signup = () => {
                       onChange={(e) => setPassword(e.target.value)} 
                       required 
                       disabled={loading}
-                      className="h-11 pr-10 border-border/50 focus:border-primary transition-colors"
+                      className="h-10 sm:h-11 pr-10 border-border/50 focus:border-primary transition-colors text-sm"
                       placeholder="••••••••"
                     />
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent" 
+                      className="absolute right-0 top-0 h-10 w-10 sm:h-11 sm:w-11 hover:bg-transparent" 
                       onClick={() => setShowPassword(!showPassword)} 
                       disabled={loading}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                      {showPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium flex items-center gap-1.5">
+                  <Label htmlFor="confirmPassword" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     Şifre Tekrar
                   </Label>
@@ -488,18 +488,18 @@ const Signup = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       required 
                       disabled={loading}
-                      className="h-11 pr-10 border-border/50 focus:border-primary transition-colors"
+                      className="h-10 sm:h-11 pr-10 border-border/50 focus:border-primary transition-colors text-sm"
                       placeholder="••••••••"
                     />
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent" 
+                      className="absolute right-0 top-0 h-10 w-10 sm:h-11 sm:w-11 hover:bg-transparent" 
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
                       disabled={loading}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                      {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
@@ -510,21 +510,21 @@ const Signup = () => {
             {wizardSteps.length > 0 && userType === 'site_owner' && (
               <>
                 <WizardProgress steps={wizardSteps} currentStep={currentStep} />
-                <div className="min-h-[200px]">{renderWizardStep()}</div>
+                <div className="min-h-[180px] sm:min-h-[200px]">{renderWizardStep()}</div>
               </>
             )}
 
             {/* Submit Buttons - Premium Design */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4">
               {userType === 'site_owner' && currentStep > 0 && (
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={handleBack} 
                   disabled={loading} 
-                  className="flex-1 h-11 border-border/50 hover:border-primary/50"
+                  className="flex-1 h-10 sm:h-11 border-border/50 hover:border-primary/50 text-xs sm:text-sm"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-1" />Geri
+                  <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />Geri
                 </Button>
               )}
               
@@ -533,24 +533,25 @@ const Signup = () => {
                   type="button" 
                   onClick={handleNext} 
                   disabled={loading} 
-                  className="flex-1 ml-auto h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all"
+                  className="flex-1 ml-auto h-10 sm:h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
                 >
-                  İleri<ChevronRight className="w-4 h-4 ml-1" />
+                  İleri<ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
                 </Button>
               ) : (
                 <Button 
                   type="submit" 
                   disabled={loading} 
-                  className="flex-1 ml-auto h-11 bg-gradient-to-r from-primary via-accent to-secondary hover:from-primary/90 hover:via-accent/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all text-white font-medium"
+                  className="flex-1 ml-auto h-10 sm:h-11 bg-gradient-to-r from-primary via-accent to-secondary hover:from-primary/90 hover:via-accent/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all text-white font-medium text-xs sm:text-sm"
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Kayıt Ediliyor...
+                      <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Kayıt Ediliyor...</span>
+                      <span className="sm:hidden">Kayıt...</span>
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       Kayıt Ol
@@ -562,16 +563,16 @@ const Signup = () => {
           </form>
 
           {/* Login Link - Enhanced */}
-          <div className="mt-6 text-center text-sm border-t pt-6">
-            <p className="text-muted-foreground mb-2">
+          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm border-t pt-4 sm:pt-6">
+            <p className="text-muted-foreground mb-1.5 sm:mb-2">
               Zaten hesabınız var mı?
             </p>
             <Link 
               to="/login" 
-              className="inline-flex items-center gap-1.5 text-primary hover:text-primary/80 font-medium transition-colors group"
+              className="inline-flex items-center gap-1 sm:gap-1.5 text-primary hover:text-primary/80 font-medium transition-colors group"
             >
               Giriş Yap
-              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
