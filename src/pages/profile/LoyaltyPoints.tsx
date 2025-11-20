@@ -9,6 +9,7 @@ import { Trophy, TrendingUp, Gift, History, Star, Award, Sparkles } from 'lucide
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { SEO } from '@/components/SEO';
+import { Leaderboard } from '@/components/Leaderboard';
 
 const getTierIcon = (tier: string) => {
   switch (tier) {
@@ -378,6 +379,9 @@ export default function LoyaltyPoints() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Leaderboard Section */}
+        <Leaderboard limit={10} showTitle={true} />
       </div>
     </ProfileLayout>
   );

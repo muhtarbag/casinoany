@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_definitions: {
+        Row: {
+          category: string
+          code: string
+          color: string
+          created_at: string
+          description: string
+          display_order: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          points_reward: number
+          requirement_type: string
+          requirement_value: number | null
+        }
+        Insert: {
+          category: string
+          code: string
+          color?: string
+          created_at?: string
+          description: string
+          display_order?: number
+          icon: string
+          id?: string
+          is_active?: boolean
+          name: string
+          points_reward?: number
+          requirement_type: string
+          requirement_value?: number | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          color?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          points_reward?: number
+          requirement_type?: string
+          requirement_value?: number | null
+        }
+        Relationships: []
+      }
       admin_notification_preferences: {
         Row: {
           admin_id: string
@@ -2817,6 +2865,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_code: string
+          earned_at: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          achievement_code: string
+          earned_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          achievement_code?: string
+          earned_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_code_fkey"
+            columns: ["achievement_code"]
+            isOneToOne: false
+            referencedRelation: "achievement_definitions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       user_bonus_tracking: {
         Row: {
           bonus_amount: number
@@ -3412,6 +3492,10 @@ export type Database = {
       }
     }
     Functions: {
+      award_achievement: {
+        Args: { p_achievement_code: string; p_user_id: string }
+        Returns: boolean
+      }
       award_loyalty_points: {
         Args: {
           p_description: string
@@ -3423,6 +3507,10 @@ export type Database = {
         Returns: undefined
       }
       can_view_site_stats: { Args: never; Returns: boolean }
+      check_and_award_achievements: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_site_notification: {
         Args: {
