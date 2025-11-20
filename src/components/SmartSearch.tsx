@@ -184,7 +184,7 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
                 setShowPopular(false);
               }, 300);
             }}
-            className="pl-12 pr-4 sm:pl-14 sm:pr-28 py-4 sm:py-6 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/70 rounded-lg border-2 border-border focus:border-primary w-full font-normal"
+            className="pl-13 pr-4 sm:pl-14 sm:pr-28 py-4 sm:py-6 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/70 rounded-lg border-2 border-border focus:border-primary w-full font-normal"
           />
           
           {/* Popular Searches Dropdown */}
