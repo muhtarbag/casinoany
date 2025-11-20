@@ -65,9 +65,11 @@ export const useReferralProgram = () => {
       return data as UserReferral;
     },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Fetch referral history
+  // Fetch referral history (limited to last 100)
   const { data: referralHistory = [], isLoading: isLoadingHistory } = useQuery({
     queryKey: ['referral-history', user?.id],
     queryFn: async () => {
@@ -80,12 +82,15 @@ export const useReferralProgram = () => {
           referred_user:profiles!referral_history_referred_id_fkey(username, email)
         `)
         .eq('referrer_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(100);
 
       if (error) throw error;
       return data as ReferralHistory[];
     },
     enabled: !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Process referral code for new users
