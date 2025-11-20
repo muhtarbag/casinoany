@@ -1,9 +1,9 @@
-import { memo, Fragment, useMemo, useState } from 'react';
+import { memo, Fragment, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Search, ChevronDown } from 'lucide-react';
+import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
@@ -12,28 +12,19 @@ interface PixelGridProps {
   searchTerm?: string;
 }
 
-const INITIAL_LOAD = 12; // First load
-const LOAD_MORE_INCREMENT = 12; // Load more increment
-
 export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
-  const [displayCount, setDisplayCount] = useState(INITIAL_LOAD);
-
-  // ✅ OPTIMIZED: Only fetch initial sites, paginate on client side
   const { data: sites, isLoading } = useQuery({
-    queryKey: ['betting-sites-homepage-optimized'],
+    queryKey: ['betting-sites-active'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, display_order, review_count, avg_rating')
+        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
         .eq('is_active', true)
-        .order('display_order', { ascending: true })
-        .limit(50); // ✅ Cap at 50 for homepage performance
+        .order('display_order', { ascending: true });
 
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - homepage data
-    gcTime: 15 * 60 * 1000,
   });
 
   const { data: banners } = useQuery({
@@ -67,19 +58,6 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
       )
     );
   }, [sites, searchTerm]);
-
-  // ✅ Display only limited sites, or all if searching
-  const displayedSites = useMemo(() => {
-    if (!filteredSites) return [];
-    if (searchTerm.trim()) return filteredSites; // Show all search results
-    return filteredSites.slice(0, displayCount); // Paginate non-search
-  }, [filteredSites, displayCount, searchTerm]);
-
-  const hasMore = !searchTerm.trim() && filteredSites && displayedSites.length < filteredSites.length;
-
-  const handleLoadMore = () => {
-    setDisplayCount(prev => prev + LOAD_MORE_INCREMENT);
-  };
 
   if (isLoading) {
     return (
@@ -179,7 +157,7 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedSites.map((site: any, index: number) => {
+        {filteredSites.map((site: any, index: number) => {
           const isPriority = index < 6;
           // Find banners for this position
           const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
@@ -224,24 +202,6 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
           );
         })}
       </div>
-
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="flex justify-center pt-8">
-          <Button
-            onClick={handleLoadMore}
-            size="lg"
-            variant="outline"
-            className="group hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-          >
-            <ChevronDown className="w-5 h-5 mr-2 group-hover:translate-y-1 transition-transform" />
-            Daha Fazla Site Göster
-            <span className="ml-2 text-sm text-muted-foreground group-hover:text-primary-foreground">
-              ({filteredSites.length - displayedSites.length} kaldı)
-            </span>
-          </Button>
-        </div>
-      )}
     </div>
   );
 });

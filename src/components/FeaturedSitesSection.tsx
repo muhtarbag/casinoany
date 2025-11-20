@@ -24,8 +24,6 @@ export const FeaturedSitesSection = ({ searchTerm = '' }: FeaturedSitesSectionPr
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000,
   });
 
   // Filter sites based on search term
