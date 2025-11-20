@@ -124,7 +124,17 @@ export const NotificationPopup = () => {
       
       if (error) throw error;
       
-      const currentPage = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
+      // Sayfa tipini belirle
+      let currentPage = 'home';
+      if (location.pathname === '/') {
+        currentPage = 'home';
+      } else if (location.pathname.match(/^\/[^/]+$/)) {
+        // Site detail pages (e.g., /havanabet, /fenomenbet)
+        currentPage = 'site_detail';
+      } else {
+        // Other pages
+        currentPage = location.pathname.split('/')[1];
+      }
       
       // Sayfa ve kullanıcı segmentine göre filtrele
       return (data as Notification[]).filter(n => {
@@ -222,6 +232,35 @@ export const NotificationPopup = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Exit intent tracking
+  useEffect(() => {
+    let exitIntentTriggered = false;
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Only trigger if mouse leaves from the top of the page (going to close tab/navigate away)
+      if (e.clientY <= 0 && !exitIntentTriggered) {
+        exitIntentTriggered = true;
+        
+        // Check if there's a notification with exit_intent trigger
+        if (notifications && notifications.length > 0) {
+          const exitNotification = notifications.find(n => n.trigger_type === 'exit_intent');
+          if (exitNotification && !openNotificationId) {
+            setShouldShow(true);
+            // Trigger check will handle the notification display
+          }
+        }
+        
+        // Reset after 5 seconds to allow re-trigger if user comes back
+        setTimeout(() => {
+          exitIntentTriggered = false;
+        }, 5000);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [notifications, openNotificationId]);
+
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
     // Zaten bir bildirim açıksa tekrar kontrol etme
@@ -297,8 +336,9 @@ export const NotificationPopup = () => {
         return false;
       
       case 'exit_intent':
-        // Can be implemented with mouse tracking
-        return false;
+        // Exit intent is handled via mouse tracking
+        // When user moves mouse to leave the page, shouldShow is set to true
+        return shouldShow;
       
       default:
         setShouldShow(true);
@@ -316,16 +356,37 @@ export const NotificationPopup = () => {
     }
   };
 
-  const handleButtonClick = (url: string | null) => {
+  const handleButtonClick = async (url: string | null) => {
     if (openNotificationId) {
       trackClickMutation.mutate(openNotificationId);
     }
     
     if (url) {
-      if (url.startsWith('http')) {
-        window.open(url, '_blank');
+      let finalUrl = url;
+      
+      // Site detay sayfasındaysak ve {affiliate_link} placeholder'ı varsa, gerçek affiliate link'i al
+      if (url.includes('{affiliate_link}')) {
+        const slug = location.pathname.substring(1); // Remove leading slash
+        
+        try {
+          const { data: site } = await supabase
+            .from('betting_sites')
+            .select('affiliate_link')
+            .eq('slug', slug)
+            .single();
+          
+          if (site?.affiliate_link) {
+            finalUrl = url.replace('{affiliate_link}', site.affiliate_link);
+          }
+        } catch (error) {
+          console.error('Failed to fetch affiliate link:', error);
+        }
+      }
+      
+      if (finalUrl.startsWith('http')) {
+        window.open(finalUrl, '_blank');
       } else {
-        navigate(url);
+        navigate(finalUrl);
       }
       handleClose();
     }
