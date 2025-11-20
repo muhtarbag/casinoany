@@ -134,10 +134,24 @@ export const SmartSearch = ({ onSearch, searchTerm, onNavigate }: SmartSearchPro
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     trackSearch(localSearch);
-    onSearch(localSearch);
-    setShowSuggestions(false);
-    setShowPopular(false);
-    document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // If there's a top suggestion, navigate to it directly
+    if (suggestions.length > 0) {
+      const topSuggestion = suggestions[0];
+      setShowSuggestions(false);
+      setShowPopular(false);
+      if (onNavigate) {
+        onNavigate(topSuggestion.slug);
+      } else {
+        window.location.href = `/${topSuggestion.slug}`;
+      }
+    } else {
+      // Otherwise, just perform search
+      onSearch(localSearch);
+      setShowSuggestions(false);
+      setShowPopular(false);
+      document.getElementById('sites-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleSuggestionClick = (siteSlug: string, siteName: string) => {
