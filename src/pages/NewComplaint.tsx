@@ -10,11 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewComplaint = () => {
@@ -89,9 +90,9 @@ const NewComplaint = () => {
     onSuccess: (data) => {
       toast({
         title: 'Başarılı',
-        description: 'Şikayetiniz kaydedildi',
+        description: 'Şikayetiniz kaydedildi ve CasinoAny ekibi tarafından incelenmek üzere gönderildi. İnceleme sonrası yayınlanacaktır.',
       });
-      navigate(`/sikayetler/${data.id}`);
+      navigate(`/sikayetler/${data.slug || data.id}`);
     },
     onError: () => {
       toast({
@@ -147,6 +148,13 @@ const NewComplaint = () => {
             <CardTitle className="text-2xl">Yeni Şikayet</CardTitle>
           </CardHeader>
           <CardContent>
+            <Alert className="mb-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Şikayetiniz gönderildikten sonra CasinoAny ekibi tarafından incelenecek ve uygun bulunması durumunda yayınlanacaktır.
+              </AlertDescription>
+            </Alert>
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="site">Site Seçimi *</Label>

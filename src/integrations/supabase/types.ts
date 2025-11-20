@@ -2284,6 +2284,9 @@ export type Database = {
         Row: {
           anonymous_email: string | null
           anonymous_name: string | null
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
           category: string
           created_at: string | null
           description: string
@@ -2304,6 +2307,9 @@ export type Database = {
         Insert: {
           anonymous_email?: string | null
           anonymous_name?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           category: string
           created_at?: string | null
           description: string
@@ -2324,6 +2330,9 @@ export type Database = {
         Update: {
           anonymous_email?: string | null
           anonymous_name?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           category?: string
           created_at?: string | null
           description?: string
