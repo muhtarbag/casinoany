@@ -94,6 +94,7 @@ export const NotificationPopup = () => {
   const [formPhone, setFormPhone] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scrollDepth, setScrollDepth] = useState(0);
   const sessionId = getSessionId();
 
   // Admin paneldeyse bildirimleri gösterme
@@ -207,6 +208,20 @@ export const NotificationPopup = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Scroll depth tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrolled = (scrollTop / (documentHeight - windowHeight)) * 100;
+      setScrollDepth(Math.round(scrolled));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
     // Zaten bir bildirim açıksa tekrar kontrol etme
@@ -274,7 +289,11 @@ export const NotificationPopup = () => {
         return false;
       
       case 'scroll_depth':
-        // Can be implemented with scroll tracking
+        const requiredScroll = trigger_conditions?.scroll_percentage || 30;
+        if (scrollDepth >= requiredScroll) {
+          setShouldShow(true);
+          return true;
+        }
         return false;
       
       case 'exit_intent':
