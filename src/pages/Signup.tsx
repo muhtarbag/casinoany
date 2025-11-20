@@ -308,6 +308,15 @@ const Signup = () => {
               </RadioGroup>
             </div>
 
+            {userType === 'user' && (
+              <div className="space-y-1 pt-2 pb-3 border-b">
+                <h3 className="font-semibold text-base">Profil Bilgileri</h3>
+                <p className="text-sm text-muted-foreground">
+                  Diğer bilgilerinizi profilinizden istediğiniz zaman güncelleyebilirsiniz
+                </p>
+              </div>
+            )}
+
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
