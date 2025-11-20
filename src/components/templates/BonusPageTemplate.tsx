@@ -88,7 +88,7 @@ export const BonusPageTemplate = ({
       )}
 
       {/* Hero Section */}
-      <div className="text-center space-y-4 py-6 md:py-8 px-4">
+      <div className="text-center space-y-4 pt-8 pb-6 md:pt-12 md:pb-8 px-4">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-tight">
           {pageTitle}
         </h1>
