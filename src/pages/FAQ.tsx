@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { SEO } from '@/components/SEO';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
@@ -221,6 +223,7 @@ export default function FAQ() {
 
   return (
     <>
+      <Header />
       <SEO
         title="Sıkça Sorulan Sorular (SSS)"
         description="Bahis siteleri platformu hakkında bireysel ve kurumsal üyeler için sıkça sorulan sorular ve cevapları. Hesap yönetimi, şikayetler, bonus kampanyaları ve daha fazlası."
@@ -403,6 +406,7 @@ export default function FAQ() {
           </Card>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
