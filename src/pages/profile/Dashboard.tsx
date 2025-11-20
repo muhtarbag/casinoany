@@ -176,14 +176,6 @@ export default function Dashboard() {
 
                     {/* Badge or Arrow */}
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      {item.count !== undefined && item.count > 0 && (
-                        <Badge 
-                          variant="secondary" 
-                          className="text-lg px-3 py-1 font-bold"
-                        >
-                          {item.count}
-                        </Badge>
-                      )}
                       <ChevronRight 
                         className={cn(
                           "w-5 h-5 transition-transform group-hover:translate-x-1",
