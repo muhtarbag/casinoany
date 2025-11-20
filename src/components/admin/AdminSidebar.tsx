@@ -12,7 +12,8 @@ import {
   Folder,
   Bell,
   AlertTriangle,
-  BarChart3
+  BarChart3,
+  Trophy
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -85,6 +86,15 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
         { id: 'comments', icon: MessageSquare, label: 'Blog Yorumları', route: '/admin/blog/comments', roles: ['content_editor'] },
         { id: 'complaints', icon: AlertTriangle, label: 'Şikayetler', route: '/admin/complaints', roles: ['content_editor'] },
         { id: 'notifications', icon: Bell, label: 'Bildirimler', route: '/admin/notifications', roles: ['content_editor'] },
+      ],
+    },
+    {
+      label: '🏆 Gamification Hub',
+      items: [
+        { id: 'gamification', icon: Trophy, label: 'Dashboard', route: '/admin/gamification/dashboard', roles: [] },
+        { id: 'achievements', icon: Trophy, label: 'Başarılar', route: '/admin/gamification/achievements', roles: [] },
+        { id: 'rewards', icon: Gift, label: 'Ödüller', route: '/admin/gamification/rewards', roles: [] },
+        { id: 'user-stats', icon: BarChart3, label: 'Kullanıcı Stats', route: '/admin/gamification/user-stats', roles: [] },
       ],
     },
     {

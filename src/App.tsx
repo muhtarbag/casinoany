@@ -58,6 +58,10 @@ import AdminRecommendedSites from "./pages/admin/sites/RecommendedSites";
 import AdminSiteStats from "./pages/admin/sites/SiteStats";
 import AdminBlogStats from "./pages/admin/blog/BlogStats";
 import AdminBlogComments from "./pages/admin/blog/BlogComments";
+import GamificationDashboard from "./pages/admin/gamification/Dashboard";
+import AchievementsManagement from "./pages/admin/gamification/Achievements";
+import RewardsManagement from "./pages/admin/gamification/Rewards";
+import UserStatsManagement from "./pages/admin/gamification/UserStats";
 import AdminSystemLogs from "./pages/admin/system/SystemLogs";
 import AdminSiteOwners from "./pages/admin/SiteOwners";
 
@@ -190,6 +194,12 @@ const AppContent = () => {
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="site-owners" element={<AdminSiteOwners />} />
+            
+            {/* Gamification Routes */}
+            <Route path="gamification/dashboard" element={<GamificationDashboard />} />
+            <Route path="gamification/achievements" element={<AchievementsManagement />} />
+            <Route path="gamification/rewards" element={<RewardsManagement />} />
+            <Route path="gamification/user-stats" element={<UserStatsManagement />} />
           </Route>
           
           {/* User Panel Routes */}
