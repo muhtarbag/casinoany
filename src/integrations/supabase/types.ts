@@ -2294,6 +2294,7 @@ export type Database = {
           response_count: number | null
           severity: string
           site_id: string
+          slug: string | null
           status: string
           title: string
           updated_at: string | null
@@ -2313,6 +2314,7 @@ export type Database = {
           response_count?: number | null
           severity?: string
           site_id: string
+          slug?: string | null
           status?: string
           title: string
           updated_at?: string | null
@@ -2332,6 +2334,7 @@ export type Database = {
           response_count?: number | null
           severity?: string
           site_id?: string
+          slug?: string | null
           status?: string
           title?: string
           updated_at?: string | null
@@ -4093,6 +4096,10 @@ export type Database = {
         Returns: string
       }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
+      generate_complaint_slug: {
+        Args: { site_slug: string; title_text: string }
+        Returns: string
+      }
       generate_referral_code: { Args: never; Returns: string }
       get_current_user_roles: {
         Args: never

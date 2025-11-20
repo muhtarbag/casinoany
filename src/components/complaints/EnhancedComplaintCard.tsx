@@ -46,7 +46,7 @@ export const EnhancedComplaintCard = ({
             <div className="flex items-start justify-between gap-2">
               <div className="space-y-1.5 md:space-y-2 flex-1 min-w-0">
                 <Link 
-                  to={`/sikayetler/${complaint.id}`}
+                  to={`/sikayetler/${complaint.slug || complaint.id}`}
                   className="text-sm md:text-lg font-semibold hover:text-primary transition-colors line-clamp-2 block"
                 >
                   {complaint.title}
@@ -107,7 +107,7 @@ export const EnhancedComplaintCard = ({
                 </div>
 
               <Button variant="ghost" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm w-full sm:w-auto">
-                <Link to={`/sikayetler/${complaint.id}`}>
+                <Link to={`/sikayetler/${complaint.slug || complaint.id}`}>
                   <span className="hidden sm:inline">Detayları Gör</span>
                   <span className="sm:hidden">Detay</span>
                 </Link>
