@@ -22,7 +22,7 @@ const Index = () => {
     }, 100);
   };
 
-  // Fetch featured sites for ItemList schema
+  // Fetch featured sites for ItemList schema - OPTIMIZED
   const { data: featuredSitesForSchema } = useQuery({
     queryKey: ['featured-sites-schema'],
     queryFn: async () => {
@@ -37,6 +37,8 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes - schema data rarely changes
+    gcTime: 30 * 60 * 1000,
   });
 
   const breadcrumbItems = [
