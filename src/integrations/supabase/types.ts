@@ -2129,6 +2129,66 @@ export type Database = {
           },
         ]
       }
+      site_badges: {
+        Row: {
+          badge_color: string
+          badge_icon: string
+          badge_label: string
+          badge_type: string
+          created_at: string | null
+          criteria_met: Json | null
+          display_order: number | null
+          earned_at: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          site_id: string
+        }
+        Insert: {
+          badge_color?: string
+          badge_icon?: string
+          badge_label: string
+          badge_type: string
+          created_at?: string | null
+          criteria_met?: Json | null
+          display_order?: number | null
+          earned_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id: string
+        }
+        Update: {
+          badge_color?: string
+          badge_icon?: string
+          badge_label?: string
+          badge_type?: string
+          created_at?: string | null
+          criteria_met?: Json | null
+          display_order?: number | null
+          earned_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_badges_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_badges_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_banners: {
         Row: {
           alt_text: string | null
@@ -2298,6 +2358,90 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_keywords: {
+        Row: {
+          best_rank: number | null
+          clicks: number | null
+          created_at: string | null
+          ctr: number | null
+          current_rank: number | null
+          difficulty: number | null
+          first_tracked_at: string | null
+          id: string
+          impressions: number | null
+          is_target_keyword: boolean | null
+          keyword: string
+          last_checked_at: string | null
+          previous_rank: number | null
+          priority: string | null
+          rank_change: number | null
+          search_volume: number | null
+          site_id: string
+          trend: string | null
+          updated_at: string | null
+          worst_rank: number | null
+        }
+        Insert: {
+          best_rank?: number | null
+          clicks?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          current_rank?: number | null
+          difficulty?: number | null
+          first_tracked_at?: string | null
+          id?: string
+          impressions?: number | null
+          is_target_keyword?: boolean | null
+          keyword: string
+          last_checked_at?: string | null
+          previous_rank?: number | null
+          priority?: string | null
+          rank_change?: number | null
+          search_volume?: number | null
+          site_id: string
+          trend?: string | null
+          updated_at?: string | null
+          worst_rank?: number | null
+        }
+        Update: {
+          best_rank?: number | null
+          clicks?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          current_rank?: number | null
+          difficulty?: number | null
+          first_tracked_at?: string | null
+          id?: string
+          impressions?: number | null
+          is_target_keyword?: boolean | null
+          keyword?: string
+          last_checked_at?: string | null
+          previous_rank?: number | null
+          priority?: string | null
+          rank_change?: number | null
+          search_volume?: number | null
+          site_id?: string
+          trend?: string | null
+          updated_at?: string | null
+          worst_rank?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_keywords_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_keywords_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
         ]
@@ -2608,6 +2752,84 @@ export type Database = {
           },
         ]
       }
+      site_popularity_metrics: {
+        Row: {
+          active_users_now: number | null
+          category_rank: number | null
+          clicks_today: number | null
+          created_at: string | null
+          id: string
+          is_rising_star: boolean | null
+          is_trending: boolean | null
+          last_bonus_claim_at: string | null
+          last_complaint_at: string | null
+          last_review_at: string | null
+          metric_date: string
+          overall_rank: number | null
+          popularity_score: number | null
+          registrations_today: number | null
+          site_id: string
+          trend_score: number | null
+          updated_at: string | null
+          views_today: number | null
+        }
+        Insert: {
+          active_users_now?: number | null
+          category_rank?: number | null
+          clicks_today?: number | null
+          created_at?: string | null
+          id?: string
+          is_rising_star?: boolean | null
+          is_trending?: boolean | null
+          last_bonus_claim_at?: string | null
+          last_complaint_at?: string | null
+          last_review_at?: string | null
+          metric_date?: string
+          overall_rank?: number | null
+          popularity_score?: number | null
+          registrations_today?: number | null
+          site_id: string
+          trend_score?: number | null
+          updated_at?: string | null
+          views_today?: number | null
+        }
+        Update: {
+          active_users_now?: number | null
+          category_rank?: number | null
+          clicks_today?: number | null
+          created_at?: string | null
+          id?: string
+          is_rising_star?: boolean | null
+          is_trending?: boolean | null
+          last_bonus_claim_at?: string | null
+          last_complaint_at?: string | null
+          last_review_at?: string | null
+          metric_date?: string
+          overall_rank?: number | null
+          popularity_score?: number | null
+          registrations_today?: number | null
+          site_id?: string
+          trend_score?: number | null
+          updated_at?: string | null
+          views_today?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_popularity_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_popularity_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_recommended_sites: {
         Row: {
           created_at: string
@@ -2657,6 +2879,133 @@ export type Database = {
           },
           {
             foreignKeyName: "site_recommended_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_reputation_scores: {
+        Row: {
+          activity_score: number | null
+          avg_response_time_hours: number | null
+          complaint_resolution_rate: number | null
+          complaint_resolution_score: number | null
+          created_at: string | null
+          id: string
+          last_calculated_at: string | null
+          rating_score: number | null
+          reputation_score: number
+          resolved_complaints: number | null
+          response_time_score: number | null
+          review_score: number | null
+          score_history: Json | null
+          site_id: string
+          total_complaints: number | null
+          trust_level: string
+          updated_at: string | null
+        }
+        Insert: {
+          activity_score?: number | null
+          avg_response_time_hours?: number | null
+          complaint_resolution_rate?: number | null
+          complaint_resolution_score?: number | null
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          rating_score?: number | null
+          reputation_score?: number
+          resolved_complaints?: number | null
+          response_time_score?: number | null
+          review_score?: number | null
+          score_history?: Json | null
+          site_id: string
+          total_complaints?: number | null
+          trust_level?: string
+          updated_at?: string | null
+        }
+        Update: {
+          activity_score?: number | null
+          avg_response_time_hours?: number | null
+          complaint_resolution_rate?: number | null
+          complaint_resolution_score?: number | null
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          rating_score?: number | null
+          reputation_score?: number
+          resolved_complaints?: number | null
+          response_time_score?: number | null
+          review_score?: number | null
+          score_history?: Json | null
+          site_id?: string
+          total_complaints?: number | null
+          trust_level?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_reputation_scores_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_reputation_scores_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_review_highlights: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          highlight_type: string
+          id: string
+          is_active: boolean | null
+          review_id: string
+          site_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          highlight_type: string
+          id?: string
+          is_active?: boolean | null
+          review_id: string
+          site_id: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          highlight_type?: string
+          id?: string
+          is_active?: boolean | null
+          review_id?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_review_highlights_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "site_reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_review_highlights_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_review_highlights_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "betting_sites_full"
@@ -2716,6 +3065,90 @@ export type Database = {
             foreignKeyName: "site_reviews_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_seo_metrics: {
+        Row: {
+          content_length: number | null
+          content_score: number | null
+          created_at: string | null
+          critical_issues: number | null
+          has_meta_description: boolean | null
+          has_meta_title: boolean | null
+          heading_structure: Json | null
+          id: string
+          image_alt_coverage: number | null
+          last_analyzed_at: string | null
+          meta_description_length: number | null
+          meta_score: number | null
+          meta_title_length: number | null
+          performance_score: number | null
+          recommendations: Json | null
+          seo_score: number | null
+          site_id: string
+          technical_score: number | null
+          updated_at: string | null
+          warnings: number | null
+        }
+        Insert: {
+          content_length?: number | null
+          content_score?: number | null
+          created_at?: string | null
+          critical_issues?: number | null
+          has_meta_description?: boolean | null
+          has_meta_title?: boolean | null
+          heading_structure?: Json | null
+          id?: string
+          image_alt_coverage?: number | null
+          last_analyzed_at?: string | null
+          meta_description_length?: number | null
+          meta_score?: number | null
+          meta_title_length?: number | null
+          performance_score?: number | null
+          recommendations?: Json | null
+          seo_score?: number | null
+          site_id: string
+          technical_score?: number | null
+          updated_at?: string | null
+          warnings?: number | null
+        }
+        Update: {
+          content_length?: number | null
+          content_score?: number | null
+          created_at?: string | null
+          critical_issues?: number | null
+          has_meta_description?: boolean | null
+          has_meta_title?: boolean | null
+          heading_structure?: Json | null
+          id?: string
+          image_alt_coverage?: number | null
+          last_analyzed_at?: string | null
+          meta_description_length?: number | null
+          meta_score?: number | null
+          meta_title_length?: number | null
+          performance_score?: number | null
+          recommendations?: Json | null
+          seo_score?: number | null
+          site_id?: string
+          technical_score?: number | null
+          updated_at?: string | null
+          warnings?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_seo_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_seo_metrics_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
             referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
@@ -2803,6 +3236,138 @@ export type Database = {
             foreignKeyName: "site_stats_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: true
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_traffic_sources: {
+        Row: {
+          created_at: string | null
+          direct_conversions: number | null
+          direct_views: number | null
+          id: string
+          metric_date: string
+          organic_conversions: number | null
+          organic_views: number | null
+          referral_conversions: number | null
+          referral_views: number | null
+          site_id: string
+          social_conversions: number | null
+          social_views: number | null
+          top_referrers: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          direct_conversions?: number | null
+          direct_views?: number | null
+          id?: string
+          metric_date?: string
+          organic_conversions?: number | null
+          organic_views?: number | null
+          referral_conversions?: number | null
+          referral_views?: number | null
+          site_id: string
+          social_conversions?: number | null
+          social_views?: number | null
+          top_referrers?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          direct_conversions?: number | null
+          direct_views?: number | null
+          id?: string
+          metric_date?: string
+          organic_conversions?: number | null
+          organic_views?: number | null
+          referral_conversions?: number | null
+          referral_views?: number | null
+          site_id?: string
+          social_conversions?: number | null
+          social_views?: number | null
+          top_referrers?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_traffic_sources_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_traffic_sources_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites_full"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_user_behavior: {
+        Row: {
+          avg_scroll_depth: number | null
+          avg_session_duration: number | null
+          bounce_rate: number | null
+          created_at: string | null
+          desktop_users: number | null
+          hourly_distribution: Json | null
+          id: string
+          metric_date: string
+          mobile_users: number | null
+          pages_per_session: number | null
+          peak_hours: Json | null
+          site_id: string
+          tablet_users: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_scroll_depth?: number | null
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          desktop_users?: number | null
+          hourly_distribution?: Json | null
+          id?: string
+          metric_date?: string
+          mobile_users?: number | null
+          pages_per_session?: number | null
+          peak_hours?: Json | null
+          site_id: string
+          tablet_users?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_scroll_depth?: number | null
+          avg_session_duration?: number | null
+          bounce_rate?: number | null
+          created_at?: string | null
+          desktop_users?: number | null
+          hourly_distribution?: Json | null
+          id?: string
+          metric_date?: string
+          mobile_users?: number | null
+          pages_per_session?: number | null
+          peak_hours?: Json | null
+          site_id?: string
+          tablet_users?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_user_behavior_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "betting_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_user_behavior_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "betting_sites_full"
             referencedColumns: ["id"]
           },
@@ -3506,6 +4071,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      calculate_all_reputation_scores: { Args: never; Returns: undefined }
+      calculate_reputation_score: {
+        Args: { p_site_id: string }
+        Returns: number
+      }
+      calculate_seo_score: { Args: { p_site_id: string }; Returns: number }
       can_view_site_stats: { Args: never; Returns: boolean }
       check_and_award_achievements: {
         Args: { p_user_id: string }
