@@ -1977,6 +1977,39 @@ export type Database = {
           },
         ]
       }
+      referral_history: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          points_awarded: number
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           created_at: string | null
@@ -3074,6 +3107,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code: string
+          successful_referrals: number
+          total_points_earned: number
+          total_referrals: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code: string
+          successful_referrals?: number
+          total_points_earned?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code?: string
+          successful_referrals?: number
+          total_points_earned?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_reward_redemptions: {
         Row: {
           admin_notes: string | null
@@ -3369,6 +3435,7 @@ export type Database = {
         Returns: string
       }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
+      generate_referral_code: { Args: never; Returns: string }
       get_current_user_roles: {
         Args: never
         Returns: {
@@ -3498,6 +3565,10 @@ export type Database = {
       mark_notification_as_read: {
         Args: { p_notification_id: string; p_user_id: string }
         Returns: undefined
+      }
+      process_referral_signup: {
+        Args: { p_referral_code: string; p_referred_user_id: string }
+        Returns: boolean
       }
       refresh_all_materialized_views: { Args: never; Returns: undefined }
       refresh_daily_site_metrics: { Args: never; Returns: undefined }

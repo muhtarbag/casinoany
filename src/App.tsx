@@ -94,6 +94,7 @@ import BonusTracking from "./pages/profile/BonusTracking";
 import ProfileSettings from "./pages/profile/Settings";
 import ProfileNotifications from "./pages/profile/Notifications";
 import LoyaltyPoints from "./pages/profile/LoyaltyPoints";
+import Referrals from "./pages/profile/Referrals";
 
 // User panel pages - all imported directly
 import UserDashboard from "./pages/panel/Dashboard";
@@ -200,6 +201,7 @@ const AppContent = () => {
           <Route path="/profile/bonus-tracking" element={<BonusTracking />} />
           <Route path="/profile/notifications" element={<ProfileNotifications />} />
           <Route path="/profile/loyalty" element={<LoyaltyPoints />} />
+          <Route path="/profile/referrals" element={<Referrals />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
           
           <Route path="/about" element={<About />} />
