@@ -280,21 +280,38 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
-      <Card className="w-full max-w-lg shadow-xl">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      </div>
+
+      {/* Logo / Back to Home */}
+      <Link 
+        to="/" 
+        className="absolute top-6 left-6 flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group z-10"
+      >
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+          <span className="text-white font-bold text-lg">C</span>
+        </div>
+        <span className="font-semibold hidden sm:inline-block">CasinoAny</span>
+      </Link>
+
+      <Card className="w-full max-w-lg shadow-2xl border-primary/10 backdrop-blur-sm bg-background/95 relative z-10 animate-scale-in">
         <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Kayıt Ol
+          <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            Hoş Geldiniz
           </CardTitle>
           <CardDescription className="text-center text-sm">
-            Hesap oluşturmak için bilgilerinizi girin
+            Hesap oluşturarak topluluğumuza katılın
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Hesap Tipi - Kompakt */}
+            {/* Hesap Tipi - Modern Cards */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Hesap Tipi</Label>
+              <Label className="text-sm font-medium">Üyelik Türü Seçin</Label>
               <RadioGroup 
                 value={userType} 
                 onValueChange={(value) => { 
@@ -303,45 +320,65 @@ const Signup = () => {
                 }} 
                 className="grid grid-cols-2 gap-3"
               >
-                <div className={`relative flex items-center space-x-2 border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${userType === 'user' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <RadioGroupItem value="user" id="user" />
-                  <Label htmlFor="user" className="cursor-pointer text-sm font-medium">
-                    Bireysel
+                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'user' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
+                  <RadioGroupItem value="user" id="user" className="absolute top-3 right-3" />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-2 shadow-lg">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <Label htmlFor="user" className="cursor-pointer text-center">
+                    <div className="font-semibold text-sm">Bireysel</div>
+                    <p className="text-xs text-muted-foreground mt-0.5">Üye olun</p>
                   </Label>
                 </div>
-                <div className={`relative flex items-center space-x-2 border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${userType === 'site_owner' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <RadioGroupItem value="site_owner" id="site_owner" />
-                  <Label htmlFor="site_owner" className="cursor-pointer text-sm font-medium">
-                    Site Sahibi
+                <div className={`relative flex flex-col items-center justify-center border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${userType === 'site_owner' ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-md' : 'border-border/50 hover:border-primary/30'}`}>
+                  <RadioGroupItem value="site_owner" id="site_owner" className="absolute top-3 right-3" />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center mb-2 shadow-lg">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <Label htmlFor="site_owner" className="cursor-pointer text-center">
+                    <div className="font-semibold text-sm">Site Sahibi</div>
+                    <p className="text-xs text-muted-foreground mt-0.5">İşletme</p>
                   </Label>
                 </div>
               </RadioGroup>
             </div>
 
-            {/* Form Alanları - Kompakt Grid Layout */}
-            <div className="space-y-3">
+            {/* Form Alanları - Premium Design */}
+            <div className="space-y-3 pt-2">
               {/* Ad Soyad */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="firstName" className="text-sm">Ad *</Label>
+                  <Label htmlFor="firstName" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Ad
+                  </Label>
                   <Input 
                     id="firstName" 
                     value={firstName} 
                     onChange={(e) => setFirstName(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-10"
+                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    placeholder="Adınız"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="lastName" className="text-sm">Soyad *</Label>
+                  <Label htmlFor="lastName" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Soyad
+                  </Label>
                   <Input 
                     id="lastName" 
                     value={lastName} 
                     onChange={(e) => setLastName(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-10"
+                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    placeholder="Soyadınız"
                   />
                 </div>
               </div>
@@ -349,7 +386,10 @@ const Signup = () => {
               {/* Telefon Email Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-sm">Telefon *</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                    Telefon
+                  </Label>
                   <Input 
                     id="phone" 
                     type="tel" 
@@ -358,11 +398,14 @@ const Signup = () => {
                     onChange={(e) => setPhone(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-10"
+                    className="h-11 border-border/50 focus:border-primary transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-sm">E-posta *</Label>
+                  <Label htmlFor="email" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                    E-posta
+                  </Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -370,7 +413,8 @@ const Signup = () => {
                     onChange={(e) => setUserEmail(e.target.value)} 
                     required 
                     disabled={loading}
-                    className="h-10"
+                    className="h-11 border-border/50 focus:border-primary transition-colors"
+                    placeholder="ornek@email.com"
                   />
                 </div>
               </div>
@@ -378,7 +422,10 @@ const Signup = () => {
               {/* Kullanıcı Adı - Sadece bireysel için */}
               {userType === 'user' && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="username" className="text-sm">Kullanıcı Adı *</Label>
+                  <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Kullanıcı Adı
+                  </Label>
                   <Input
                     id="username"
                     type="text"
@@ -387,9 +434,12 @@ const Signup = () => {
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                     disabled={loading}
                     maxLength={20}
-                    className="h-10"
+                    className="h-11 border-border/50 focus:border-primary transition-colors"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     Sadece küçük harf, rakam ve alt çizgi
                   </p>
                 </div>
@@ -398,7 +448,10 @@ const Signup = () => {
               {/* Şifreler Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-sm">Şifre *</Label>
+                  <Label htmlFor="password" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Şifre
+                  </Label>
                   <div className="relative">
                     <Input 
                       id="password" 
@@ -407,22 +460,26 @@ const Signup = () => {
                       onChange={(e) => setPassword(e.target.value)} 
                       required 
                       disabled={loading}
-                      className="h-10 pr-10"
+                      className="h-11 pr-10 border-border/50 focus:border-primary transition-colors"
+                      placeholder="••••••••"
                     />
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-10 w-10" 
+                      className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent" 
                       onClick={() => setShowPassword(!showPassword)} 
                       disabled={loading}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword" className="text-sm">Şifre Tekrar *</Label>
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Şifre Tekrar
+                  </Label>
                   <div className="relative">
                     <Input 
                       id="confirmPassword" 
@@ -431,17 +488,18 @@ const Signup = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)} 
                       required 
                       disabled={loading}
-                      className="h-10 pr-10"
+                      className="h-11 pr-10 border-border/50 focus:border-primary transition-colors"
+                      placeholder="••••••••"
                     />
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-10 w-10" 
+                      className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent" 
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
                       disabled={loading}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
                 </div>
@@ -456,23 +514,34 @@ const Signup = () => {
               </>
             )}
 
-            {/* Submit Buttons */}
-            <div className="flex gap-3 pt-2">
+            {/* Submit Buttons - Premium Design */}
+            <div className="flex gap-3 pt-4">
               {userType === 'site_owner' && currentStep > 0 && (
-                <Button type="button" variant="outline" onClick={handleBack} disabled={loading} className="flex-1">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleBack} 
+                  disabled={loading} 
+                  className="flex-1 h-11 border-border/50 hover:border-primary/50"
+                >
                   <ChevronLeft className="w-4 h-4 mr-1" />Geri
                 </Button>
               )}
               
               {userType === 'site_owner' && currentStep < wizardSteps.length - 1 ? (
-                <Button type="button" onClick={handleNext} disabled={loading} className="flex-1 ml-auto">
+                <Button 
+                  type="button" 
+                  onClick={handleNext} 
+                  disabled={loading} 
+                  className="flex-1 ml-auto h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all"
+                >
                   İleri<ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
                 <Button 
                   type="submit" 
                   disabled={loading} 
-                  className="flex-1 ml-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                  className="flex-1 ml-auto h-11 bg-gradient-to-r from-primary via-accent to-secondary hover:from-primary/90 hover:via-accent/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all text-white font-medium"
                 >
                   {loading ? (
                     <>
@@ -480,18 +549,31 @@ const Signup = () => {
                       Kayıt Ediliyor...
                     </>
                   ) : (
-                    'Kayıt Ol'
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Kayıt Ol
+                    </>
                   )}
                 </Button>
               )}
             </div>
           </form>
 
-          {/* Login Link */}
-          <div className="mt-4 text-center text-sm border-t pt-4">
-            <span className="text-muted-foreground">Zaten hesabınız var mı? </span>
-            <Link to="/login" className="text-primary hover:underline font-medium">
+          {/* Login Link - Enhanced */}
+          <div className="mt-6 text-center text-sm border-t pt-6">
+            <p className="text-muted-foreground mb-2">
+              Zaten hesabınız var mı?
+            </p>
+            <Link 
+              to="/login" 
+              className="inline-flex items-center gap-1.5 text-primary hover:text-primary/80 font-medium transition-colors group"
+            >
               Giriş Yap
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           </div>
         </CardContent>
