@@ -543,32 +543,36 @@ export default function SiteDetail() {
         </Card>
 
         {/* Content Tabs */}
-        <Tabs defaultValue="review" className="mb-2">
-          <TabsList className="w-full justify-start overflow-x-auto mb-4 flex-nowrap">
-            <TabsTrigger value="review" className="flex items-center gap-2 whitespace-nowrap">
-              <Award className="w-4 h-4" />
-              <span className="hidden sm:inline">Casino İncelemesi</span>
-              <span className="sm:hidden">İnceleme</span>
-            </TabsTrigger>
-            <TabsTrigger value="bonus" className="flex items-center gap-2 whitespace-nowrap">
-              <Gift className="w-4 h-4" />
-              <span className="hidden sm:inline">Bonuslar & Kampanyalar</span>
-              <span className="sm:hidden">Bonuslar</span>
-            </TabsTrigger>
-            <TabsTrigger value="comments" className="flex items-center gap-2 whitespace-nowrap">
-              <MessageCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Yorumlar & Şikayetler</span>
-              <span className="sm:hidden">Yorumlar</span>
-              {reviews && complaints && (reviews.length + complaints.length) > 0 && (
-                <Badge variant="secondary" className="ml-1">{reviews.length + complaints.length}</Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="blog" className="flex items-center gap-2 whitespace-nowrap">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">İlgili Blog Yazıları</span>
-              <span className="sm:hidden">Blog</span>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="review" className="mb-8">
+          <div className="bg-card border border-border rounded-lg p-1 shadow-sm">
+            <TabsList className="w-full justify-start overflow-x-auto flex-nowrap bg-transparent gap-1">
+              <TabsTrigger value="review" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <Award className="w-4 h-4" />
+                <span className="hidden sm:inline">Casino İncelemesi</span>
+                <span className="sm:hidden">İnceleme</span>
+              </TabsTrigger>
+              <TabsTrigger value="bonus" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <Gift className="w-4 h-4" />
+                <span className="hidden sm:inline">Bonuslar & Kampanyalar</span>
+                <span className="sm:hidden">Bonuslar</span>
+              </TabsTrigger>
+              <TabsTrigger value="comments" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <MessageCircle className="w-4 h-4" />
+                <span className="hidden sm:inline">Yorumlar & Şikayetler</span>
+                <span className="sm:hidden">Yorumlar</span>
+                {reviews && complaints && (reviews.length + complaints.length) > 0 && (
+                  <Badge variant="secondary" className="ml-1 data-[state=active]:bg-primary-foreground data-[state=active]:text-primary">
+                    {reviews.length + complaints.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="blog" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">İlgili Blog Yazıları</span>
+                <span className="sm:hidden">Blog</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Casino Review Tab */}
           <TabsContent value="review">
