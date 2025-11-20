@@ -67,7 +67,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-dark pt-16 md:pt-20">
+    <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
       <SEO
         title="Güvenilir Casino Siteleri 2025 | %500 Bonus"
         description="Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, hızlı para çekme garantisi. 50+ lisanslı casino incelemesi. Slot, rulet, canlı casino oyunları."

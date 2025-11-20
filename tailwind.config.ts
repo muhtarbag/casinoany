@@ -101,6 +101,13 @@ export default {
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',
       },
+      spacing: {
+        'header': 'var(--header-height)',
+        'header-desktop': 'var(--header-height-desktop)',
+      },
+      maxWidth: {
+        'container': 'var(--container-max-width)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
