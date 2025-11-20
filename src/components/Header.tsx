@@ -15,13 +15,13 @@ export const Header = () => {
     <header className={cn(
       "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
       "backdrop-blur-xl backdrop-saturate-150 fixed w-full shadow-sm",
-      "transition-all duration-500 ease-in-out",
+      "transition-all duration-500 ease-in-out h-16 md:h-[72px]",
       isImpersonating ? "top-[44px]" : "top-0",
       isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
       "z-50"
     )}>
-        <div className="container mx-auto px-4 py-4 md:py-5">
-          <nav className="flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 h-full max-w-[1280px]">
+          <nav className="flex items-center justify-between h-full">
             <NavLink to="/" className="group flex items-center transition-all duration-300 hover:scale-105">
               <div className="relative">
                 <div className="absolute -inset-2 bg-primary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

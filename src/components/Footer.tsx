@@ -25,7 +25,7 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-gradient-to-b from-card/30 to-card/60 mt-20">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 max-w-[1280px]">
         {/* Newsletter Section */}
         <div className="bg-primary/10 rounded-lg p-8 mb-12 border border-primary/20">
           <div className="max-w-2xl mx-auto text-center">
