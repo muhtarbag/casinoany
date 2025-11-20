@@ -68,14 +68,6 @@ export const Header = () => {
               <span className="relative z-10">Şikayetler</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
-            <NavLink 
-              to="/hakkimizda" 
-              className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
-              activeClassName="text-primary"
-            >
-              <span className="relative z-10">Hakkımızda</span>
-              <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </NavLink>
 
             <div className="flex items-center gap-2 ml-2 lg:ml-4 pl-2 lg:pl-4 border-l border-border/40">
               {user ? (
