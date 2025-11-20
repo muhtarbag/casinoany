@@ -11,17 +11,20 @@ import { supabase } from '@/integrations/supabase/client';
 
 export default function CasinoSites() {
   const { data: sites } = useQuery({
-    queryKey: ['casino-sites'],
+    queryKey: ['casino-sites-page'],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('betting_sites')
         .select('id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
+        .eq('is_active', true)
         .order('rating', { ascending: false })
         .limit(6);
       
       if (error) throw error;
       return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000,
   });
 
   return (
