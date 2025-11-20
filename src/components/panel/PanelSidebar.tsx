@@ -108,12 +108,6 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
           title: "Raporlar",
           icon: BarChart3,
           description: "İstatistikler ve dışa aktarım"
-        },
-        {
-          id: "advanced-analytics",
-          title: "Gelişmiş Analitik",
-          icon: BarChart3,
-          description: "İtibar, SEO ve trafik analizi"
         }
       ]
     }
