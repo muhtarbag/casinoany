@@ -547,17 +547,17 @@ export default function SiteDetail() {
           <div className="bg-card border border-border rounded-lg p-1 shadow-sm">
             <TabsList className="w-full justify-start overflow-x-auto flex-nowrap bg-transparent gap-1">
               <TabsTrigger value="review" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <Award className="w-4 h-4" />
+                <Award className="w-5 h-5 md:w-4 md:h-4" />
                 <span className="hidden sm:inline">Casino İncelemesi</span>
                 <span className="sm:hidden">İnceleme</span>
               </TabsTrigger>
               <TabsTrigger value="bonus" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <Gift className="w-4 h-4" />
+                <Gift className="w-5 h-5 md:w-4 md:h-4" />
                 <span className="hidden sm:inline">Bonuslar & Kampanyalar</span>
                 <span className="sm:hidden">Bonuslar</span>
               </TabsTrigger>
               <TabsTrigger value="comments" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-5 h-5 md:w-4 md:h-4" />
                 <span className="hidden sm:inline">Yorumlar & Şikayetler</span>
                 <span className="sm:hidden">Yorumlar</span>
                 {reviews && complaints && (reviews.length + complaints.length) > 0 && (
@@ -567,7 +567,7 @@ export default function SiteDetail() {
                 )}
               </TabsTrigger>
               <TabsTrigger value="blog" className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <FileText className="w-4 h-4" />
+                <FileText className="w-5 h-5 md:w-4 md:h-4" />
                 <span className="hidden sm:inline">İlgili Blog Yazıları</span>
                 <span className="sm:hidden">Blog</span>
               </TabsTrigger>
