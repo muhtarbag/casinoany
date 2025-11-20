@@ -62,7 +62,7 @@ export const BonusPageTemplate = ({
   howToSteps
 }: BonusPageTemplateProps) => {
   return (
-    <div className="space-y-8 px-4 md:px-6 lg:px-8">
+    <div className="space-y-8 px-4 md:px-6 lg:px-8 pt-6 md:pt-8">
       {/* Schema for first bonus (featured) */}
       {bonusOffers[0] && (
         <BonusOfferSchema
