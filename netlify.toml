@@ -1,0 +1,110 @@
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-pages.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-casinos.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-blogs.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-bonuses.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-news.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-news"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-static.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-complaints.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-images.xml"
+  to = "https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images"
+  status = 200
+  force = true
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.casinoany.com/*"
+  to = "https://casinoany.com/:splat"
+  status = 301
+  force = true
+
+# Redirect http to https
+[[redirects]]
+  from = "http://casinoany.com/*"
+  to = "https://casinoany.com/:splat"
+  status = 301
+  force = true
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/sitemap*.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "application/xml; charset=utf-8"

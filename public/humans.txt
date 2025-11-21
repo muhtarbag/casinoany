@@ -1,0 +1,22 @@
+/* TEAM */
+Developer: CasinoAny Development Team
+Site: https://casinoany.com
+Twitter: @CasinoAny
+Location: Istanbul, Turkey
+
+/* SITE */
+Last update: 2025/11/21
+Language: Turkish / Türkçe
+Doctype: HTML5
+IDE: VS Code, Lovable
+Tech Stack: React, TypeScript, Tailwind CSS, Supabase
+
+/* THANKS */
+Powered by: Supabase, Netlify/Cloudflare
+Design: Custom minimalist dark theme
+Fonts: Inter (Google Fonts)
+
+/* MISSION */
+Providing reliable, transparent casino and betting site reviews
+for Turkish players. Helping users make informed decisions
+with detailed comparisons and expert analysis.
