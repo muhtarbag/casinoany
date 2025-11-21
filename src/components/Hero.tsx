@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,11 +7,9 @@ import { BettingSiteCard } from './BettingSiteCard';
 import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import BlurText from './BlurText';
+import FloatingLines from './FloatingLines';
 import { RetryBoundary } from './feedback/RetryBoundary';
 import useEmblaCarousel from 'embla-carousel-react';
-
-// CRITICAL: Lazy load Three.js to prevent blocking main thread
-const FloatingLines = lazy(() => import('./FloatingLines'));
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -187,26 +185,26 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
   return (
     <div className="relative overflow-hidden bg-background touch-manipulation">
-      {/* Static gradient background - always visible */}
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-background via-muted/10 to-background z-0" />
-      
-      {/* Three.js Floating Lines - Lazy loaded AFTER content is ready */}
+      {/* Three.js Floating Lines Background - Only show when content is loaded */}
       {!isFeaturedLoading && featuredSites && (
-        <Suspense fallback={null}>
-          <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none z-0 animate-fade-in">
-            <RetryBoundary fallback={null}>
-              <FloatingLines 
-                enabledWaves={['top', 'middle', 'bottom']}
-                lineCount={[10, 15, 20]}
-                lineDistance={[8, 6, 4]}
-                bendRadius={5.0}
-                bendStrength={-0.5}
-                interactive={true}
-                parallax={true}
-              />
-            </RetryBoundary>
-          </div>
-        </Suspense>
+        <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none z-0 animate-fade-in">
+          <RetryBoundary fallback={<div className="w-full h-full bg-gradient-to-b from-background to-muted/20" />}>
+            <FloatingLines 
+              enabledWaves={['top', 'middle', 'bottom']}
+              lineCount={[10, 15, 20]}
+              lineDistance={[8, 6, 4]}
+              bendRadius={5.0}
+              bendStrength={-0.5}
+              interactive={true}
+              parallax={true}
+            />
+          </RetryBoundary>
+        </div>
+      )}
+      
+      {/* Clean gradient background for loading state */}
+      {isFeaturedLoading && (
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-background via-muted/10 to-background z-0" />
       )}
 
       <div className="container relative z-10 mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] pt-4 pb-8 md:py-12 lg:py-16">

@@ -13,14 +13,17 @@
       gtag('config', 'G-JF61BVV6P9');
     </script>
     
-    <!-- DNS Prefetch & Preconnect for Performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cpaukwimbfoembwwtqhj.supabase.co" crossorigin />
-    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://cpaukwimbfoembwwtqhj.supabase.co" />
     
-    <!-- Critical Font Preload (Inter - Most used) -->
+    <!-- Font Preload for LCP Optimization (Turkish subset) -->
+    <link 
+      rel="preload" 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=latin,latin-ext" 
+      as="style"
+    />
     <link 
       rel="preload" 
       href="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2" 
@@ -28,18 +31,6 @@
       type="font/woff2" 
       crossorigin="anonymous"
     />
-    
-    <!-- Preload critical CSS (inline below for instant render) -->
-    <style>
-      /* Critical CSS - Inline for instant FCP */
-      body { 
-        margin: 0; 
-        font-family: Inter, system-ui, -apple-system, sans-serif;
-        background: linear-gradient(180deg, hsl(220, 20%, 8%), hsl(220, 18%, 10%));
-        color: hsl(0, 0%, 98%);
-      }
-      * { box-sizing: border-box; }
-    </style>
     
     <!-- Google Fonts - Load with display swap -->
     <link 
@@ -108,9 +99,10 @@
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
-
-    
-    <meta property="og:type" content="website" />
+    <!-- Preconnect to critical domains -->
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
     <meta property="og:url" content="https://casinoany.com/" />
     <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/tSNROLHLVxYYMQDeVwzBGJY3V7j1/social-images/social-1763106431041-casinoanyOG.jpg">
 
