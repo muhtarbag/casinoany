@@ -366,13 +366,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                           key={site.id} 
                           className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-all duration-300"
                         >
-                          {/* Premium Badge */}
-                          {index === 0 && (
-                            <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-gold to-warning text-gold-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-                              <Award className="w-3 h-3" />
-                              En İyi Seçim
-                            </div>
-                          )}
                           
                           <div className="relative group/card">
                             {/* Glow Effect on Hover */}
