@@ -104,7 +104,7 @@ export const Footer = () => {
                   <img 
                     src={visiontechLogo} 
                     alt="VisionTech" 
-                    className="h-8 w-auto"
+                    className="h-12 w-auto"
                   />
                 </a>
               </div>
@@ -244,7 +244,7 @@ export const Footer = () => {
                 <img 
                   src={visiontechLogo} 
                   alt="VisionTech" 
-                  className="h-7 w-auto"
+                  className="h-10 w-auto"
                 />
               </a>
             </div>
