@@ -61,7 +61,7 @@ export const EnhancedComplaintCard = ({
                 "absolute inset-0 rounded-2xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500",
                 isResolved ? "bg-success" : "bg-primary"
               )} />
-              <Avatar className="relative h-32 w-32 md:h-48 md:w-48 lg:h-56 lg:w-56 ring-4 md:ring-6 ring-border group-hover:ring-primary/50 transition-all duration-300 rounded-2xl shadow-2xl">
+              <Avatar className="relative h-40 w-40 md:h-48 md:w-48 lg:h-56 lg:w-56 ring-4 md:ring-6 ring-border group-hover:ring-primary/50 transition-all duration-300 rounded-2xl shadow-2xl">
                 <AvatarImage 
                   src={complaint.betting_sites?.logo_url} 
                   alt={complaint.betting_sites?.name}
