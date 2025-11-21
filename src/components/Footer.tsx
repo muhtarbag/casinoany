@@ -91,10 +91,10 @@ export const Footer = () => {
                   <img 
                     src={trustpilotLogo} 
                     alt="Trustpilot" 
-                    className="h-8 w-auto"
+                    className="h-10 w-auto"
                   />
                 </a>
-                <div className="h-8 w-px bg-white/20"></div>
+                <div className="h-10 w-px bg-white/20"></div>
                 <a 
                   href="https://visiontech.co" 
                   target="_blank" 
@@ -105,7 +105,7 @@ export const Footer = () => {
                   <img 
                     src={visiontechLogo} 
                     alt="VisionTech" 
-                    className="h-12 w-auto"
+                    className="h-10 w-auto"
                   />
                 </a>
               </div>
@@ -232,10 +232,10 @@ export const Footer = () => {
                 <img 
                   src={trustpilotLogo} 
                   alt="Trustpilot" 
-                  className="h-7 w-auto"
+                  className="h-8 w-auto"
                 />
               </a>
-              <div className="h-7 w-px bg-white/20"></div>
+              <div className="h-8 w-px bg-white/20"></div>
               <a 
                 href="https://visiontech.co" 
                 target="_blank" 
@@ -246,7 +246,7 @@ export const Footer = () => {
                 <img 
                   src={visiontechLogo} 
                   alt="VisionTech" 
-                  className="h-10 w-auto"
+                  className="h-8 w-auto"
                 />
               </a>
             </div>
