@@ -46,7 +46,7 @@ export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
       
       <CardContent className="p-5 sm:p-4 relative">
         {/* Logo Section - Kompakt */}
-        <div className="flex items-center justify-center h-16 sm:h-14 mb-4 sm:mb-3 relative">
+        <div className="flex items-center justify-center h-20 sm:h-16 mb-4 sm:mb-3 relative border-2 border-border/40 rounded-lg bg-card/50 shadow-md p-2 group-hover:border-primary/40 group-hover:shadow-lg transition-all">
           {/* Loading Skeleton */}
           {isLoading && !showFallback && (
             <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded" />
@@ -57,7 +57,7 @@ export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
               src={site.logo_url}
               alt={`${site.name} logo`}
               className={cn(
-                "max-h-full max-w-full object-contain transition-opacity duration-300",
+                "max-h-full max-w-full object-contain transition-all duration-300 group-hover:scale-105",
                 isLoading ? "opacity-0" : "opacity-100 animate-fade-in"
               )}
               onLoad={handleImageLoad}
