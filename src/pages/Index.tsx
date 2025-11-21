@@ -6,6 +6,7 @@ import { Hero } from '@/components/Hero';
 import { PixelGrid } from '@/components/PixelGrid';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
+import { ComplaintsShowcase } from '@/components/ComplaintsShowcase';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -156,6 +157,9 @@ const Index = () => {
             </Link>
           </div>
         </section>
+
+        {/* Complaints Showcase Section */}
+        <ComplaintsShowcase />
       </main>
 
       <Footer />
