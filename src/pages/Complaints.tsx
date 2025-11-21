@@ -57,8 +57,8 @@ const Complaints = () => {
     enabled: !!user?.id,
   });
 
-  const { data: complaints, isLoading } = useQuery({
-    queryKey: ['complaints', searchTerm, categoryFilter, statusFilter, siteFilter, sortBy],
+  const { data: allComplaints, isLoading } = useQuery({
+    queryKey: ['complaints', categoryFilter, statusFilter, siteFilter, sortBy],
     queryFn: async () => {
       let query = supabase
         .from('site_complaints')
@@ -81,10 +81,6 @@ const Complaints = () => {
         query = query.eq('site_id', siteFilter);
       }
 
-      if (searchTerm) {
-        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-      }
-
       // Apply sorting
       switch (sortBy) {
         case 'oldest':
@@ -104,6 +100,18 @@ const Complaints = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Client-side filtering for search term (includes site name)
+  const complaints = allComplaints?.filter((complaint: any) => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const titleMatch = complaint.title?.toLowerCase().includes(searchLower);
+    const descMatch = complaint.description?.toLowerCase().includes(searchLower);
+    const siteNameMatch = complaint.betting_sites?.name?.toLowerCase().includes(searchLower);
+    
+    return titleMatch || descMatch || siteNameMatch;
   });
 
   // Like/unlike mutation
@@ -320,7 +328,7 @@ const Complaints = () => {
           <CardContent className="pt-6">
             <div className="grid gap-4 md:grid-cols-3">
               <Input
-                placeholder="Şikayet ara..."
+                placeholder="Şikayet veya site adı ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
