@@ -161,14 +161,14 @@ export const EnhancedComplaintCard = ({
 
               <Button 
                 variant="default" 
-                size="default" 
+                size="sm" 
                 asChild 
-                className="h-10 md:h-11 px-6 md:px-8 font-semibold shadow-lg hover:shadow-xl transition-all group/btn"
+                className="h-8 md:h-9 px-4 md:px-5 font-medium shadow-md hover:shadow-lg transition-all group/btn"
               >
                 <Link to={`/sikayetler/${complaint.slug || complaint.id}`}>
                   <span>Detayları Gör</span>
                   <svg 
-                    className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" 
+                    className="w-3 h-3 ml-1.5 transition-transform group-hover/btn:translate-x-1" 
                     fill="none" 
                     viewBox="0 0 24 24" 
                     stroke="currentColor"
