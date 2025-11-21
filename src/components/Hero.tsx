@@ -310,15 +310,56 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         {isFeaturedLoading ? (
           <LoadingSpinner size="lg" text="Öne çıkan siteler yükleniyor..." />
         ) : featuredSites && featuredSites.length > 0 ? (
-          <div className="relative -mx-4 px-4 py-12 overflow-hidden">
+          <div className="relative -mx-4 px-4 py-16 overflow-hidden">
+            {/* Premium Background Effects */}
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            
             <div className="relative z-10 space-y-8">
-              <div className="text-center">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">Öne Çıkan Siteler</h2>
-                <p className="text-primary font-semibold text-sm sm:text-base md:text-lg">En yüksek puanlı ve en çok tercih edilen bahis siteleri</p>
+              {/* Premium Header */}
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 backdrop-blur-sm">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider">Premium Seçimler</span>
+                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                </div>
+                
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-fade-in">
+                  Öne Çıkan Siteler
+                </h2>
+                
+                <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
+                  En yüksek puanlı ve en çok tercih edilen bahis siteleri
+                </p>
               </div>
-              <div className="relative max-w-7xl mx-auto">
+
+              {/* Carousel Container */}
+              <div className="relative max-w-7xl mx-auto group">
+                {/* Navigation Buttons */}
+                {canScrollPrev && (
+                  <button
+                    onClick={scrollPrev}
+                    className="hidden md:flex absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 items-center justify-center rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-2xl hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    aria-label="Previous slide"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                )}
+                
+                {canScrollNext && (
+                  <button
+                    onClick={scrollNext}
+                    className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 items-center justify-center rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-2xl hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    aria-label="Next slide"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                )}
+
+                {/* Carousel */}
                 <div 
-                  className="overflow-hidden relative touch-pan-x" 
+                  className="overflow-hidden relative touch-pan-x rounded-2xl" 
                   ref={emblaRef}
                 >
                   <div className="flex gap-4 md:gap-6">
@@ -327,31 +368,68 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                       return (
                         <div 
                           key={site.id} 
-                          className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-opacity duration-300"
+                          className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-all duration-300"
                         >
-                          <BettingSiteCard 
-                            id={site.id}
-                            slug={site.slug}
-                            name={site.name} 
-                            logo={site.logo_url || undefined} 
-                            rating={Number(site.rating) || 0} 
-                            bonus={site.bonus || undefined} 
-                            features={site.features || undefined} 
-                            affiliateUrl={site.affiliate_link} 
-                            email={site.email || undefined} 
-                            whatsapp={site.whatsapp || undefined} 
-                            telegram={site.telegram || undefined} 
-                            twitter={site.twitter || undefined} 
-                            instagram={site.instagram || undefined} 
-                            facebook={site.facebook || undefined} 
-                            youtube={site.youtube || undefined}
-                            views={stats?.views || 0}
-                            clicks={stats?.clicks || 0}
-                          />
+                          {/* Premium Badge */}
+                          {index === 0 && (
+                            <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-gold to-warning text-gold-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                              <Award className="w-3 h-3" />
+                              En İyi Seçim
+                            </div>
+                          )}
+                          
+                          <div className="relative group/card">
+                            {/* Glow Effect on Hover */}
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent to-primary rounded-2xl opacity-0 group-hover/card:opacity-75 blur transition-all duration-500" />
+                            
+                            <div className="relative">
+                              <BettingSiteCard 
+                                id={site.id}
+                                slug={site.slug}
+                                name={site.name} 
+                                logo={site.logo_url || undefined} 
+                                rating={Number(site.rating) || 0} 
+                                bonus={site.bonus || undefined} 
+                                features={site.features || undefined} 
+                                affiliateUrl={site.affiliate_link} 
+                                email={site.email || undefined} 
+                                whatsapp={site.whatsapp || undefined} 
+                                telegram={site.telegram || undefined} 
+                                twitter={site.twitter || undefined} 
+                                instagram={site.instagram || undefined} 
+                                facebook={site.facebook || undefined} 
+                                youtube={site.youtube || undefined}
+                                views={stats?.views || 0}
+                                clicks={stats?.clicks || 0}
+                              />
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
                   </div>
+                </div>
+
+                {/* Progress Dots */}
+                <div className="flex justify-center gap-2 mt-6">
+                  {featuredSites.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => emblaApi?.scrollTo(index)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === selectedIndex 
+                          ? 'w-8 bg-gradient-to-r from-primary to-accent shadow-lg' 
+                          : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Swipe Indicator (Mobile) */}
+                <div className="md:hidden flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+                  <ChevronRight className="w-4 h-4 animate-pulse" />
+                  <span>Kaydırarak gezin</span>
                 </div>
               </div>
             </div>
