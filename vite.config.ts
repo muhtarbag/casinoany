@@ -203,62 +203,80 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React - Most critical, loaded first
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+        manualChunks: (id) => {
+          // Critical path - load first
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor-react-core';
+          }
+          if (id.includes('node_modules/react-router')) {
+            return 'vendor-react-router';
+          }
           
-          // Data Management - Frequently used
-          'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
-          'vendor-supabase': ['@supabase/supabase-js'],
+          // Data layer - critical for app
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'vendor-query';
+          }
+          if (id.includes('node_modules/@supabase/supabase-js')) {
+            return 'vendor-supabase';
+          }
           
-          // UI Components - Split by usage frequency
-          'vendor-ui-core': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-popover'
-          ],
-          'vendor-ui-extended': [
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-switch'
-          ],
+          // Heavy 3D - defer load
+          if (id.includes('node_modules/three')) {
+            return 'vendor-three';
+          }
           
-          // Icons & Visual
-          'vendor-icons': ['lucide-react', 'react-icons'],
-          'vendor-animation': ['framer-motion'],
+          // Charts - lazy loaded
+          if (id.includes('node_modules/recharts')) {
+            return 'vendor-charts';
+          }
           
-          // Charts - Heavy, load on demand
-          'vendor-charts': ['recharts'],
+          // Editor - admin only
+          if (id.includes('node_modules/react-quill')) {
+            return 'vendor-editor';
+          }
           
-          // Forms & Validation
-          'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
+          // UI Core - frequently used
+          if (id.includes('node_modules/@radix-ui')) {
+            if (id.includes('dialog') || id.includes('dropdown') || id.includes('select') || id.includes('tabs')) {
+              return 'vendor-ui-core';
+            }
+            return 'vendor-ui-extended';
+          }
           
-          // Rich Content - Heavy editor
-          'vendor-editor': ['react-quill'],
+          // Icons
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/react-icons')) {
+            return 'vendor-icons';
+          }
           
-          // Utilities - Small but frequently used
-          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge', 'lodash-es'],
+          // Animation
+          if (id.includes('node_modules/framer-motion')) {
+            return 'vendor-animation';
+          }
           
-          // Theme & SEO
-          'vendor-misc': ['next-themes', 'react-helmet-async', 'sonner']
+          // Forms
+          if (id.includes('node_modules/react-hook-form') || id.includes('node_modules/zod') || id.includes('node_modules/@hookform')) {
+            return 'vendor-forms';
+          }
+          
+          // Utilities
+          if (id.includes('node_modules/date-fns') || id.includes('node_modules/clsx') || id.includes('node_modules/tailwind-merge') || id.includes('node_modules/lodash')) {
+            return 'vendor-utils';
+          }
+          
+          // Other vendors
+          if (id.includes('node_modules/')) {
+            return 'vendor-misc';
+          }
         }
       },
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 600, // Stricter limit
     sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
     cssCodeSplit: true,
-    assetsInlineLimit: 4096,
+    assetsInlineLimit: 2048, // Smaller inline limit (2KB instead of 4KB)
+    reportCompressedSize: false, // Faster builds
   },
   // Optimize dependencies - CRITICAL for preventing multiple React instances
   optimizeDeps: {
