@@ -212,12 +212,12 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
 
   return (
-    <div className="relative overflow-hidden bg-background touch-manipulation">
-      {/* Lightweight FloatingLines - Optimized for all devices */}
-      <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none z-0">
+    <div className="relative min-h-screen bg-background touch-manipulation">
+      {/* Lightweight FloatingLines - Optimized for all devices - Extended to full Hero height */}
+      <div className="absolute inset-0 w-full min-h-full opacity-40 pointer-events-none z-0">
         <FloatingLines 
           enabledWaves={['middle']}
-          lineCount={8}
+          lineCount={10}
           lineDistance={6}
           bendRadius={3.0}
           bendStrength={-0.3}
@@ -227,15 +227,15 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         />
       </div>
 
-      {/* LightRays - Ultra minimal configuration */}
-      <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none z-[1]">
+      {/* LightRays - Ultra minimal configuration - Extended to full Hero height */}
+      <div className="absolute inset-0 w-full min-h-full opacity-30 pointer-events-none z-[1]">
         <LightRays
           raysOrigin="top-center"
           raysColor="#ffffff"
           raysSpeed={0.3}
           lightSpread={0.8}
-          rayLength={1.2}
-          fadeDistance={0.6}
+          rayLength={1.5}
+          fadeDistance={0.8}
           followMouse={false}
           mouseInfluence={0}
           noiseAmount={0}
