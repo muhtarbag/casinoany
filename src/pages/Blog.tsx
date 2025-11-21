@@ -99,7 +99,7 @@ const Blog = () => {
               placeholder="Blog yazılarında ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 focus:placeholder-transparent"
             />
           </div>
 
