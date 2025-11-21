@@ -21,7 +21,8 @@ export const HowItWorksSection = () => {
       iconGradient: "from-primary to-accent",
       action: scrollToSites,
       actionText: "İncele",
-      actionVariant: "outline" as const
+      actionVariant: "default" as const,
+      buttonClass: "bg-primary hover:bg-primary/90"
     },
     {
       icon: MessageSquare,
@@ -44,7 +45,8 @@ export const HowItWorksSection = () => {
       badge: "Ücretsiz 🎉",
       action: "/auth",
       actionText: "Üye Ol",
-      actionVariant: "outline" as const
+      actionVariant: "default" as const,
+      buttonClass: "bg-success hover:bg-success/90 text-success-foreground"
     }
   ];
 
@@ -127,7 +129,7 @@ export const HowItWorksSection = () => {
                         <Button
                           variant={step.actionVariant}
                           size="lg"
-                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : ''}`}
+                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : step.buttonClass || ''}`}
                           onClick={step.action}
                         >
                           {step.actionText}
@@ -138,7 +140,7 @@ export const HowItWorksSection = () => {
                           asChild
                           variant={step.actionVariant}
                           size="lg"
-                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : ''}`}
+                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : step.buttonClass || ''}`}
                         >
                           <Link to={step.action}>
                             {step.actionText}
@@ -208,7 +210,7 @@ export const HowItWorksSection = () => {
                 {typeof step.action === 'function' ? (
                   <Button
                     variant={step.actionVariant}
-                    className={`w-full group-hover:scale-105 transition-all ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-lg' : 'group-hover:bg-primary group-hover:text-primary-foreground'}`}
+                    className={`w-full group-hover:scale-105 transition-all ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-lg' : step.buttonClass || ''}`}
                     onClick={step.action}
                   >
                     {step.actionText}
@@ -218,7 +220,7 @@ export const HowItWorksSection = () => {
                   <Button
                     asChild
                     variant={step.actionVariant}
-                    className={`w-full group-hover:scale-105 transition-all ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-lg' : 'group-hover:bg-primary group-hover:text-primary-foreground'}`}
+                    className={`w-full group-hover:scale-105 transition-all ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 shadow-lg' : step.buttonClass || ''}`}
                   >
                     <Link to={step.action}>
                       {step.actionText}
