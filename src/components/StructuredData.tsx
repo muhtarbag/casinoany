@@ -21,7 +21,7 @@ export const OrganizationSchema = () => {
     '@type': 'Organization',
     name: 'CasinoAny.com',
     url: window.location.origin,
-    logo: `${window.location.origin}/logos/casinodoo-logo.svg`,
+    logo: `${window.location.origin}/logos/casinoany-logo.png`,
     description: 'Türkiye\'nin en güvenilir casino ve bahis siteleri karşılaştırma platformu. 50+ lisanslı site, yüksek bonuslar ve detaylı incelemeleri.',
     sameAs: [
       'https://twitter.com/casinoany',

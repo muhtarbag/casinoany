@@ -35,7 +35,7 @@ import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
 import { NotificationBell } from '@/components/profile/NotificationBell';
 import { MobileProfileMenu } from '@/components/profile/MobileProfileMenu';
-import logo from '@/assets/casinodoo-logo.svg';
+import logo from '@/assets/casinoany-logo.png';
 
 interface ProfileLayoutProps {
   children: ReactNode;
