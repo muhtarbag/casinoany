@@ -283,5 +283,15 @@ All colors MUST be HSL.
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
+  
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
