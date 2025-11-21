@@ -731,10 +731,10 @@ export const BlogManagement = () => {
                     id="meta_title"
                     value={formData.meta_title}
                     onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
-                    placeholder="60 karakter önerilir"
-                    maxLength={60}
+                    placeholder="120 karakter önerilir"
+                    maxLength={120}
                   />
-                  <p className="text-xs text-muted-foreground">{formData.meta_title.length}/60 karakter</p>
+                  <p className="text-xs text-muted-foreground">{formData.meta_title.length}/120 karakter</p>
                 </div>
 
                 <div className="space-y-2">
