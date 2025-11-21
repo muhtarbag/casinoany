@@ -369,83 +369,15 @@ const Complaints = () => {
             ))}
           </div>
         ) : complaints && complaints.length > 0 ? (
-          <div className="grid gap-3 md:gap-4">
+          <div className="grid gap-4 md:gap-6">
             {complaints.map((complaint: any) => (
-              <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      {complaint.betting_sites?.logo_url && (
-                        <img
-                          src={complaint.betting_sites.logo_url}
-                          alt={complaint.betting_sites.name}
-                          className="w-16 h-16 object-contain rounded"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-1">
-                            {complaint.title}
-                          </h3>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-sm font-medium text-primary">
-                              {complaint.betting_sites?.name}
-                            </span>
-                            <Badge variant="outline" className="text-xs">
-                              {categoryLabels[complaint.category]}
-                            </Badge>
-                            <Badge variant={getStatusVariant(complaint.status)} className="text-xs">
-                              {statusLabels[complaint.status]}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {complaint.description}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className={cn(
-                              "flex items-center gap-1 h-auto p-1",
-                              userLikes.includes(complaint.id) && "text-primary"
-                            )}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              likeMutation.mutate(complaint.id);
-                            }}
-                            disabled={likeMutation.isPending}
-                          >
-                            <ThumbsUp className={cn(
-                              "w-4 h-4",
-                              userLikes.includes(complaint.id) && "fill-current"
-                            )} />
-                            {complaint.helpful_count || 0}
-                          </Button>
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            {complaint.response_count || 0} cevap
-                          </span>
-                          <span>
-                            {format(new Date(complaint.created_at), 'dd MMM yyyy', { locale: tr })}
-                          </span>
-                        </div>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/sikayetler/${complaint.slug || complaint.id}`}>
-                            Detay Gör
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <EnhancedComplaintCard
+                key={complaint.id}
+                complaint={complaint}
+                categoryLabels={categoryLabels}
+                statusLabels={statusLabels}
+                getStatusVariant={getStatusVariant}
+              />
             ))}
           </div>
         ) : (
