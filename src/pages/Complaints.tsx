@@ -262,20 +262,21 @@ const Complaints = () => {
       <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-b from-card/50 via-background to-background border-b border-border/40">
-          {/* LightRays - Ultra lightweight configuration for all devices */}
-          <div className="absolute inset-0 w-full h-full opacity-15 pointer-events-none z-0">
+          {/* LightRays - Daha belirgin ve estetik */}
+          <div className="absolute inset-0 w-full h-full opacity-40 pointer-events-none z-0 mix-blend-screen">
             <LightRays
               raysOrigin="top-center"
-              raysColor="#ffffff"
-              raysSpeed={0.3}
-              lightSpread={0.8}
-              rayLength={1.2}
-              fadeDistance={0.6}
+              raysColor="#f59e0b"
+              raysSpeed={0.5}
+              lightSpread={1.2}
+              rayLength={1.8}
+              fadeDistance={0.8}
               followMouse={false}
               mouseInfluence={0}
-              noiseAmount={0}
-              distortion={0}
-              pulsating={false}
+              noiseAmount={0.05}
+              distortion={0.1}
+              pulsating={true}
+              saturation={0.7}
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none z-[1]" />
