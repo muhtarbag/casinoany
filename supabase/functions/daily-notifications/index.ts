@@ -55,6 +55,26 @@ Deno.serve(async (req) => {
       console.log('✓ Pending complaint notifications sent');
     }
 
+    // 4. Notify about expiring campaigns
+    console.log('Running notify_expiring_campaigns...');
+    const { error: campaignError } = await supabase.rpc('notify_expiring_campaigns');
+    
+    if (campaignError) {
+      console.error('Error in notify_expiring_campaigns:', campaignError);
+    } else {
+      console.log('✓ Expiring campaign notifications sent');
+    }
+
+    // 5. Notify site owners about old unresolved complaints
+    console.log('Running notify_old_unresolved_complaints...');
+    const { error: oldComplaintError } = await supabase.rpc('notify_old_unresolved_complaints');
+    
+    if (oldComplaintError) {
+      console.error('Error in notify_old_unresolved_complaints:', oldComplaintError);
+    } else {
+      console.log('✓ Old complaint notifications sent');
+    }
+
     console.log('Daily notification jobs completed successfully!');
 
     return new Response(
@@ -65,6 +85,8 @@ Deno.serve(async (req) => {
           incomplete_profiles: !profileError,
           reengagement: !reengagementError,
           pending_complaints: !complaintError,
+          expiring_campaigns: !campaignError,
+          old_unresolved_complaints: !oldComplaintError,
         },
         timestamp: new Date().toISOString(),
       }),
