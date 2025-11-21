@@ -221,7 +221,7 @@ export const Footer = () => {
               Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
             </p>
             
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-3 mb-4">
               <a 
                 href="https://www.trustpilot.com" 
                 target="_blank" 
@@ -232,10 +232,10 @@ export const Footer = () => {
                 <img 
                   src={trustpilotLogo} 
                   alt="Trustpilot" 
-                  className="h-8 w-auto"
+                  className="h-7 w-auto"
                 />
               </a>
-              <div className="h-8 w-px bg-white/20"></div>
+              <div className="h-7 w-px bg-border"></div>
               <a 
                 href="https://visiontech.co" 
                 target="_blank" 
@@ -246,7 +246,7 @@ export const Footer = () => {
                 <img 
                   src={visiontechLogo} 
                   alt="VisionTech" 
-                  className="h-8 w-auto"
+                  className="h-7 w-auto"
                 />
               </a>
             </div>
