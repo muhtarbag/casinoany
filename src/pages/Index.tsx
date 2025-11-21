@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
-import { OrganizationSchema, WebSiteSchema, BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
@@ -85,8 +85,6 @@ const Index = () => {
           'casino incelemeleri'
         ]}
       />
-      <OrganizationSchema />
-      <WebSiteSchema />
       <BreadcrumbSchema items={breadcrumbItems} />
       <FAQSchema faqs={faqData} />
       {featuredSitesForSchema && featuredSitesForSchema.length > 0 && (
