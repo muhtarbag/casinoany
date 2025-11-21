@@ -4349,6 +4349,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: number
       }
+      check_incomplete_profiles: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_site_notification: {
         Args: {
@@ -4503,6 +4504,7 @@ export type Database = {
       }
       refresh_all_materialized_views: { Args: never; Returns: undefined }
       refresh_daily_site_metrics: { Args: never; Returns: undefined }
+      send_reengagement_notifications: { Args: never; Returns: undefined }
       sync_daily_affiliate_metrics: { Args: never; Returns: undefined }
       track_conversion: {
         Args: {
