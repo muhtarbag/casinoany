@@ -66,21 +66,9 @@ const Index = () => {
     }
   ];
 
-  // Create ItemList structured data
-  const itemListData = featuredSitesForSchema && featuredSitesForSchema.length > 0 
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'ItemList',
-        name: 'En İyi Casino Siteleri 2025',
-        itemListElement: featuredSitesForSchema.map((site, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: site.name,
-          url: `${window.location.origin}/site/${site.slug}`,
-          ...(site.logo_url && { image: site.logo_url })
-        }))
-      }
-    : null;
+  // Create ItemList structured data - REMOVED to prevent duplication
+  // Google was detecting multiple ItemList schemas which caused validation errors
+  const itemListData = null;
 
   const faqSchemaData = {
     '@context': 'https://schema.org',
