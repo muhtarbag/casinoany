@@ -183,10 +183,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
   return (
     <div className="relative overflow-hidden bg-background touch-manipulation">
-      {/* Lightweight CSS Animated Background */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-        <div className="hero-gradient-animation" />
-      </div>
 
       <div className="container relative z-10 mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] pt-4 pb-8 md:py-12 lg:py-16">
         <div className="text-center space-y-6 md:space-y-8 mb-12 md:mb-16">

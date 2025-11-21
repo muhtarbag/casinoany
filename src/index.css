@@ -277,27 +277,5 @@ All colors MUST be HSL.
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
-  
-  /* Lightweight Hero Background Animation */
-  .hero-gradient-animation {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      135deg,
-      hsl(220 20% 8%) 0%,
-      hsl(280 98% 69% / 0.03) 25%,
-      hsl(220 20% 8%) 50%,
-      hsl(195 85% 55% / 0.03) 75%,
-      hsl(220 20% 8%) 100%
-    );
-    background-size: 400% 400%;
-    animation: gradient-shift 15s ease infinite;
-    opacity: 0.6;
-  }
-  
-  @keyframes gradient-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
 }
 
