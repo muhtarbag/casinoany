@@ -321,12 +321,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <div className="relative z-10 space-y-8">
               {/* Premium Header */}
               <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 backdrop-blur-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider">Premium Seçimler</span>
-                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                </div>
-                
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent animate-fade-in">
                   Öne Çıkan Siteler
                 </h2>
