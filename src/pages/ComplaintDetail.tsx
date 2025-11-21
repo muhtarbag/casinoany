@@ -576,7 +576,10 @@ const ComplaintDetail = () => {
                   </p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
-                      {response.profiles?.first_name || response.profiles?.username || response.profiles?.email}
+                      {response.is_site_owner_response 
+                        ? `${complaint.betting_sites?.name || 'Site'} Destek Ekibi`
+                        : (response.profiles?.first_name || response.profiles?.username || response.profiles?.email)
+                      }
                     </span>
                     <span>
                       {format(new Date(response.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}
