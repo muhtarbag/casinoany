@@ -1,0 +1,17 @@
+Contact: mailto:security@casinoany.com
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: tr, en
+Canonical: https://casinoany.com/.well-known/security.txt
+
+# Our security policy
+Policy: https://casinoany.com/guvenlik-politikasi
+
+# Please report security issues responsibly
+# Include as much information as possible:
+# - Type of vulnerability
+# - Steps to reproduce
+# - Potential impact
+# - Any additional details
+
+# We appreciate responsible disclosure
+# We aim to respond within 48 hours
