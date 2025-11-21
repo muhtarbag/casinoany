@@ -1,6 +1,5 @@
 import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users, ChevronDown } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
-import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -80,20 +79,7 @@ export const Footer = () => {
               </div>
               
               {/* Trust Badges */}
-              <div className="pt-2 space-y-3">
-                <a 
-                  href="https://gamecheck.com/tr" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block hover:opacity-80 transition-opacity"
-                  aria-label="GameCheck Verified"
-                >
-                  <img 
-                    src={gameCheckLogo} 
-                    alt="GameCheck Verified" 
-                    className="h-12 w-auto"
-                  />
-                </a>
+              <div className="pt-2">
                 <a 
                   href="https://www.trustpilot.com" 
                   target="_blank" 
@@ -220,25 +206,12 @@ export const Footer = () => {
               Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
             </p>
             
-            <div className="flex gap-4 mb-4">
-              <a 
-                href="https://gamecheck.com/tr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block hover:opacity-80 transition-opacity"
-                aria-label="GameCheck Verified"
-              >
-                <img 
-                  src={gameCheckLogo} 
-                  alt="GameCheck Verified" 
-                  className="h-10 w-auto"
-                />
-              </a>
+            <div className="mb-4">
               <a 
                 href="https://www.trustpilot.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block hover:opacity-80 transition-opacity"
+                className="block hover:opacity-80 transition-opacity w-fit"
                 aria-label="Trustpilot"
               >
                 <img 
