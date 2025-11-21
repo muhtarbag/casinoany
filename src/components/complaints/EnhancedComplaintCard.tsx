@@ -53,31 +53,34 @@ export const EnhancedComplaintCard = ({
       )} />
 
       <CardContent className="p-4 md:p-8 relative">
-        <div className="flex items-start gap-4 md:gap-6">
-          {/* Enhanced Logo */}
-          <div className="relative flex-shrink-0">
-            <div className={cn(
-              "absolute inset-0 rounded-xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500",
-              isResolved ? "bg-success" : "bg-primary"
-            )} />
-            <Avatar className="relative h-20 w-20 md:h-28 md:w-28 ring-4 ring-border group-hover:ring-primary/50 transition-all duration-300 rounded-xl shadow-lg">
-              <AvatarImage 
-                src={complaint.betting_sites?.logo_url} 
-                alt={complaint.betting_sites?.name}
-                className="object-contain p-2"
-              />
-              <AvatarFallback className="text-lg md:text-2xl font-bold bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
-                {complaint.betting_sites?.name?.charAt(0) || '?'}
-              </AvatarFallback>
-            </Avatar>
-            {isHighPriority && (
-              <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg animate-pulse">
-                <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
-              </div>
-            )}
+        <div className="flex flex-col gap-4 md:gap-6">
+          {/* Enhanced Logo - Top Section */}
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className={cn(
+                "absolute inset-0 rounded-2xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500",
+                isResolved ? "bg-success" : "bg-primary"
+              )} />
+              <Avatar className="relative h-32 w-32 md:h-48 md:w-48 lg:h-56 lg:w-56 ring-4 md:ring-6 ring-border group-hover:ring-primary/50 transition-all duration-300 rounded-2xl shadow-2xl">
+                <AvatarImage 
+                  src={complaint.betting_sites?.logo_url} 
+                  alt={complaint.betting_sites?.name}
+                  className="object-contain p-4 md:p-6"
+                />
+                <AvatarFallback className="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl">
+                  {complaint.betting_sites?.name?.charAt(0) || '?'}
+                </AvatarFallback>
+              </Avatar>
+              {isHighPriority && (
+                <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-2 md:p-3 shadow-lg animate-pulse">
+                  <TrendingUp className="w-4 h-4 md:w-6 md:h-6" />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex-1 space-y-3 md:space-y-4 min-w-0">
+          {/* Content Section */}
+          <div className="space-y-3 md:space-y-4">
             {/* Header Section */}
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-2 md:space-y-3 flex-1 min-w-0">
