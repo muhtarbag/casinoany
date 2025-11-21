@@ -79,7 +79,7 @@ export const ComplaintFilters = ({
         
         <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           <Input
-            placeholder="Şikayet ara..."
+            placeholder="Şikayet veya site adı ara..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full"
