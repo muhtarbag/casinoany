@@ -204,7 +204,7 @@ const BettingSiteCardComponent = ({
     >
       <CardHeader className="space-y-4 p-6 relative">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-48 h-48 sm:w-40 sm:h-40 md:w-44 md:h-44 bg-card dark:bg-card rounded-xl flex items-center justify-center overflow-hidden border-3 border-primary/30 hover:border-primary/60 shadow-xl hover:shadow-2xl ring-3 ring-primary/25 hover:ring-primary/50 transition-all duration-300 relative group/logo" style={{ willChange: 'transform' }}>
+          <div className="flex-shrink-0 w-56 h-56 sm:w-44 sm:h-44 md:w-48 md:h-48 flex items-center justify-center relative group/logo" style={{ willChange: 'transform' }}>
             {/* Loading Skeleton */}
             {isLoading && !showFallback && (
               <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded-xl" />
@@ -214,11 +214,11 @@ const BettingSiteCardComponent = ({
               <OptimizedImage
                 src={logoUrl!}
                 alt={`${name} logo`}
-                className={`w-44 h-44 sm:w-36 sm:h-36 md:w-40 md:h-40 object-contain p-2 transition-all duration-300 group-hover/logo:scale-110 ${
+                className={`w-full h-full object-contain transition-all duration-300 group-hover/logo:scale-105 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
                 }`}
-                width={176}
-                height={176}
+                width={224}
+                height={224}
                 objectFit="contain"
                 fetchPriority={priority ? 'high' : 'auto'}
                 priority={priority}
@@ -226,8 +226,8 @@ const BettingSiteCardComponent = ({
                 fallback="/placeholder.svg"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 flex items-center justify-center animate-scale-in rounded-xl">
-                <span className="text-6xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+              <div className="w-full h-full flex items-center justify-center animate-scale-in">
+                <span className="text-7xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
                   {name.charAt(0)}
                 </span>
               </div>
