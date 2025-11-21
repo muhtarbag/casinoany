@@ -93,13 +93,13 @@ const Blog = () => {
 
         <div className="mb-8 space-y-4">
           <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 peer-focus:opacity-0 transition-opacity pointer-events-none" />
             <Input
               type="text"
               placeholder="Blog yazılarında ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 focus:placeholder-transparent"
+              className="peer pl-10 focus:placeholder-transparent"
             />
           </div>
 
