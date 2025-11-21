@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-pages.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- Casinos/Betting Sites Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-casinos.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- Blog Posts Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-blogs.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- News Articles Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-news.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- Bonuses Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-bonuses.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- Images Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-images.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+  
+  <!-- Complaints Sitemap -->
+  <sitemap>
+    <loc>https://casinoany.com/sitemap-complaints.xml</loc>
+    <lastmod>2025-11-21</lastmod>
+  </sitemap>
+</sitemapindex>
