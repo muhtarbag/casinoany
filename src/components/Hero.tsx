@@ -251,9 +251,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <span className="text-xs md:text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold leading-tight">
-            <span className="text-primary">En İyi Bahis Siteleri</span>
+            <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent">
+              En İyi Bahis Siteleri
+            </span>
             <br />
-            <span className="text-foreground text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">
+            <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">
               Güvenilir ve Kazançlı
             </span>
           </h1>
@@ -325,7 +327,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                   <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-fade-in">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent animate-fade-in">
                   Öne Çıkan Siteler
                 </h2>
                 
