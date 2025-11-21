@@ -1,15 +1,12 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Hero } from '@/components/Hero';
+import { PixelGrid } from '@/components/PixelGrid';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
-
-// Lazy load heavy components for better initial load
-const PixelGrid = lazy(() => import('@/components/PixelGrid').then(module => ({ default: module.PixelGrid })));
-const FeaturedSitesSection = lazy(() => import('@/components/FeaturedSitesSection').then(module => ({ default: module.FeaturedSitesSection })));
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -129,15 +126,9 @@ const Index = () => {
       <main>
         <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
-        <Suspense fallback={
-          <div className="container mx-auto px-4 py-12 flex justify-center">
-            <LoadingSpinner size="lg" text="Casino siteleri yükleniyor..." />
-          </div>
-        }>
-          <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-            <PixelGrid searchTerm={searchTerm} />
-          </div>
-        </Suspense>
+        <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
+          <PixelGrid searchTerm={searchTerm} />
+        </div>
 
         {/* Featured Casino Reviews Section */}
         <section className="container mx-auto px-4 py-8 md:py-12">
@@ -151,13 +142,7 @@ const Index = () => {
             </p>
           </div>
         
-        <Suspense fallback={
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" text="İncelemeler yükleniyor..." />
-          </div>
-        }>
-          <FeaturedSitesSection searchTerm={searchTerm} />
-        </Suspense>
+        <FeaturedSitesSection searchTerm={searchTerm} />
 
           {/* Bonus CTA */}
           <div className="text-center mt-8">
