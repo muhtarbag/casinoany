@@ -260,7 +260,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             >
               <Link to="/sikayetler/yeni">
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Sorununu Çöz
+                Şikayet Paylaş
               </Link>
             </Button>
           </div>
