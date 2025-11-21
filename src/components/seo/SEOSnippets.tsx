@@ -33,9 +33,7 @@ export const SEOSnippets = ({
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       
-      {/* Robots Meta */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
+      {/* Robots Meta - Removed to avoid conflict with SEO component */}
       
       {/* Language and Regional */}
       <meta httpEquiv="content-language" content="tr" />
