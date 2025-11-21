@@ -1,5 +1,5 @@
 import { Shield, Lock, CreditCard } from 'lucide-react';
-import logo from '@/assets/casinodoo-logo.svg';
+import logo from '@/assets/casinoany-logo.png';
 import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
 

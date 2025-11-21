@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, Shield } from 'lucide-react';
 import { MobileMenu } from '@/components/MobileMenu';
-import logo from '@/assets/casinodoo-logo.svg';
+import logo from '@/assets/casinoany-logo.png';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
 

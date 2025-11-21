@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Home, Info, FileText, Shield, LogOut, Gift, Folder, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import logo from '@/assets/casinodoo-logo.svg';
+import logo from '@/assets/casinoany-logo.png';
 
 interface MobileMenuProps {
   onOpenChange?: (open: boolean) => void;
