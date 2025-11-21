@@ -1,11 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, MessageSquare, ThumbsUp, Clock, CheckCircle2, Shield } from 'lucide-react';
+import { AlertCircle, MessageSquare, ThumbsUp, Clock, CheckCircle2, Shield, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 interface EnhancedComplaintCardProps {
   complaint: any;
@@ -22,94 +23,155 @@ export const EnhancedComplaintCard = ({
 }: EnhancedComplaintCardProps) => {
   const hasOfficialResponse = complaint.response_count > 0;
   const isResolved = complaint.status === 'resolved';
+  const isHighPriority = complaint.helpful_count >= 5;
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 border-l-2 md:border-l-4" 
-          style={{ 
-            borderLeftColor: isResolved ? 'hsl(var(--success))' : 'hsl(var(--destructive))' 
-          }}>
-      <CardContent className="p-3 md:p-6">
-        <div className="flex items-start gap-2 md:gap-4">
-          {/* Site Logo */}
-          <Avatar className="h-12 w-12 md:h-16 md:w-16 border border-border md:border-2 flex-shrink-0">
-            <AvatarImage 
-              src={complaint.betting_sites?.logo_url} 
-              alt={complaint.betting_sites?.name} 
-            />
-            <AvatarFallback className="text-xs md:text-base">
-              {complaint.betting_sites?.name?.charAt(0) || '?'}
-            </AvatarFallback>
-          </Avatar>
+    <Card 
+      className={cn(
+        "group relative overflow-hidden transition-all duration-500",
+        "hover:shadow-2xl hover:scale-[1.01] hover:-translate-y-1",
+        "border-2",
+        isResolved && "border-success/30 bg-success/5",
+        !isResolved && isHighPriority && "border-destructive/30 bg-destructive/5",
+        !isResolved && !isHighPriority && "border-border hover:border-primary/30"
+      )}
+    >
+      {/* Gradient Overlay */}
+      <div className={cn(
+        "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none",
+        isResolved 
+          ? "bg-gradient-to-br from-success/10 via-transparent to-transparent" 
+          : "bg-gradient-to-br from-primary/10 via-accent/5 to-transparent"
+      )} />
 
-          <div className="flex-1 space-y-2 md:space-y-3 min-w-0">
-            {/* Header with badges */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="space-y-1.5 md:space-y-2 flex-1 min-w-0">
+      {/* Status Accent Bar */}
+      <div className={cn(
+        "absolute left-0 top-0 bottom-0 w-1.5 md:w-2 transition-all duration-300",
+        isResolved && "bg-gradient-to-b from-success via-success/70 to-success/50",
+        !isResolved && isHighPriority && "bg-gradient-to-b from-destructive via-destructive/70 to-destructive/50",
+        !isResolved && !isHighPriority && "bg-gradient-to-b from-primary via-primary/70 to-primary/50"
+      )} />
+
+      <CardContent className="p-4 md:p-8 relative">
+        <div className="flex items-start gap-4 md:gap-6">
+          {/* Enhanced Logo */}
+          <div className="relative flex-shrink-0">
+            <div className={cn(
+              "absolute inset-0 rounded-xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500",
+              isResolved ? "bg-success" : "bg-primary"
+            )} />
+            <Avatar className="relative h-20 w-20 md:h-28 md:w-28 ring-4 ring-border group-hover:ring-primary/50 transition-all duration-300 rounded-xl shadow-lg">
+              <AvatarImage 
+                src={complaint.betting_sites?.logo_url} 
+                alt={complaint.betting_sites?.name}
+                className="object-contain p-2"
+              />
+              <AvatarFallback className="text-lg md:text-2xl font-bold bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
+                {complaint.betting_sites?.name?.charAt(0) || '?'}
+              </AvatarFallback>
+            </Avatar>
+            {isHighPriority && (
+              <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg animate-pulse">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 space-y-3 md:space-y-4 min-w-0">
+            {/* Header Section */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-2 md:space-y-3 flex-1 min-w-0">
                 <Link 
                   to={`/sikayetler/${complaint.slug || complaint.id}`}
-                  className="text-sm md:text-lg font-semibold hover:text-primary transition-colors line-clamp-2 block"
+                  className="text-base md:text-xl lg:text-2xl font-bold hover:text-primary transition-colors line-clamp-2 block leading-tight group-hover:underline decoration-2 underline-offset-4"
                 >
                   {complaint.title}
                 </Link>
                 
-                <div className="flex flex-wrap items-center gap-1 md:gap-2">
-                  <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2.5 py-0 md:py-1 whitespace-nowrap">
+                {/* Enhanced Badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs md:text-sm px-3 md:px-4 py-1 md:py-1.5 font-semibold border-2 shadow-sm hover:shadow-md transition-shadow"
+                  >
                     {complaint.betting_sites?.name}
                   </Badge>
-                  <Badge variant="secondary" className="text-[10px] md:text-xs px-1.5 md:px-2.5 py-0 md:py-1">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs md:text-sm px-3 md:px-4 py-1 md:py-1.5 font-medium shadow-sm"
+                  >
                     {categoryLabels[complaint.category]}
                   </Badge>
-                  <Badge variant={getStatusVariant(complaint.status)} className="text-[10px] md:text-xs px-1.5 md:px-2.5 py-0 md:py-1">
+                  <Badge 
+                    variant={getStatusVariant(complaint.status)} 
+                    className="text-xs md:text-sm px-3 md:px-4 py-1 md:py-1.5 font-medium shadow-sm"
+                  >
                     {statusLabels[complaint.status]}
                   </Badge>
                   {hasOfficialResponse && (
-                    <Badge variant="default" className="gap-1 text-[10px] md:text-xs px-1.5 md:px-2.5 py-0 md:py-1 hidden sm:flex">
-                      <Shield className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                      <span className="hidden md:inline">Resmi Yanıt Var</span>
-                      <span className="md:hidden">Resmi</span>
+                    <Badge 
+                      variant="default" 
+                      className="gap-1.5 text-xs md:text-sm px-3 md:px-4 py-1 md:py-1.5 font-medium bg-gradient-to-r from-primary to-primary/80 shadow-lg"
+                    >
+                      <Shield className="w-3 h-3 md:w-4 md:h-4" />
+                      <span>Resmi Yanıt</span>
                     </Badge>
                   )}
                 </div>
               </div>
 
               {isResolved && (
-                <div className="flex items-center gap-0.5 md:gap-1 text-success flex-shrink-0">
-                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5" />
-                  <span className="text-xs md:text-sm font-medium hidden sm:inline">Çözüldü</span>
+                <div className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl bg-success/10 border-2 border-success/30 flex-shrink-0">
+                  <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8 text-success" />
+                  <span className="text-xs font-bold text-success whitespace-nowrap">Çözüldü</span>
                 </div>
               )}
             </div>
 
             {/* Description */}
-            <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm md:text-base text-muted-foreground line-clamp-2 leading-relaxed">
               {complaint.description}
             </p>
 
-              <div className="flex items-center justify-between pt-2 border-t">
-                <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground flex-wrap">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="hidden sm:inline">{format(new Date(complaint.created_at), 'dd MMM yyyy', { locale: tr })}</span>
-                    <span className="sm:hidden">{format(new Date(complaint.created_at), 'dd/MM', { locale: tr })}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <MessageSquare className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>{complaint.response_count || 0}</span>
-                    <span className="hidden md:inline">yanıt</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>{complaint.helpful_count || 0}</span>
-                    <span className="hidden md:inline">faydalı</span>
-                  </div>
+            {/* Footer Section */}
+            <div className="flex items-center justify-between pt-3 md:pt-4 border-t-2 border-border/50">
+              <div className="flex items-center gap-3 md:gap-6 text-sm md:text-base flex-wrap">
+                <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                  <Clock className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="font-medium">
+                    {format(new Date(complaint.created_at), 'dd MMM yyyy', { locale: tr })}
+                  </span>
                 </div>
+                
+                <div className="flex items-center gap-2 text-accent hover:text-accent/80 transition-colors">
+                  <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="font-semibold">{complaint.response_count || 0}</span>
+                  <span className="hidden md:inline font-medium">yanıt</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+                  <ThumbsUp className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="font-semibold">{complaint.helpful_count || 0}</span>
+                  <span className="hidden md:inline font-medium">faydalı</span>
+                </div>
+              </div>
 
-              <Button variant="ghost" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm w-full sm:w-auto">
+              <Button 
+                variant="default" 
+                size="default" 
+                asChild 
+                className="h-10 md:h-11 px-6 md:px-8 font-semibold shadow-lg hover:shadow-xl transition-all group/btn"
+              >
                 <Link to={`/sikayetler/${complaint.slug || complaint.id}`}>
-                  <span className="hidden sm:inline">Detayları Gör</span>
-                  <span className="sm:hidden">Detay</span>
+                  <span>Detayları Gör</span>
+                  <svg 
+                    className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </Button>
             </div>
