@@ -94,6 +94,7 @@ export const Footer = () => {
                     className="h-8 w-auto"
                   />
                 </a>
+                <div className="h-8 w-px bg-white/20"></div>
                 <a 
                   href="https://visiontech.co" 
                   target="_blank" 
@@ -234,6 +235,7 @@ export const Footer = () => {
                   className="h-7 w-auto"
                 />
               </a>
+              <div className="h-7 w-px bg-white/20"></div>
               <a 
                 href="https://visiontech.co" 
                 target="_blank" 
