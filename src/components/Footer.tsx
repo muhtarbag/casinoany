@@ -1,4 +1,4 @@
-import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
+import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users, ChevronDown } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
 import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
@@ -8,6 +8,12 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { FooterCategories } from './footer/FooterCategories';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Footer = () => {
   const [email, setEmail] = useState('');
@@ -49,7 +55,8 @@ export const Footer = () => {
         </div>
 
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        {/* Desktop Version - Grid Layout */}
+        <div className="hidden lg:grid lg:grid-cols-5 gap-8 mb-8">
           {/* About Section */}
           <div className="lg:col-span-2">
             <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
@@ -202,6 +209,157 @@ export const Footer = () => {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* Mobile Version - Accordion */}
+        <div className="lg:hidden mb-8">
+          {/* About Section - Always Visible on Mobile */}
+          <div className="mb-6 pb-6 border-b border-border">
+            <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
+            </p>
+            
+            <div className="flex gap-4 mb-4">
+              <a 
+                href="https://gamecheck.com/tr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity"
+                aria-label="GameCheck Verified"
+              >
+                <img 
+                  src={gameCheckLogo} 
+                  alt="GameCheck Verified" 
+                  className="h-10 w-auto"
+                />
+              </a>
+              <a 
+                href="https://www.trustpilot.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity"
+                aria-label="Trustpilot"
+              >
+                <img 
+                  src={trustpilotLogo} 
+                  alt="Trustpilot" 
+                  className="h-7 w-auto"
+                />
+              </a>
+            </div>
+          </div>
+
+          {/* Accordion Sections */}
+          <Accordion type="single" collapsible className="w-full">
+            {/* Keşfet */}
+            <AccordionItem value="discover" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                Keşfet
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-3 pt-2 text-sm">
+                  <li>
+                    <Link to="/" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      🏠 Ana Sayfa
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/haberler" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      📰 Haberler
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      ℹ️ Hakkımızda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      📝 Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/sss" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      ❓ SSS
+                    </Link>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Kategoriler */}
+            <AccordionItem value="categories" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                Kategoriler
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="pt-2">
+                  <FooterCategories />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* İletişim */}
+            <AccordionItem value="contact" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                İletişim
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-2">
+                      <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <a href="mailto:hello@visiontech.co" className="hover:text-primary transition-colors">
+                        hello@visiontech.co
+                      </a>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Send className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <a href="https://t.me/visiontechco" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                        @visiontechco
+                      </a>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <span>7/24 Destek</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-3 text-sm">Sosyal Medya</h4>
+                    <div className="flex gap-2">
+                      <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Twitter/X">
+                        <Twitter className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer" 
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Facebook">
+                        <Facebook className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer" 
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Instagram">
+                        <Instagram className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer" 
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="YouTube">
+                        <Youtube className="w-5 h-5" />
+                      </a>
+                      <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer" 
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Pinterest">
+                        <Pin className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
 
         {/* Payment Methods & Security */}
