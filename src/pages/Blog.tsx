@@ -74,7 +74,7 @@ const Blog = () => {
           title="Bahis Siteleri Blog Yazıları"
           items={filteredPosts.map(post => ({
             name: post.title,
-            url: `${window.location.origin}/blog/${post.slug}`,
+            url: `${window.location.origin}/${post.slug}`,
             image: post.featured_image
           }))}
         />
@@ -182,7 +182,7 @@ const Blog = () => {
                 {featuredPost && (
                   <Card
                     className="group relative overflow-hidden cursor-pointer border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-500 animate-fade-in"
-                    onClick={() => navigate(`/blog/${featuredPost.slug}`)}
+                    onClick={() => navigate(`/${featuredPost.slug}`)}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
@@ -259,7 +259,7 @@ const Blog = () => {
                         key={post.id}
                         className="group cursor-pointer hover:border-primary/50 transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl hover:shadow-primary/10 animate-fade-in"
                         style={{ animationDelay: `${index * 100}ms` }}
-                        onClick={() => navigate(`/blog/${post.slug}`)}
+                        onClick={() => navigate(`/${post.slug}`)}
                       >
                         {post.featured_image && (
                           <div className="relative w-full h-56 overflow-hidden">
