@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { PixelGrid } from '@/components/PixelGrid';
 import { Hero } from '@/components/Hero';
-import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, FAQSchema } from '@/components/StructuredData';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { Link } from 'react-router-dom';
@@ -66,6 +66,53 @@ const Index = () => {
     }
   ];
 
+  // Create ItemList structured data
+  const itemListData = featuredSitesForSchema && featuredSitesForSchema.length > 0 
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'En İyi Casino Siteleri 2025',
+        itemListElement: featuredSitesForSchema.map((site, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: site.name,
+          url: `${window.location.origin}/site/${site.slug}`,
+          ...(site.logo_url && { image: site.logo_url })
+        }))
+      }
+    : null;
+
+  const faqSchemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqData.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer
+      }
+    }))
+  };
+
+  const breadcrumbSchemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbItems.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url
+    }))
+  };
+
+  // Combine all structured data
+  const allStructuredData = [
+    breadcrumbSchemaData,
+    faqSchemaData,
+    ...(itemListData ? [itemListData] : [])
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
       <SEO
@@ -84,19 +131,8 @@ const Index = () => {
           'online casino türkiye',
           'casino incelemeleri'
         ]}
+        structuredData={allStructuredData}
       />
-      <BreadcrumbSchema items={breadcrumbItems} />
-      <FAQSchema faqs={faqData} />
-      {featuredSitesForSchema && featuredSitesForSchema.length > 0 && (
-        <ItemListSchema 
-          title="En İyi Casino Siteleri 2025"
-          items={featuredSitesForSchema.map(site => ({
-            name: site.name,
-            url: `${window.location.origin}/site/${site.slug}`,
-            image: site.logo_url || undefined
-          }))}
-        />
-      )}
       <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
       
