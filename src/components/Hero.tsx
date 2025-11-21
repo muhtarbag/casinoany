@@ -2,14 +2,16 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, Award, Shield, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { BettingSiteCard } from './BettingSiteCard';
 import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
+import { Button } from './ui/button';
 import BlurText from './BlurText';
 import FloatingLines from './FloatingLines';
 import LightRays from './LightRays';
 import useEmblaCarousel from 'embla-carousel-react';
+import { Link } from 'react-router-dom';
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -237,6 +239,32 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             searchTerm={localSearch} 
             onNavigate={(slug) => navigate(`/${slug}`)}
           />
+          
+          {/* Quick Actions */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Button
+              onClick={() => onSearch('')}
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto h-12 px-6 font-semibold border-2 hover:border-primary/50 transition-all"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              En İyi Siteleri Keşfet
+            </Button>
+            
+            <Button
+              asChild
+              variant="default"
+              size="lg"
+              className="w-full sm:w-auto h-12 px-6 font-semibold bg-accent hover:bg-accent/90 transition-all shadow-lg hover:shadow-xl"
+            >
+              <Link to="/sikayetler/yeni">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Sorununu Çöz
+              </Link>
+            </Button>
+          </div>
+
           <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6 pt-4 md:pt-6">
             <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-card border border-border">
               <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-primary flex-shrink-0" />
