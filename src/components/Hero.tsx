@@ -8,6 +8,7 @@ import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import BlurText from './BlurText';
 import FloatingLines from './FloatingLines';
+import LightRays from './LightRays';
 import useEmblaCarousel from 'embla-carousel-react';
 
 interface HeroProps {
@@ -195,6 +196,23 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           interactive={false}
           parallax={false}
           animationSpeed={0.5}
+        />
+      </div>
+
+      {/* LightRays - Ultra minimal configuration */}
+      <div className="absolute inset-0 w-full h-full opacity-20 pointer-events-none z-[1]">
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#ffffff"
+          raysSpeed={0.3}
+          lightSpread={0.8}
+          rayLength={1.2}
+          fadeDistance={0.6}
+          followMouse={false}
+          mouseInfluence={0}
+          noiseAmount={0}
+          distortion={0}
+          pulsating={false}
         />
       </div>
 
