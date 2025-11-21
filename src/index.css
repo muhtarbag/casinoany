@@ -252,6 +252,12 @@ All colors MUST be HSL.
     -webkit-tap-highlight-color: transparent;
   }
   
+  /* Grid pattern for backgrounds */
+  .bg-grid-white\/\[0\.02\] {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  }
+  
   /* Mobile-specific text sizes */
   @media (max-width: 640px) {
     .text-mobile-xs { font-size: 0.75rem; }
