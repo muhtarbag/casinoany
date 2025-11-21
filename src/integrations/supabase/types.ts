@@ -4496,6 +4496,7 @@ export type Database = {
         Args: { p_notification_id: string; p_user_id: string }
         Returns: undefined
       }
+      notify_pending_complaints: { Args: never; Returns: undefined }
       process_referral_signup: {
         Args: { p_referral_code: string; p_referred_user_id: string }
         Returns: boolean
