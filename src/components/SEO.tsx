@@ -131,8 +131,11 @@ export const SEO = ({
 
       {/* Additional SEO Meta Tags */}
       <meta name="robots" content={robotsTag} />
-      {isNoIndex && <meta name="googlebot" content="noindex, follow" />}
-      <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+      <meta name="googlebot" content={
+        isNoIndex 
+          ? "noindex, follow" 
+          : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+      } />
       <meta name="bingbot" content="index, follow, max-image-preview:large" />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       
