@@ -200,7 +200,7 @@ export default function BlogPost() {
       
       <Header />
       
-      <main className="container mx-auto px-4 py-8 pb-24 md:pb-8">
+      <main className="container mx-auto px-4 py-8 pb-24 md:pb-8 pt-20 md:pt-24">
         <article className="max-w-4xl mx-auto">
           {/* Breadcrumb Navigation */}
           <Breadcrumb 
