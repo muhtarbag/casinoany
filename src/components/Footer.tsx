@@ -1,6 +1,7 @@
 import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users, ChevronDown } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
+import visiontechLogo from '@/assets/visiontech-logo.png';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
@@ -79,7 +80,7 @@ export const Footer = () => {
               </div>
               
               {/* Trust Badges */}
-              <div className="pt-2">
+              <div className="pt-2 flex items-center gap-4">
                 <a 
                   href="https://www.trustpilot.com" 
                   target="_blank" 
@@ -90,6 +91,19 @@ export const Footer = () => {
                   <img 
                     src={trustpilotLogo} 
                     alt="Trustpilot" 
+                    className="h-8 w-auto"
+                  />
+                </a>
+                <a 
+                  href="https://visiontech.co" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block hover:opacity-80 transition-opacity"
+                  aria-label="VisionTech"
+                >
+                  <img 
+                    src={visiontechLogo} 
+                    alt="VisionTech" 
                     className="h-8 w-auto"
                   />
                 </a>
@@ -206,17 +220,30 @@ export const Footer = () => {
               Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
             </p>
             
-            <div className="mb-4">
+            <div className="flex items-center gap-4 mb-4">
               <a 
                 href="https://www.trustpilot.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="block hover:opacity-80 transition-opacity w-fit"
+                className="block hover:opacity-80 transition-opacity"
                 aria-label="Trustpilot"
               >
                 <img 
                   src={trustpilotLogo} 
                   alt="Trustpilot" 
+                  className="h-7 w-auto"
+                />
+              </a>
+              <a 
+                href="https://visiontech.co" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity"
+                aria-label="VisionTech"
+              >
+                <img 
+                  src={visiontechLogo} 
+                  alt="VisionTech" 
                   className="h-7 w-auto"
                 />
               </a>
