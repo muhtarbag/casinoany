@@ -256,7 +256,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
               asChild
               variant="default"
               size="lg"
-              className="w-full sm:w-auto h-12 px-6 font-semibold bg-accent hover:bg-accent/90 transition-all shadow-lg hover:shadow-xl"
+              className="w-full sm:w-auto h-12 px-6 font-semibold bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 transition-all shadow-lg hover:shadow-xl"
             >
               <Link to="/sikayetler/yeni">
                 <MessageSquare className="w-4 h-4 mr-2" />
