@@ -77,7 +77,15 @@ export const HowItWorksSection = () => {
   }, [steps.length]);
 
   return (
-    <section className="container mx-auto px-4 py-12 md:py-16">
+    <section className="relative container mx-auto px-4 py-12 md:py-16 overflow-hidden">
+      {/* Animated Background Effects */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-0 left-1/2 w-80 h-80 bg-success/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+      </div>
+
       {/* Header */}
       <div className="text-center mb-8 md:mb-12">
         <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
