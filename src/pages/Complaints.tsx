@@ -20,6 +20,7 @@ import { ComplaintAnalytics } from '@/components/complaints/ComplaintAnalytics';
 import { LoadingState } from '@/components/ui/loading-state';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import LightRays from '@/components/LightRays';
 
 const Complaints = () => {
   const queryClient = useQueryClient();
@@ -261,8 +262,24 @@ const Complaints = () => {
       <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-b from-card/50 via-background to-background border-b border-border/40">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-          <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] py-12 md:py-16 relative">
+          {/* LightRays - Ultra lightweight configuration for all devices */}
+          <div className="absolute inset-0 w-full h-full opacity-15 pointer-events-none z-0">
+            <LightRays
+              raysOrigin="top-center"
+              raysColor="#ffffff"
+              raysSpeed={0.3}
+              lightSpread={0.8}
+              rayLength={1.2}
+              fadeDistance={0.6}
+              followMouse={false}
+              mouseInfluence={0}
+              noiseAmount={0}
+              distortion={0}
+              pulsating={false}
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 pointer-events-none z-[1]" />
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] py-12 md:py-16 relative z-[2]">
             <div className="text-center space-y-6 max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <AlertCircle className="w-4 h-4 text-primary" />
