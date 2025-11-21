@@ -33,10 +33,11 @@ export const HowItWorksSection = () => {
               asChild
               variant="outline"
               className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+              onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
             >
-              <Link to="/sites">
+              <a href="#sites-list">
                 Siteleri İncele
-              </Link>
+              </a>
             </Button>
           </div>
         </div>
