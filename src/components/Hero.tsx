@@ -74,6 +74,8 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
 
+    let autoScrollInterval: NodeJS.Timeout;
+
     // Wait a bit to ensure carousel is fully initialized
     const initDelay = setTimeout(() => {
       const handleAutoScroll = () => {
@@ -89,33 +91,32 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
       };
 
       // Start auto-scroll for mobile with the configured duration
-      const autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
+      autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
 
       // Clear interval on user interaction
       const clearAutoScroll = () => {
-        clearInterval(autoScrollInterval);
+        if (autoScrollInterval) {
+          clearInterval(autoScrollInterval);
+        }
       };
       
       emblaApi.on('pointerDown', clearAutoScroll);
-      emblaApi.on('settle', () => {
-        // Resume auto-scroll after manual interaction settles
-        if (!isDragging) {
-          clearInterval(autoScrollInterval);
-          const newInterval = setInterval(handleAutoScroll, autoScrollDuration);
-          return () => clearInterval(newInterval);
-        }
-      });
 
       return () => {
-        clearInterval(autoScrollInterval);
+        if (autoScrollInterval) {
+          clearInterval(autoScrollInterval);
+        }
         emblaApi.off('pointerDown', clearAutoScroll);
       };
     }, 300); // Small delay to ensure everything is ready
 
     return () => {
       clearTimeout(initDelay);
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+      }
     };
-  }, [emblaApi, autoScrollDuration, isDragging]);
+  }, [emblaApi, autoScrollDuration]);
 
   // Fetch carousel settings (birleştirilmiş tek query)
   const { data: carouselSettings } = useQuery({
