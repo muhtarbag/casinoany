@@ -83,7 +83,7 @@ const About = () => {
         description="CasinoAny.com olarak 2020'den beri güvenilir, lisanslı bahis sitelerini inceleyen ve karşılaştıran bağımsız bir platformuz. Uzman ekibimiz, detaylı analizler ve kullanıcı yorumlarıyla en iyi bahis deneyimi için objektif bilgiler sunuyor."
         keywords={['bahis siteleri hakkında', 'güvenilir bahis platformu', 'bahis sitesi karşılaştırma', 'lisanslı bahis siteleri', 'bahis sitesi inceleme']}
         canonical={`${window.location.origin}/about`}
-        structuredData={[organizationStructuredData, faqStructuredData]}
+        structuredData={faqStructuredData}
       />
       <BreadcrumbSchema items={[
         { name: 'Ana Sayfa', url: window.location.origin },
