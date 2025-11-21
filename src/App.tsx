@@ -70,6 +70,8 @@ import AdminFooterManagement from "./pages/admin/system/FooterManagement";
 // Public pages - all imported directly
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import BlogRedirect from "./pages/BlogRedirect";
+import SlugRouter from "./pages/SlugRouter";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import NotFound from "./pages/NotFound";
@@ -227,7 +229,8 @@ const AppContent = () => {
           
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
+          {/* 301 Redirect old blog URLs to new structure */}
+          <Route path="/blog/:slug" element={<BlogRedirect />} />
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
           
@@ -265,9 +268,10 @@ const AppContent = () => {
           {/* Game Providers */}
           <Route path="/oyun-saglayicilari" element={<GameProviders />} />
           
-          {/* Dynamic Category Pages - must be before catch-all */}
-          <Route path="/:slug" element={<CategoryPage />} />
+          {/* Dynamic routing - checks blog posts first, then categories */}
+          <Route path="/:slug" element={<SlugRouter />} />
           
+          {/* AMP pages keep old structure for compatibility */}
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -485,7 +485,7 @@ export const BlogManagement = () => {
     
     try {
       await generateInternalLinks(
-        `/blog/${formData.slug}`,
+        `/${formData.slug}`,
         'blog',
         formData.content,
         5

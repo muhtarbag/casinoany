@@ -118,7 +118,7 @@ async function generateSitemap() {
   if (posts) {
     posts.forEach(post => {
       urls.push({
-        loc: `${SITE_URL}/blog/${post.slug}`,
+        loc: `${SITE_URL}/${post.slug}`,
         lastmod: post.updated_at ? new Date(post.updated_at).toISOString().split('T')[0] : undefined,
         changefreq: 'monthly',
         priority: 0.7

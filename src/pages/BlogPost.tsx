@@ -32,7 +32,7 @@ export default function BlogPost() {
 
   // Fetch AI-suggested internal links
   const { data: internalLinks } = useInternalLinks(
-    post?.slug ? `/blog/${post.slug}` : '',
+    post?.slug ? `/${post.slug}` : '',
     !!post?.slug
   );
 
@@ -177,7 +177,7 @@ export default function BlogPost() {
         title={post.meta_title || post.title}
         description={post.meta_description || post.excerpt}
         keywords={post.meta_keywords || []}
-        canonical={`${window.location.origin}/blog/${post.slug}`}
+        canonical={`${window.location.origin}/${post.slug}`}
         ogType="article"
         ogImage={post.featured_image || undefined}
         ogImageAlt={post.title}
@@ -208,7 +208,7 @@ export default function BlogPost() {
           },
           mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': `${window.location.origin}/blog/${post.slug}`,
+            '@id': `${window.location.origin}/${post.slug}`,
           },
           wordCount: post.content?.replace(/<[^>]*>/g, '').split(/\s+/).length,
           keywords: post.tags?.join(', '),
@@ -239,7 +239,7 @@ export default function BlogPost() {
                 '@type': 'ListItem',
                 position: post.category ? 4 : 3,
                 name: post.title,
-                item: `${window.location.origin}/blog/${post.slug}`,
+                item: `${window.location.origin}/${post.slug}`,
               },
             ],
           },
@@ -477,7 +477,7 @@ export default function BlogPost() {
                       className="group cursor-pointer hover:border-primary/50 transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm animate-fade-in hover:shadow-xl hover:shadow-primary/10"
                       style={{ animationDelay: `${index * 100}ms` }}
                       onClick={() => {
-                        navigate(`/blog/${relatedPost.slug}`);
+                        navigate(`/${relatedPost.slug}`);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                     >
