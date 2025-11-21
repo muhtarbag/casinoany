@@ -12,6 +12,7 @@ import FloatingLines from './FloatingLines';
 import LightRays from './LightRays';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Link } from 'react-router-dom';
+import { HowItWorksSection } from './HowItWorksSection';
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -306,6 +307,10 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             </div>
           </div>
         </div>
+
+        {/* How It Works Section */}
+        <HowItWorksSection />
+
         {isFeaturedLoading ? (
           <LoadingSpinner size="lg" text="Öne çıkan siteler yükleniyor..." />
         ) : featuredSites && featuredSites.length > 0 ? (
