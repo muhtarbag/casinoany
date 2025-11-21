@@ -243,121 +243,170 @@ export function UserNotificationManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Kullanıcı Bildirimleri</h2>
-          <p className="text-muted-foreground">
-            Bireysel ve kurumsal kullanıcılara bildirim gönderin
-          </p>
+    <div className="space-y-8">
+      {/* Modern Header Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
+        <div className="relative p-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                Kullanıcı Bildirimleri
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Bireysel ve kurumsal kullanıcılara özel bildirimler oluşturun
+              </p>
+            </div>
+            <Button 
+              onClick={() => handleOpenDialog()}
+              size="lg"
+              className="shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-primary/80"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Yeni Bildirim
+            </Button>
+          </div>
         </div>
-        <Button onClick={() => handleOpenDialog()}>
-          <Plus className="w-4 h-4 mr-2" />
-          Yeni Bildirim
-        </Button>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+      {/* Modern Statistics Cards */}
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card to-muted/20 hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Toplam Bildirim</CardTitle>
+            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.total || 0}</div>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold">{stats?.total || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Tüm bildirimler</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktif</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+        <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card to-muted/20 hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Aktif</CardTitle>
+            <div className="p-2 rounded-lg bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.active || 0}</div>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold">{stats?.active || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Yayında</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bireysel</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card to-muted/20 hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Bireysel</CardTitle>
+            <div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+              <Users className="h-5 w-5 text-blue-500" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.byAudience.individual || 0}</div>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold">{stats?.byAudience.individual || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Bireysel kullanıcılar</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kurumsal</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
+        <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card to-muted/20 hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Kurumsal</CardTitle>
+            <div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
+              <Building2 className="h-5 w-5 text-purple-500" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.byAudience.corporate || 0}</div>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold">{stats?.byAudience.corporate || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Kurumsal hesaplar</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Notifications List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Bildirimler</CardTitle>
-          <CardDescription>Tüm kullanıcı bildirimlerini görüntüleyin ve yönetin</CardDescription>
+      {/* Modern Notifications List */}
+      <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card via-card to-muted/10">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-50" />
+        <CardHeader className="relative border-b border-border/50 bg-card/50 backdrop-blur-sm">
+          <CardTitle className="text-2xl">Bildirimler</CardTitle>
+          <CardDescription className="text-base">
+            Tüm kullanıcı bildirimlerini görüntüleyin ve yönetin
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative p-6">
           <div className="space-y-4">
             {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">Yükleniyor...</div>
+              <div className="text-center py-16">
+                <div className="inline-flex items-center gap-3 text-muted-foreground">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-lg">Yükleniyor...</span>
+                </div>
+              </div>
             ) : notifications.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Henüz bildirim oluşturulmamış
+              <div className="text-center py-16">
+                <div className="inline-flex flex-col items-center gap-4">
+                  <div className="p-4 rounded-2xl bg-muted/50">
+                    <Bell className="w-12 h-12 text-muted-foreground/50" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-medium text-muted-foreground">Henüz bildirim yok</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">İlk bildiriminizi oluşturun</p>
+                  </div>
+                </div>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className="flex items-start justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="group relative flex items-start justify-between p-6 border border-border/50 rounded-xl hover:shadow-lg hover:border-primary/20 bg-card/50 backdrop-blur-sm transition-all duration-300"
                 >
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className={getTypeColor(notification.notification_type)}>
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <div className={`p-2 rounded-lg ${getTypeColor(notification.notification_type)} bg-opacity-10`}>
                         {getTypeIcon(notification.notification_type)}
                       </div>
-                      <h3 className="font-semibold">{notification.title}</h3>
-                      <Badge variant={notification.is_active ? 'default' : 'secondary'}>
+                      <h3 className="font-bold text-lg">{notification.title}</h3>
+                      <Badge 
+                        variant={notification.is_active ? 'default' : 'secondary'}
+                        className="text-xs px-3 py-1"
+                      >
                         {notification.is_active ? 'Aktif' : 'Pasif'}
                       </Badge>
                       {notification.priority === 'urgent' && (
-                        <Badge variant="destructive">Acil</Badge>
+                        <Badge variant="destructive" className="text-xs px-3 py-1 animate-pulse">
+                          Acil
+                        </Badge>
                       )}
                       {notification.priority === 'high' && (
-                        <Badge variant="outline" className="border-orange-500 text-orange-500">
+                        <Badge variant="outline" className="text-xs px-3 py-1 border-orange-500 text-orange-500">
                           Yüksek
                         </Badge>
                       )}
                     </div>
                     
-                    <p className="text-sm text-muted-foreground">{notification.message}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{notification.message}</p>
                     
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border/30">
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50">
                         {getAudienceIcon(notification.target_audience)}
-                        <span>
+                        <span className="font-medium">
                           {notification.target_audience === 'all' && 'Tüm Kullanıcılar'}
                           {notification.target_audience === 'individual' && 'Bireysel'}
                           {notification.target_audience === 'corporate' && 'Kurumsal'}
                         </span>
                       </div>
-                      <span>•</span>
-                      <span>
+                      <span className="text-border">•</span>
+                      <span className="font-medium">
                         {format(new Date(notification.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}
                       </span>
                       {notification.expires_at && (
                         <>
-                          <span>•</span>
-                          <span className={new Date(notification.expires_at) < new Date() ? 'text-red-500' : ''}>
+                          <span className="text-border">•</span>
+                          <span className={`font-medium px-3 py-1 rounded-full ${new Date(notification.expires_at) < new Date() ? 'text-red-500 bg-red-500/10' : 'bg-muted/50'}`}>
                             Son: {format(new Date(notification.expires_at), 'dd MMM yyyy', { locale: tr })}
                           </span>
                         </>
@@ -365,17 +414,19 @@ export function UserNotificationManagement() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Switch
                       checked={notification.is_active}
                       onCheckedChange={(checked) =>
                         toggleMutation.mutate({ id: notification.id, is_active: checked })
                       }
+                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-primary data-[state=checked]:to-primary/80"
                     />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleOpenDialog(notification)}
+                      className="hover:bg-primary/10 hover:text-primary transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -383,8 +434,9 @@ export function UserNotificationManagement() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(notification.id)}
+                      className="hover:bg-destructive/10 hover:text-destructive transition-colors"
                     >
-                      <Trash2 className="w-4 h-4 text-destructive" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
