@@ -71,6 +71,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.170.0",
+    "tsx": "^4.20.6",
     "vaul": "^0.9.9",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-prerender": "^1.0.8",
