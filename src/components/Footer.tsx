@@ -1,5 +1,5 @@
 import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users, ChevronDown } from 'lucide-react';
-import logo from '@/assets/casinodoo-logo.svg';
+import logo from '@/assets/casinoany-logo.png';
 import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
 import { Button } from './ui/button';
