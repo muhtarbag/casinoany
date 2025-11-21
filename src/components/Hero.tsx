@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,10 +8,12 @@ import { SmartSearch } from './SmartSearch';
 import { LoadingSpinner } from './LoadingSpinner';
 import { Button } from './ui/button';
 import BlurText from './BlurText';
-import FloatingLines from './FloatingLines';
-import LightRays from './LightRays';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Link } from 'react-router-dom';
+
+// Lazy load WebGL animations to prevent blocking initial render
+const FloatingLines = lazy(() => import('./FloatingLines'));
+const LightRays = lazy(() => import('./LightRays'));
 
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
@@ -21,11 +23,20 @@ interface HeroProps {
 export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState(searchTerm);
+  const [showAnimations, setShowAnimations] = useState(false);
   
   // Sync local search with prop changes
   useEffect(() => {
     setLocalSearch(searchTerm);
   }, [searchTerm]);
+
+  // Delay loading animations until after initial render
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowAnimations(true);
+    }, 100); // Small delay to ensure content renders first
+    return () => clearTimeout(timer);
+  }, []);
   const [animationType, setAnimationType] = useState<string>('slide');
   const [autoScrollDuration, setAutoScrollDuration] = useState<number>(2500);
   const [isDragging, setIsDragging] = useState(false);
@@ -213,36 +224,41 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
 
   return (
     <div className="relative min-h-screen bg-background touch-manipulation">
-      {/* Lightweight FloatingLines - Optimized for all devices - Extended to full Hero height */}
-      <div className="absolute inset-0 w-full min-h-full opacity-40 pointer-events-none z-0">
-        <FloatingLines 
-          enabledWaves={['middle']}
-          lineCount={10}
-          lineDistance={6}
-          bendRadius={3.0}
-          bendStrength={-0.3}
-          interactive={false}
-          parallax={false}
-          animationSpeed={0.5}
-        />
-      </div>
+      {/* Lazy-loaded WebGL animations - only after initial content renders */}
+      {showAnimations && (
+        <Suspense fallback={null}>
+          {/* Lightweight FloatingLines - Optimized for all devices - Extended to full Hero height */}
+          <div className="absolute inset-0 w-full min-h-full opacity-40 pointer-events-none z-0">
+            <FloatingLines 
+              enabledWaves={['middle']}
+              lineCount={10}
+              lineDistance={6}
+              bendRadius={3.0}
+              bendStrength={-0.3}
+              interactive={false}
+              parallax={false}
+              animationSpeed={0.5}
+            />
+          </div>
 
-      {/* LightRays - Ultra minimal configuration - Extended to full Hero height */}
-      <div className="absolute inset-0 w-full min-h-full opacity-30 pointer-events-none z-[1]">
-        <LightRays
-          raysOrigin="top-center"
-          raysColor="#ffffff"
-          raysSpeed={0.3}
-          lightSpread={0.8}
-          rayLength={1.5}
-          fadeDistance={0.8}
-          followMouse={false}
-          mouseInfluence={0}
-          noiseAmount={0}
-          distortion={0}
-          pulsating={false}
-        />
-      </div>
+          {/* LightRays - Ultra minimal configuration - Extended to full Hero height */}
+          <div className="absolute inset-0 w-full min-h-full opacity-30 pointer-events-none z-[1]">
+            <LightRays
+              raysOrigin="top-center"
+              raysColor="#ffffff"
+              raysSpeed={0.3}
+              lightSpread={0.8}
+              rayLength={1.5}
+              fadeDistance={0.8}
+              followMouse={false}
+              mouseInfluence={0}
+              noiseAmount={0}
+              distortion={0}
+              pulsating={false}
+            />
+          </div>
+        </Suspense>
+      )}
 
       <div className="container relative z-10 mx-auto px-4 md:px-6 lg:px-8 max-w-[1280px] pt-4 pb-8 md:py-12 lg:py-16">
         <div className="text-center space-y-6 md:space-y-8 mb-12 md:mb-16">
