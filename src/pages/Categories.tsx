@@ -31,7 +31,7 @@ export default function Categories() {
         />
 
         {/* Hero Section */}
-        <div className="text-center mb-16 space-y-6 animate-fade-in px-4 sm:px-0">
+        <div className="text-center mb-16 space-y-6 px-4 sm:px-0">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             <LucideIcons.Sparkles className="w-4 h-4" />
             <span>Kategoriler</span>
@@ -53,17 +53,9 @@ export default function Categories() {
             <LoadingSpinner />
           </div>
         ) : categories && categories.length > 0 ? (
-          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-            {categories.map((category, index) => (
-              <div 
-                key={category.id}
-                style={{
-                  animationDelay: `${index * 100}ms`
-                }}
-                className="animate-scale-in"
-              >
-                <CategoryCard category={category} />
-              </div>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {categories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
             ))}
           </div>
         ) : (
@@ -73,7 +65,7 @@ export default function Categories() {
         )}
 
         {/* Bottom CTA - İyileştirilmiş - MOBİL RESPONSIVE */}
-        <div className="mt-16 sm:mt-20 text-center space-y-6 p-6 sm:p-8 md:p-12 rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 animate-fade-in">
+        <div className="mt-16 sm:mt-20 text-center space-y-6 p-6 sm:p-8 md:p-12 rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary text-sm font-medium mb-2">
             <LucideIcons.TrendingUp className="w-4 h-4" />
             <span>Tüm Siteler</span>
