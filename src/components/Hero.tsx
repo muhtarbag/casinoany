@@ -74,23 +74,48 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
 
-    const handleAutoScroll = () => {
-      if (!emblaApi) return;
-      emblaApi.scrollNext();
-    };
+    // Wait a bit to ensure carousel is fully initialized
+    const initDelay = setTimeout(() => {
+      const handleAutoScroll = () => {
+        if (!emblaApi) return;
+        
+        // Check if carousel can scroll
+        if (emblaApi.canScrollNext()) {
+          emblaApi.scrollNext();
+        } else {
+          // Loop back to start
+          emblaApi.scrollTo(0);
+        }
+      };
 
-    // Start auto-scroll for mobile with smoother transition
-    const autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
+      // Start auto-scroll for mobile with the configured duration
+      const autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
 
-    // Clear interval on user interaction
-    const clearAutoScroll = () => clearInterval(autoScrollInterval);
-    emblaApi.on('pointerDown', clearAutoScroll);
+      // Clear interval on user interaction
+      const clearAutoScroll = () => {
+        clearInterval(autoScrollInterval);
+      };
+      
+      emblaApi.on('pointerDown', clearAutoScroll);
+      emblaApi.on('settle', () => {
+        // Resume auto-scroll after manual interaction settles
+        if (!isDragging) {
+          clearInterval(autoScrollInterval);
+          const newInterval = setInterval(handleAutoScroll, autoScrollDuration);
+          return () => clearInterval(newInterval);
+        }
+      });
+
+      return () => {
+        clearInterval(autoScrollInterval);
+        emblaApi.off('pointerDown', clearAutoScroll);
+      };
+    }, 300); // Small delay to ensure everything is ready
 
     return () => {
-      clearInterval(autoScrollInterval);
-      emblaApi.off('pointerDown', clearAutoScroll);
+      clearTimeout(initDelay);
     };
-  }, [emblaApi, autoScrollDuration]);
+  }, [emblaApi, autoScrollDuration, isDragging]);
 
   // Fetch carousel settings (birleştirilmiş tek query)
   const { data: carouselSettings } = useQuery({
