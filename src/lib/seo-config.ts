@@ -16,7 +16,11 @@ export const seoConfig = {
     'hızlı para çeken casino',
     'çevrimsiz bonus',
     'casino incelemeleri',
-    'türkiye casino siteleri'
+    'türkiye casino siteleri',
+    'casino siteleri inceleme',
+    'casino şikayet',
+    'casino yorum',
+    'topluluk değerlendirmeleri'
   ],
   twitterHandle: '@casinoany',
   fbAppId: '',

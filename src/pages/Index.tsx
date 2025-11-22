@@ -95,7 +95,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
       <SEO
         title="En Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny"
-        description="2025'in en güvenilir casino sitelerini inceleyin. %500 hoş geldin bonusu, hızlı para çekme garantisi, lisanslı bahis siteleri. 50+ detaylı casino incelemesi."
+        description="2025'in en güvenilir casino sitelerini inceleyin. Topluluk değerlendirmeleri, şikayet ve yorumlar, %500 hoş geldin bonusu. 50+ detaylı casino incelemesi."
         keywords={[
           'casino siteleri',
           'güvenilir casino',
@@ -108,7 +108,11 @@ const Index = () => {
           'hızlı para çeken casino',
           'çevrimsiz bonus',
           'casino incelemeleri',
-          'türkiye casino siteleri'
+          'türkiye casino siteleri',
+          'casino siteleri inceleme',
+          'casino şikayet',
+          'casino yorum',
+          'topluluk değerlendirmeleri'
         ]}
         structuredData={allStructuredData}
       />
