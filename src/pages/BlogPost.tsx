@@ -316,40 +316,6 @@ export default function BlogPost() {
       
       <Header />
 
-      {/* Mobile Stats Bar */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 md:hidden animate-fade-in">
-        <div className="flex items-center gap-3 bg-gradient-to-r from-card/98 to-card/95 backdrop-blur-xl border-2 border-border/50 rounded-full px-5 py-3 shadow-2xl shadow-primary/10">
-          {post.published_at && (
-            <>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <time dateTime={post.published_at} className="text-xs font-medium text-muted-foreground">
-                  {format(new Date(post.published_at), 'd MMM yyyy', { locale: tr })}
-                </time>
-              </div>
-              <div className="w-px h-5 bg-gradient-to-b from-transparent via-border to-transparent" />
-            </>
-          )}
-          {post.read_time && (
-            <>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">
-                  {post.read_time} dk
-                </span>
-              </div>
-              <div className="w-px h-5 bg-gradient-to-b from-transparent via-border to-transparent" />
-            </>
-          )}
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              {post.view_count.toLocaleString('tr-TR')}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Premium Scroll to Top Button */}
       <Button
         size="icon"
