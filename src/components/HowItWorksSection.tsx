@@ -16,18 +16,18 @@ export const HowItWorksSection = () => {
     {
       icon: Search,
       title: "Karşılaştır",
-      description: "Yüzlerce bahis sitesini karşılaştır",
+      description: "100+ güvenilir bahis sitesini karşılaştır ve en iyisini bul",
       gradient: "from-primary/20 to-accent/20",
       iconGradient: "from-primary to-accent",
       action: scrollToSites,
-      actionText: "İncele",
+      actionText: "Siteleri Karşılaştır",
       actionVariant: "default" as const,
       buttonClass: "bg-primary hover:bg-primary/90"
     },
     {
       icon: MessageSquare,
-      title: "Paylaş",
-      description: "Deneyimlerini topluluğa anlat",
+      title: "Yorum Yaz & Şikayet Yaz",
+      description: "Deneyimlerini paylaş, topluluğa yorum ve şikayet yaz",
       gradient: "from-accent/20 to-primary/20",
       iconGradient: "from-accent to-primary",
       badge: "Topluluk ⭐",
@@ -39,7 +39,7 @@ export const HowItWorksSection = () => {
     {
       icon: Gift,
       title: "Kazan",
-      description: "VIP bonuslar ve ödüller kazan",
+      description: "Her yorumda ve şikayette puan kazan, VIP bonuslara eriş",
       gradient: "from-success/20 to-primary/20",
       iconGradient: "from-success to-primary",
       badge: "Ücretsiz 🎉",
@@ -112,7 +112,7 @@ export const HowItWorksSection = () => {
               const Icon = step.icon;
               return (
                 <div key={index} className="w-full flex-shrink-0 px-2">
-                  <div className={`relative bg-gradient-to-br ${step.gradient} backdrop-blur-sm rounded-2xl p-6 border ${step.featured ? 'border-accent' : 'border-border/40'} min-h-[280px] flex flex-col`}>
+                  <div className={`relative bg-gradient-to-br ${step.gradient} backdrop-blur-sm rounded-2xl p-6 border ${step.featured ? 'border-accent' : 'border-border/40'} min-h-[240px] flex flex-col`}>
                     {step.badge && (
                       <div className="absolute top-4 right-4">
                         <span className="bg-gradient-to-r from-accent to-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg">
