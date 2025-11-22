@@ -1,18 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-const SUPABASE_URL = 'https://cpaukwimbfoembwwtqhj.supabase.co';
+import { Helmet } from 'react-helmet-async';
 
 export default function SitemapXML() {
   const { type } = useParams();
+  const [xml, setXml] = useState<string>('');
   
   useEffect(() => {
-    // Determine which sitemap to serve
-    const sitemapPath = type ? `sitemap-${type}` : 'sitemap';
+    const fetchSitemap = async () => {
+      try {
+        const sitemapPath = type ? `sitemap-${type}` : 'sitemap';
+        const response = await fetch(`https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/${sitemapPath}`);
+        const xmlText = await response.text();
+        setXml(xmlText);
+      } catch (error) {
+        console.error('Sitemap fetch error:', error);
+        // Fallback XML
+        setXml(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.casinoany.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`);
+      }
+    };
     
-    // Redirect to edge function
-    window.location.replace(`${SUPABASE_URL}/functions/v1/${sitemapPath}`);
+    fetchSitemap();
   }, [type]);
 
-  return null;
+  // Return raw XML with proper content type header
+  return (
+    <>
+      <Helmet>
+        <meta httpEquiv="Content-Type" content="application/xml; charset=utf-8" />
+      </Helmet>
+      <pre style={{ 
+        margin: 0, 
+        fontFamily: 'monospace',
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word'
+      }}>
+        {xml}
+      </pre>
+    </>
+  );
 }
