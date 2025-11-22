@@ -5,10 +5,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Only create supabase client if credentials are available
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 export async function generateRoutes(): Promise<string[]> {
   const routes: string[] = [
@@ -21,6 +24,12 @@ export async function generateRoutes(): Promise<string[]> {
     '/gizlilik-politikasi',
     '/kullanim-kosullari',
   ];
+
+  // Only fetch dynamic routes if Supabase is available
+  if (!supabase) {
+    console.log('ℹ️  Supabase credentials not found, using static routes only');
+    return routes;
+  }
 
   try {
     // Fetch active categories
