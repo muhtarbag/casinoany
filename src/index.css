@@ -176,8 +176,16 @@ All colors MUST be HSL.
     -webkit-tap-highlight-color: transparent;
   }
 
+  html,
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
   body {
     @apply bg-background text-foreground;
+    /* Prevent horizontal scroll */
+    overflow-x: hidden;
     /* Prevent text size adjustment on orientation change */
     -webkit-text-size-adjust: 100%;
     /* Smooth scrolling */
