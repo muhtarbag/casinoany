@@ -9,6 +9,7 @@ export default function SitemapXML() {
   useEffect(() => {
     const fetchSitemap = async () => {
       try {
+        // Correct endpoint based on type parameter
         const sitemapPath = type ? `sitemap-${type}` : 'sitemap';
         const response = await fetch(`https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/${sitemapPath}`);
         const xmlText = await response.text();
