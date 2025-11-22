@@ -66,6 +66,7 @@ import UserStatsManagement from "./pages/admin/gamification/UserStats";
 import AdminSystemLogs from "./pages/admin/system/SystemLogs";
 import AdminSiteOwners from "./pages/admin/SiteOwners";
 import AdminFooterManagement from "./pages/admin/system/FooterManagement";
+import AdvertisingManagement from "./pages/admin/advertising";
 
 // Public pages - all imported directly
 import Blog from "./pages/Blog";
@@ -197,6 +198,7 @@ const AppContent = () => {
             <Route path="finance/affiliate" element={<AdminAffiliateManagement />} />
             <Route path="finance/bonus" element={<AdminBonusManagement />} />
             <Route path="finance/bonus-requests" element={<AdminBonusRequests />} />
+            <Route path="advertising" element={<AdvertisingManagement />} />
             <Route path="system/history" element={<AdminChangeHistory />} />
             <Route path="system/build-health" element={<AdminBuildHealth />} />
             <Route path="system/logs" element={<AdminSystemLogs />} />
