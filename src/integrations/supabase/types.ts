@@ -1681,6 +1681,57 @@ export type Database = {
           },
         ]
       }
+      domain_tracking: {
+        Row: {
+          context_text: string | null
+          created_at: string | null
+          domain: string
+          flagged_at: string | null
+          flagged_by: string | null
+          flagged_reason: string | null
+          full_url: string
+          id: string
+          is_flagged: boolean | null
+          source_column: string
+          source_record_id: string
+          source_table: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context_text?: string | null
+          created_at?: string | null
+          domain: string
+          flagged_at?: string | null
+          flagged_by?: string | null
+          flagged_reason?: string | null
+          full_url: string
+          id?: string
+          is_flagged?: boolean | null
+          source_column: string
+          source_record_id: string
+          source_table: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context_text?: string | null
+          created_at?: string | null
+          domain?: string
+          flagged_at?: string | null
+          flagged_by?: string | null
+          flagged_reason?: string | null
+          full_url?: string
+          id?: string
+          is_flagged?: boolean | null
+          source_column?: string
+          source_record_id?: string
+          source_table?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       footer_links: {
         Row: {
           created_at: string | null
@@ -4634,6 +4685,13 @@ export type Database = {
         Returns: string
       }
       daily_analytics_maintenance: { Args: never; Returns: undefined }
+      extract_domains_from_text: {
+        Args: { p_text: string }
+        Returns: {
+          domain: string
+          full_url: string
+        }[]
+      }
       generate_complaint_slug: {
         Args: { site_slug: string; title_text: string }
         Returns: string
@@ -4807,6 +4865,16 @@ export type Database = {
           p_site_id?: string
         }
         Returns: string
+      }
+      track_domains_in_record: {
+        Args: {
+          p_column_name: string
+          p_content: string
+          p_record_id: string
+          p_table_name: string
+          p_user_id: string
+        }
+        Returns: undefined
       }
       track_internal_link_click: {
         Args: { p_link_id: string }
