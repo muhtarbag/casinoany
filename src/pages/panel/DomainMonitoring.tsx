@@ -157,14 +157,43 @@ export default function DomainMonitoring() {
   const flaggedDomains = allDomains.filter((d) => d.is_flagged);
   const unflaggedDomains = allDomains.filter((d) => !d.is_flagged);
 
-  // Group by domain
+  // Smart categorization
+  const categorizeDomain = (domain: string) => {
+    const suspiciousKeywords = ['link', 'bet', 'casino', 'porn', 'xxx', 'hack', 'seo'];
+    const domainLower = domain.toLowerCase();
+    
+    if (suspiciousKeywords.some(keyword => domainLower.includes(keyword))) {
+      return 'high-risk';
+    }
+    
+    const knownDomains = ['google.com', 'youtube.com', 'facebook.com', 'twitter.com', 'instagram.com'];
+    if (knownDomains.some(known => domainLower.includes(known))) {
+      return 'safe';
+    }
+    
+    return 'medium-risk';
+  };
+
+  // Group by domain with risk analysis
   const domainGroups = allDomains.reduce((acc: any, curr: any) => {
     if (!acc[curr.domain]) {
-      acc[curr.domain] = [];
+      acc[curr.domain] = {
+        entries: [],
+        riskLevel: categorizeDomain(curr.domain),
+        isFlagged: false,
+      };
     }
-    acc[curr.domain].push(curr);
+    acc[curr.domain].entries.push(curr);
+    if (curr.is_flagged) {
+      acc[curr.domain].isFlagged = true;
+    }
     return acc;
   }, {});
+
+  // Categorize by risk
+  const highRiskDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'high-risk');
+  const mediumRiskDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'medium-risk');
+  const safeDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'safe');
 
   const scanExistingContent = async () => {
     setIsScanning(true);
@@ -193,21 +222,37 @@ export default function DomainMonitoring() {
     }
   };
 
-  const DomainCard = ({ item }: { item: any }) => (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" />
-              {item.domain}
-              {item.is_flagged && (
-                <Badge variant="destructive" className="ml-2">
-                  <Flag className="w-3 h-3 mr-1" />
-                  İşaretli
-                </Badge>
-              )}
-            </CardTitle>
+  const DomainCard = ({ item }: { item: any }) => {
+    const riskLevel = categorizeDomain(item.domain);
+    const riskColor = 
+      riskLevel === 'high-risk' ? 'border-destructive/50 bg-destructive/5' :
+      riskLevel === 'medium-risk' ? 'border-yellow-500/50 bg-yellow-50/50' :
+      'border-green-500/50 bg-green-50/50';
+    
+    return (
+      <Card className={`hover:shadow-md transition-shadow ${riskColor}`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ExternalLink className="w-4 h-4" />
+                {item.domain}
+                {riskLevel === 'high-risk' && (
+                  <Badge variant="destructive">🔴 Yüksek Risk</Badge>
+                )}
+                {riskLevel === 'medium-risk' && (
+                  <Badge className="bg-yellow-500 hover:bg-yellow-600">🟡 Orta Risk</Badge>
+                )}
+                {riskLevel === 'safe' && (
+                  <Badge className="bg-green-500 hover:bg-green-600">🟢 Güvenli</Badge>
+                )}
+                {item.is_flagged && (
+                  <Badge variant="destructive" className="ml-2">
+                    <Flag className="w-3 h-3 mr-1" />
+                    İşaretli
+                  </Badge>
+                )}
+              </CardTitle>
             <CardDescription className="mt-1">
               {item.source_table} - {item.source_column}
             </CardDescription>
@@ -304,7 +349,8 @@ export default function DomainMonitoring() {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -354,7 +400,7 @@ export default function DomainMonitoring() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Toplam Domain</CardTitle>
@@ -371,31 +417,101 @@ export default function DomainMonitoring() {
             <div className="text-2xl font-bold">{allDomains.length}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-destructive/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-destructive">İşaretli</CardTitle>
+            <CardTitle className="text-sm font-medium text-destructive">Yüksek Risk</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{flaggedDomains.length}</div>
+            <div className="text-2xl font-bold text-destructive">{highRiskDomains.length}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-yellow-500/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-yellow-600">Orta Risk</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{mediumRiskDomains.length}</div>
+          </CardContent>
+        </Card>
+        <Card className="border-green-500/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-green-600">Güvenli</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{safeDomains.length}</div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList>
-          <TabsTrigger value="all">
-            Tümü ({allDomains.length})
+      <Tabs defaultValue="high-risk" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="high-risk" className="text-destructive">
+            🔴 Yüksek Risk ({highRiskDomains.length})
+          </TabsTrigger>
+          <TabsTrigger value="medium-risk" className="text-yellow-600">
+            🟡 Orta Risk ({mediumRiskDomains.length})
+          </TabsTrigger>
+          <TabsTrigger value="safe" className="text-green-600">
+            🟢 Güvenli ({safeDomains.length})
           </TabsTrigger>
           <TabsTrigger value="flagged">
-            İşaretliler ({flaggedDomains.length})
+            🚩 İşaretli ({flaggedDomains.length})
           </TabsTrigger>
-          <TabsTrigger value="unflagged">
-            Temiz ({unflaggedDomains.length})
+          <TabsTrigger value="all">
+            📋 Tümü ({allDomains.length})
           </TabsTrigger>
           <TabsTrigger value="grouped">
-            Domain Gruplu
+            📊 Domain Gruplu
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="high-risk" className="space-y-4">
+          {highRiskDomains.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Yüksek riskli domain yok
+              </CardContent>
+            </Card>
+          ) : (
+            highRiskDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
+          )}
+        </TabsContent>
+
+        <TabsContent value="medium-risk" className="space-y-4">
+          {mediumRiskDomains.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Orta riskli domain yok
+              </CardContent>
+            </Card>
+          ) : (
+            mediumRiskDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
+          )}
+        </TabsContent>
+
+        <TabsContent value="safe" className="space-y-4">
+          {safeDomains.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Güvenli domain yok
+              </CardContent>
+            </Card>
+          ) : (
+            safeDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
+          )}
+        </TabsContent>
+
+        <TabsContent value="flagged" className="space-y-4">
+          {flaggedDomains.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                İşaretli domain yok
+              </CardContent>
+            </Card>
+          ) : (
+            flaggedDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
+          )}
+        </TabsContent>
 
         <TabsContent value="all" className="space-y-4">
           {isLoading ? (
@@ -423,49 +539,68 @@ export default function DomainMonitoring() {
           )}
         </TabsContent>
 
-        <TabsContent value="unflagged" className="space-y-4">
-          {unflaggedDomains.map((item: any) => (
-            <DomainCard key={item.id} item={item} />
-          ))}
-        </TabsContent>
 
         <TabsContent value="grouped" className="space-y-4">
-          {Object.entries(domainGroups).map(([domain, items]: [string, any]) => (
-            <Card key={domain}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {domain}
-                  <Badge variant="secondary">{items.length} kayıt</Badge>
-                  {items.some((i: any) => i.is_flagged) && (
-                    <Badge variant="destructive">
-                      <AlertTriangle className="w-3 h-3 mr-1" />
-                      Dikkat
-                    </Badge>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {items.map((item: any) => (
-                  <div
-                    key={item.id}
-                    className="text-sm p-2 bg-muted rounded flex items-center justify-between"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">{item.source_table}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {format(new Date(item.created_at), 'dd MMM yyyy', { locale: tr })}
+          {Object.entries(domainGroups)
+            .sort(([, a]: [string, any], [, b]: [string, any]) => {
+              // Sort by risk level first
+              const riskOrder = { 'high-risk': 0, 'medium-risk': 1, 'safe': 2 };
+              return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
+            })
+            .map(([domain, data]: [string, any]) => {
+              const { entries, riskLevel, isFlagged } = data;
+              return (
+                <Card key={domain} className={
+                  riskLevel === 'high-risk' ? 'border-destructive/50' :
+                  riskLevel === 'medium-risk' ? 'border-yellow-500/50' :
+                  'border-green-500/50'
+                }>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {riskLevel === 'high-risk' && '🔴'}
+                      {riskLevel === 'medium-risk' && '🟡'}
+                      {riskLevel === 'safe' && '🟢'}
+                      {domain}
+                      <Badge variant="secondary">{entries.length} kayıt</Badge>
+                      {isFlagged && (
+                        <Badge variant="destructive">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          İşaretli
+                        </Badge>
+                      )}
+                      {riskLevel === 'high-risk' && (
+                        <Badge variant="destructive">Yüksek Risk</Badge>
+                      )}
+                      {riskLevel === 'medium-risk' && (
+                        <Badge className="bg-yellow-500 hover:bg-yellow-600">Orta Risk</Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {entries.map((item: any) => (
+                      <div
+                        key={item.id}
+                        className="text-sm p-2 bg-muted rounded flex items-center justify-between"
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium">{item.source_table} - {item.source_column}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Kullanıcı: {item.profiles?.username || item.profiles?.email || 'Anonim'} • {format(new Date(item.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {item.is_flagged && (
+                            <Badge variant="destructive" className="ml-2">
+                              İşaretli
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    {item.is_flagged && (
-                      <Badge variant="destructive" className="ml-2">
-                        İşaretli
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
+                    ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
         </TabsContent>
       </Tabs>
     </div>
