@@ -370,7 +370,7 @@ function CampaignForm({ onSuccess }: { onSuccess: () => void }) {
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-50 bg-popover">
             <SelectItem value="banner">Banner Reklamı</SelectItem>
             <SelectItem value="sponsored_content">Sponsorlu İçerik</SelectItem>
             <SelectItem value="featured_placement">Öne Çıkarılmış Yerleşim</SelectItem>
