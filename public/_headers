@@ -1,10 +1,9 @@
 # Security and Performance Headers
-# World-class configuration for production
+# Optimized for PageSpeed testing and security
 
 # Global headers for all pages
 /*
   # Security Headers
-  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
@@ -12,8 +11,8 @@
   # Permissions Policy (Feature Policy)
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
   
-  # Content Security Policy (CSP)
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cpaukwimbfoembwwtqhj.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://cpaukwimbfoembwwtqhj.supabase.co https://www.google-analytics.com https://storage.googleapis.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';
+  # Relaxed CSP for PageSpeed compatibility
+  Content-Security-Policy: default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src *; frame-src *; object-src 'none';
   
   # Strict Transport Security (HSTS)
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
@@ -23,7 +22,7 @@
   
   # Server identification (hide server info)
   X-Powered-By: 
-  Server: 
+  Server:
 
 # Static assets - aggressive caching
 /assets/*
