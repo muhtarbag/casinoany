@@ -10,6 +10,7 @@ import { Button } from './ui/button';
 import BlurText from './BlurText';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Link } from 'react-router-dom';
+import { AdBanner } from './advertising/AdBanner';
 
 // Lazy load WebGL animations to prevent blocking initial render
 const FloatingLines = lazy(() => import('./FloatingLines'));
@@ -323,6 +324,11 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
               <div className="text-left"><div className="text-lg md:text-2xl font-bold">21.000+</div><div className="text-xs md:text-sm text-muted-foreground">Kullanıcı</div></div>
             </div>
           </div>
+        </div>
+
+        {/* Hero Banner Ad */}
+        <div className="mb-12 md:mb-16">
+          <AdBanner location="hero" />
         </div>
 
         {isFeaturedLoading ? (

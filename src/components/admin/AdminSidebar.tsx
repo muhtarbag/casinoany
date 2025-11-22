@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   BarChart3,
   Trophy,
-  Link2
+  Link2,
+  Megaphone
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -78,6 +79,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
         { id: 'affiliate', icon: DollarSign, label: 'Affiliate', route: '/admin/finance/affiliate', roles: ['finance'], shortcut: 'g a' },
         { id: 'bonus', icon: Gift, label: 'Bonuslar', route: '/admin/finance/bonus', roles: ['content_editor', 'finance'] },
         { id: 'requests', icon: Mail, label: 'Bonus Talepleri', route: '/admin/finance/bonus-requests', roles: ['finance'] },
+        { id: 'advertising', icon: Megaphone, label: 'Reklam Yönetimi', route: '/admin/advertising', roles: [] },
       ],
     },
     {
