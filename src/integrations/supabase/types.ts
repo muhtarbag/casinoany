@@ -4853,6 +4853,13 @@ export type Database = {
       }
       refresh_all_materialized_views: { Args: never; Returns: undefined }
       refresh_daily_site_metrics: { Args: never; Returns: undefined }
+      scan_existing_content_for_domains: {
+        Args: never
+        Returns: {
+          found_domains: number
+          scanned_records: number
+        }[]
+      }
       send_reengagement_notifications: { Args: never; Returns: undefined }
       sync_daily_affiliate_metrics: { Args: never; Returns: undefined }
       track_conversion: {
