@@ -88,5 +88,6 @@ Sitemap: https://casinoany.com/sitemap-casinos.xml
 Sitemap: https://casinoany.com/sitemap-blogs.xml
 Sitemap: https://casinoany.com/sitemap-news.xml
 Sitemap: https://casinoany.com/sitemap-bonuses.xml
+Sitemap: https://casinoany.com/sitemap-static.xml
 Sitemap: https://casinoany.com/sitemap-images.xml
 Sitemap: https://casinoany.com/sitemap-complaints.xml

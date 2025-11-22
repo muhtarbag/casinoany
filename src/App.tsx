@@ -88,6 +88,7 @@ import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import KVKK from "./pages/KVKK";
 import Sitemap from "./pages/Sitemap";
+import SitemapXML from "./pages/SitemapXML";
 import SiteRedirect from "./pages/SiteRedirect";
 import AMPBlogPost from "./pages/amp/AMPBlogPost";
 import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
@@ -241,7 +242,13 @@ const AppContent = () => {
           <Route path="/sikayetler/yeni" element={<NewComplaint />} />
           <Route path="/sikayetler/*" element={<ComplaintDetail />} />
           
-          <Route path="/sitemap.xml" element={<Sitemap />} />
+          {/* XML Sitemap Routes - Serve pure XML */}
+          <Route path="/sitemap.xml" element={<SitemapXML />} />
+          <Route path="/sitemap-:type.xml" element={<SitemapXML />} />
+          
+          {/* HTML Sitemap Page */}
+          <Route path="/sitemap" element={<Sitemap />} />
+          
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/about" element={<About />} />
           <Route path="/hakkimizda" element={<About />} />
