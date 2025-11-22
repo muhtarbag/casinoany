@@ -35,7 +35,7 @@ export function AdBanner({ location, className = '' }: AdBannerProps) {
         });
 
       if (error) throw error;
-      return data?.[0] as BannerData | null;
+      return data?.[0] ?? null;
     },
     staleTime: 5 * 60 * 1000, // Cache 5 minutes
     gcTime: 10 * 60 * 1000,
