@@ -300,9 +300,9 @@ export default function BlogPost() {
 
         <div className="container mx-auto px-4 py-8 pb-24 md:pb-12 pt-6 md:pt-8 relative">
           {/* Two-column layout: Main content + Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
             {/* Main Content */}
-            <article className="max-w-3xl mx-auto lg:mx-0 w-full">
+            <article className="w-full max-w-3xl mx-auto">
             {/* Breadcrumb Navigation */}
             <div className="mb-4 animate-fade-in">
               <Breadcrumb 
