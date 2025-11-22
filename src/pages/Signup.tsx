@@ -452,7 +452,7 @@ const Signup = () => {
                       <Input 
                         id="phone" 
                         type="tel" 
-                        placeholder="5325323232" 
+                        placeholder="" 
                         value={phone.replace('+90', '')} 
                         onChange={(e) => {
                           const value = e.target.value.replace(/\D/g, '').slice(0, 10);
