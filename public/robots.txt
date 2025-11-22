@@ -1,24 +1,14 @@
 # robots.txt for casinoany.com
-# World-class SEO configuration
-
 User-agent: *
 Allow: /
 
-# Ana Sitemap Index
-Sitemap: https://www.casinoany.com/sitemap.xml
+# Sitemap
+Sitemap: https://casinoany.com/sitemap.xml
 
-# Alt Sitemaps (isteğe bağlı)
-Sitemap: https://www.casinoany.com/sitemap-pages.xml
-Sitemap: https://www.casinoany.com/sitemap-casinos.xml
-Sitemap: https://www.casinoany.com/sitemap-blogs.xml
-Sitemap: https://www.casinoany.com/sitemap-bonuses.xml
-Sitemap: https://www.casinoany.com/sitemap-images.xml
-
-# Disallow admin and private areas
+# Disallow admin areas
 Disallow: /admin/
 Disallow: /panel/
 Disallow: /auth/
-Disallow: /api/
 
 # Crawl optimization
 Crawl-delay: 0
