@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Loader2, GripVertical } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, GripVertical, Check, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -156,6 +156,32 @@ export const BonusManagement = () => {
       toast({
         title: 'Başarılı',
         description: 'Sıralama güncellendi.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Quick approve/reject mutations
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const { error } = await supabase
+        .from('bonus_offers')
+        .update({ is_active: isActive })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers'] });
+      toast({
+        title: 'Başarılı',
+        description: variables.isActive ? 'Bonus onaylandı.' : 'Bonus reddedildi.',
       });
     },
     onError: (error: any) => {
@@ -424,6 +450,8 @@ export const BonusManagement = () => {
                         deleteMutation.mutate(id);
                       }
                     }}
+                    onApprove={(id) => updateStatusMutation.mutate({ id, isActive: true })}
+                    onReject={(id) => updateStatusMutation.mutate({ id, isActive: false })}
                   />
                 ))}
                 {bonusOffers?.length === 0 && (
@@ -444,9 +472,11 @@ interface SortableBonusItemProps {
   bonus: any;
   onEdit: (bonus: any) => void;
   onDelete: (id: string) => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
 }
 
-const SortableBonusItem = ({ bonus, onEdit, onDelete }: SortableBonusItemProps) => {
+const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: SortableBonusItemProps) => {
   const {
     attributes,
     listeners,
@@ -508,6 +538,28 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete }: SortableBonusItemProps) 
           </div>
         </div>
         <div className="flex gap-2">
+          {!bonus.is_active && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => onApprove(bonus.id)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Check className="w-4 h-4 mr-1" />
+              Onay
+            </Button>
+          )}
+          {bonus.is_active && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => onReject(bonus.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <X className="w-4 h-4 mr-1" />
+              Red
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
