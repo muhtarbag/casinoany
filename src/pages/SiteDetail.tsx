@@ -715,31 +715,31 @@ export default function SiteDetail() {
                               
                               {/* Info Grid */}
                               {(bonus.wagering_requirement || bonus.eligibility || bonus.validity_period) && (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                   {bonus.wagering_requirement && (
-                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
-                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                    <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 p-3 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mt-6"></div>
                                       <div className="relative">
-                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Çevrim Şartı</p>
-                                        <p className="text-base font-bold text-foreground">{bonus.wagering_requirement}</p>
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Çevrim Şartı</p>
+                                        <p className="text-sm font-bold text-foreground">{bonus.wagering_requirement}</p>
                                       </div>
                                     </div>
                                   )}
                                   {bonus.eligibility && (
-                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
-                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                    <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 p-3 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mt-6"></div>
                                       <div className="relative">
-                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Kimler İçin</p>
-                                        <p className="text-base font-bold text-foreground">{bonus.eligibility}</p>
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Kimler İçin</p>
+                                        <p className="text-sm font-bold text-foreground">{bonus.eligibility}</p>
                                       </div>
                                     </div>
                                   )}
                                   {bonus.validity_period && (
-                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
-                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                    <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 p-3 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-full -mr-6 -mt-6"></div>
                                       <div className="relative">
-                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Geçerlilik</p>
-                                        <p className="text-base font-bold text-foreground">{bonus.validity_period}</p>
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Geçerlilik</p>
+                                        <p className="text-sm font-bold text-foreground">{bonus.validity_period}</p>
                                       </div>
                                     </div>
                                   )}
