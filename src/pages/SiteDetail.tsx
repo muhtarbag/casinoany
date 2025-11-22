@@ -673,19 +673,31 @@ export default function SiteDetail() {
                           <div className="flex flex-col">
                             {/* Image Section */}
                             {bonus.image_url && (
-                              <div className="relative w-full h-64 lg:h-80 overflow-hidden flex-shrink-0">
-                                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent z-10"></div>
+                              <div className="relative w-full h-48 sm:h-64 lg:h-72 overflow-hidden flex-shrink-0">
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent z-10"></div>
                                 <img 
                                   src={bonus.image_url} 
                                   alt={bonus.title}
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                                 />
-                                {/* Floating Badge */}
-                                <div className="absolute top-4 right-4 z-20">
-                                  <Badge className="bg-gold/90 text-gold-foreground backdrop-blur-sm border-gold/20 shadow-lg px-3 py-1.5 text-sm font-bold">
+                                {/* Floating Badge - Top Right */}
+                                <div className="absolute top-6 right-6 z-20">
+                                  <Badge className="bg-gradient-to-r from-gold to-gold/90 text-gold-foreground backdrop-blur-sm shadow-2xl px-4 py-2 text-base md:text-lg font-bold border-2 border-gold/30">
                                     {bonus.bonus_amount}
                                   </Badge>
                                 </div>
+                                {/* Bonus Type Badge - Top Left */}
+                                {bonus.bonus_type && (
+                                  <div className="absolute top-6 left-6 z-20">
+                                    <Badge variant="secondary" className="backdrop-blur-md bg-background/80 px-3 py-1.5 text-sm font-semibold shadow-lg">
+                                      {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
+                                      {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
+                                      {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
+                                      {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
+                                      {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
+                                    </Badge>
+                                  </div>
+                                )}
                               </div>
                             )}
                             
@@ -698,15 +710,17 @@ export default function SiteDetail() {
                                     {bonus.title}
                                   </h3>
                                   {!bonus.image_url && (
-                                    <Badge className="bg-primary text-primary-foreground shadow-md px-4 py-2 text-base font-bold whitespace-nowrap">
-                                      {bonus.bonus_amount}
-                                    </Badge>
+                                    <>
+                                      <Badge className="bg-primary text-primary-foreground shadow-md px-4 py-2 text-base font-bold whitespace-nowrap">
+                                        {bonus.bonus_amount}
+                                      </Badge>
+                                    </>
                                   )}
                                 </div>
                                 
-                                {/* Type Badge */}
-                                <div className="flex flex-wrap gap-2">
-                                  {bonus.bonus_type && (
+                                {/* Type Badge - Only show if no image */}
+                                {!bonus.image_url && bonus.bonus_type && (
+                                  <div className="flex flex-wrap gap-2">
                                     <Badge variant="secondary" className="px-3 py-1.5 text-sm font-semibold">
                                       {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
                                       {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
@@ -714,8 +728,8 @@ export default function SiteDetail() {
                                       {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
                                       {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
                                     </Badge>
-                                  )}
-                                </div>
+                                  </div>
+                                )}
                               </div>
                               
                               {/* Info Grid */}
