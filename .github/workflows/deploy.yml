@@ -26,14 +26,11 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           
       - name: Generate Sitemap
-        run: node --loader tsx scripts/generate-sitemap.ts
+        run: npx tsx scripts/generate-sitemap.ts
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-          
-      # Optional: Enable prerendering
-      # - name: Prerender pages
-      #   run: node scripts/prerender.js
+          SITE_URL: https://casinoany.com
       
       - name: Deploy to production
         run: echo "Deploy step - integrate with your hosting provider"
