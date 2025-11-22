@@ -1,23 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AdBanner } from './AdBanner';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function MobileStickyAd() {
   const [isVisible, setIsVisible] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Don't render on desktop
+  // Don't render on desktop or when not visible
   if (!isMobile || !isVisible) return null;
 
   return (
