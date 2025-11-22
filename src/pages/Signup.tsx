@@ -18,6 +18,7 @@ import { Step3CompanyDetails } from '@/components/wizard/Step3CompanyDetails';
 import { Step4Summary } from '@/components/wizard/Step4Summary';
 import { StepIndividualProfile } from '@/components/wizard/StepIndividualProfile';
 import logo from '@/assets/casinodoo-logo.svg';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 const Signup = () => {
   const [userEmail, setUserEmail] = useState('');
@@ -31,6 +32,9 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState<'user' | 'site_owner'>('user');
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance('signup');
 
   const [username, setUsername] = useState('');
 

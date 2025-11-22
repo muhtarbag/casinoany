@@ -8,6 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { analytics } from "@/lib/analytics";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { useSiteBanners } from '@/hooks/queries/useBettingSitesQueries';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,6 +65,9 @@ export default function SiteDetail() {
   const [showStickyCTA, setShowStickyCTA] = useState(false);
   const [expandedTerms, setExpandedTerms] = useState<Record<string, boolean>>({});
   const lastScrollYRef = useRef(0);
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance(`site-detail-${slug || id}`);
 
   // ✅ OPTIMIZED: Check if sidebar ad exists using centralized hook
   const { data: sidebarAds } = useSiteBanners('sidebar');
