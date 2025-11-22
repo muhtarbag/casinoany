@@ -16,7 +16,8 @@ import {
   Trophy,
   Link2,
   Megaphone,
-  ExternalLink
+  ExternalLink,
+  Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -106,6 +107,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
+        { id: 'performance', icon: Activity, label: 'Performans İzleme', route: '/admin/system/performance', roles: [] },
         { id: 'domain-monitoring', icon: ExternalLink, label: 'Domain İzleme', route: '/admin/system/domain-monitoring', roles: [] },
         { id: 'footer', icon: Link2, label: 'Footer Yönetimi', route: '/admin/system/footer', roles: [] },
       ],
