@@ -680,8 +680,8 @@ export default function SiteDetail() {
                                   alt={bonus.title}
                                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                                 />
-                                {/* Floating Badge - Top Right */}
-                                <div className="absolute top-6 right-6 z-20">
+                                {/* Floating Badge - Bottom Right */}
+                                <div className="absolute bottom-6 right-6 z-20">
                                   <Badge className="bg-gradient-to-r from-gold to-gold/90 text-gold-foreground backdrop-blur-sm shadow-2xl px-4 py-2 text-base md:text-lg font-bold border-2 border-gold/30">
                                     {bonus.bonus_amount}
                                   </Badge>
