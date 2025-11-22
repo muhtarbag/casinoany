@@ -62,6 +62,271 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_banners: {
+        Row: {
+          alt_text: string | null
+          banner_location: string
+          banner_name: string
+          banner_size: string
+          campaign_id: string
+          click_url: string
+          cpc_rate: number | null
+          cpm_rate: number | null
+          created_at: string | null
+          current_clicks: number | null
+          current_impressions: number | null
+          end_date: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          max_clicks: number | null
+          max_impressions: number | null
+          mobile_image_url: string | null
+          priority: number | null
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          banner_location: string
+          banner_name: string
+          banner_size: string
+          campaign_id: string
+          click_url: string
+          cpc_rate?: number | null
+          cpm_rate?: number | null
+          created_at?: string | null
+          current_clicks?: number | null
+          current_impressions?: number | null
+          end_date?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          max_clicks?: number | null
+          max_impressions?: number | null
+          mobile_image_url?: string | null
+          priority?: number | null
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          banner_location?: string
+          banner_name?: string
+          banner_size?: string
+          campaign_id?: string
+          click_url?: string
+          cpc_rate?: number | null
+          cpm_rate?: number | null
+          created_at?: string | null
+          current_clicks?: number | null
+          current_impressions?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          max_clicks?: number | null
+          max_impressions?: number | null
+          mobile_image_url?: string | null
+          priority?: number | null
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_banners_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_campaigns: {
+        Row: {
+          advertiser_company: string | null
+          advertiser_email: string
+          advertiser_name: string
+          advertiser_phone: string | null
+          campaign_status: string
+          campaign_type: string
+          contract_terms: string | null
+          created_at: string | null
+          created_by: string | null
+          end_date: string | null
+          id: string
+          notes: string | null
+          spent_budget: number | null
+          start_date: string
+          total_budget: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          advertiser_company?: string | null
+          advertiser_email: string
+          advertiser_name: string
+          advertiser_phone?: string | null
+          campaign_status?: string
+          campaign_type: string
+          contract_terms?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          spent_budget?: number | null
+          start_date: string
+          total_budget?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          advertiser_company?: string | null
+          advertiser_email?: string
+          advertiser_name?: string
+          advertiser_phone?: string | null
+          campaign_status?: string
+          campaign_type?: string
+          contract_terms?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          spent_budget?: number | null
+          start_date?: string
+          total_budget?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ad_impressions: {
+        Row: {
+          banner_id: string
+          browser: string | null
+          campaign_id: string
+          created_at: string | null
+          device_type: string | null
+          id: string
+          impression_type: string
+          ip_address: string | null
+          page_path: string
+          referrer: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          banner_id: string
+          browser?: string | null
+          campaign_id: string
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          impression_type: string
+          ip_address?: string | null
+          page_path: string
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          banner_id?: string
+          browser?: string | null
+          campaign_id?: string
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          impression_type?: string
+          ip_address?: string | null
+          page_path?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_impressions_banner_id_fkey"
+            columns: ["banner_id"]
+            isOneToOne: false
+            referencedRelation: "ad_banners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_impressions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_revenue: {
+        Row: {
+          campaign_id: string
+          clicks_count: number | null
+          created_at: string | null
+          id: string
+          impressions_count: number | null
+          revenue_amount: number
+          revenue_date: string
+          revenue_type: string
+        }
+        Insert: {
+          campaign_id: string
+          clicks_count?: number | null
+          created_at?: string | null
+          id?: string
+          impressions_count?: number | null
+          revenue_amount?: number
+          revenue_date: string
+          revenue_type: string
+        }
+        Update: {
+          campaign_id?: string
+          clicks_count?: number | null
+          created_at?: string | null
+          id?: string
+          impressions_count?: number | null
+          revenue_amount?: number
+          revenue_date?: string
+          revenue_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_revenue_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       admin_notification_preferences: {
         Row: {
           admin_id: string
@@ -4339,6 +4604,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      calculate_daily_ad_revenue: {
+        Args: { p_date?: string }
+        Returns: undefined
+      }
       calculate_reputation_score: {
         Args: { p_site_id: string }
         Returns: undefined
@@ -4367,6 +4636,19 @@ export type Database = {
         Returns: string
       }
       generate_referral_code: { Args: never; Returns: string }
+      get_active_banner: {
+        Args: { p_limit?: number; p_location: string }
+        Returns: {
+          alt_text: string
+          banner_name: string
+          campaign_id: string
+          click_url: string
+          id: string
+          image_url: string
+          mobile_image_url: string
+          priority: number
+        }[]
+      }
       get_current_user_roles: {
         Args: never
         Returns: {
@@ -4442,6 +4724,10 @@ export type Database = {
           user_id: string
         }
         Returns: boolean
+      }
+      increment_banner_stats: {
+        Args: { p_banner_id: string; p_stat_type: string }
+        Returns: undefined
       }
       increment_blog_view_count: {
         Args: { post_id: string }
