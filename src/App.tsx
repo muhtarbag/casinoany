@@ -242,10 +242,6 @@ const AppContent = () => {
           <Route path="/sikayetler/yeni" element={<NewComplaint />} />
           <Route path="/sikayetler/*" element={<ComplaintDetail />} />
           
-          {/* XML Sitemap Routes - Redirect to edge functions */}
-          <Route path="/sitemap.xml" element={<SitemapXML />} />
-          <Route path="/sitemap-:type.xml" element={<SitemapXML />} />
-          
           {/* HTML Sitemap Page */}
           <Route path="/sitemap" element={<Sitemap />} />
           
