@@ -78,7 +78,9 @@ export const CasinoContentEditor = ({
   };
 
   const addGameCategory = () => {
-    setGameCategories({ ...gameCategories, "": "" });
+    // ✅ Use unique temporary key to avoid conflicts
+    const tempKey = `new_category_${Date.now()}`;
+    setGameCategories({ ...gameCategories, [tempKey]: "" });
   };
 
   const removeGameCategory = (key: string) => {
@@ -89,10 +91,17 @@ export const CasinoContentEditor = ({
 
   const updateGameCategory = (oldKey: string, newKey: string, value: string) => {
     const newCategories = { ...gameCategories };
-    if (oldKey !== newKey && oldKey !== "") {
+    
+    // ✅ FIXED: Always delete old key if it's different from new key
+    if (oldKey !== newKey) {
       delete newCategories[oldKey];
     }
-    newCategories[newKey] = value;
+    
+    // ✅ Only set if newKey is not empty
+    if (newKey.trim() !== "" || value.trim() !== "") {
+      newCategories[newKey] = value;
+    }
+    
     setGameCategories(newCategories);
   };
 
@@ -197,10 +206,10 @@ export const CasinoContentEditor = ({
                 <Plus className="w-4 h-4 mr-1" />
                 Kategori Ekle
               </Button>
-              {Object.entries(gameCategories).map(([key, value], index) => (
-                <div key={`game-${index}`} className="grid grid-cols-2 gap-2">
+              {Object.entries(gameCategories).map(([key, value]) => (
+                <div key={key || `empty-${Math.random()}`} className="grid grid-cols-2 gap-2">
                   <Input
-                    value={key}
+                    value={key.startsWith('new_category_') ? '' : key}
                     onChange={(e) => updateGameCategory(key, e.target.value, value)}
                     placeholder="Kategori (örn: slot)"
                   />
