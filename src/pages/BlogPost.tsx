@@ -291,18 +291,17 @@ export default function BlogPost() {
         <ChevronUp className="w-5 h-5" />
       </Button>
       
-      <main className="relative overflow-hidden">
+      <main className="flex-1 container mx-auto px-4 py-8 overflow-x-hidden relative">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-40 right-10 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
           <div className="absolute bottom-40 left-10 w-96 h-96 bg-accent/3 rounded-full blur-3xl" />
         </div>
 
-        <div className="container mx-auto px-4 py-8 pb-24 md:pb-12 pt-6 md:pt-8 relative">
-          {/* Two-column layout: Main content + Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto items-start">
-            {/* Main Content */}
-            <article className="w-full max-w-3xl mx-auto">
+        {/* Two-column layout: Main content + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-[1400px] mx-auto">
+          {/* Main Content */}
+          <article className="w-full">
             {/* Breadcrumb Navigation */}
             <div className="mb-4 animate-fade-in">
               <Breadcrumb 
@@ -549,7 +548,6 @@ export default function BlogPost() {
             <AdBanner location="sidebar" className="w-full" />
           </aside>
         </div>
-      </div>
       </main>
 
       <Footer />
