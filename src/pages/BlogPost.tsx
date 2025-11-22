@@ -302,7 +302,7 @@ export default function BlogPost() {
           {/* Two-column layout: Main content + Sidebar */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto">
             {/* Main Content */}
-            <article className="max-w-3xl">
+            <article className="max-w-3xl mx-auto lg:mx-0 w-full">
             {/* Breadcrumb Navigation */}
             <div className="mb-4 animate-fade-in">
               <Breadcrumb 
