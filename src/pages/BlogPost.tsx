@@ -18,6 +18,7 @@ import { useEffect, useRef, useMemo, useState } from 'react';
 import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { cn } from '@/lib/utils';
+import { AdBanner } from '@/components/advertising/AdBanner';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -297,7 +298,10 @@ export default function BlogPost() {
         </div>
 
         <div className="container mx-auto px-4 py-8 pb-24 md:pb-12 pt-6 md:pt-8 relative">
-          <article className="max-w-3xl mx-auto">
+          {/* Two-column layout: Main content + Sidebar */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-7xl mx-auto">
+            {/* Main Content */}
+            <article className="max-w-3xl">
             {/* Breadcrumb Navigation */}
             <div className="mb-4 animate-fade-in">
               <Breadcrumb 
@@ -538,7 +542,13 @@ export default function BlogPost() {
               </div>
             </div>
           </article>
+
+          {/* Sidebar - Desktop only */}
+          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit">
+            <AdBanner location="sidebar" className="w-full" />
+          </aside>
         </div>
+      </div>
       </main>
 
       <Footer />
