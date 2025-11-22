@@ -100,12 +100,53 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
   const categorizedSites = categorizeSites();
   const suggestedSite = categorizedSites.find(s => s.emailMatch && s.status === 'available');
 
-  // Auto-suggest site if email matches
+  // Site seçildiğinde veya yeni site adı girildiğinde username'i otomatik oluştur
   useEffect(() => {
-    if (suggestedSite && !selectedSite) {
-      // Don't auto-select, just suggest
+    if (selectedSite === 'new_site' && newSiteName.trim()) {
+      // Yeni site adından username oluştur
+      const generatedUsername = newSiteName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Özel karakterleri kaldır
+        .replace(/\s+/g, '_') // Boşlukları alt çizgi yap
+        .substring(0, 30); // Max 30 karakter
+      setUsername(generatedUsername);
+    } else if (selectedSite && selectedSite !== 'new_site') {
+      // Seçilen siteden username oluştur
+      const selectedSiteData = categorizedSites.find(s => s.id === selectedSite);
+      if (selectedSiteData) {
+        const generatedUsername = selectedSiteData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .substring(0, 30);
+        setUsername(generatedUsername);
+      }
     }
-  }, [suggestedSite]);
+  }, [selectedSite, newSiteName, categorizedSites]);
+
+  // Site seçildiğinde veya yeni site adı girildiğinde username'i otomatik oluştur
+  useEffect(() => {
+    if (selectedSite === 'new_site' && newSiteName.trim()) {
+      // Yeni site adından username oluştur
+      const generatedUsername = newSiteName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Özel karakterleri kaldır
+        .replace(/\s+/g, '_') // Boşlukları alt çizgi yap
+        .substring(0, 30); // Max 30 karakter
+      setUsername(generatedUsername);
+    } else if (selectedSite && selectedSite !== 'new_site') {
+      // Seçilen siteden username oluştur
+      const selectedSiteData = categorizedSites.find(s => s.id === selectedSite);
+      if (selectedSiteData) {
+        const generatedUsername = selectedSiteData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .substring(0, 30);
+        setUsername(generatedUsername);
+      }
+    }
+  }, [selectedSite, newSiteName, categorizedSites, setUsername]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -151,23 +192,23 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Site ve Şirket Bilgileri</h3>
       
-      {/* Kullanıcı Adı */}
+      {/* Kullanıcı Adı - Otomatik oluşturuluyor */}
       <div className="space-y-2">
         <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-          Kullanıcı Adı *
+          Kullanıcı Adı (Site isminden otomatik oluşturuldu)
         </Label>
         <Input
           id="username"
           type="text"
-          placeholder="kullaniciadi"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           disabled={disabled}
-          className="lowercase"
+          className="lowercase bg-muted/50"
+          placeholder="Site seçtikten sonra otomatik oluşturulacak"
         />
         <p className="text-xs text-muted-foreground">
-          Sadece küçük harf, rakam ve alt çizgi kullanabilirsiniz. Min 3, max 30 karakter.
+          Site adından otomatik oluşturuldu. Düzenleyebilirsiniz.
         </p>
       </div>
       
