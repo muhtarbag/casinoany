@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,9 @@ export const CasinoContentEditor = ({
   faq,
   setFaq,
 }: CasinoContentEditorProps) => {
+  // Track editing state for category names
+  const [editingCategoryKey, setEditingCategoryKey] = React.useState<string | null>(null);
+  const [tempCategoryName, setTempCategoryName] = React.useState<string>('');
   const addPro = () => setPros([...pros, ""]);
   const removePro = (index: number) => {
     // ✅ Filter out empty values when removing
@@ -211,15 +215,27 @@ export const CasinoContentEditor = ({
               </Button>
               {Object.entries(gameCategories).map(([key, value]) => {
                 const displayKey = key.startsWith('new_category_') ? '' : key;
+                const isEditing = editingCategoryKey === key;
+                const currentValue = isEditing ? tempCategoryName : displayKey;
+                
                 return (
                   <div key={key} className="grid grid-cols-2 gap-2">
                     <Input
-                      defaultValue={displayKey}
+                      value={currentValue}
+                      onChange={(e) => {
+                        setTempCategoryName(e.target.value);
+                        if (!isEditing) {
+                          setEditingCategoryKey(key);
+                          setTempCategoryName(e.target.value);
+                        }
+                      }}
                       onBlur={(e) => {
                         const newName = e.target.value.trim();
                         if (newName && newName !== key) {
                           updateCategoryName(key, newName);
                         }
+                        setEditingCategoryKey(null);
+                        setTempCategoryName('');
                       }}
                       placeholder="Kategori (örn: slot)"
                     />
