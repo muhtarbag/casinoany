@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { AdBanner } from './AdBanner';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,8 +10,25 @@ export function MobileStickyAd() {
   const [isVisible, setIsVisible] = useState(true);
   const isMobile = useIsMobile();
 
-  // Don't render on desktop or when not visible
-  if (!isMobile || !isVisible) return null;
+  // Check if there's an active banner
+  const { data: banner } = useQuery({
+    queryKey: ['ad-banner-check', 'mobile_sticky'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_active_banner', { 
+          p_location: 'mobile_sticky',
+          p_limit: 1 
+        });
+
+      if (error || !data || data.length === 0) return null;
+      return data[0];
+    },
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Don't render if: not mobile, user closed it, or no banner available
+  if (!isMobile || !isVisible || !banner) return null;
 
   return (
     <div 
