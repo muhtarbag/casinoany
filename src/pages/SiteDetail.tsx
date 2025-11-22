@@ -670,11 +670,11 @@ export default function SiteDetail() {
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         
                         <CardContent className="p-0">
-                          <div className="flex flex-col lg:flex-row">
+                          <div className="flex flex-col">
                             {/* Image Section */}
                             {bonus.image_url && (
-                              <div className="relative lg:w-72 h-48 lg:h-auto overflow-hidden flex-shrink-0">
-                                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-background/90 to-transparent z-10"></div>
+                              <div className="relative w-full h-64 lg:h-80 overflow-hidden flex-shrink-0">
+                                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent z-10"></div>
                                 <img 
                                   src={bonus.image_url} 
                                   alt={bonus.title}
