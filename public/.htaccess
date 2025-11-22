@@ -1,18 +1,6 @@
 # Performance Optimizations
 
-# Sitemap Proxy Rules
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  
-  # Proxy sitemap requests to Supabase Edge Functions
-  # This allows Google to access sitemaps from your domain
-  RewriteRule ^sitemap\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap [P,L]
-  RewriteRule ^sitemap-pages\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages [P,L]
-  RewriteRule ^sitemap-casinos\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos [P,L]
-  RewriteRule ^sitemap-blogs\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs [P,L]
-  RewriteRule ^sitemap-bonuses\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses [P,L]
-  RewriteRule ^sitemap-images\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images [P,L]
-</IfModule>
+# Static files are served directly
 
 # Enable compression
 <IfModule mod_deflate.c>
