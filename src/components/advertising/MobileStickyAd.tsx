@@ -35,7 +35,7 @@ export function MobileStickyAd() {
       {/* Close Button */}
       <button
         onClick={() => setIsVisible(false)}
-        className="absolute top-0.5 right-2 z-10 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors p-0"
+        className="absolute top-0.5 right-3 z-10 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors p-0"
         style={{ width: '14px', height: '14px', minWidth: '14px', minHeight: '14px' }}
         aria-label="Reklamı kapat"
       >
