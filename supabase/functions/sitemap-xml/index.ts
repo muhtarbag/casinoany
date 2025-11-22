@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Content-Type': 'application/xml; charset=UTF-8',
-  'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+  'Cache-Control': 'public, max-age=0, must-revalidate',
 };
 
 async function checkRateLimit(supabase: any, ip: string, functionName: string): Promise<{ allowed: boolean; retryAfter?: number }> {
