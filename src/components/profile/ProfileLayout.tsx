@@ -329,10 +329,12 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0 pb-24 lg:pb-0">
+          <main className="flex-1 min-w-0 pb-24 lg:pb-0 relative">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
-                {children}
+                <div className="w-full">
+                  {children}
+                </div>
               </PageTransition>
             </PullToRefresh>
           </main>
