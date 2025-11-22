@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.get-active-domain]
 verify_jwt = false
+
+[functions.sitemap]
+verify_jwt = false
