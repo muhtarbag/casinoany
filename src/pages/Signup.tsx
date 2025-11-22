@@ -453,7 +453,7 @@ const Signup = () => {
                       Telefon
                     </Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none font-medium">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none font-semibold w-8">
                         +90
                       </span>
                       <Input 
@@ -467,7 +467,7 @@ const Signup = () => {
                         }} 
                         required 
                         disabled={loading}
-                        className="h-10 sm:h-11 px-0 pl-[4.5rem] pr-3 border-border/50 focus:border-primary transition-colors text-sm"
+                        className="h-10 sm:h-11 !pl-14 !pr-3 border-border/50 focus:border-primary transition-colors text-sm"
                       />
                     </div>
                     <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
