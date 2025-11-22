@@ -507,7 +507,7 @@ export default function SiteDetail() {
         />
       )}
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 overflow-x-hidden">
         {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-6">
           <button onClick={() => navigate("/")} className="hover:text-foreground transition-colors">
@@ -518,7 +518,7 @@ export default function SiteDetail() {
         </div>
 
         {/* Two-column layout: Main content + Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-[1400px] mx-auto">
           {/* Main Content */}
           <div>
             {/* Site Header */}
@@ -684,8 +684,8 @@ export default function SiteDetail() {
           </div>
 
           {/* Sidebar - Desktop only */}
-          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit">
-            <AdBanner location="sidebar" className="w-full" />
+          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit max-w-[300px] overflow-hidden">
+            <AdBanner location="sidebar" className="w-full max-w-full" />
           </aside>
         </div>
       </main>

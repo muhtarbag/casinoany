@@ -135,7 +135,7 @@ export function AdBanner({ location, className = '' }: AdBannerProps) {
   return (
     <div 
       ref={bannerRef}
-      className={`relative group cursor-pointer ${className}`}
+      className={`relative group cursor-pointer overflow-hidden ${className}`}
       onClick={handleBannerClick}
     >
       {/* Sponsored Label - Hidden on mobile sticky */}
@@ -153,19 +153,19 @@ export function AdBanner({ location, className = '' }: AdBannerProps) {
         location === 'mobile_sticky' 
           ? 'rounded border-none' 
           : 'rounded-lg border border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:scale-[1.01]'
-      }`}>
+      } ${location === 'sidebar' ? 'max-w-[300px]' : ''}`}>
         <OptimizedImage
           src={imageUrl}
           alt={banner.alt_text || banner.banner_name}
-          className={location === 'mobile_sticky' ? 'w-full h-full object-cover' : 'w-full h-auto'}
-          width={location === 'mobile_sticky' ? 320 : 1920}
-          height={location === 'mobile_sticky' ? 100 : 400}
+          className={`${location === 'mobile_sticky' ? 'w-full h-full object-cover' : 'w-full h-auto'} ${location === 'sidebar' ? 'max-w-full' : ''}`}
+          width={location === 'mobile_sticky' ? 320 : location === 'sidebar' ? 300 : 1920}
+          height={location === 'mobile_sticky' ? 100 : location === 'sidebar' ? 250 : 400}
           priority={location === 'hero'}
           sizes={
             location === 'hero' 
               ? '(max-width: 640px) 100vw, 1280px'
               : location === 'sidebar'
-              ? '(max-width: 1024px) 0px, 300px'
+              ? '300px'
               : location === 'mobile_sticky'
               ? '100vw'
               : '(max-width: 640px) 100vw, 800px'
