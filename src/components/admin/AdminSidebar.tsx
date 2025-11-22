@@ -15,7 +15,8 @@ import {
   BarChart3,
   Trophy,
   Link2,
-  Megaphone
+  Megaphone,
+  Search
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -106,6 +107,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
         { id: 'footer', icon: Link2, label: 'Footer Yönetimi', route: '/admin/system/footer', roles: [] },
+        { id: 'seo-health', icon: Search, label: 'SEO Sağlık', route: '/admin/seo/health', roles: [] },
       ],
     },
   ].map(group => ({
