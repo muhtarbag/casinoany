@@ -193,10 +193,13 @@ const Signup = () => {
     setLoading(true);
     
     try {
+      // Map userType to correct database enum values
+      const dbUserType = userType === 'user' ? 'individual' : 'corporate';
+      
       const metadata: any = {
         first_name: firstName,
         last_name: lastName,
-        accountType: userType
+        accountType: dbUserType
       };
 
       // Telefon sadece bireysel üyelik için
