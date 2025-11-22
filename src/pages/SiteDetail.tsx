@@ -63,6 +63,7 @@ export default function SiteDetail() {
   const [showStickyCTA, setShowStickyCTA] = useState(false);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [expandedTerms, setExpandedTerms] = useState<Record<string, boolean>>({});
 
   // Check if sidebar ad exists
   const { data: hasSidebarAd } = useQuery({
@@ -650,10 +651,7 @@ export default function SiteDetail() {
 
                 {/* Bonus Cards Grid */}
                 <div className="space-y-6">
-                  {bonusOffers.map((bonus: any, index: number) => {
-                    const [showFullTerms, setShowFullTerms] = useState(false);
-                    
-                    return (
+                  {bonusOffers.map((bonus: any, index: number) => (
                     <div 
                       key={bonus.id} 
                       className="group relative animate-fade-in hover-scale"
@@ -742,11 +740,11 @@ export default function SiteDetail() {
                                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-lg"></div>
                                   <div className="relative bg-muted/30 backdrop-blur-sm rounded-lg p-4 border border-border/50">
                                     <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-                                      {bonus.terms.length > 300 && !showFullTerms ? (
+                                      {bonus.terms.length > 300 && !expandedTerms[bonus.id] ? (
                                         <>
                                           {bonus.terms.substring(0, 300)}...
                                           <button 
-                                            onClick={() => setShowFullTerms(true)}
+                                            onClick={() => setExpandedTerms(prev => ({ ...prev, [bonus.id]: true }))}
                                             className="text-primary hover:underline ml-1 font-semibold"
                                           >
                                             Devamını Oku
@@ -757,7 +755,7 @@ export default function SiteDetail() {
                                           {bonus.terms}
                                           {bonus.terms.length > 300 && (
                                             <button 
-                                              onClick={() => setShowFullTerms(false)}
+                                              onClick={() => setExpandedTerms(prev => ({ ...prev, [bonus.id]: false }))}
                                               className="text-primary hover:underline ml-1 font-semibold"
                                             >
                                               Daha Az Göster
@@ -788,7 +786,7 @@ export default function SiteDetail() {
                         </CardContent>
                       </Card>
                     </div>
-                  )})}
+                  ))}
                 </div>
 
                 {/* Disclaimer */}
