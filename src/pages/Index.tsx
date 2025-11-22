@@ -94,20 +94,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
       <SEO
-        title="Güvenilir Casino Siteleri 2025 | %500 Bonus"
-        description="Türkiye'nin en güvenilir casino sitelerini karşılaştırın. %500'e varan hoş geldin bonusları, hızlı para çekme garantisi. 50+ lisanslı casino incelemesi. Slot, rulet, canlı casino oyunları."
+        title="En Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny"
+        description="2025'in en güvenilir casino sitelerini inceleyin. %500 hoş geldin bonusu, hızlı para çekme garantisi, lisanslı bahis siteleri. 50+ detaylı casino incelemesi."
         keywords={[
           'casino siteleri',
           'güvenilir casino',
           'casino bonusları',
-          'canlı casino',
-          'slot siteleri',
           'bahis siteleri',
           'deneme bonusu',
-          'çevrimsiz bonus',
+          'online casino',
+          'canlı casino',
+          'slot siteleri',
           'hızlı para çeken casino',
-          'online casino türkiye',
-          'casino incelemeleri'
+          'çevrimsiz bonus',
+          'casino incelemeleri',
+          'türkiye casino siteleri'
         ]}
         structuredData={allStructuredData}
       />

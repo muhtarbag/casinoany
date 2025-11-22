@@ -210,9 +210,9 @@ export default function BlogPost() {
       />
 
       <SEO
-        title={post.meta_title || post.title}
-        description={post.meta_description || post.excerpt}
-        keywords={post.meta_keywords || []}
+        title={post.meta_title || `${post.title} | CasinoAny Blog`}
+        description={post.meta_description || (post.excerpt && post.excerpt.length > 160 ? post.excerpt.substring(0, 157) + '...' : post.excerpt)}
+        keywords={post.meta_keywords || post.tags || ['casino', 'bahis', 'bonus']}
         canonical={`${window.location.origin}/${post.slug}`}
         ogType="article"
         ogImage={post.featured_image || undefined}
