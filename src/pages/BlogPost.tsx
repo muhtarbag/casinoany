@@ -19,6 +19,7 @@ import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQuerie
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { cn } from '@/lib/utils';
 import { AdBanner } from '@/components/advertising/AdBanner';
+import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -552,6 +553,9 @@ export default function BlogPost() {
       </main>
 
       <Footer />
+      
+      {/* Mobile Sticky Ad */}
+      <MobileStickyAd />
     </div>
   );
 }
