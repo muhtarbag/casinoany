@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ExternalLink, AlertTriangle, CheckCircle, Search, Flag, Scan, Loader2, Shield, Activity, TrendingUp } from 'lucide-react';
+import { ExternalLink, AlertTriangle, CheckCircle, Search, Flag, Scan, Loader2, Shield, Activity, Database, AlertCircle, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -28,6 +28,7 @@ export default function DomainMonitoring() {
   const [flagReason, setFlagReason] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('all');
   const queryClient = useQueryClient();
 
   // Check user permissions on mount
@@ -211,7 +212,7 @@ export default function DomainMonitoring() {
     const domainLower = domain.toLowerCase();
     
     if (suspiciousKeywords.some(keyword => domainLower.includes(keyword))) {
-      return 'high-risk';
+      return 'high';
     }
     
     const knownDomains = ['google.com', 'youtube.com', 'facebook.com', 'twitter.com', 'instagram.com'];
@@ -219,7 +220,7 @@ export default function DomainMonitoring() {
       return 'safe';
     }
     
-    return 'medium-risk';
+    return 'medium';
   };
 
   // Group by domain with risk analysis
@@ -244,9 +245,19 @@ export default function DomainMonitoring() {
   }, {});
 
   // Categorize by risk
-  const highRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'high-risk');
-  const mediumRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'medium-risk');
+  const highRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'high');
+  const mediumRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'medium');
   const safeDomains = allDomains.filter(d => categorizeDomain(d) === 'safe');
+
+  const stats = {
+    total: allDomains.length,
+    unique_domains: Object.keys(domainGroups).length,
+    high_risk: highRiskDomains.length,
+    medium_risk: mediumRiskDomains.length,
+    safe: safeDomains.length,
+    flagged: flaggedDomains.length,
+    whitelisted: whitelistedDomains.length,
+  };
 
   const scanExistingContent = async () => {
     setIsScanning(true);
@@ -275,24 +286,18 @@ export default function DomainMonitoring() {
     }
   };
 
-  const DomainCard = ({ item }: { item: any }) => {
+  const DomainCard = ({ item, index }: { item: any; index: number }) => {
     const riskLevel = categorizeDomain(item);
     const riskConfig = {
-      'high-risk': {
-        gradient: 'from-red-50 via-red-50/50 to-background dark:from-red-950/20 dark:via-red-900/10 dark:to-background',
-        border: 'border-red-200 dark:border-red-800',
-        icon: '🔴',
+      'high': {
+        icon: <AlertTriangle className="h-4 w-4 text-destructive" />
       },
-      'medium-risk': {
-        gradient: 'from-yellow-50 via-yellow-50/50 to-background dark:from-yellow-950/20 dark:via-yellow-900/10 dark:to-background',
-        border: 'border-yellow-200 dark:border-yellow-800',
-        icon: '🟡',
+      'medium': {
+        icon: <AlertCircle className="h-4 w-4 text-warning" />
       },
       'safe': {
-        gradient: 'from-green-50 via-green-50/50 to-background dark:from-green-950/20 dark:via-green-900/10 dark:to-background',
-        border: 'border-green-200 dark:border-green-800',
-        icon: '🟢',
-      },
+        icon: <CheckCircle className="h-4 w-4 text-success" />
+      }
     };
 
     const config = riskConfig[riskLevel];
@@ -301,223 +306,208 @@ export default function DomainMonitoring() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
+        transition={{ delay: index * 0.05 }}
+        whileHover={{ y: -2 }}
       >
-        <Card className={`relative overflow-hidden bg-gradient-to-br ${config.gradient} border-2 ${config.border} shadow-lg hover:shadow-2xl transition-all`}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-          <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
+        <Card className="hover:shadow-lg transition-all">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
                 {config.icon}
-                <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                <span className="font-bold">{item.domain}</span>
+                <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="font-semibold truncate">{item.domain}</span>
                 {item.is_whitelisted && (
-                  <Badge className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-0 shadow-md">
-                    <CheckCircle className="w-3 h-3 mr-1" />
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    <CheckCircle className="h-3 w-3 mr-1" />
                     Whitelist
                   </Badge>
                 )}
-                {riskLevel === 'high-risk' && !item.is_whitelisted && (
-                  <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-md">
-                    🔴 Yüksek Risk
+                {riskLevel === 'high' && !item.is_whitelisted && (
+                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                    Yüksek Risk
                   </Badge>
                 )}
-                {riskLevel === 'medium-risk' && !item.is_whitelisted && (
-                  <Badge className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0 shadow-md">
-                    🟡 Orta Risk
+                {riskLevel === 'medium' && !item.is_whitelisted && (
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                    Orta Risk
                   </Badge>
                 )}
                 {riskLevel === 'safe' && !item.is_whitelisted && (
-                  <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-md">
-                    🟢 Güvenli
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    Güvenli
                   </Badge>
                 )}
                 {item.is_flagged && (
-                  <Badge variant="destructive" className="shadow-md">
-                    <Flag className="w-3 h-3 mr-1" />
+                  <Badge variant="outline" className="bg-info/10 text-info border-info/20">
+                    <Flag className="h-3 w-3 mr-1" />
                     İşaretli
                   </Badge>
                 )}
-              </CardTitle>
-              <CardDescription className="mt-2 flex items-center gap-2">
-                <span className="px-2 py-1 bg-muted rounded-md text-xs font-mono">{item.source_table}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className="px-2 py-1 bg-muted rounded-md text-xs font-mono">{item.source_column}</span>
-              </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div>
-          <p className="text-sm font-medium mb-1">URL:</p>
-          <a
-            href={item.full_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary hover:underline break-all"
-          >
-            {item.full_url}
-          </a>
-        </div>
+              </div>
+            </CardTitle>
+            <CardDescription className="flex items-center gap-2 text-sm mt-2">
+              <span className="px-2 py-1 bg-muted/50 rounded text-xs font-mono">
+                {item.source_table}.{item.source_column}
+              </span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm font-medium mb-1">URL:</p>
+              <a
+                href={item.full_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline break-all"
+              >
+                {item.full_url}
+              </a>
+            </div>
 
-        {item.context_text && (
-          <div>
-            <p className="text-sm font-medium mb-1">İçerik:</p>
-            <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
-              ...{item.context_text}...
-            </p>
-          </div>
-        )}
+            {item.context_text && (
+              <div>
+                <p className="text-sm font-medium mb-1">İçerik:</p>
+                <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
+                  ...{item.context_text}...
+                </p>
+              </div>
+            )}
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
-          <div>
-            Kullanıcı: {item.profiles?.username || item.profiles?.email || 'Anonim'}
-          </div>
-          <div>{format(new Date(item.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}</div>
-        </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+              <div>
+                Kullanıcı: {item.profiles?.username || item.profiles?.email || 'Anonim'}
+              </div>
+              <div>{format(new Date(item.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}</div>
+            </div>
 
-        {item.is_flagged && item.flagged_reason && (
-          <div className="bg-destructive/10 p-2 rounded">
-            <p className="text-sm font-medium text-destructive">İşaretlenme Nedeni:</p>
-            <p className="text-sm text-muted-foreground">{item.flagged_reason}</p>
-          </div>
-        )}
+            {item.is_flagged && item.flagged_reason && (
+              <div className="bg-destructive/10 p-2 rounded border border-destructive/20">
+                <p className="text-sm font-medium text-destructive">İşaretlenme Nedeni:</p>
+                <p className="text-sm text-muted-foreground">{item.flagged_reason}</p>
+              </div>
+            )}
 
-        <div className="flex gap-2 pt-3 flex-wrap">
-          {item.is_whitelisted ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => unwhitelistMutation.mutate(item.id)}
-              disabled={unwhitelistMutation.isPending}
-              className="bg-gradient-to-r from-cyan-50 to-cyan-100 hover:from-cyan-100 hover:to-cyan-200 border-cyan-300"
-            >
-              <CheckCircle className="w-4 h-4 mr-1" />
-              Whitelist'ten Çıkar
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-md"
-              onClick={() => whitelistMutation.mutate({ id: item.id })}
-              disabled={whitelistMutation.isPending}
-            >
-              <CheckCircle className="w-4 h-4 mr-1" />
-              Whitelist Yap
-            </Button>
-          )}
-          
-          {item.is_flagged ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => unflagMutation.mutate(item.id)}
-              disabled={unflagMutation.isPending}
-              className="bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border-green-300"
-            >
-              İşareti Kaldır
-            </Button>
-          ) : (
-            <Dialog>
-              <DialogTrigger asChild>
+            <div className="flex gap-2 pt-3 flex-wrap">
+              <Button
+                size="sm"
+                variant={item.is_whitelisted ? "outline" : "default"}
+                onClick={() => item.is_whitelisted ? unwhitelistMutation.mutate(item.id) : whitelistMutation.mutate({ id: item.id })}
+                disabled={whitelistMutation.isPending || unwhitelistMutation.isPending}
+              >
+                {item.is_whitelisted ? (
+                  <>
+                    <X className="h-4 w-4 mr-1" />
+                    Whitelist'ten Çıkar
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Whitelist Yap
+                  </>
+                )}
+              </Button>
+              
+              {item.is_flagged ? (
                 <Button
                   size="sm"
-                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md"
-                  onClick={() => setSelectedDomain(item)}
+                  variant="outline"
+                  onClick={() => unflagMutation.mutate(item.id)}
+                  disabled={unflagMutation.isPending}
                 >
-                  <Flag className="w-4 h-4 mr-1" />
-                  İşaretle
+                  <X className="h-4 w-4 mr-1" />
+                  İşareti Kaldır
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Domain İşaretle</DialogTitle>
-                  <DialogDescription>
-                    Bu domain'i neden işaretliyorsunuz? (örn: hacklink, spam)
-                  </DialogDescription>
-                </DialogHeader>
-                <Textarea
-                  value={flagReason}
-                  onChange={(e) => setFlagReason(e.target.value)}
-                  placeholder="İşaretleme nedeni..."
-                  rows={3}
-                  className="resize-none"
-                />
-                <DialogFooter>
-                  <Button
-                    onClick={() => {
-                      if (flagReason.trim()) {
-                        flagMutation.mutate({ id: item.id, reason: flagReason });
-                      }
-                    }}
-                    disabled={!flagReason.trim() || flagMutation.isPending}
-                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                  >
-                    İşaretle
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-      </CardContent>
+              ) : (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setSelectedDomain(item)}
+                    >
+                      <Flag className="h-4 w-4 mr-1" />
+                      İşaretle
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Domain İşaretle</DialogTitle>
+                      <DialogDescription>
+                        Bu domain'i neden işaretliyorsunuz? (örn: hacklink, spam)
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Textarea
+                      value={flagReason}
+                      onChange={(e) => setFlagReason(e.target.value)}
+                      placeholder="İşaretleme nedeni..."
+                      rows={3}
+                      className="resize-none"
+                    />
+                    <DialogFooter>
+                      <Button
+                        onClick={() => {
+                          if (flagReason.trim()) {
+                            flagMutation.mutate({ id: item.id, reason: flagReason });
+                          }
+                        }}
+                        disabled={!flagReason.trim() || flagMutation.isPending}
+                      >
+                        İşaretle
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+          </CardContent>
         </Card>
       </motion.div>
     );
   };
 
+  const filteredDomains = activeTab === 'all' ? allDomains :
+                         activeTab === 'high' ? highRiskDomains :
+                         activeTab === 'medium' ? mediumRiskDomains :
+                         activeTab === 'safe' ? safeDomains :
+                         activeTab === 'flagged' ? flaggedDomains :
+                         activeTab === 'whitelisted' ? whitelistedDomains : allDomains;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Hero Header with Gradient */}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8 text-white shadow-2xl"
+          className="mb-8"
         >
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20" />
-          
-          <div className="relative z-10 flex items-start justify-between">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <Shield className="w-8 h-8" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold tracking-tight">Domain Monitoring</h1>
-                  <p className="text-blue-100 mt-1">
-                    Kullanıcı içeriklerinde akıllı domain takibi ve güvenlik analizi
-                  </p>
-                </div>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <Shield className="h-8 w-8 text-primary" />
               </div>
-              
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                  <Activity className="w-4 h-4" />
-                  <span>Real-time İzleme</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                  <TrendingUp className="w-4 h-4" />
-                  <span>Akıllı Kategorizasyon</span>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Domain İzleme Sistemi</h1>
+                <p className="text-muted-foreground text-sm flex items-center gap-2 mt-1">
+                  <Activity className="h-4 w-4" />
+                  Gerçek zamanlı güvenlik ve içerik kontrolü
+                </p>
               </div>
             </div>
-            
+
             <Button
               onClick={scanExistingContent}
               disabled={isScanning}
               size="lg"
-              className="bg-white text-purple-600 hover:bg-white/90 shadow-lg"
             >
               {isScanning ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Taranıyor...
                 </>
               ) : (
                 <>
-                  <Scan className="w-5 h-5 mr-2" />
+                  <Search className="mr-2 h-4 w-4" />
                   Tüm İçeriği Tara
                 </>
               )}
@@ -530,32 +520,33 @@ export default function DomainMonitoring() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="relative"
+          className="relative mb-6"
         >
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Domain ara... (örn: example.com)"
+            type="text"
+            placeholder="Domain, tablo veya kaynak ara..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-14 text-lg bg-card border-2 focus:border-primary shadow-lg transition-all"
+            className="pl-11 bg-card border"
           />
         </motion.div>
 
-        {/* Stats Cards with Gradient */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-slate-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Toplam Domain</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Yüksek Risk
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{Object.keys(domainGroups).length}</div>
-                <p className="text-xs text-muted-foreground mt-1">Benzersiz domain</p>
+                <div className="text-2xl font-bold text-destructive">{stats.high_risk}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -565,14 +556,14 @@ export default function DomainMonitoring() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.25 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-blue-700 dark:text-blue-300">Toplam Kayıt</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Orta Risk
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{allDomains.length}</div>
-                <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">Tüm girişler</p>
+                <div className="text-2xl font-bold text-warning">{stats.medium_risk}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -582,14 +573,14 @@ export default function DomainMonitoring() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-red-700 dark:text-red-300">🔴 Yüksek Risk</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Güvenli
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-red-600 dark:text-red-400">{highRiskDomains.length}</div>
-                <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-1">Dikkat gerektir</p>
+                <div className="text-2xl font-bold text-success">{stats.safe}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -599,14 +590,14 @@ export default function DomainMonitoring() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.35 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-yellow-700 dark:text-yellow-300">🟡 Orta Risk</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  İşaretli
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{mediumRiskDomains.length}</div>
-                <p className="text-xs text-yellow-600/70 dark:text-yellow-400/70 mt-1">Gözlem altında</p>
+                <div className="text-2xl font-bold text-info">{stats.flagged}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -616,14 +607,14 @@ export default function DomainMonitoring() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-green-700 dark:text-green-300">🟢 Güvenli</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Benzersiz Domain
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{safeDomains.length}</div>
-                <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">Onaylanmış</p>
+                <div className="text-2xl font-bold text-primary">{stats.unique_domains}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -633,245 +624,81 @@ export default function DomainMonitoring() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.45 }}
           >
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-950 dark:to-cyan-900 shadow-lg hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full -mr-12 -mt-12" />
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-cyan-700 dark:text-cyan-300">✅ Whitelist</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Toplam Girdi
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{whitelistedDomains.length}</div>
-                <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 mt-1">Güvenli liste</p>
+                <div className="text-2xl font-bold text-foreground">{stats.total}</div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        {/* Modern Tabs */}
+        {/* Tabs */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <Tabs defaultValue="high-risk" className="w-full">
-            <TabsList className="grid w-full grid-cols-7 h-auto p-2 bg-card border-2 shadow-lg">
-              <TabsTrigger 
-                value="high-risk" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">🔴</span>
-                <span className="text-xs font-medium">Yüksek Risk</span>
-                <span className="text-xs opacity-80">({highRiskDomains.length})</span>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="h-auto p-1.5 bg-muted">
+              <TabsTrigger value="all" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <Database className="h-4 w-4 mb-1" />
+                <span className="text-xs">Tümü</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.total}</Badge>
               </TabsTrigger>
-              <TabsTrigger 
-                value="medium-risk" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">🟡</span>
-                <span className="text-xs font-medium">Orta Risk</span>
-                <span className="text-xs opacity-80">({mediumRiskDomains.length})</span>
+              <TabsTrigger value="high" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <AlertTriangle className="h-4 w-4 mb-1" />
+                <span className="text-xs">Yüksek Risk</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.high_risk}</Badge>
               </TabsTrigger>
-              <TabsTrigger 
-                value="safe" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">🟢</span>
-                <span className="text-xs font-medium">Güvenli</span>
-                <span className="text-xs opacity-80">({safeDomains.length})</span>
+              <TabsTrigger value="medium" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <AlertCircle className="h-4 w-4 mb-1" />
+                <span className="text-xs">Orta Risk</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.medium_risk}</Badge>
               </TabsTrigger>
-              <TabsTrigger 
-                value="whitelisted" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">✅</span>
-                <span className="text-xs font-medium">Whitelist</span>
-                <span className="text-xs opacity-80">({whitelistedDomains.length})</span>
+              <TabsTrigger value="safe" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <CheckCircle className="h-4 w-4 mb-1" />
+                <span className="text-xs">Güvenli</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.safe}</Badge>
               </TabsTrigger>
-              <TabsTrigger 
-                value="flagged" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">🚩</span>
-                <span className="text-xs font-medium">İşaretli</span>
-                <span className="text-xs opacity-80">({flaggedDomains.length})</span>
+              <TabsTrigger value="flagged" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <Flag className="h-4 w-4 mb-1" />
+                <span className="text-xs">İşaretli</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.flagged}</Badge>
               </TabsTrigger>
-              <TabsTrigger 
-                value="all" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">📋</span>
-                <span className="text-xs font-medium">Tümü</span>
-                <span className="text-xs opacity-80">({allDomains.length})</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="grouped" 
-                className="data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white flex-col h-auto py-3"
-              >
-                <span className="text-2xl mb-1">📊</span>
-                <span className="text-xs font-medium">Gruplu</span>
-                <span className="text-xs opacity-80">({Object.keys(domainGroups).length})</span>
+              <TabsTrigger value="whitelisted" className="flex-col h-auto py-2 px-4 data-[state=active]:bg-card">
+                <Shield className="h-4 w-4 mb-1" />
+                <span className="text-xs">Whitelist</span>
+                <Badge variant="secondary" className="mt-1 text-xs">{stats.whitelisted}</Badge>
               </TabsTrigger>
             </TabsList>
 
-        <TabsContent value="high-risk" className="space-y-4">
-          {highRiskDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Yüksek riskli domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            highRiskDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="medium-risk" className="space-y-4">
-          {mediumRiskDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Orta riskli domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            mediumRiskDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="safe" className="space-y-4">
-          {safeDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Güvenli domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            safeDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="whitelisted" className="space-y-4">
-          {whitelistedDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Whitelist'te domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            whitelistedDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="flagged" className="space-y-4">
-          {flaggedDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                İşaretli domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            flaggedDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="all" className="space-y-4">
-          {isLoading ? (
-            <div>Yükleniyor...</div>
-          ) : allDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Henüz domain kaydı yok
-              </CardContent>
-            </Card>
-          ) : (
-            allDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-        <TabsContent value="flagged" className="space-y-4">
-          {flaggedDomains.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                İşaretli domain yok
-              </CardContent>
-            </Card>
-          ) : (
-            flaggedDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
-          )}
-        </TabsContent>
-
-
-        <TabsContent value="grouped" className="space-y-4">
-          {Object.entries(domainGroups)
-            .sort(([, a]: [string, any], [, b]: [string, any]) => {
-              // Whitelisted first, then by risk level
-              if (a.isWhitelisted && !b.isWhitelisted) return -1;
-              if (!a.isWhitelisted && b.isWhitelisted) return 1;
-              const riskOrder = { 'high-risk': 0, 'medium-risk': 1, 'safe': 2 };
-              return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
-            })
-            .map(([domain, data]: [string, any]) => {
-              const { entries, riskLevel, isFlagged, isWhitelisted } = data;
-              return (
-                <Card key={domain} className={
-                  riskLevel === 'high-risk' ? 'border-destructive/50' :
-                  riskLevel === 'medium-risk' ? 'border-yellow-500/50' :
-                  'border-green-500/50'
-                }>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {riskLevel === 'high-risk' && '🔴'}
-                      {riskLevel === 'medium-risk' && '🟡'}
-                      {riskLevel === 'safe' && '🟢'}
-                      {domain}
-                      <Badge variant="secondary">{entries.length} kayıt</Badge>
-                      {isWhitelisted && (
-                        <Badge className="bg-blue-500 hover:bg-blue-600">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Whitelist
-                        </Badge>
-                      )}
-                      {isFlagged && (
-                        <Badge variant="destructive">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                          İşaretli
-                        </Badge>
-                      )}
-                      {riskLevel === 'high-risk' && !isWhitelisted && (
-                        <Badge variant="destructive">Yüksek Risk</Badge>
-                      )}
-                      {riskLevel === 'medium-risk' && !isWhitelisted && (
-                        <Badge className="bg-yellow-500 hover:bg-yellow-600">Orta Risk</Badge>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {entries.map((item: any) => (
-                      <div
-                        key={item.id}
-                        className="text-sm p-2 bg-muted rounded flex items-center justify-between"
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium">{item.source_table} - {item.source_column}</div>
-                          <div className="text-xs text-muted-foreground">
-                            Kullanıcı: {item.profiles?.username || item.profiles?.email || 'Anonim'} • {format(new Date(item.created_at), 'dd MMM yyyy HH:mm', { locale: tr })}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          {item.is_flagged && (
-                            <Badge variant="destructive" className="ml-2">
-                              İşaretli
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+            <TabsContent value={activeTab} className="mt-6">
+              {isLoading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredDomains.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <p className="text-muted-foreground">Kayıt bulunamadı</p>
                   </CardContent>
                 </Card>
-              );
-            })}
-        </TabsContent>
-      </Tabs>
-    </motion.div>
-  </div>
-</div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredDomains.map((domain, index) => (
+                    <DomainCard key={domain.id} item={domain} index={index} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+      </div>
+    </div>
   );
 }
