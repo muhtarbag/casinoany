@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { analytics } from "@/lib/analytics";
@@ -11,17 +11,24 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Star } from "lucide-react";
+import { Star, User } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const reviewSchema = z.object({
-  name: z.string().trim().min(2, "İsim en az 2 karakter olmalıdır").max(100, "İsim en fazla 100 karakter olabilir"),
-  email: z.string().trim().email("Geçerli bir email adresi giriniz").max(255, "Email en fazla 255 karakter olabilir"),
+// Login olmuş kullanıcılar için name/email opsiyonel (profile'dan çekilecek)
+const reviewSchemaAuthenticated = z.object({
   title: z.string().trim().min(5, "Başlık en az 5 karakter olmalıdır").max(100, "Başlık en fazla 100 karakter olabilir"),
   comment: z.string().trim().min(20, "Yorum en az 20 karakter olmalıdır").max(1000, "Yorum en fazla 1000 karakter olabilir"),
   rating: z.number().min(1, "En az 1 yıldız vermelisiniz").max(5, "En fazla 5 yıldız verebilirsiniz"),
 });
 
-type ReviewFormData = z.infer<typeof reviewSchema>;
+// Anonim kullanıcılar için name/email zorunlu
+const reviewSchemaAnonymous = reviewSchemaAuthenticated.extend({
+  name: z.string().trim().min(2, "İsim en az 2 karakter olmalıdır").max(100, "İsim en fazla 100 karakter olabilir"),
+  email: z.string().trim().email("Geçerli bir email adresi giriniz").max(255, "Email en fazla 255 karakter olabilir"),
+});
+
+type ReviewFormDataAuthenticated = z.infer<typeof reviewSchemaAuthenticated>;
+type ReviewFormDataAnonymous = z.infer<typeof reviewSchemaAnonymous>;
 
 interface ReviewFormProps {
   siteId: string;
@@ -32,24 +39,59 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
   const queryClient = useQueryClient();
   const [hoveredRating, setHoveredRating] = useState(0);
 
-  const form = useForm<ReviewFormData>({
-    resolver: zodResolver(reviewSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      title: "",
-      comment: "",
-      rating: 0,
+  // Kullanıcı profil bilgilerini çek
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('email, first_name, last_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
     },
+    enabled: !!user?.id,
+  });
+
+  const isAuthenticated = !!user;
+
+  const form = useForm<ReviewFormDataAuthenticated | ReviewFormDataAnonymous>({
+    resolver: zodResolver(isAuthenticated ? reviewSchemaAuthenticated : reviewSchemaAnonymous),
+    defaultValues: isAuthenticated 
+      ? {
+          title: "",
+          comment: "",
+          rating: 0,
+        }
+      : {
+          name: "",
+          email: "",
+          title: "",
+          comment: "",
+          rating: 0,
+        },
   });
 
   const createReviewMutation = useMutation({
-    mutationFn: async (data: ReviewFormData) => {
+    mutationFn: async (data: ReviewFormDataAuthenticated | ReviewFormDataAnonymous) => {
+      // Login olmuş kullanıcı için profile bilgilerini kullan
+      const userName = isAuthenticated 
+        ? `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Kullanıcı'
+        : ('name' in data ? data.name : '');
+      
+      const userEmail = isAuthenticated
+        ? profile?.email || user?.email || ''
+        : ('email' in data ? data.email : '');
+
       const { error } = await supabase.from("site_reviews").insert({
         site_id: siteId,
         user_id: user?.id || null,
-        name: data.name,
-        email: data.email,
+        name: userName,
+        email: userEmail,
         title: data.title,
         comment: data.comment,
         rating: data.rating,
@@ -59,9 +101,10 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Track review submission in analytics
-      analytics.trackReviewSubmit(siteId, data.rating);
+      const rating = form.getValues('rating');
+      analytics.trackReviewSubmit(siteId, rating);
       
       handleSuccess(
         "Yorumunuz başarıyla gönderildi! Admin onayından sonra yayınlanacaktır.",
@@ -78,7 +121,7 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
     },
   });
 
-  const onSubmit = (data: ReviewFormData) => {
+  const onSubmit = (data: ReviewFormDataAuthenticated | ReviewFormDataAnonymous) => {
     createReviewMutation.mutate(data);
   };
 
@@ -87,6 +130,17 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Login olmuş kullanıcı bilgisi */}
+        {isAuthenticated && profile && (
+          <Alert className="bg-primary/5 border-primary/20">
+            <User className="h-4 w-4" />
+            <AlertDescription>
+              <span className="font-medium">{profile.first_name} {profile.last_name}</span> olarak yorum yazıyorsunuz
+              {profile.email && <span className="text-muted-foreground"> ({profile.email})</span>}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Rating Stars */}
         <FormField
           control={form.control}
@@ -121,35 +175,39 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
           )}
         />
 
-        {/* Name */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>İsminiz</FormLabel>
-              <FormControl>
-                <Input placeholder="Adınız ve Soyadınız" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Name - Sadece anonim kullanıcılar için */}
+        {!isAuthenticated && (
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>İsminiz</FormLabel>
+                <FormControl>
+                  <Input placeholder="Adınız ve Soyadınız" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
-        {/* Email */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email Adresiniz</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="ornek@email.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Email - Sadece anonim kullanıcılar için */}
+        {!isAuthenticated && (
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Adresiniz</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="ornek@email.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Title */}
         <FormField
