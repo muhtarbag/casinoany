@@ -180,7 +180,7 @@ export default function Referrals() {
                 <p className="text-sm mt-1">Yukarıdaki linki paylaşarak başla!</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+              <div className="space-y-3">
                 {referralHistory.map((referral) => (
                   <div
                     key={referral.id}

@@ -309,7 +309,7 @@ export default function Settings() {
 
               <div>
                 <Label>En Sevdiğiniz Oyun Sağlayıcılar</Label>
-                <div className="space-y-3 mt-2 max-h-64 overflow-y-auto">
+                <div className="space-y-3 mt-2">
                   {GAME_PROVIDERS.map((provider) => (
                     <div key={provider} className="flex items-center space-x-2">
                       <Checkbox

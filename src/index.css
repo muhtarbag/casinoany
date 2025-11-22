@@ -180,20 +180,33 @@ All colors MUST be HSL.
   body {
     overflow-x: hidden;
     width: 100%;
+    height: 100%;
+    position: relative;
   }
 
   body {
     @apply bg-background text-foreground;
     /* Prevent horizontal scroll */
     overflow-x: hidden;
+    overflow-y: auto;
     /* Prevent text size adjustment on orientation change */
     -webkit-text-size-adjust: 100%;
     /* Smooth scrolling */
     scroll-behavior: smooth;
-    /* Prevent pull-to-refresh on mobile */
+    /* Prevent pull-to-refresh on mobile - use contain instead of none */
     overscroll-behavior-y: contain;
-    /* Better touch scrolling */
+    /* Better touch scrolling for iOS */
     -webkit-overflow-scrolling: touch;
+    /* Ensure scroll is not blocked */
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Ensure root element allows scrolling */
+  #root {
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
   }
 
   /* Touch-friendly tap targets */
