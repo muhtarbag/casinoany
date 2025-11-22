@@ -64,6 +64,20 @@ export default function SiteDetail() {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
   const [lastScrollY, setLastScrollY] = useState(0);
 
+  // Check if sidebar ad exists
+  const { data: hasSidebarAd } = useQuery({
+    queryKey: ['sidebar-ad-check'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_active_banner', { 
+          p_location: 'sidebar',
+          p_limit: 1 
+        });
+      return !!data?.[0];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading, error: siteError } = useQuery({
     queryKey: ["betting-site", slug || id],
@@ -517,8 +531,10 @@ export default function SiteDetail() {
           <span className="text-foreground">{site.name}</span>
         </div>
 
-        {/* Two-column layout: Main content + Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-[1400px] mx-auto">
+        {/* Two-column layout: Main content + Sidebar (only if ad exists) */}
+        <div className={`grid gap-8 max-w-[1400px] mx-auto ${
+          hasSidebarAd ? 'grid-cols-1 lg:grid-cols-[1fr_300px]' : 'grid-cols-1'
+        }`}>
           {/* Main Content */}
           <div>
             {/* Site Header */}
@@ -683,10 +699,12 @@ export default function SiteDetail() {
         <RecommendedSites currentSiteId={site.id} currentSiteFeatures={site.features || []} />
           </div>
 
-          {/* Sidebar - Desktop only */}
-          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit max-w-[300px] overflow-hidden">
-            <AdBanner location="sidebar" className="w-full max-w-full" />
-          </aside>
+          {/* Sidebar - Desktop only, only show if ad exists */}
+          {hasSidebarAd && (
+            <aside className="hidden lg:block space-y-6 sticky top-24 h-fit max-w-[300px] overflow-hidden">
+              <AdBanner location="sidebar" className="w-full max-w-full" />
+            </aside>
+          )}
         </div>
       </main>
       
