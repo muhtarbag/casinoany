@@ -15,15 +15,18 @@ import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp, Share2, Bookmark, Hea
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useEffect, useRef, useMemo, useState } from 'react';
-import { useBlogPost, useIncrementBlogView } from '@/hooks/queries/useBlogQueries';
+import { useBlogPost, useIncrementBlogView, useBlogPostLikeStatus, useToggleBlogPostLike } from '@/hooks/queries/useBlogQueries';
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { cn } from '@/lib/utils';
 import { AdBanner } from '@/components/advertising/AdBanner';
 import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [readingProgress, setReadingProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -31,6 +34,24 @@ export default function BlogPost() {
   const { data: post, isLoading } = useBlogPost(slug || '');
   const incrementView = useIncrementBlogView();
   const viewTrackedRef = useRef(false);
+
+  // Like functionality
+  const { data: likeStatus } = useBlogPostLikeStatus(post?.id || '', user?.id);
+  const toggleLike = useToggleBlogPostLike();
+
+  const handleLikeClick = () => {
+    if (!user) {
+      toast.error('Beğenmek için giriş yapmalısınız');
+      return;
+    }
+    if (!post?.id) return;
+
+    toggleLike.mutate({
+      postId: post.id,
+      userId: user.id,
+      isLiked: likeStatus?.isLiked || false
+    });
+  };
 
   // Check if sidebar ad exists
   const { data: hasSidebarAd } = useQuery({
@@ -307,9 +328,19 @@ export default function BlogPost() {
           <Button 
             size="sm" 
             variant="ghost" 
-            className="rounded-full w-11 h-11 p-0 hover:bg-red-500/10 hover:text-red-500 transition-all group"
+            className={cn(
+              "rounded-full w-11 h-11 p-0 transition-all",
+              likeStatus?.isLiked 
+                ? "bg-red-500/10 text-red-500" 
+                : "hover:bg-red-500/10 hover:text-red-500"
+            )}
+            onClick={handleLikeClick}
+            disabled={toggleLike.isPending}
           >
-            <Heart className="w-4.5 h-4.5 group-hover:fill-current transition-all" />
+            <Heart className={cn(
+              "w-4.5 h-4.5 transition-all",
+              likeStatus?.isLiked && "fill-current"
+            )} />
           </Button>
         </div>
       </div>
@@ -453,10 +484,23 @@ export default function BlogPost() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  className="gap-2.5 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-all duration-300 group"
+                  onClick={handleLikeClick}
+                  disabled={toggleLike.isPending}
+                  className={cn(
+                    "gap-2.5 transition-all duration-300 group",
+                    likeStatus?.isLiked
+                      ? "bg-red-500/10 border-red-500/50 text-red-500"
+                      : "hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500"
+                  )}
                 >
-                  <Heart className="w-4 h-4 group-hover:scale-110 group-hover:fill-current transition-all" />
-                  <span className="font-semibold">Beğen</span>
+                  <Heart className={cn(
+                    "w-4 h-4 group-hover:scale-110 transition-all",
+                    likeStatus?.isLiked && "fill-current"
+                  )} />
+                  <span className="font-semibold">
+                    {likeStatus?.isLiked ? 'Beğenildi' : 'Beğen'} 
+                    {likeStatus?.likeCount ? ` (${likeStatus.likeCount})` : ''}
+                  </span>
                 </Button>
               </div>
             </header>

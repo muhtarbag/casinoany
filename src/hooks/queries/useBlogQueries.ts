@@ -187,3 +187,76 @@ export const useAddBlogComment = () => {
     },
   });
 };
+
+// Blog post like status
+export const useBlogPostLikeStatus = (postId: string, userId: string | undefined) => {
+  return useQuery({
+    queryKey: ['blog-post-like', postId, userId],
+    queryFn: async () => {
+      if (!userId) return { isLiked: false, likeCount: 0 };
+
+      const [likeCheck, post] = await Promise.all([
+        supabase
+          .from('blog_post_likes')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', userId)
+          .maybeSingle(),
+        supabase
+          .from('blog_posts')
+          .select('like_count')
+          .eq('id', postId)
+          .single()
+      ]);
+
+      return {
+        isLiked: !!likeCheck.data,
+        likeCount: post.data?.like_count || 0
+      };
+    },
+    enabled: !!postId,
+    staleTime: 0,
+  });
+};
+
+// Toggle blog post like
+export const useToggleBlogPostLike = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ postId, userId, isLiked }: { 
+      postId: string; 
+      userId: string;
+      isLiked: boolean;
+    }) => {
+      if (isLiked) {
+        // Unlike
+        const { error } = await supabase
+          .from('blog_post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+      } else {
+        // Like
+        const { error } = await supabase
+          .from('blog_post_likes')
+          .insert({ post_id: postId, user_id: userId });
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['blog-post-like', variables.postId] 
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.blog.detail(variables.postId)
+      });
+    },
+    onError: (error: any) => {
+      toast.error('İşlem sırasında hata oluştu');
+    },
+  });
+};
