@@ -549,14 +549,6 @@ export default function SiteDetail() {
       )}
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8 overflow-x-hidden">
-        {/* Breadcrumb */}
-        <div className="text-sm text-muted-foreground mb-6">
-          <button onClick={() => navigate("/")} className="hover:text-foreground transition-colors">
-            Ana Sayfa
-          </button>
-          {" / "}
-          <span className="text-foreground">{site.name}</span>
-        </div>
 
         {/* Two-column layout: Main content + Sidebar (only if ad exists) */}
         <div className={`grid gap-8 max-w-[1400px] mx-auto ${
