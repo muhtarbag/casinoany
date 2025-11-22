@@ -312,22 +312,34 @@ function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label>Kampanya</Label>
-        <Select 
-          value={formData.campaign_id} 
-          onValueChange={(value) => setFormData(prev => ({ ...prev, campaign_id: value }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Kampanya seçin" />
-          </SelectTrigger>
-          <SelectContent>
-            {campaigns.map((campaign) => (
-              <SelectItem key={campaign.id} value={campaign.id}>
-                {campaign.advertiser_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Label>Kampanya *</Label>
+        {campaigns.length === 0 ? (
+          <div className="p-4 border border-border rounded-lg bg-muted/50">
+            <p className="text-sm text-muted-foreground mb-2">
+              ⚠️ Henüz kampanya oluşturulmamış. Önce bir kampanya oluşturmalısınız.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              "Kampanyalar" sekmesine gidip yeni kampanya ekleyin.
+            </p>
+          </div>
+        ) : (
+          <Select 
+            value={formData.campaign_id} 
+            onValueChange={(value) => setFormData(prev => ({ ...prev, campaign_id: value }))}
+            required
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Kampanya seçin" />
+            </SelectTrigger>
+            <SelectContent className="z-50 bg-popover">
+              {campaigns.map((campaign) => (
+                <SelectItem key={campaign.id} value={campaign.id}>
+                  {campaign.advertiser_name} ({campaign.campaign_status})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -357,7 +369,7 @@ function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () 
             <SelectTrigger>
               <SelectValue placeholder="Lokasyon seçin" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-50 bg-popover">
               {BANNER_LOCATIONS.map((loc) => (
                 <SelectItem key={loc.value} value={loc.value}>
                   {loc.label} ({loc.size})
@@ -452,9 +464,19 @@ function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () 
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={createBannerMutation.isPending}>
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={createBannerMutation.isPending || campaigns.length === 0}
+      >
         {createBannerMutation.isPending ? 'Oluşturuluyor...' : 'Banner Oluştur'}
       </Button>
+      
+      {campaigns.length === 0 && (
+        <p className="text-xs text-center text-muted-foreground">
+          Önce bir kampanya oluşturmalısınız
+        </p>
+      )}
     </form>
   );
 }
