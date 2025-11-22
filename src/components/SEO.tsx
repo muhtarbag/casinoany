@@ -141,7 +141,6 @@ export const SEO = ({
       
       {/* Google-Specific Optimizations */}
       <meta name="google" content="notranslate" />
-      <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" />
       
       {/* Mobile Optimization for Google */}
       <meta name="mobile-web-app-capable" content="yes" />
