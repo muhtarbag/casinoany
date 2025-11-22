@@ -627,22 +627,6 @@ export default function SiteDetail() {
           <TabsContent value="bonus" className="space-y-6">
             {bonusOffers && bonusOffers.length > 0 ? (
               <>
-                {/* Hero Section */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-8 md:p-12 text-primary-foreground animate-fade-in">
-                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-10"></div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-primary-foreground/20 rounded-xl backdrop-blur-sm">
-                        <Gift className="w-8 h-8" />
-                      </div>
-                      <div>
-                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Aktif Bonuslar</h2>
-                        <p className="text-primary-foreground/90 mt-1">{bonusOffers.length} özel kampanya sizi bekliyor</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Bonus Cards Grid */}
                 <div className="space-y-6">
                   {bonusOffers.map((bonus: any, index: number) => (
