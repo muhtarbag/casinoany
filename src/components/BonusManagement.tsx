@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { BonusImageUploader } from '@/components/bonus/BonusImageUploader';
 
 interface BonusOffer {
   id: string;
@@ -305,28 +306,11 @@ export const BonusManagement = () => {
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="image_url">Bonus Görseli (URL)</Label>
-                    <Input
-                      id="image_url"
-                      type="url"
-                      value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      placeholder="https://example.com/bonus-image.jpg"
-                    />
-                    {formData.image_url && (
-                      <div className="mt-2 border rounded-lg overflow-hidden">
-                        <img 
-                          src={formData.image_url} 
-                          alt="Bonus önizleme" 
-                          className="w-full h-32 object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = '/placeholder.svg';
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  <BonusImageUploader
+                    currentImageUrl={formData.image_url}
+                    onImageUploaded={(url) => setFormData({ ...formData, image_url: url })}
+                    onImageRemoved={() => setFormData({ ...formData, image_url: '' })}
+                  />
 
                   <div>
                     <Label htmlFor="bonus_type">Bonus Türü</Label>
