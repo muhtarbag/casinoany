@@ -9,9 +9,8 @@ export default function SitemapXML() {
   useEffect(() => {
     const fetchAndServeSitemap = async () => {
       try {
-        // Determine sitemap endpoint
-        const sitemapEndpoint = type ? `sitemap-${type}` : 'sitemap';
-        const url = `${SUPABASE_URL}/functions/v1/${sitemapEndpoint}`;
+        // All sitemap requests go to sitemap-xml endpoint
+        const url = `${SUPABASE_URL}/functions/v1/sitemap-xml`;
 
         // Fetch XML from edge function
         const response = await fetch(url);
