@@ -168,6 +168,9 @@ export const useCategoryWithRelations = (slug: string) => {
   return useQuery({
     queryKey: [...categoryKeys.detail(slug), 'relations'],
     queryFn: async () => {
+      console.log('[Category Query] Starting fetch:', { slug });
+      const startTime = performance.now();
+      
       // 1. Kategori bilgisini al
       const { data: category, error: catError } = await supabase
         .from('categories')
@@ -176,9 +179,19 @@ export const useCategoryWithRelations = (slug: string) => {
         .eq('is_active', true)
         .single();
 
-      if (catError) throw catError;
+      if (catError) {
+        console.error('[Category Query] Category fetch error:', catError);
+        throw catError;
+      }
+      
+      console.log('[Category Query] Category fetched:', { 
+        id: category.id, 
+        name: category.name,
+        duration: performance.now() - startTime 
+      });
 
       // 2. İlişkili siteleri al
+      const sitesStartTime = performance.now();
       const { data: siteRelations, error: siteError } = await supabase
         .from('site_categories')
         .select(`
@@ -188,14 +201,23 @@ export const useCategoryWithRelations = (slug: string) => {
         .eq('category_id', category.id)
         .order('display_order', { ascending: true });
 
-      if (siteError) throw siteError;
+      if (siteError) {
+        console.error('[Category Query] Sites fetch error:', siteError);
+        throw siteError;
+      }
 
       const sites = (siteRelations || [])
         .map((rel: any) => rel.betting_sites)
         .filter(Boolean)
         .filter((site: any) => site.is_active);
+      
+      console.log('[Category Query] Sites fetched:', { 
+        count: sites.length,
+        duration: performance.now() - sitesStartTime 
+      });
 
       // 3. İlişkili blog yazılarını al
+      const blogsStartTime = performance.now();
       const { data: blogs, error: blogError } = await supabase
         .from('blog_posts')
         .select('*')
@@ -204,7 +226,23 @@ export const useCategoryWithRelations = (slug: string) => {
         .order('published_at', { ascending: false })
         .limit(10);
 
-      if (blogError) throw blogError;
+      if (blogError) {
+        console.error('[Category Query] Blogs fetch error:', blogError);
+        throw blogError;
+      }
+
+      console.log('[Category Query] Blogs fetched:', { 
+        count: blogs?.length || 0,
+        duration: performance.now() - blogsStartTime 
+      });
+
+      const totalDuration = performance.now() - startTime;
+      console.log('[Category Query] Complete:', {
+        slug,
+        totalDuration,
+        sitesCount: sites.length,
+        blogsCount: blogs?.length || 0
+      });
 
       return {
         ...category,
