@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Mail } from 'lucide-react';
 import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 const Login = () => {
@@ -125,6 +126,14 @@ const Login = () => {
               )}
             </Button>
           </form>
+          
+          <Alert className="mt-4 bg-primary/5 border-primary/20">
+            <Mail className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              Yeni kayıt olduysanız, giriş yapabilmek için önce e-posta adresinize gönderilen doğrulama linkine tıklamanız gerekmektedir.
+            </AlertDescription>
+          </Alert>
+          
           <div className="mt-4 text-center text-sm">
             <span className="text-muted-foreground">Hesabınız yok mu? </span>
             <Link to="/signup" className="text-primary hover:underline">
