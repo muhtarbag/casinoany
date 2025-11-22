@@ -151,7 +151,7 @@ export const SiteDetailReviews = ({
                 variant="destructive"
                 className="flex-1"
               >
-                <Link to={`/new-complaint?site=${site.id}`}>
+                <Link to={`/sikayetler/yeni?site=${site.id}`}>
                   <AlertCircle className="w-4 h-4 mr-2" />
                   Şikayet Yaz
                 </Link>
