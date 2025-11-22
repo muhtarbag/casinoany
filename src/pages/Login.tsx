@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,9 @@ const Login = () => {
   const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance('login');
 
   useEffect(() => {
     // Only redirect if auth is loaded and user exists

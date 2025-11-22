@@ -10,9 +10,13 @@ import { ComplaintsShowcase } from '@/components/ComplaintsShowcase';
 import { Link } from 'react-router-dom';
 import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 import { useFeaturedSites } from '@/hooks/queries/useBettingSitesQueries';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance('homepage');
   
   const handleSearch = (term: string) => {
     setSearchTerm(term);

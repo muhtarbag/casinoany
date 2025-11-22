@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useAchievements } from '@/hooks/useAchievements';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 export default function Dashboard() {
   const { user, isSiteOwner, loading, impersonatedUserId, isImpersonating } = useAuth();
@@ -19,6 +20,9 @@ export default function Dashboard() {
 
   // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
   const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance('member-dashboard');
 
   // Fetch achievements
   const { recentAchievements, earnedCount, totalCount, isLoading: isLoadingAchievements } = useAchievements(effectiveUserId);

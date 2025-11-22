@@ -14,10 +14,14 @@ import { ArrowRight } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import NotFound from './NotFound';
 import { BreadcrumbSchema, ItemListSchema } from '@/components/StructuredData';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 export default function CategoryDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: category, isLoading, error } = useCategoryWithRelations(slug || '');
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance(`category-${slug}`);
 
   if (isLoading) {
     return (

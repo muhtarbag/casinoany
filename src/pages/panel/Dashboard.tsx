@@ -17,6 +17,7 @@ import {
   AlertCircle,
   User
 } from 'lucide-react';
+import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
 export default function Dashboard() {
   const { user, impersonatedUserId, isImpersonating } = useAuth();
@@ -24,6 +25,9 @@ export default function Dashboard() {
 
   // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
   const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
+  
+  // ⚡ Performance monitoring
+  usePageLoadPerformance('site-owner-dashboard');
 
   const { data: profile } = useQuery({
     queryKey: ['user-profile', effectiveUserId],
