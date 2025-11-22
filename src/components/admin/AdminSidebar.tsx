@@ -15,7 +15,8 @@ import {
   BarChart3,
   Trophy,
   Link2,
-  Megaphone
+  Megaphone,
+  ExternalLink
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -105,6 +106,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       items: [
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
+        { id: 'domain-monitoring', icon: ExternalLink, label: 'Domain İzleme', route: '/admin/system/domain-monitoring', roles: [] },
         { id: 'footer', icon: Link2, label: 'Footer Yönetimi', route: '/admin/system/footer', roles: [] },
       ],
     },
