@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,109 +22,111 @@ import { cn } from "@/lib/utils";
 // Create queryClient once outside component to avoid React dispatcher issues
 const queryClient = createAppQueryClient();
 
-// All pages imported directly (no lazy loading for maximum stability)
+// ⚡ CRITICAL PAGES - Loaded immediately for fastest initial experience
 import Index from "./pages/Index";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-
-// CRITICAL: Core auth & admin pages imported directly
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import AdminRoot from "./pages/admin";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminAnalytics from "./pages/admin/Analytics";
-import AdminSitesHub from "./pages/admin/sites/index";
-import AdminRoleManagement from "./pages/admin/system/RoleManagement";
-import AdminUsers from "./pages/admin/system/Users";
-
-// Admin pages - all imported directly
-import AdminBlogManagement from "./pages/admin/blog/BlogManagement";
-import AdminAffiliateManagement from "./pages/admin/finance/AffiliateManagement";
-import AdminBonusManagement from "./pages/admin/finance/BonusManagement";
-import AdminReviews from "./pages/admin/Reviews";
-import AdminComplaints from "./pages/admin/Complaints";
-import AdminNotifications from "./pages/admin/Notifications";
-import AdminNews from "./pages/admin/News";
-import AdminCasinoContent from "./pages/admin/content/CasinoContent";
-import AdminCategoryManagement from "./pages/admin/content/CategoryManagement";
-import AdminCategorySites from "./pages/admin/content/CategorySites";
-import AdminBonusRequests from "./pages/admin/finance/BonusRequests";
-import AdminContentPlanner from "./pages/admin/content/ContentPlanner";
-import AdminChangeHistory from "./pages/admin/system/ChangeHistory";
-import AdminBuildHealth from "./pages/admin/system/BuildHealth";
-import AdminFeaturedSites from "./pages/admin/sites/FeaturedSites";
-import AdminBannerManagement from "./pages/admin/sites/BannerManagement";
-import AdminSiteAdditionRequests from "./pages/admin/sites/SiteAdditionRequests";
-import AdminRecommendedSites from "./pages/admin/sites/RecommendedSites";
-import AdminSiteStats from "./pages/admin/sites/SiteStats";
-import AdminBlogStats from "./pages/admin/blog/BlogStats";
-import AdminBlogComments from "./pages/admin/blog/BlogComments";
-import GamificationDashboard from "./pages/admin/gamification/Dashboard";
-import AchievementsManagement from "./pages/admin/gamification/Achievements";
-import RewardsManagement from "./pages/admin/gamification/Rewards";
-import UserStatsManagement from "./pages/admin/gamification/UserStats";
-import AdminSystemLogs from "./pages/admin/system/SystemLogs";
-import AdminSiteOwners from "./pages/admin/SiteOwners";
-import AdminFooterManagement from "./pages/admin/system/FooterManagement";
-import AdvertisingManagement from "./pages/admin/advertising";
-import DomainMonitoring from "./pages/panel/DomainMonitoring";
-
-// Public pages - all imported directly
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import BlogRedirect from "./pages/BlogRedirect";
-import SlugRouter from "./pages/SlugRouter";
-import News from "./pages/News";
-import NewsDetail from "./pages/NewsDetail";
 import NotFound from "./pages/NotFound";
-import SiteDetail from "./pages/SiteDetail";
-import CasinoSites from "./pages/CasinoSites";
-import SportsBetting from "./pages/SportsBetting";
-import LiveCasino from "./pages/LiveCasino";
-import BonusCampaigns from "./pages/BonusCampaigns";
-import MobileBetting from "./pages/MobileBetting";
-import About from "./pages/About";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Cookies from "./pages/Cookies";
-import KVKK from "./pages/KVKK";
-import Sitemap from "./pages/Sitemap";
-import SiteRedirect from "./pages/SiteRedirect";
-import AMPBlogPost from "./pages/amp/AMPBlogPost";
-import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
-import Categories from "./pages/Categories";
-import CategoryDetail from "./pages/CategoryDetail";
-import FAQ from "./pages/FAQ";
-import GameProviders from "./pages/GameProviders";
-import CategoryPage from "./pages/CategoryPage";
 
-// User profile pages - all imported directly
-import Favorites from "./pages/profile/Favorites";
-import Memberships from "./pages/profile/Memberships";
-import ProfileDashboard from "./pages/profile/Dashboard";
-import ProfileReviews from "./pages/profile/Reviews";
-import ProfileComplaints from "./pages/profile/Complaints";
-import BonusTracking from "./pages/profile/BonusTracking";
-import ProfileSettings from "./pages/profile/Settings";
-import ProfileNotifications from "./pages/profile/Notifications";
-import LoyaltyPoints from "./pages/profile/LoyaltyPoints";
-import Referrals from "./pages/profile/Referrals";
-import Achievements from "./pages/profile/Achievements";
+// 🔐 Auth Pages - Lazy loaded (not critical for first paint)
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
-// User panel pages - all imported directly
-import UserDashboard from "./pages/panel/Dashboard";
-import SiteManagement from "./pages/panel/SiteManagement";
+// 👑 Admin Pages - Lazy loaded (only for admin users)
+const AdminRoot = lazy(() => import("./pages/admin"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminSitesHub = lazy(() => import("./pages/admin/sites/index"));
+const AdminRoleManagement = lazy(() => import("./pages/admin/system/RoleManagement"));
+const AdminUsers = lazy(() => import("./pages/admin/system/Users"));
+const AdminBlogManagement = lazy(() => import("./pages/admin/blog/BlogManagement"));
+const AdminAffiliateManagement = lazy(() => import("./pages/admin/finance/AffiliateManagement"));
+const AdminBonusManagement = lazy(() => import("./pages/admin/finance/BonusManagement"));
+const AdminReviews = lazy(() => import("./pages/admin/Reviews"));
+const AdminComplaints = lazy(() => import("./pages/admin/Complaints"));
+const AdminNotifications = lazy(() => import("./pages/admin/Notifications"));
+const AdminNews = lazy(() => import("./pages/admin/News"));
+const AdminCasinoContent = lazy(() => import("./pages/admin/content/CasinoContent"));
+const AdminCategoryManagement = lazy(() => import("./pages/admin/content/CategoryManagement"));
+const AdminCategorySites = lazy(() => import("./pages/admin/content/CategorySites"));
+const AdminBonusRequests = lazy(() => import("./pages/admin/finance/BonusRequests"));
+const AdminContentPlanner = lazy(() => import("./pages/admin/content/ContentPlanner"));
+const AdminChangeHistory = lazy(() => import("./pages/admin/system/ChangeHistory"));
+const AdminBuildHealth = lazy(() => import("./pages/admin/system/BuildHealth"));
+const AdminFeaturedSites = lazy(() => import("./pages/admin/sites/FeaturedSites"));
+const AdminBannerManagement = lazy(() => import("./pages/admin/sites/BannerManagement"));
+const AdminSiteAdditionRequests = lazy(() => import("./pages/admin/sites/SiteAdditionRequests"));
+const AdminRecommendedSites = lazy(() => import("./pages/admin/sites/RecommendedSites"));
+const AdminSiteStats = lazy(() => import("./pages/admin/sites/SiteStats"));
+const AdminBlogStats = lazy(() => import("./pages/admin/blog/BlogStats"));
+const AdminBlogComments = lazy(() => import("./pages/admin/blog/BlogComments"));
+const GamificationDashboard = lazy(() => import("./pages/admin/gamification/Dashboard"));
+const AchievementsManagement = lazy(() => import("./pages/admin/gamification/Achievements"));
+const RewardsManagement = lazy(() => import("./pages/admin/gamification/Rewards"));
+const UserStatsManagement = lazy(() => import("./pages/admin/gamification/UserStats"));
+const AdminSystemLogs = lazy(() => import("./pages/admin/system/SystemLogs"));
+const AdminSiteOwners = lazy(() => import("./pages/admin/SiteOwners"));
+const AdminFooterManagement = lazy(() => import("./pages/admin/system/FooterManagement"));
+const AdvertisingManagement = lazy(() => import("./pages/admin/advertising"));
+const DomainMonitoring = lazy(() => import("./pages/panel/DomainMonitoring"));
 
-// Complaint pages - all imported directly
-import Complaints from "./pages/Complaints";
-import ComplaintDetail from "./pages/ComplaintDetail";
-import NewComplaint from "./pages/NewComplaint";
+// 📝 Blog & Content Pages - Lazy loaded (content heavy)
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const BlogRedirect = lazy(() => import("./pages/BlogRedirect"));
+const News = lazy(() => import("./pages/News"));
+const NewsDetail = lazy(() => import("./pages/NewsDetail"));
 
-// SEO-optimized pages - all imported directly
-import DenemeBonusu from "./pages/DenemeBonusuDynamic";
+// 🎰 Casino Pages - Lazy loaded (user-facing but not critical)
+const SiteDetail = lazy(() => import("./pages/SiteDetail"));
+const CasinoSites = lazy(() => import("./pages/CasinoSites"));
+const SportsBetting = lazy(() => import("./pages/SportsBetting"));
+const LiveCasino = lazy(() => import("./pages/LiveCasino"));
+const BonusCampaigns = lazy(() => import("./pages/BonusCampaigns"));
+const MobileBetting = lazy(() => import("./pages/MobileBetting"));
+const Categories = lazy(() => import("./pages/Categories"));
+const CategoryDetail = lazy(() => import("./pages/CategoryDetail"));
+const GameProviders = lazy(() => import("./pages/GameProviders"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const SiteRedirect = lazy(() => import("./pages/SiteRedirect"));
+const DenemeBonusu = lazy(() => import("./pages/DenemeBonusuDynamic"));
 
-// PWA Install page - imported directly
-import Install from "./pages/Install";
+// 👤 Profile Pages - Lazy loaded (authenticated users only)
+const ProfileDashboard = lazy(() => import("./pages/profile/Dashboard"));
+const Favorites = lazy(() => import("./pages/profile/Favorites"));
+const Memberships = lazy(() => import("./pages/profile/Memberships"));
+const ProfileReviews = lazy(() => import("./pages/profile/Reviews"));
+const ProfileComplaints = lazy(() => import("./pages/profile/Complaints"));
+const BonusTracking = lazy(() => import("./pages/profile/BonusTracking"));
+const ProfileSettings = lazy(() => import("./pages/profile/Settings"));
+const ProfileNotifications = lazy(() => import("./pages/profile/Notifications"));
+const LoyaltyPoints = lazy(() => import("./pages/profile/LoyaltyPoints"));
+const Referrals = lazy(() => import("./pages/profile/Referrals"));
+const Achievements = lazy(() => import("./pages/profile/Achievements"));
+
+// 🎯 User Panel Pages - Lazy loaded (site owners only)
+const UserDashboard = lazy(() => import("./pages/panel/Dashboard"));
+const SiteManagement = lazy(() => import("./pages/panel/SiteManagement"));
+
+// 📢 Complaint Pages - Lazy loaded (user submissions)
+const Complaints = lazy(() => import("./pages/Complaints"));
+const ComplaintDetail = lazy(() => import("./pages/ComplaintDetail"));
+const NewComplaint = lazy(() => import("./pages/NewComplaint"));
+
+// 📄 Static/Legal Pages - Lazy loaded (low priority)
+const About = lazy(() => import("./pages/About"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Cookies = lazy(() => import("./pages/Cookies"));
+const KVKK = lazy(() => import("./pages/KVKK"));
+const Sitemap = lazy(() => import("./pages/Sitemap"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Install = lazy(() => import("./pages/Install"));
+
+// ⚡ AMP & Special Routes - Lazy loaded (SEO crawlers)
+const AMPBlogPost = lazy(() => import("./pages/amp/AMPBlogPost"));
+const AMPSiteDetail = lazy(() => import("./pages/amp/AMPSiteDetail"));
+const SlugRouter = lazy(() => import("./pages/SlugRouter"));
 
 // Loading fallback component - Clean and minimal
 const PageLoader = () => (
