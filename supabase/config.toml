@@ -27,20 +27,11 @@ verify_jwt = true
 [functions.content-planner]
 verify_jwt = true
 
-[functions.dynamic-sitemap]
-verify_jwt = false
-
 [functions.generate-casino-content]
 verify_jwt = true
 
 [functions.keyword-tracker]
 verify_jwt = true
-
-[functions.sitemap-xml]
-verify_jwt = false
-
-[functions.update-sitemap]
-verify_jwt = false
 
 [functions.sitemap]
 verify_jwt = false
