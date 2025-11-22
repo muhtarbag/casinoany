@@ -11,11 +11,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY!;
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const SITE_URL = process.env.SITE_URL || 'https://casinoany.com';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Only create supabase client if credentials are available
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 interface SitemapUrl {
   loc: string;
@@ -50,64 +53,69 @@ async function generateSitemap() {
     });
   });
 
-  try {
-    // Fetch categories
-    const { data: categories } = await supabase
-      .from('categories')
-      .select('slug, updated_at')
-      .eq('is_active', true);
+  // Only fetch dynamic routes if Supabase is available
+  if (supabase) {
+    try {
+      // Fetch categories
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('slug, updated_at')
+        .eq('is_active', true);
 
-    if (categories) {
-      categories.forEach(cat => {
-        urls.push({
-          loc: `${SITE_URL}/${cat.slug}`,
-          lastmod: cat.updated_at || now,
-          changefreq: 'weekly',
-          priority: 0.8,
+      if (categories) {
+        categories.forEach(cat => {
+          urls.push({
+            loc: `${SITE_URL}/${cat.slug}`,
+            lastmod: cat.updated_at || now,
+            changefreq: 'weekly',
+            priority: 0.8,
+          });
         });
-      });
-    }
+      }
 
-    // Fetch betting sites
-    const { data: sites } = await supabase
-      .from('betting_sites')
-      .select('slug, updated_at')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
+      // Fetch betting sites
+      const { data: sites } = await supabase
+        .from('betting_sites')
+        .select('slug, updated_at')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
 
-    if (sites) {
-      sites.forEach(site => {
-        urls.push({
-          loc: `${SITE_URL}/site/${site.slug}`,
-          lastmod: site.updated_at || now,
-          changefreq: 'weekly',
-          priority: 0.9,
+      if (sites) {
+        sites.forEach(site => {
+          urls.push({
+            loc: `${SITE_URL}/site/${site.slug}`,
+            lastmod: site.updated_at || now,
+            changefreq: 'weekly',
+            priority: 0.9,
+          });
         });
-      });
-    }
+      }
 
-    // Fetch blog posts
-    const { data: posts } = await supabase
-      .from('blog_posts')
-      .select('slug, updated_at')
-      .eq('is_published', true)
-      .order('published_at', { ascending: false });
+      // Fetch blog posts
+      const { data: posts } = await supabase
+        .from('blog_posts')
+        .select('slug, updated_at')
+        .eq('is_published', true)
+        .order('published_at', { ascending: false });
 
-    if (posts) {
-      posts.forEach(post => {
-        urls.push({
-          loc: `${SITE_URL}/blog/${post.slug}`,
-          lastmod: post.updated_at || now,
-          changefreq: 'monthly',
-          priority: 0.7,
+      if (posts) {
+        posts.forEach(post => {
+          urls.push({
+            loc: `${SITE_URL}/blog/${post.slug}`,
+            lastmod: post.updated_at || now,
+            changefreq: 'monthly',
+            priority: 0.7,
+          });
         });
-      });
-    }
+      }
 
-    console.log(`✅ Found ${urls.length} URLs\n`);
-  } catch (error) {
-    console.error('⚠️  Error fetching dynamic routes:', error);
-    console.log('📝 Continuing with static routes only...\n');
+      console.log(`✅ Found ${urls.length} URLs (with dynamic content)\n`);
+    } catch (error) {
+      console.error('⚠️  Error fetching dynamic routes:', error);
+      console.log('📝 Continuing with static routes only...\n');
+    }
+  } else {
+    console.log('ℹ️  Supabase credentials not found, using static routes only\n');
   }
 
   // Generate XML
