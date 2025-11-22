@@ -47,7 +47,7 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('email, first_name, last_name')
+        .select('email, first_name, last_name, username')
         .eq('id', user.id)
         .maybeSingle();
       
@@ -80,7 +80,7 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
     mutationFn: async (data: ReviewFormDataAuthenticated | ReviewFormDataAnonymous) => {
       // Login olmuş kullanıcı için profile bilgilerini kullan
       const userName = isAuthenticated 
-        ? `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Kullanıcı'
+        ? profile?.username || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Kullanıcı'
         : ('name' in data ? data.name : '');
       
       const userEmail = isAuthenticated
@@ -135,8 +135,9 @@ export default function ReviewForm({ siteId }: ReviewFormProps) {
           <Alert className="bg-primary/5 border-primary/20">
             <User className="h-4 w-4" />
             <AlertDescription>
-              <span className="font-medium">{profile.first_name} {profile.last_name}</span> olarak yorum yazıyorsunuz
-              {profile.email && <span className="text-muted-foreground"> ({profile.email})</span>}
+              <span className="font-medium">
+                {profile.username || `${profile.first_name} ${profile.last_name}`}
+              </span> olarak yorum yazıyorsunuz
             </AlertDescription>
           </Alert>
         )}
