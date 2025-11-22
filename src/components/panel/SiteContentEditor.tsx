@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Eye, FileText, HelpCircle, Gamepad2, LogIn, Wallet, Award } from 'lucide-react';
+import { Loader2, Save, Eye, FileText, HelpCircle, Gamepad2, LogIn, Wallet, Award, AlertTriangle } from 'lucide-react';
 import { CasinoContentEditor } from '@/components/CasinoContentEditor';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AdvancedContentEditor } from './content/AdvancedContentEditor';
+import { siteContentSchema } from '@/lib/validation/siteContentSchema';
 
 interface SiteContentEditorProps {
   siteId: string;
@@ -45,7 +46,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     enabled: !!siteId,
   });
 
-  // ✅ Real-time updates for content changes
+  // ✅ Real-time updates for content changes (silent mode)
   useEffect(() => {
     if (!siteId) return;
 
@@ -76,10 +77,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
             // Invalidate query to ensure consistency
             queryClient.invalidateQueries({ queryKey: ['site-content', siteId] });
             
-            toast({
-              title: "İçerik Güncellendi",
-              description: "Site içeriği real-time olarak güncellendi.",
-            });
+            // ✅ Silent update - no toast notification
           }
         }
       )
@@ -88,7 +86,7 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [siteId, queryClient, toast]);
+  }, [siteId, queryClient]);
 
   // Load content when fetched
   useEffect(() => {
@@ -128,9 +126,28 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
     }
   }, [pros, cons, verdict, expertReview, gameCategories, loginGuide, withdrawalGuide, faq, blockStyles, siteContent]);
 
-  // Save mutation
+  // Save mutation with validation
   const saveMutation = useMutation({
     mutationFn: async () => {
+      // ✅ VALIDATE before saving
+      const validationResult = siteContentSchema.safeParse({
+        pros,
+        cons,
+        verdict,
+        expertReview,
+        gameCategories,
+        loginGuide,
+        withdrawalGuide,
+        faq,
+      });
+
+      if (!validationResult.success) {
+        const errors = validationResult.error.errors.map(err => 
+          `${err.path.join('.')}: ${err.message}`
+        ).join('\n');
+        throw new Error(`Lütfen aşağıdaki hataları düzeltin:\n\n${errors}`);
+      }
+
       const { error } = await supabase
         .from('betting_sites')
         .update({
@@ -174,11 +191,15 @@ export const SiteContentEditor = ({ siteId }: SiteContentEditorProps) => {
       });
     },
     onError: (error: any) => {
+      // ✅ Show detailed validation errors
       toast({
-        title: 'Hata',
+        title: 'Kaydetme Başarısız',
         description: error.message || 'İçerik kaydedilemedi',
         variant: 'destructive',
+        duration: 10000, // Show for 10 seconds
       });
+      
+      console.error('Save error:', error);
     },
   });
 
