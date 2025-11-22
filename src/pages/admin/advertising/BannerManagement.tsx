@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Eye, EyeOff, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Eye, EyeOff, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
@@ -23,6 +23,7 @@ const BANNER_LOCATIONS = [
 
 export default function BannerManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingBanner, setEditingBanner] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -225,6 +226,14 @@ export default function BannerManagement() {
                           <ExternalLink className="w-4 h-4" />
                         </Button>
 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingBanner(banner)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+
                         <Switch
                           checked={banner.is_active}
                           onCheckedChange={() => toggleBannerMutation.mutate({
@@ -253,46 +262,69 @@ export default function BannerManagement() {
           );
         })}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingBanner} onOpenChange={(open) => !open && setEditingBanner(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Banner Düzenle</DialogTitle>
+          </DialogHeader>
+          <BannerForm 
+            campaigns={campaigns || []} 
+            banner={editingBanner}
+            onSuccess={() => setEditingBanner(null)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 // Banner Form Component
-function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () => void }) {
+function BannerForm({ campaigns, banner, onSuccess }: { campaigns: any[]; banner?: any; onSuccess: () => void }) {
   const [formData, setFormData] = useState({
-    campaign_id: '',
-    banner_name: '',
-    banner_location: '',
-    banner_size: '',
-    image_url: '',
-    mobile_image_url: '',
-    click_url: '',
-    alt_text: '',
-    priority: 0,
-    start_date: format(new Date(), 'yyyy-MM-dd'),
-    end_date: '',
-    cpm_rate: 0,
-    cpc_rate: 0,
+    campaign_id: banner?.campaign_id || '',
+    banner_name: banner?.banner_name || '',
+    banner_location: banner?.banner_location || '',
+    banner_size: banner?.banner_size || '',
+    image_url: banner?.image_url || '',
+    mobile_image_url: banner?.mobile_image_url || '',
+    click_url: banner?.click_url || '',
+    alt_text: banner?.alt_text || '',
+    priority: banner?.priority || 0,
+    start_date: banner?.start_date ? format(new Date(banner.start_date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+    end_date: banner?.end_date ? format(new Date(banner.end_date), 'yyyy-MM-dd') : '',
+    cpm_rate: banner?.cpm_rate || 0,
+    cpc_rate: banner?.cpc_rate || 0,
   });
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const createBannerMutation = useMutation({
+  const saveBannerMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase
-        .from('ad_banners')
-        .insert({
-          ...data,
-          start_date: new Date(data.start_date).toISOString(),
-          end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
-        });
+      const payload = {
+        ...data,
+        start_date: new Date(data.start_date).toISOString(),
+        end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
+      };
 
-      if (error) throw error;
+      if (banner) {
+        const { error } = await supabase
+          .from('ad_banners')
+          .update(payload)
+          .eq('id', banner.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('ad_banners')
+          .insert(payload);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-banners'] });
-      toast({ title: 'Banner oluşturuldu' });
+      toast({ title: banner ? 'Banner güncellendi' : 'Banner oluşturuldu' });
       onSuccess();
     },
     onError: (error) => {
@@ -306,7 +338,7 @@ function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createBannerMutation.mutate(formData);
+    saveBannerMutation.mutate(formData);
   };
 
   return (
@@ -467,9 +499,12 @@ function BannerForm({ campaigns, onSuccess }: { campaigns: any[]; onSuccess: () 
       <Button 
         type="submit" 
         className="w-full" 
-        disabled={createBannerMutation.isPending || campaigns.length === 0}
+        disabled={saveBannerMutation.isPending || campaigns.length === 0}
       >
-        {createBannerMutation.isPending ? 'Oluşturuluyor...' : 'Banner Oluştur'}
+        {saveBannerMutation.isPending 
+          ? (banner ? 'Güncelleniyor...' : 'Oluşturuluyor...') 
+          : (banner ? 'Banner Güncelle' : 'Banner Oluştur')
+        }
       </Button>
       
       {campaigns.length === 0 && (
