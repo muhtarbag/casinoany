@@ -89,20 +89,23 @@ export const CasinoContentEditor = ({
     setGameCategories(newCategories);
   };
 
-  const updateGameCategory = (oldKey: string, newKey: string, value: string) => {
+  const updateCategoryName = (oldKey: string, newKey: string) => {
+    if (oldKey === newKey) return;
+    
     const newCategories = { ...gameCategories };
+    const value = newCategories[oldKey] || '';
     
-    // ✅ FIXED: Always delete old key if it's different from new key
-    if (oldKey !== newKey) {
-      delete newCategories[oldKey];
-    }
+    delete newCategories[oldKey];
     
-    // ✅ Only set if newKey is not empty
-    if (newKey.trim() !== "" || value.trim() !== "") {
+    if (newKey.trim() !== '') {
       newCategories[newKey] = value;
     }
     
     setGameCategories(newCategories);
+  };
+
+  const updateCategoryValue = (key: string, value: string) => {
+    setGameCategories({ ...gameCategories, [key]: value });
   };
 
   const addFaq = () => setFaq([...faq, { question: "", answer: "" }]);
@@ -206,25 +209,33 @@ export const CasinoContentEditor = ({
                 <Plus className="w-4 h-4 mr-1" />
                 Kategori Ekle
               </Button>
-              {Object.entries(gameCategories).map(([key, value]) => (
-                <div key={key || `empty-${Math.random()}`} className="grid grid-cols-2 gap-2">
-                  <Input
-                    value={key.startsWith('new_category_') ? '' : key}
-                    onChange={(e) => updateGameCategory(key, e.target.value, value)}
-                    placeholder="Kategori (örn: slot)"
-                  />
-                  <div className="flex gap-2">
+              {Object.entries(gameCategories).map(([key, value]) => {
+                const displayKey = key.startsWith('new_category_') ? '' : key;
+                return (
+                  <div key={key} className="grid grid-cols-2 gap-2">
                     <Input
-                      value={value}
-                      onChange={(e) => updateGameCategory(key, key, e.target.value)}
-                      placeholder="Açıklama (örn: 500+ slot oyunu)"
+                      defaultValue={displayKey}
+                      onBlur={(e) => {
+                        const newName = e.target.value.trim();
+                        if (newName && newName !== key) {
+                          updateCategoryName(key, newName);
+                        }
+                      }}
+                      placeholder="Kategori (örn: slot)"
                     />
-                    <Button type="button" size="icon" variant="ghost" onClick={() => removeGameCategory(key)}>
-                      <X className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Input
+                        value={value}
+                        onChange={(e) => updateCategoryValue(key, e.target.value)}
+                        placeholder="Açıklama (örn: 500+ slot oyunu)"
+                      />
+                      <Button type="button" size="icon" variant="ghost" onClick={() => removeGameCategory(key)}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </AccordionContent>
           </AccordionItem>
 
