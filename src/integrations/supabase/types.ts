@@ -1236,6 +1236,7 @@ export type Database = {
           display_order: number | null
           eligibility: string | null
           id: string
+          image_url: string | null
           is_active: boolean | null
           site_id: string | null
           terms: string | null
@@ -1251,6 +1252,7 @@ export type Database = {
           display_order?: number | null
           eligibility?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           site_id?: string | null
           terms?: string | null
@@ -1266,6 +1268,7 @@ export type Database = {
           display_order?: number | null
           eligibility?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           site_id?: string | null
           terms?: string | null

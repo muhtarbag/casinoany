@@ -27,6 +27,7 @@ interface BonusOffer {
   validity_period: string | null;
   display_order: number;
   is_active: boolean;
+  image_url: string | null;
 }
 
 export const BonusManagement = () => {
@@ -45,6 +46,7 @@ export const BonusManagement = () => {
     validity_period: '',
     display_order: 0,
     is_active: true,
+    image_url: '',
   });
 
   // Fetch all bonus offers
@@ -199,6 +201,7 @@ export const BonusManagement = () => {
         validity_period: bonus.validity_period || '',
         display_order: bonus.display_order,
         is_active: bonus.is_active,
+        image_url: bonus.image_url || '',
       });
     } else {
       setEditingBonus(null);
@@ -213,6 +216,7 @@ export const BonusManagement = () => {
         validity_period: '',
         display_order: 0,
         is_active: true,
+        image_url: '',
       });
     }
     setIsDialogOpen(true);
@@ -299,6 +303,29 @@ export const BonusManagement = () => {
                       placeholder="Örn: 100 TL"
                       required
                     />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="image_url">Bonus Görseli (URL)</Label>
+                    <Input
+                      id="image_url"
+                      type="url"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                      placeholder="https://example.com/bonus-image.jpg"
+                    />
+                    {formData.image_url && (
+                      <div className="mt-2 border rounded-lg overflow-hidden">
+                        <img 
+                          src={formData.image_url} 
+                          alt="Bonus önizleme" 
+                          className="w-full h-32 object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -467,13 +494,25 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete }: SortableBonusItemProps) 
       
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center gap-4">
-          {bonus.betting_sites?.logo_url && (
-            <img
-              src={bonus.betting_sites.logo_url}
-              alt={bonus.betting_sites?.name}
-              className="w-12 h-12 object-contain rounded"
-            />
-          )}
+          <div className="flex items-center gap-3">
+            {bonus.betting_sites?.logo_url && (
+              <img
+                src={bonus.betting_sites.logo_url}
+                alt={bonus.betting_sites?.name}
+                className="w-12 h-12 object-contain rounded"
+              />
+            )}
+            {bonus.image_url && (
+              <img
+                src={bonus.image_url}
+                alt={bonus.title}
+                className="w-16 h-12 object-cover rounded border"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </div>
           <div>
             <p className="font-medium">{bonus.title}</p>
             <p className="text-sm text-muted-foreground">
