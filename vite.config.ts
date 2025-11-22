@@ -29,7 +29,8 @@ export default defineConfig(({ mode }) => ({
       ext: '.br',
     }),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      injectRegister: 'inline',
       includeAssets: ['favicon.ico', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
       manifest: {
         name: 'CasinoAny - Casino ve Bahis Siteleri',
@@ -71,8 +72,10 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
-        navigateFallback: null, // Don't use offline.html as fallback, let the app handle it
+        navigateFallback: null,
         navigateFallbackDenylist: [/^\/api/, /^\/admin/],
+        skipWaiting: false,
+        clientsClaim: false,
         runtimeCaching: [
           // API Calls - NetworkFirst (fresh data priority, fallback to cache)
           {
