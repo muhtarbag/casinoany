@@ -15,6 +15,7 @@ Allow: /blog/
 Allow: /news/
 Allow: /kategori/
 Allow: /sikayetler/
+Allow: /sitemap*.xml
 
 # Disallow admin and private areas
 Disallow: /admin/

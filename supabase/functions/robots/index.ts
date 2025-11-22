@@ -85,6 +85,9 @@ Deno.serve(async (req) => {
 User-agent: *
 Allow: /
 
+# Explicitly allow sitemaps
+Allow: /sitemap*.xml
+
 # Sitemaps
 ${sitemaps.map(s => `Sitemap: https://${domain}/${s}`).join('\n')}
 
