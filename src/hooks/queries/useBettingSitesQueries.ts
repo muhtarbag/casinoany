@@ -101,22 +101,21 @@ export const useSiteStats = () => {
 };
 
 /**
- * Fetch site banners
+ * Fetch ad banners by location
+ * Uses RPC function for active banners
  */
-export const useSiteBanners = (displayPage: string = 'home') => {
+export const useSiteBanners = (location: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.banners, displayPage],
+    queryKey: [QUERY_KEYS.banners, location],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('site_banners')
-        .select('*')
-        .eq('is_active', true)
-        .contains('display_pages', [displayPage])
-        .order('position', { ascending: true })
-        .order('display_order', { ascending: true });
+        .rpc('get_active_banner', { 
+          p_location: location,
+          p_limit: 10 
+        });
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
     ...QUERY_CONFIG.static,
   });
