@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ExternalLink, AlertTriangle, CheckCircle, Search, Flag } from 'lucide-react';
+import { ExternalLink, AlertTriangle, CheckCircle, Search, Flag, Scan, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -25,7 +25,30 @@ export default function DomainMonitoring() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDomain, setSelectedDomain] = useState<any>(null);
   const [flagReason, setFlagReason] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
   const queryClient = useQueryClient();
+
+  // Real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('domain-tracking-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'domain_tracking',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['domain-tracking'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: domains, isLoading } = useQuery({
     queryKey: ['domain-tracking', searchTerm],
@@ -100,6 +123,33 @@ export default function DomainMonitoring() {
     acc[curr.domain].push(curr);
     return acc;
   }, {});
+
+  const scanExistingContent = async () => {
+    setIsScanning(true);
+    try {
+      const { data, error } = await supabase.rpc('scan_existing_content_for_domains');
+      
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ['domain-tracking'] });
+      
+      if (data && data.length > 0) {
+        toast({
+          title: 'Tarama tamamlandı',
+          description: `${data[0].scanned_records} kayıt tarandı, ${data[0].found_domains} domain bulundu`,
+        });
+      }
+    } catch (error) {
+      console.error('Scan error:', error);
+      toast({
+        title: 'Tarama hatası',
+        description: 'Bir hata oluştu',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   const DomainCard = ({ item }: { item: any }) => (
     <Card className="hover:shadow-md transition-shadow">
@@ -216,11 +266,33 @@ export default function DomainMonitoring() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Domain Monitoring</h1>
-        <p className="text-muted-foreground">
-          Kullanıcıların girdiği tüm domainleri izleyin ve hacklink/spam tespiti yapın
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Domain Monitoring</h1>
+          <p className="text-muted-foreground">
+            Kullanıcıların girdiği tüm domainleri izleyin ve hacklink/spam tespiti yapın
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            ✨ Real-time: Yeni domainler otomatik görünür
+          </p>
+        </div>
+        <Button
+          onClick={scanExistingContent}
+          disabled={isScanning}
+          variant="outline"
+        >
+          {isScanning ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Taranıyor...
+            </>
+          ) : (
+            <>
+              <Scan className="w-4 h-4 mr-2" />
+              Tüm İçeriği Tara
+            </>
+          )}
+        </Button>
       </div>
 
       <div className="flex gap-4 items-center">
