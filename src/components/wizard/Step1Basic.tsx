@@ -196,7 +196,8 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
       <div className="space-y-2">
         <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-          Kullanıcı Adı (Site isminden otomatik oluşturuldu)
+          Kullanıcı Adı
+          <span className="text-xs font-normal text-muted-foreground">(Otomatik oluşturuldu)</span>
         </Label>
         <Input
           id="username"
@@ -205,11 +206,14 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
           onChange={(e) => setUsername(e.target.value)}
           required
           disabled={disabled}
-          className="lowercase bg-muted/50"
+          className="lowercase bg-muted/30"
           placeholder="Site seçtikten sonra otomatik oluşturulacak"
         />
-        <p className="text-xs text-muted-foreground">
-          Site adından otomatik oluşturuldu. Düzenleyebilirsiniz.
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Site isminden otomatik oluşturulur, gerekirse değiştirebilirsiniz
         </p>
       </div>
       
