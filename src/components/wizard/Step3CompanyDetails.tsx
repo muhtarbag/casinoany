@@ -31,6 +31,7 @@ export const Step3CompanyDetails = ({
               placeholder="https://sirket.com"
               value={companyWebsite}
               onChange={(e) => setCompanyWebsite(e.target.value)}
+              required
               disabled={disabled}
             />
           </div>

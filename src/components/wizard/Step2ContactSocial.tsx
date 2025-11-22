@@ -65,6 +65,7 @@ export const Step2ContactSocial = ({
               placeholder="Ad Soyad"
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
+              required
               disabled={disabled}
             />
           </div>

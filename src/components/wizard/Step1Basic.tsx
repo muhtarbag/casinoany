@@ -203,6 +203,7 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
           disabled={disabled}
           className="lowercase bg-muted/50"
           placeholder="Site seçtikten sonra otomatik oluşturulacak"
@@ -269,6 +270,7 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
             placeholder="Örn: Sahabet, Betboo"
             value={newSiteName}
             onChange={(e) => setNewSiteName(e.target.value)}
+            required
             disabled={disabled}
           />
           <p className="text-xs text-muted-foreground">
@@ -285,6 +287,7 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
           placeholder="Şirket adınız"
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
+          required
           disabled={disabled}
         />
       </div>

@@ -182,8 +182,15 @@ const Signup = () => {
       toast({ title: 'Hata', description: 'Şifreler eşleşmiyor', variant: 'destructive' });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: 'Hata', description: 'Şifre en az 6 karakter olmalıdır', variant: 'destructive' });
+    
+    // Güçlü şifre validasyonu
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
+    if (!passwordRegex.test(password)) {
+      toast({ 
+        title: 'Hata', 
+        description: 'Şifre en az 6 karakter, büyük harf, küçük harf, rakam ve sembol içermelidir', 
+        variant: 'destructive' 
+      });
       return;
     }
 
@@ -502,6 +509,7 @@ const Signup = () => {
                     placeholder="kullaniciadi"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    required
                     disabled={loading}
                     maxLength={20}
                     className="h-10 sm:h-11 border-border/50 focus:border-primary transition-colors text-sm"
@@ -544,6 +552,9 @@ const Signup = () => {
                       {showPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />}
                     </Button>
                   </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    Min 6 karakter, büyük/küçük harf, rakam ve sembol
+                  </p>
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="confirmPassword" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
