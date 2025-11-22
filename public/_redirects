@@ -1,10 +1,2 @@
-# Sitemap proxy - Supabase edge functions
-/sitemap.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap 200
-/sitemap-pages.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages 200
-/sitemap-casinos.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos 200
-/sitemap-blogs.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs 200
-/sitemap-bonuses.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses 200
-/sitemap-images.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images 200
-
 # SPA fallback
 /* /index.html 200
