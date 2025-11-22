@@ -167,6 +167,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkUserRoles = async (userId: string) => {
     try {
+      // Auto-approve individual users if email is verified
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser?.email_confirmed_at) {
+        await supabase.rpc('auto_approve_verified_individual');
+      }
+      
       const { data, error } = await supabase
         .from('user_roles')
         .select('role, status')
