@@ -67,16 +67,14 @@ export default function DomainMonitoring() {
     };
   }, [queryClient]);
 
-  const { data: domains, isLoading } = useQuery({
+  const { data: domains, isLoading, error: queryError } = useQuery({
     queryKey: ['domain-tracking', searchTerm],
     queryFn: async () => {
       let query = supabase
         .from('domain_tracking')
-        .select(`
-          *,
-          profiles:user_id(username, email)
-        `)
-        .order('created_at', { ascending: false });
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       if (searchTerm) {
         query = query.ilike('domain', `%${searchTerm}%`);
@@ -90,6 +88,27 @@ export default function DomainMonitoring() {
       }
       
       console.log('Fetched domains:', data?.length || 0);
+      
+      // Manually fetch user info for each unique user_id
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map(d => d.user_id).filter(Boolean))];
+        
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, username, email')
+            .in('id', userIds);
+          
+          // Map profiles to domains
+          const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+          
+          return data.map(domain => ({
+            ...domain,
+            profiles: domain.user_id ? profileMap.get(domain.user_id) : null
+          }));
+        }
+      }
+      
       return data;
     },
   });
