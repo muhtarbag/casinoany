@@ -20,6 +20,7 @@ import RecommendedSites from "@/components/RecommendedSites";
 import { SiteDetailHeader } from '@/components/site-detail/SiteDetailHeader';
 import { SiteDetailContact } from '@/components/site-detail/SiteDetailContact';
 import { SiteDetailReviews } from '@/components/site-detail/SiteDetailReviews';
+import { AdBanner } from '@/components/advertising/AdBanner';
 
 interface Profile {
   username: string;
@@ -515,19 +516,23 @@ export default function SiteDetail() {
           <span className="text-foreground">{site.name}</span>
         </div>
 
-        {/* Site Header */}
-        <div className="mb-2">
-          <SiteDetailHeader
-            site={site}
-            logoUrl={logoUrl}
-            averageRating={averageRating}
-            reviewCount={reviews?.length || 0}
-            onAffiliateClick={handleAffiliateClick}
-            isFavorite={isFavorite}
-            onToggleFavorite={handleToggleFavorite}
-            favoriteLoading={isToggling}
-          />
-        </div>
+        {/* Two-column layout: Main content + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
+          {/* Main Content */}
+          <div>
+            {/* Site Header */}
+            <div className="mb-2">
+              <SiteDetailHeader
+                site={site}
+                logoUrl={logoUrl}
+                averageRating={averageRating}
+                reviewCount={reviews?.length || 0}
+                onAffiliateClick={handleAffiliateClick}
+                isFavorite={isFavorite}
+                onToggleFavorite={handleToggleFavorite}
+                favoriteLoading={isToggling}
+              />
+            </div>
 
         {/* Site Info Card */}
         <Card className="shadow-xl border-primary/20 mb-2">
@@ -675,6 +680,13 @@ export default function SiteDetail() {
 
         {/* Recommended Sites */}
         <RecommendedSites currentSiteId={site.id} currentSiteFeatures={site.features || []} />
+          </div>
+
+          {/* Sidebar - Desktop only */}
+          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit">
+            <AdBanner location="sidebar" className="w-full" />
+          </aside>
+        </div>
       </main>
       
       {/* Sticky Floating CTA */}
