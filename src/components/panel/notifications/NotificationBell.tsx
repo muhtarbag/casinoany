@@ -125,20 +125,23 @@ export function NotificationBell({ siteId, className }: NotificationBellProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={cn('relative', className)}
+          className={cn(
+            'relative group hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 transition-all duration-300',
+            className
+          )}
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-gradient-to-r from-red-500 to-red-600 border-2 border-background shadow-lg animate-pulse"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent className="w-96 p-0 border-2 border-primary/20 shadow-2xl bg-background/95 backdrop-blur-xl" align="end">
         <NotificationList
           notifications={notifications}
           onMarkAsRead={(id) => markAsReadMutation.mutate(id)}
