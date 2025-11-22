@@ -688,15 +688,15 @@ export default function SiteDetail() {
                                 </div>
                                 {/* Bonus Type Badge - Top Left */}
                                 {bonus.bonus_type && (
-                                  <div className="absolute top-6 left-6 z-20">
-                                    <Badge variant="secondary" className="backdrop-blur-md bg-background/80 px-3 py-1.5 text-sm font-semibold shadow-lg">
-                                      {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
-                                      {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
-                                      {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
-                                      {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
-                                      {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
-                                    </Badge>
-                                  </div>
+                                <div className="absolute top-6 left-6 z-20">
+                                  <Badge variant="outline" className="backdrop-blur-md bg-card/90 border-primary/30 text-foreground px-3 py-1.5 text-sm font-semibold shadow-lg">
+                                    {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
+                                    {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
+                                    {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
+                                    {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
+                                    {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
+                                  </Badge>
+                                </div>
                                 )}
                               </div>
                             )}
