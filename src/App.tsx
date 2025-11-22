@@ -67,6 +67,7 @@ const UserStatsManagement = lazy(() => import("./pages/admin/gamification/UserSt
 const AdminSystemLogs = lazy(() => import("./pages/admin/system/SystemLogs"));
 const AdminSiteOwners = lazy(() => import("./pages/admin/SiteOwners"));
 const AdminFooterManagement = lazy(() => import("./pages/admin/system/FooterManagement"));
+const AdminPerformanceMonitoring = lazy(() => import("./pages/admin/system/PerformanceMonitoring"));
 const AdvertisingManagement = lazy(() => import("./pages/admin/advertising"));
 const DomainMonitoring = lazy(() => import("./pages/panel/DomainMonitoring"));
 
@@ -207,6 +208,7 @@ const AppContent = () => {
             <Route path="system/logs" element={<AdminSystemLogs />} />
             <Route path="system/footer" element={<AdminFooterManagement />} />
             <Route path="system/domain-monitoring" element={<DomainMonitoring />} />
+            <Route path="system/performance" element={<AdminPerformanceMonitoring />} />
             <Route path="site-owners" element={<AdminSiteOwners />} />
             
             {/* Gamification Routes */}

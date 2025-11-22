@@ -1,6 +1,4 @@
 import { memo, Fragment, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { BettingSiteCard } from './BettingSiteCard';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
@@ -9,41 +7,20 @@ import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 import { HowItWorksSection } from './HowItWorksSection';
 import { AdBanner } from './advertising/AdBanner';
+import { useBettingSites, useSiteBanners } from '@/hooks/queries/useBettingSitesQueries';
 
 interface PixelGridProps {
   searchTerm?: string;
 }
 
 export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
-  const { data: sites, isLoading } = useQuery({
-    queryKey: ['betting-sites-active'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
+  // OPTIMIZED: Using centralized queries with proper caching
+  const { data: sites, isLoading } = useBettingSites({ 
+    isActive: true,
+    orderBy: 'display_order'
   });
-
-  const { data: banners } = useQuery({
-    queryKey: ['site-banners-home'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_banners')
-        .select('*')
-        .eq('is_active', true)
-        .contains('display_pages', ['home'])
-        .order('position', { ascending: true })
-        .order('display_order', { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  
+  const { data: banners } = useSiteBanners('home');
 
   // Filter sites based on search term
   const filteredSites = useMemo(() => {
