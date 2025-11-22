@@ -4,8 +4,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap Index (Main sitemap that lists all sub-sitemaps)
-Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap
+# Ana Sitemap (Tüm alt sitemap'leri listeler)
+Sitemap: https://www.casinoany.com/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/
