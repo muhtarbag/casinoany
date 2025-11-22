@@ -118,7 +118,7 @@ export const NotificationBell = () => {
             {notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
-                className={`flex flex-col items-start p-4 cursor-pointer hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5 transition-all duration-300 ${!notification.is_read ? 'bg-gradient-to-r from-primary/10 to-transparent border-l-2 border-l-primary' : ''}`}
+                className={`flex flex-col items-start p-4 cursor-pointer hover:bg-muted/30 transition-all duration-300 ${!notification.is_read ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
                 onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex items-start gap-3 w-full">
