@@ -84,7 +84,6 @@ export default function AdminRoot() {
       'system/roles': 'roles',
       'system/build-health': 'build-health',
       'system/footer': 'footer',
-      'seo/health': 'seo-health',
     };
     
     return routeToTabMap[path] || path;
@@ -122,7 +121,6 @@ export default function AdminRoot() {
       'roles': '/admin/system/roles',
       'build-health': '/admin/system/build-health',
       'footer': '/admin/system/footer',
-      'seo-health': '/admin/seo/health',
     };
     
     const route = tabToRouteMap[tabId] || `/admin/${tabId}`;
@@ -170,7 +168,6 @@ export default function AdminRoot() {
       'categories': 'Kategoriler',
       'banners': 'Banner Yönetimi',
       'footer': 'Footer Yönetimi',
-      'seo': 'SEO',
     };
     
     const items = [];
