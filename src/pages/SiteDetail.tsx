@@ -21,6 +21,7 @@ import { SiteDetailHeader } from '@/components/site-detail/SiteDetailHeader';
 import { SiteDetailContact } from '@/components/site-detail/SiteDetailContact';
 import { SiteDetailReviews } from '@/components/site-detail/SiteDetailReviews';
 import { AdBanner } from '@/components/advertising/AdBanner';
+import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 
 interface Profile {
   username: string;
@@ -732,6 +733,9 @@ export default function SiteDetail() {
       </div>
       
       <Footer />
+      
+      {/* Mobile Sticky Ad */}
+      <MobileStickyAd />
     </div>
   );
 }

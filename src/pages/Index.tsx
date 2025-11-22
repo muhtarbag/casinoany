@@ -8,6 +8,7 @@ import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { ComplaintsShowcase } from '@/components/ComplaintsShowcase';
 import { Link } from 'react-router-dom';
+import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -163,6 +164,9 @@ const Index = () => {
       </main>
 
       <Footer />
+      
+      {/* Mobile Sticky Ad */}
+      <MobileStickyAd />
     </div>
   );
 };

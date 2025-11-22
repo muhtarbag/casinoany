@@ -8,6 +8,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
 import { DynamicBanner } from './DynamicBanner';
 import { HowItWorksSection } from './HowItWorksSection';
+import { AdBanner } from './advertising/AdBanner';
 
 interface PixelGridProps {
   searchTerm?: string;
@@ -112,6 +113,9 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
           // Find banners for this position
           const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
           
+          // Show between_sites ad after every 3 sites (index 2, 5, 8, etc.)
+          const showBetweenSitesAd = (index + 1) % 3 === 0;
+          
           return (
             <Fragment key={site.id}>
               <BettingSiteCard
@@ -146,6 +150,11 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
                       title={banner.title}
                     />
                   ))}
+                </div>
+              )}
+              {showBetweenSitesAd && (
+                <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                  <AdBanner location="between_sites" className="w-full" />
                 </div>
               )}
             </Fragment>
