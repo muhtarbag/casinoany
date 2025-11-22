@@ -30,7 +30,6 @@ export const SiteDetailHeader = ({
         <div className="flex flex-col items-center text-center gap-1">
           {logoUrl && (
             <div className="flex-shrink-0 relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img 
                 src={logoUrl} 
                 alt={`${site.name} logo`} 
