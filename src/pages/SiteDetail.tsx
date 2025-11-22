@@ -78,6 +78,33 @@ export default function SiteDetail() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Fetch bonus offers for this site
+  const { data: bonusOffers } = useQuery({
+    queryKey: ['site-bonus-offers', slug || id],
+    queryFn: async () => {
+      if (!slug && !id) return [];
+      
+      const { data: siteData } = await supabase
+        .from("betting_sites")
+        .select("id")
+        .or(slug ? `slug.eq.${slug}` : `id.eq.${id}`)
+        .single();
+      
+      if (!siteData) return [];
+      
+      const { data, error } = await supabase
+        .from('bonus_offers')
+        .select('*')
+        .eq('site_id', siteData.id)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!(slug || id),
+  });
+
   // Fetch site data by slug or id
   const { data: site, isLoading: siteLoading, error: siteError } = useQuery({
     queryKey: ["betting-site", slug || id],
@@ -623,43 +650,121 @@ export default function SiteDetail() {
                   {site.name} sitesinde geçerli olan bonus teklifleri
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {site.bonus && (
-                  <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                    <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                      <Star className="w-5 h-5 text-gold" />
-                      Hoş Geldin Bonusu
-                    </h3>
-                    <p className="text-muted-foreground mb-4">{site.bonus}</p>
-                    <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Bonusu Talep Et
-                    </Button>
+              <CardContent className="space-y-6">
+                {bonusOffers && bonusOffers.length > 0 ? (
+                  <div className="space-y-4">
+                    {bonusOffers.map((bonus: any) => (
+                      <div key={bonus.id} className="p-6 bg-gradient-to-br from-primary/5 via-background to-primary/5 rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <div className="flex flex-col md:flex-row gap-4">
+                          {bonus.image_url && (
+                            <div className="md:w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
+                              <img 
+                                src={bonus.image_url} 
+                                alt={bonus.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="flex-1 space-y-3">
+                            <div>
+                              <h3 className="font-bold text-xl mb-1 flex items-center gap-2">
+                                <Star className="w-5 h-5 text-gold fill-gold" />
+                                {bonus.title}
+                              </h3>
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                <Badge variant="secondary" className="bg-primary/20 text-primary">
+                                  {bonus.bonus_amount}
+                                </Badge>
+                                {bonus.bonus_type && (
+                                  <Badge variant="outline">
+                                    {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
+                                    {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin Bonusu'}
+                                    {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
+                                    {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
+                                    {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {(bonus.wagering_requirement || bonus.eligibility || bonus.validity_period) && (
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                                {bonus.wagering_requirement && (
+                                  <div className="bg-background/50 p-2 rounded">
+                                    <p className="text-muted-foreground text-xs">Çevrim</p>
+                                    <p className="font-medium">{bonus.wagering_requirement}</p>
+                                  </div>
+                                )}
+                                {bonus.eligibility && (
+                                  <div className="bg-background/50 p-2 rounded">
+                                    <p className="text-muted-foreground text-xs">Kimler</p>
+                                    <p className="font-medium">{bonus.eligibility}</p>
+                                  </div>
+                                )}
+                                {bonus.validity_period && (
+                                  <div className="bg-background/50 p-2 rounded">
+                                    <p className="text-muted-foreground text-xs">Geçerlilik</p>
+                                    <p className="font-medium">{bonus.validity_period}</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {bonus.terms && (
+                              <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg">
+                                <p className="whitespace-pre-line">{bonus.terms}</p>
+                              </div>
+                            )}
+                            
+                            <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Bonusu Talep Et
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <>
+                    {site.bonus && (
+                      <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                        <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                          <Star className="w-5 h-5 text-gold" />
+                          Hoş Geldin Bonusu
+                        </h3>
+                        <p className="text-muted-foreground mb-4">{site.bonus}</p>
+                        <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Bonusu Talep Et
+                        </Button>
+                      </div>
+                    )}
+                    
+                    <div className="grid gap-4">
+                      <div className="p-4 bg-muted/50 rounded-lg">
+                        <h4 className="font-medium mb-2">💰 Çevrim Koşulları</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Bonus çevrim şartları ve detayları için {site.name} sitesini ziyaret edin.
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-muted/50 rounded-lg">
+                        <h4 className="font-medium mb-2">🎯 Özel Kampanyalar</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Sadakat programı, cashback ve diğer kampanyalar için siteyi kontrol edin.
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-muted/50 rounded-lg">
+                        <h4 className="font-medium mb-2">📅 Güncel Promosyonlar</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Haftalık ve aylık özel promosyonlar için {site.name} sitesini takip edin.
+                        </p>
+                      </div>
+                    </div>
+                  </>
                 )}
-                
-                <div className="grid gap-4">
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">💰 Çevrim Koşulları</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Bonus çevrim şartları ve detayları için {site.name} sitesini ziyaret edin.
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">🎯 Özel Kampanyalar</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Sadakat programı, cashback ve diğer kampanyalar için siteyi kontrol edin.
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">📅 Güncel Promosyonlar</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Haftalık ve aylık özel promosyonlar için {site.name} sitesini takip edin.
-                    </p>
-                  </div>
-                </div>
                 
                 <div className="pt-4 border-t">
                   <p className="text-xs text-muted-foreground">
