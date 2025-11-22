@@ -2,9 +2,22 @@
 export const seoConfig = {
   siteName: 'CasinoAny',
   siteUrl: typeof window !== 'undefined' ? window.location.origin : 'https://casinoany.com',
-  defaultTitle: 'CasinoAny - Türkiye\'nin En Güvenilir Bahis ve Casino Siteleri',
-  defaultDescription: 'En iyi bahis ve casino sitelerini karşılaştırın. Yüksek bonuslar, güvenilir ödeme yöntemleri ve detaylı site incelemeleri.',
-  defaultKeywords: ['bahis siteleri', 'casino siteleri', 'deneme bonusu', 'online bahis', 'canlı casino', 'güvenilir bahis'],
+  defaultTitle: 'En Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny',
+  defaultDescription: '2025\'in en güvenilir casino sitelerini inceleyin. %500 hoş geldin bonusu, hızlı para çekme, lisanslı bahis siteleri. 50+ detaylı inceleme.',
+  defaultKeywords: [
+    'casino siteleri', 
+    'güvenilir casino', 
+    'casino bonusları', 
+    'bahis siteleri', 
+    'deneme bonusu', 
+    'online casino', 
+    'canlı casino', 
+    'slot siteleri',
+    'hızlı para çeken casino',
+    'çevrimsiz bonus',
+    'casino incelemeleri',
+    'türkiye casino siteleri'
+  ],
   twitterHandle: '@casinoany',
   fbAppId: '',
   

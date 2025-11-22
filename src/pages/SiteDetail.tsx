@@ -431,9 +431,17 @@ export default function SiteDetail() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
       <ScrollProgress />
       <SEO
-        title={`${site.name} - Detaylı İnceleme ve Kullanıcı Yorumları`}
-        description={`${site.name} bahis sitesi hakkında detaylı inceleme. ${site.bonus || 'Bonus kampanyaları'}, kullanıcı yorumları ve ${averageRating} puan değerlendirmesi. ${site.features?.slice(0, 3).join(', ')}`}
-        keywords={[site.name, 'bahis sitesi', 'casino', 'bonus', ...(site.features || [])]}
+        title={`${site.name} İnceleme ve Bonus 2025 | CasinoAny`}
+        description={`${site.name} detaylı inceleme. ${site.bonus || 'Hoş geldin bonusu'}, ödeme yöntemleri, ${averageRating} puan kullanıcı değerlendirmesi. Güvenilir mi? Tüm detaylar.`}
+        keywords={[
+          site.name,
+          `${site.name} bonus`,
+          `${site.name} inceleme`,
+          'casino sitesi',
+          'bahis sitesi',
+          'güvenilir casino',
+          ...(site.features || []).slice(0, 5)
+        ]}
         canonical={`${window.location.origin}/site/${site.slug}`}
         ogImage={logoUrl || undefined}
         ogImageAlt={`${site.name} Logo`}
