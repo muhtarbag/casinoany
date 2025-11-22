@@ -4,16 +4,8 @@
 User-agent: *
 Allow: /
 
-# Sitemaps
-Sitemap: https://www.casinoany.com/sitemap.xml
-Sitemap: https://www.casinoany.com/sitemap-pages.xml
-Sitemap: https://www.casinoany.com/sitemap-casinos.xml
-Sitemap: https://www.casinoany.com/sitemap-blogs.xml
-Sitemap: https://www.casinoany.com/sitemap-news.xml
-Sitemap: https://www.casinoany.com/sitemap-bonuses.xml
-Sitemap: https://www.casinoany.com/sitemap-static.xml
-Sitemap: https://www.casinoany.com/sitemap-images.xml
-Sitemap: https://www.casinoany.com/sitemap-complaints.xml
+# Sitemap Index (Main sitemap that lists all sub-sitemaps)
+Sitemap: https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap
 
 # Disallow admin and private areas
 Disallow: /admin/

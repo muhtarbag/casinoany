@@ -71,15 +71,17 @@ Deno.serve(async (req) => {
     const { data: primaryDomain } = await supabase.rpc('get_primary_domain');
     const domain = primaryDomain || 'www.casinoany.com';
 
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    
     const sitemaps = [
-      'sitemap-pages.xml',
-      'sitemap-casinos.xml',
-      'sitemap-blogs.xml',
-      'sitemap-bonuses.xml',
-      'sitemap-news.xml',
-      'sitemap-static.xml',
-      'sitemap-complaints.xml',
-      'sitemap-images.xml',
+      'sitemap-pages',
+      'sitemap-casinos',
+      'sitemap-blogs',
+      'sitemap-bonuses',
+      'sitemap-news',
+      'sitemap-static',
+      'sitemap-complaints',
+      'sitemap-images',
     ];
 
     const lastmod = new Date().toISOString();
@@ -89,7 +91,7 @@ Deno.serve(async (req) => {
 ${sitemaps
   .map(
     (sitemap) => `  <sitemap>
-    <loc>https://${domain}/${sitemap}</loc>
+    <loc>${supabaseUrl}/functions/v1/${sitemap}</loc>
     <lastmod>${lastmod}</lastmod>
   </sitemap>`
   )
