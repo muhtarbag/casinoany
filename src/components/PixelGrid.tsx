@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
-import { DynamicBanner } from './DynamicBanner';
 import { HowItWorksSection } from './HowItWorksSection';
 import { AdBanner } from './advertising/AdBanner';
-import { useBettingSites, useSiteBanners } from '@/hooks/queries/useBettingSitesQueries';
+import { useBettingSites } from '@/hooks/queries/useBettingSitesQueries';
 
 interface PixelGridProps {
   searchTerm?: string;
@@ -19,8 +18,6 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
     isActive: true,
     orderBy: 'display_order'
   });
-  
-  const { data: banners } = useSiteBanners('home');
 
   // Filter sites based on search term
   const filteredSites = useMemo(() => {
@@ -87,8 +84,6 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSites.map((site: any, index: number) => {
           const isPriority = index < 6;
-          // Find banners for this position
-          const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
           
           // Show between_sites ad after every 3 sites (index 2, 5, 8, etc.)
           const showBetweenSitesAd = (index + 1) % 3 === 0;
@@ -115,20 +110,6 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
                 avgRating={site.avg_rating || 0}
                 priority={isPriority}
               />
-              {bannersAtPosition.length > 0 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                  {bannersAtPosition.map(banner => (
-                    <DynamicBanner
-                      key={banner.id}
-                      imageUrl={banner.image_url}
-                      mobileImageUrl={banner.mobile_image_url}
-                      altText={banner.alt_text}
-                      targetUrl={banner.target_url}
-                      title={banner.title}
-                    />
-                  ))}
-                </div>
-              )}
               {showBetweenSitesAd && (
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">
                   <AdBanner location="between_sites" className="w-full" />
