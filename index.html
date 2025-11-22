@@ -192,42 +192,18 @@
     
     <!-- Hide initial content after React loads -->
     <script>
-      // Wait for React to fully render before removing static content
-      if (typeof window !== 'undefined') {
-        let reactCheckAttempts = 0;
-        const maxAttempts = 50; // 5 seconds max
-        
-        const checkReactRendered = () => {
-          const root = document.getElementById('root');
-          const initialContent = document.getElementById('initial-content');
-          
-          if (!initialContent) {
-            return; // Already removed
-          }
-          
-          // Check if React has rendered (looking for React-specific elements)
-          const hasReactContent = root && (
-            root.querySelector('[data-radix-root]') || // Radix components
-            root.querySelector('.container') || // Common layout elements
-            root.children.length > 2 // More than just initial-content
-          );
-          
-          if (hasReactContent) {
-            // React has fully rendered, fade out static content
+      // Simple timeout-based removal for better PageSpeed compatibility
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var initialContent = document.getElementById('initial-content');
+          if (initialContent) {
             initialContent.style.opacity = '0';
-            setTimeout(() => {
+            setTimeout(function() {
               initialContent.remove();
             }, 300);
-          } else if (reactCheckAttempts < maxAttempts) {
-            // Keep checking
-            reactCheckAttempts++;
-            setTimeout(checkReactRendered, 100);
           }
-        };
-        
-        // Start checking after a small delay
-        setTimeout(checkReactRendered, 100);
-      }
+        }, 500);
+      });
     </script>
     
     <!-- Service Worker is auto-registered by vite-plugin-pwa -->
