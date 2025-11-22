@@ -360,20 +360,18 @@ export default function SiteDetail() {
       const scrollPosition = window.scrollY;
       
       // Detect scroll direction
-      if (scrollPosition > lastScrollY) {
-        setScrollDirection('down');
-      } else if (scrollPosition < lastScrollY) {
-        setScrollDirection('up');
-      }
-      setLastScrollY(scrollPosition);
+      setScrollDirection(prev => {
+        setLastScrollY(scrollPosition);
+        return scrollPosition > lastScrollY ? 'down' : 'up';
+      });
       
       // Show sticky CTA only when scrolling down and past 400px
-      setShowStickyCTA(scrollPosition > 400 && scrollDirection === 'down');
+      setShowStickyCTA(scrollPosition > 400);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, scrollDirection]);
+  }, []);
 
   // ✅ DÜZELTILDI: Thread-safe click tracking
   const trackClickMutation = useMutation({
