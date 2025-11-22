@@ -23,10 +23,14 @@ export function MobileStickyAd() {
   return (
     <div 
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-sm border-t border-border/50 shadow-lg transition-transform duration-300",
-        isVisible ? "translate-y-0" : "translate-y-full"
+        "fixed left-0 right-0 bg-background/98 backdrop-blur-sm border-t border-border/50 shadow-lg transition-all duration-300",
+        isVisible ? "translate-y-0" : "translate-y-full",
+        "z-[60]" // Higher than bottom nav (z-50)
       )}
-      style={{ maxHeight: '100px' }}
+      style={{ 
+        bottom: '64px', // Above the 64px (h-16) bottom navigation
+        maxHeight: '90px' 
+      }}
     >
       {/* Close Button */}
       <button
@@ -38,8 +42,8 @@ export function MobileStickyAd() {
       </button>
 
       {/* Ad Container - Minimal padding */}
-      <div className="w-full px-2 py-1 overflow-hidden">
-        <AdBanner location="mobile_sticky" className="max-h-[90px]" />
+      <div className="w-full px-2 py-1.5 overflow-hidden">
+        <AdBanner location="mobile_sticky" className="max-h-[80px]" />
       </div>
     </div>
   );
