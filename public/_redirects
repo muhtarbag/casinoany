@@ -1,13 +1,9 @@
-# Netlify/Cloudflare Pages redirects
-# Sitemap proxy - redirect to Supabase edge functions
+# Sitemap proxy - Supabase edge functions
 /sitemap.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap 200
 /sitemap-pages.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-pages 200
 /sitemap-casinos.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos 200
 /sitemap-blogs.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs 200
 /sitemap-bonuses.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses 200
-/sitemap-news.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-news 200
-/sitemap-static.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static 200
-/sitemap-complaints.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints 200
 /sitemap-images.xml https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images 200
 
 # SPA fallback

@@ -76,9 +76,6 @@ Deno.serve(async (req) => {
       'sitemap-casinos.xml',
       'sitemap-blogs.xml',
       'sitemap-bonuses.xml',
-      'sitemap-news.xml',
-      'sitemap-static.xml',
-      'sitemap-complaints.xml',
       'sitemap-images.xml',
     ];
 

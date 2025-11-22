@@ -88,7 +88,6 @@ import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import KVKK from "./pages/KVKK";
 import Sitemap from "./pages/Sitemap";
-import SitemapXML from "./pages/SitemapXML";
 import SiteRedirect from "./pages/SiteRedirect";
 import AMPBlogPost from "./pages/amp/AMPBlogPost";
 import AMPSiteDetail from "./pages/amp/AMPSiteDetail";
