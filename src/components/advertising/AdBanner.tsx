@@ -138,34 +138,44 @@ export function AdBanner({ location, className = '' }: AdBannerProps) {
       className={`relative group cursor-pointer ${className}`}
       onClick={handleBannerClick}
     >
-      {/* Sponsored Label */}
-      <div className="absolute top-2 right-2 z-10 px-3 py-1 bg-background/90 backdrop-blur-sm border border-border rounded-full">
-        <div className="flex items-center gap-1.5">
-          <ExternalLink className="w-3 h-3 text-muted-foreground" />
-          <span className="text-xs font-medium text-muted-foreground">Sponsorlu</span>
+      {/* Sponsored Label - Hidden on mobile sticky */}
+      {location !== 'mobile_sticky' && (
+        <div className="absolute top-2 right-2 z-10 px-3 py-1 bg-background/90 backdrop-blur-sm border border-border rounded-full">
+          <div className="flex items-center gap-1.5">
+            <ExternalLink className="w-3 h-3 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Sponsorlu</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Banner Image */}
-      <div className="relative w-full overflow-hidden rounded-lg border border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:scale-[1.01]">
+      <div className={`relative w-full overflow-hidden ${
+        location === 'mobile_sticky' 
+          ? 'rounded border-none' 
+          : 'rounded-lg border border-border/50 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:scale-[1.01]'
+      }`}>
         <OptimizedImage
           src={imageUrl}
           alt={banner.alt_text || banner.banner_name}
-          className="w-full h-auto"
-          width={1920}
-          height={400}
+          className={location === 'mobile_sticky' ? 'w-full h-full object-cover' : 'w-full h-auto'}
+          width={location === 'mobile_sticky' ? 320 : 1920}
+          height={location === 'mobile_sticky' ? 100 : 400}
           priority={location === 'hero'}
           sizes={
             location === 'hero' 
               ? '(max-width: 640px) 100vw, 1280px'
               : location === 'sidebar'
               ? '(max-width: 1024px) 0px, 300px'
+              : location === 'mobile_sticky'
+              ? '100vw'
               : '(max-width: 640px) 100vw, 800px'
           }
         />
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Hover Overlay - Not on mobile sticky */}
+        {location !== 'mobile_sticky' && (
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        )}
       </div>
     </div>
   );
