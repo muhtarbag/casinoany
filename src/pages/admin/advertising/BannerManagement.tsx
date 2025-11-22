@@ -298,6 +298,9 @@ function BannerForm({ campaigns, banner, onSuccess }: { campaigns: any[]; banner
     cpc_rate: banner?.cpc_rate || 0,
   });
 
+  const [uploadingDesktop, setUploadingDesktop] = useState(false);
+  const [uploadingMobile, setUploadingMobile] = useState(false);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -335,6 +338,47 @@ function BannerForm({ campaigns, banner, onSuccess }: { campaigns: any[]; banner
       });
     },
   });
+
+  const uploadImage = async (file: File, type: 'desktop' | 'mobile') => {
+    try {
+      if (type === 'desktop') setUploadingDesktop(true);
+      else setUploadingMobile(true);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('ad-banners')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('ad-banners')
+        .getPublicUrl(filePath);
+
+      if (type === 'desktop') {
+        setFormData(prev => ({ ...prev, image_url: publicUrl }));
+      } else {
+        setFormData(prev => ({ ...prev, mobile_image_url: publicUrl }));
+      }
+
+      toast({ title: 'Görsel yüklendi' });
+    } catch (error: any) {
+      toast({
+        title: 'Yükleme hatası',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      if (type === 'desktop') setUploadingDesktop(false);
+      else setUploadingMobile(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -423,22 +467,71 @@ function BannerForm({ campaigns, banner, onSuccess }: { campaigns: any[]; banner
       </div>
 
       <div className="space-y-2">
-        <Label>Banner Görseli URL</Label>
-        <Input 
-          value={formData.image_url}
-          onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-          placeholder="https://..."
-          required
-        />
+        <Label>Banner Görseli (Desktop) *</Label>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input 
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadImage(file, 'desktop');
+              }}
+              disabled={uploadingDesktop}
+              className="flex-1"
+            />
+            {uploadingDesktop && <span className="text-sm text-muted-foreground">Yükleniyor...</span>}
+          </div>
+          {formData.image_url && (
+            <div className="relative w-full h-32 border border-border rounded-lg overflow-hidden">
+              <img 
+                src={formData.image_url} 
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <Input 
+            value={formData.image_url}
+            onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+            placeholder="Ya da URL girin: https://..."
+            className="text-sm"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Mobil Görseli URL (Opsiyonel)</Label>
-        <Input 
-          value={formData.mobile_image_url}
-          onChange={(e) => setFormData(prev => ({ ...prev, mobile_image_url: e.target.value }))}
-          placeholder="https://..."
-        />
+        <Label>Mobil Görseli (Opsiyonel)</Label>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input 
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadImage(file, 'mobile');
+              }}
+              disabled={uploadingMobile}
+              className="flex-1"
+            />
+            {uploadingMobile && <span className="text-sm text-muted-foreground">Yükleniyor...</span>}
+          </div>
+          {formData.mobile_image_url && (
+            <div className="relative w-full h-32 border border-border rounded-lg overflow-hidden">
+              <img 
+                src={formData.mobile_image_url} 
+                alt="Mobile Preview"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <Input 
+            value={formData.mobile_image_url}
+            onChange={(e) => setFormData(prev => ({ ...prev, mobile_image_url: e.target.value }))}
+            placeholder="Ya da URL girin: https://..."
+            className="text-sm"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
