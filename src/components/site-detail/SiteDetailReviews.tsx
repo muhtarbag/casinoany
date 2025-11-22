@@ -138,13 +138,25 @@ export const SiteDetailReviews = ({
               </Button>
             </div>
           ) : (
-            <Button 
-              onClick={() => setShowReviewForm(true)}
-              className="w-full"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Yorum Yaz
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowReviewForm(true)}
+                className="flex-1"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Yorum Yaz
+              </Button>
+              <Button 
+                asChild
+                variant="destructive"
+                className="flex-1"
+              >
+                <Link to="/new-complaint">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Şikayet Yaz
+                </Link>
+              </Button>
+            </div>
           )
         ) : (
           <div className="flex gap-2">
