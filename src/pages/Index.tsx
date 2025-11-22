@@ -9,8 +9,7 @@ import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { ComplaintsShowcase } from '@/components/ComplaintsShowcase';
 import { Link } from 'react-router-dom';
 import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useFeaturedSites } from '@/hooks/queries/useBettingSitesQueries';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,22 +22,8 @@ const Index = () => {
     }, 100);
   };
 
-  // Fetch featured sites for ItemList schema
-  const { data: featuredSitesForSchema } = useQuery({
-    queryKey: ['featured-sites-schema'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('name, slug, logo_url, bonus')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('rating', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  // OPTIMIZED: Fetch featured sites for ItemList schema using centralized query
+  const { data: featuredSitesForSchema } = useFeaturedSites(10);
 
   const breadcrumbItems = [
     { name: 'Ana Sayfa', url: window.location.origin }
