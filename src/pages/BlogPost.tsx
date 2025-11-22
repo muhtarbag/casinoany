@@ -156,7 +156,10 @@ export default function BlogPost() {
   };
 
   const shareArticle = async () => {
-    if (navigator.share && post) {
+    if (!post) return;
+    
+    // Web Share API destekleniyorsa kullan
+    if (navigator.share) {
       try {
         await navigator.share({
           title: post.title,
@@ -165,6 +168,14 @@ export default function BlogPost() {
         });
       } catch (err) {
         console.log('Share cancelled');
+      }
+    } else {
+      // Desteklenmiyorsa URL'yi kopyala
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link kopyalandı!');
+      } catch (err) {
+        toast.error('Link kopyalanamadı');
       }
     }
   };
