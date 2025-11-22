@@ -32,6 +32,20 @@ export default function BlogPost() {
   const incrementView = useIncrementBlogView();
   const viewTrackedRef = useRef(false);
 
+  // Check if sidebar ad exists
+  const { data: hasSidebarAd } = useQuery({
+    queryKey: ['sidebar-ad-check'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_active_banner', { 
+          p_location: 'sidebar',
+          p_limit: 1 
+        });
+      return !!data?.[0];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Fetch AI-suggested internal links
   const { data: internalLinks } = useInternalLinks(
     post?.slug ? `/${post.slug}` : '',
@@ -298,8 +312,10 @@ export default function BlogPost() {
           <div className="absolute bottom-40 left-10 w-96 h-96 bg-accent/3 rounded-full blur-3xl" />
         </div>
 
-        {/* Two-column layout: Main content + Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 max-w-[1400px] mx-auto">
+        {/* Two-column layout: Main content + Sidebar (only if ad exists) */}
+        <div className={`grid gap-8 max-w-[1400px] mx-auto ${
+          hasSidebarAd ? 'grid-cols-1 lg:grid-cols-[1fr_300px]' : 'grid-cols-1'
+        }`}>
           {/* Main Content */}
           <article className="w-full">
             {/* Breadcrumb Navigation */}
@@ -543,10 +559,12 @@ export default function BlogPost() {
             </div>
           </article>
 
-          {/* Sidebar - Desktop only */}
-          <aside className="hidden lg:block space-y-6 sticky top-24 h-fit">
-            <AdBanner location="sidebar" className="w-full" />
-          </aside>
+          {/* Sidebar - Desktop only (only if ad exists) */}
+          {hasSidebarAd && (
+            <aside className="hidden lg:block space-y-6 sticky top-24 h-fit">
+              <AdBanner location="sidebar" className="w-full" />
+            </aside>
+          )}
         </div>
       </main>
 
