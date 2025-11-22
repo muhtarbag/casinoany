@@ -35,10 +35,11 @@ export function MobileStickyAd() {
       {/* Close Button */}
       <button
         onClick={() => setIsVisible(false)}
-        className="absolute top-0.5 right-0.5 z-10 w-2.5 h-2.5 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors p-0"
+        className="absolute top-0.5 right-0.5 z-10 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors p-0"
+        style={{ width: '12px', height: '12px' }}
         aria-label="Reklamı kapat"
       >
-        <X className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+        <X className="text-white" style={{ width: '10px', height: '10px' }} strokeWidth={3} />
       </button>
 
       {/* Ad Container - Minimal padding */}
