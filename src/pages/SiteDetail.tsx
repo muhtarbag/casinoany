@@ -680,12 +680,6 @@ export default function SiteDetail() {
                                   alt={bonus.title}
                                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                                 />
-                                {/* Floating Badge - Bottom Right */}
-                                <div className="absolute bottom-6 right-6 z-20">
-                                  <Badge className="bg-gradient-to-r from-gold to-gold/90 text-gold-foreground backdrop-blur-sm shadow-2xl px-4 py-2 text-base md:text-lg font-bold border-2 border-gold/30">
-                                    {bonus.bonus_amount}
-                                  </Badge>
-                                </div>
                                 {/* Bonus Type Badge - Top Left */}
                                 {bonus.bonus_type && (
                                 <div className="absolute top-6 left-6 z-20">
@@ -709,13 +703,9 @@ export default function SiteDetail() {
                                   <h3 className="text-2xl md:text-3xl font-bold leading-tight group-hover:text-primary transition-colors duration-300">
                                     {bonus.title}
                                   </h3>
-                                  {!bonus.image_url && (
-                                    <>
-                                      <Badge className="bg-primary text-primary-foreground shadow-md px-4 py-2 text-base font-bold whitespace-nowrap">
-                                        {bonus.bonus_amount}
-                                      </Badge>
-                                    </>
-                                  )}
+                                  <Badge className="bg-gradient-to-r from-gold to-gold/90 text-gold-foreground shadow-md px-4 py-2 text-base md:text-lg font-bold whitespace-nowrap flex-shrink-0">
+                                    {bonus.bonus_amount}
+                                  </Badge>
                                 </div>
                                 
                                 {/* Type Badge - Only show if no image */}
