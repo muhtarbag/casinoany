@@ -639,140 +639,235 @@ export default function SiteDetail() {
           </TabsContent>
 
           {/* Bonus Tab */}
-          <TabsContent value="bonus">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="w-5 h-5 text-primary" />
-                  Aktif Bonuslar ve Kampanyalar
-                </CardTitle>
-                <CardDescription>
-                  {site.name} sitesinde geçerli olan bonus teklifleri
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {bonusOffers && bonusOffers.length > 0 ? (
-                  <div className="space-y-4">
-                    {bonusOffers.map((bonus: any) => (
-                      <div key={bonus.id} className="p-6 bg-gradient-to-br from-primary/5 via-background to-primary/5 rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-lg hover:shadow-xl">
-                        <div className="flex flex-col md:flex-row gap-4">
-                          {bonus.image_url && (
-                            <div className="md:w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                              <img 
-                                src={bonus.image_url} 
-                                alt={bonus.title}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          )}
-                          <div className="flex-1 space-y-3">
-                            <div>
-                              <h3 className="font-bold text-xl mb-1 flex items-center gap-2">
-                                <Star className="w-5 h-5 text-gold fill-gold" />
-                                {bonus.title}
-                              </h3>
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                <Badge variant="secondary" className="bg-primary/20 text-primary">
-                                  {bonus.bonus_amount}
-                                </Badge>
-                                {bonus.bonus_type && (
-                                  <Badge variant="outline">
-                                    {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
-                                    {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin Bonusu'}
-                                    {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
-                                    {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
-                                    {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            
-                            {(bonus.wagering_requirement || bonus.eligibility || bonus.validity_period) && (
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                                {bonus.wagering_requirement && (
-                                  <div className="bg-background/50 p-2 rounded">
-                                    <p className="text-muted-foreground text-xs">Çevrim</p>
-                                    <p className="font-medium">{bonus.wagering_requirement}</p>
-                                  </div>
-                                )}
-                                {bonus.eligibility && (
-                                  <div className="bg-background/50 p-2 rounded">
-                                    <p className="text-muted-foreground text-xs">Kimler</p>
-                                    <p className="font-medium">{bonus.eligibility}</p>
-                                  </div>
-                                )}
-                                {bonus.validity_period && (
-                                  <div className="bg-background/50 p-2 rounded">
-                                    <p className="text-muted-foreground text-xs">Geçerlilik</p>
-                                    <p className="font-medium">{bonus.validity_period}</p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {bonus.terms && (
-                              <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded-lg">
-                                <p className="whitespace-pre-line">{bonus.terms}</p>
-                              </div>
-                            )}
-                            
-                            <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Bonusu Talep Et
-                            </Button>
-                          </div>
-                        </div>
+          <TabsContent value="bonus" className="space-y-6">
+            {bonusOffers && bonusOffers.length > 0 ? (
+              <>
+                {/* Hero Section */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-8 md:p-12 text-primary-foreground animate-fade-in">
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-10"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 bg-primary-foreground/20 rounded-xl backdrop-blur-sm">
+                        <Gift className="w-8 h-8" />
                       </div>
-                    ))}
+                      <div>
+                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Aktif Bonuslar</h2>
+                        <p className="text-primary-foreground/90 mt-1">{bonusOffers.length} özel kampanya sizi bekliyor</p>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <>
-                    {site.bonus && (
-                      <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                        <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                          <Star className="w-5 h-5 text-gold" />
-                          Hoş Geldin Bonusu
-                        </h3>
-                        <p className="text-muted-foreground mb-4">{site.bonus}</p>
-                        <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Bonusu Talep Et
-                        </Button>
+                </div>
+
+                {/* Bonus Cards Grid */}
+                <div className="space-y-6">
+                  {bonusOffers.map((bonus: any, index: number) => (
+                    <div 
+                      key={bonus.id} 
+                      className="group relative animate-fade-in hover-scale"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <CardContent className="p-0">
+                          <div className="flex flex-col lg:flex-row">
+                            {/* Image Section */}
+                            {bonus.image_url && (
+                              <div className="relative lg:w-72 h-48 lg:h-auto overflow-hidden flex-shrink-0">
+                                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-background/90 to-transparent z-10"></div>
+                                <img 
+                                  src={bonus.image_url} 
+                                  alt={bonus.title}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                />
+                                {/* Floating Badge */}
+                                <div className="absolute top-4 right-4 z-20">
+                                  <Badge className="bg-gold/90 text-gold-foreground backdrop-blur-sm border-gold/20 shadow-lg px-3 py-1.5 text-sm font-bold">
+                                    {bonus.bonus_amount}
+                                  </Badge>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Content Section */}
+                            <div className="flex-1 p-6 md:p-8 space-y-6">
+                              {/* Header */}
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between gap-4">
+                                  <h3 className="text-2xl md:text-3xl font-bold leading-tight group-hover:text-primary transition-colors duration-300">
+                                    {bonus.title}
+                                  </h3>
+                                  {!bonus.image_url && (
+                                    <Badge className="bg-primary text-primary-foreground shadow-md px-4 py-2 text-base font-bold whitespace-nowrap">
+                                      {bonus.bonus_amount}
+                                    </Badge>
+                                  )}
+                                </div>
+                                
+                                {/* Type Badge */}
+                                <div className="flex flex-wrap gap-2">
+                                  {bonus.bonus_type && (
+                                    <Badge variant="secondary" className="px-3 py-1.5 text-sm font-semibold">
+                                      {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
+                                      {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
+                                      {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
+                                      {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
+                                      {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Info Grid */}
+                              {(bonus.wagering_requirement || bonus.eligibility || bonus.validity_period) && (
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                  {bonus.wagering_requirement && (
+                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                      <div className="relative">
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Çevrim Şartı</p>
+                                        <p className="text-base font-bold text-foreground">{bonus.wagering_requirement}</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {bonus.eligibility && (
+                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                      <div className="relative">
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Kimler İçin</p>
+                                        <p className="text-base font-bold text-foreground">{bonus.eligibility}</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {bonus.validity_period && (
+                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 p-4 border border-border/50 group/card hover:border-primary/30 transition-colors">
+                                      <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8"></div>
+                                      <div className="relative">
+                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Geçerlilik</p>
+                                        <p className="text-base font-bold text-foreground">{bonus.validity_period}</p>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Terms */}
+                              {bonus.terms && (
+                                <div className="relative">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-lg"></div>
+                                  <div className="relative bg-muted/30 backdrop-blur-sm rounded-lg p-4 border border-border/50">
+                                    <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                                      {bonus.terms.length > 300 ? (
+                                        <>
+                                          {bonus.terms.substring(0, 300)}...
+                                          <button className="text-primary hover:underline ml-1 font-semibold">
+                                            Devamını Oku
+                                          </button>
+                                        </>
+                                      ) : bonus.terms}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* CTA Button */}
+                              <Button 
+                                onClick={handleAffiliateClick} 
+                                size="lg"
+                                className="w-full sm:w-auto relative overflow-hidden group/btn bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300"
+                              >
+                                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></span>
+                                <span className="relative flex items-center gap-2 font-bold">
+                                  <Gift className="w-5 h-5" />
+                                  Bonusu Hemen Talep Et
+                                  <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                </span>
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Disclaimer */}
+                <Card className="border-dashed bg-muted/30">
+                  <CardContent className="p-6">
+                    <div className="flex gap-3 items-start">
+                      <div className="p-2 bg-amber-500/10 rounded-lg flex-shrink-0">
+                        <svg className="w-5 h-5 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                       </div>
-                    )}
-                    
-                    <div className="grid gap-4">
-                      <div className="p-4 bg-muted/50 rounded-lg">
-                        <h4 className="font-medium mb-2">💰 Çevrim Koşulları</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Bonus çevrim şartları ve detayları için {site.name} sitesini ziyaret edin.
-                        </p>
-                      </div>
-                      
-                      <div className="p-4 bg-muted/50 rounded-lg">
-                        <h4 className="font-medium mb-2">🎯 Özel Kampanyalar</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Sadakat programı, cashback ve diğer kampanyalar için siteyi kontrol edin.
-                        </p>
-                      </div>
-                      
-                      <div className="p-4 bg-muted/50 rounded-lg">
-                        <h4 className="font-medium mb-2">📅 Güncel Promosyonlar</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Haftalık ve aylık özel promosyonlar için {site.name} sitesini takip edin.
+                      <div className="flex-1">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          <span className="font-semibold text-foreground">Önemli Uyarı:</span> Bonus şartları ve koşulları değişebilir. 
+                          Lütfen güncel bilgiler için {site.name} sitesini ziyaret edin. 
+                          Sorumlu oyun kurallarına uygun hareket ediniz.
                         </p>
                       </div>
                     </div>
-                  </>
-                )}
-                
-                <div className="pt-4 border-t">
-                  <p className="text-xs text-muted-foreground">
-                    ⚠️ Bonus şartları ve koşulları değişebilir. Güncel bilgi için lütfen {site.name} sitesini ziyaret edin.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-primary" />
+                    Aktif Bonuslar ve Kampanyalar
+                  </CardTitle>
+                  <CardDescription>
+                    {site.name} sitesinde geçerli olan bonus teklifleri
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {site.bonus && (
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                      <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                        <Star className="w-5 h-5 text-gold" />
+                        Hoş Geldin Bonusu
+                      </h3>
+                      <p className="text-muted-foreground mb-4">{site.bonus}</p>
+                      <Button onClick={handleAffiliateClick} className="w-full sm:w-auto">
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Bonusu Talep Et
+                      </Button>
+                    </div>
+                  )}
+                  
+                  <div className="grid gap-4">
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <h4 className="font-medium mb-2">💰 Çevrim Koşulları</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Bonus çevrim şartları ve detayları için {site.name} sitesini ziyaret edin.
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <h4 className="font-medium mb-2">🎯 Özel Kampanyalar</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Sadakat programı, cashback ve diğer kampanyalar için siteyi kontrol edin.
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <h4 className="font-medium mb-2">📅 Güncel Promosyonlar</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Haftalık ve aylık özel promosyonlar için {site.name} sitesini takip edin.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <p className="text-xs text-muted-foreground">
+                      ⚠️ Bonus şartları ve koşulları değişebilir. Güncel bilgi için lütfen {site.name} sitesini ziyaret edin.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Reviews Tab */}
