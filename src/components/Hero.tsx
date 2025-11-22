@@ -49,8 +49,8 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     align: 'start',
     skipSnaps: false,
     dragFree: false,
-    duration: 20,
-    containScroll: 'trimSnaps'
+    duration: 25,
+    containScroll: 'keepSnaps'
   });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -93,13 +93,9 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
       const handleAutoScroll = () => {
         if (!emblaApi) return;
         
-        // Check if carousel can scroll
-        if (emblaApi.canScrollNext()) {
-          emblaApi.scrollNext();
-        } else {
-          // Loop back to start
-          emblaApi.scrollTo(0);
-        }
+        // With loop:true, Embla handles looping automatically
+        // Just scroll to next slide, it will loop seamlessly
+        emblaApi.scrollNext();
       };
 
       // Start auto-scroll for mobile with the configured duration
