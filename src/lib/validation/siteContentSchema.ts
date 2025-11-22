@@ -17,15 +17,19 @@ export const siteContentSchema = z.object({
   
   verdict: z.string()
     .trim()
-    .min(50, { message: 'Sonuç en az 50 karakter olmalıdır' })
     .max(2000, { message: 'Sonuç en fazla 2000 karakter olabilir' })
+    .refine(val => val === '' || val.length >= 50, {
+      message: 'Sonuç en az 50 karakter olmalıdır (veya boş bırakın)'
+    })
     .optional()
     .or(z.literal('')),
   
   expertReview: z.string()
     .trim()
-    .min(100, { message: 'Uzman yorumu en az 100 karakter olmalıdır' })
     .max(5000, { message: 'Uzman yorumu en fazla 5000 karakter olabilir' })
+    .refine(val => val === '' || val.length >= 100, {
+      message: 'Uzman yorumu en az 100 karakter olmalıdır (veya boş bırakın)'
+    })
     .optional()
     .or(z.literal('')),
   

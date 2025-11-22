@@ -54,7 +54,11 @@ export const CasinoContentEditor = ({
   setFaq,
 }: CasinoContentEditorProps) => {
   const addPro = () => setPros([...pros, ""]);
-  const removePro = (index: number) => setPros(pros.filter((_, i) => i !== index));
+  const removePro = (index: number) => {
+    // ✅ Filter out empty values when removing
+    const filtered = pros.filter((_, i) => i !== index);
+    setPros(filtered.filter(p => p.trim() !== ''));
+  };
   const updatePro = (index: number, value: string) => {
     const newPros = [...pros];
     newPros[index] = value;
@@ -62,7 +66,11 @@ export const CasinoContentEditor = ({
   };
 
   const addCon = () => setCons([...cons, ""]);
-  const removeCon = (index: number) => setCons(cons.filter((_, i) => i !== index));
+  const removeCon = (index: number) => {
+    // ✅ Filter out empty values when removing
+    const filtered = cons.filter((_, i) => i !== index);
+    setCons(filtered.filter(c => c.trim() !== ''));
+  };
   const updateCon = (index: number, value: string) => {
     const newCons = [...cons];
     newCons[index] = value;
@@ -89,7 +97,11 @@ export const CasinoContentEditor = ({
   };
 
   const addFaq = () => setFaq([...faq, { question: "", answer: "" }]);
-  const removeFaq = (index: number) => setFaq(faq.filter((_, i) => i !== index));
+  const removeFaq = (index: number) => {
+    // ✅ Filter out empty FAQs when removing
+    const filtered = faq.filter((_, i) => i !== index);
+    setFaq(filtered.filter(f => f.question.trim() !== '' || f.answer.trim() !== ''));
+  };
   const updateFaq = (index: number, field: 'question' | 'answer', value: string) => {
     const newFaq = [...faq];
     newFaq[index][field] = value;
