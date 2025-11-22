@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
     console.error('Sitemap error:', error);
     
     // Return basic sitemap as fallback
-    const baseUrl = Deno.env.get('SITE_BASE_URL') || 'https://yourdomain.com';
+    const baseUrl = 'https://www.casinoany.com';
     const fallbackSitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
