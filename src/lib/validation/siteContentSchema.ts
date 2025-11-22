@@ -17,7 +17,7 @@ export const siteContentSchema = z.object({
   
   verdict: z.string()
     .trim()
-    .max(2000, { message: 'Sonuç en fazla 2000 karakter olabilir' })
+    .max(5000, { message: 'Sonuç en fazla 5000 karakter olabilir' })
     .refine(val => val === '' || val.length >= 50, {
       message: 'Sonuç en az 50 karakter olmalıdır (veya boş bırakın)'
     })
@@ -26,7 +26,7 @@ export const siteContentSchema = z.object({
   
   expertReview: z.string()
     .trim()
-    .max(5000, { message: 'Uzman yorumu en fazla 5000 karakter olabilir' })
+    .max(10000, { message: 'Uzman yorumu en fazla 10000 karakter olabilir' })
     .refine(val => val === '' || val.length >= 100, {
       message: 'Uzman yorumu en az 100 karakter olmalıdır (veya boş bırakın)'
     })
@@ -40,13 +40,13 @@ export const siteContentSchema = z.object({
   
   loginGuide: z.string()
     .trim()
-    .max(3000, { message: 'Giriş rehberi en fazla 3000 karakter olabilir' })
+    .max(5000, { message: 'Giriş rehberi en fazla 5000 karakter olabilir' })
     .optional()
     .or(z.literal('')),
   
   withdrawalGuide: z.string()
     .trim()
-    .max(3000, { message: 'Para çekme rehberi en fazla 3000 karakter olabilir' })
+    .max(5000, { message: 'Para çekme rehberi en fazla 5000 karakter olabilir' })
     .optional()
     .or(z.literal('')),
   
