@@ -26,7 +26,24 @@ export default function DomainMonitoring() {
   const [selectedDomain, setSelectedDomain] = useState<any>(null);
   const [flagReason, setFlagReason] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  // Check user permissions on mount
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', user?.id);
+      
+      setDebugInfo({ user: user?.email, roles });
+      console.log('User permissions:', { user: user?.email, roles });
+    };
+    
+    checkPermissions();
+  }, []);
 
   // Real-time updates
   useEffect(() => {
@@ -66,7 +83,13 @@ export default function DomainMonitoring() {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Domain tracking query error:', error);
+        throw error;
+      }
+      
+      console.log('Fetched domains:', data?.length || 0);
       return data;
     },
   });
@@ -275,6 +298,11 @@ export default function DomainMonitoring() {
           <p className="text-xs text-muted-foreground mt-1">
             ✨ Real-time: Yeni domainler otomatik görünür
           </p>
+          {debugInfo && (
+            <div className="mt-2 text-xs bg-muted p-2 rounded">
+              <strong>Debug:</strong> {debugInfo.user} - Roles: {JSON.stringify(debugInfo.roles)}
+            </div>
+          )}
         </div>
         <Button
           onClick={scanExistingContent}
