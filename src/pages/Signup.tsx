@@ -234,16 +234,16 @@ const Signup = () => {
         } else {
           toast({ 
             title: 'Başvuru Alındı!', 
-            description: 'Başvurunuz başarıyla kaydedildi. Yönetici onayı bekleniyor.', 
-            duration: 6000 
+            description: 'E-posta adresinize bir doğrulama linki gönderdik. Lütfen e-postanızı doğrulayın. Ardından başvurunuz yönetici tarafından değerlendirilecektir.', 
+            duration: 8000 
           });
         }
       } else {
         analytics.trackSignup();
         toast({ 
           title: 'Kayıt Başarılı!', 
-          description: 'Hesabınız başarıyla oluşturuldu.', 
-          duration: 4000 
+          description: 'E-posta adresinize bir doğrulama linki gönderdik. Lütfen e-postanızı kontrol edin ve linke tıklayarak hesabınızı aktifleştirin.', 
+          duration: 8000 
         });
       }
 
