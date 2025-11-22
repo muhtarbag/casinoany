@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,9 +61,8 @@ export default function SiteDetail() {
   const [viewTracked, setViewTracked] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showStickyCTA, setShowStickyCTA] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [expandedTerms, setExpandedTerms] = useState<Record<string, boolean>>({});
+  const lastScrollYRef = useRef(0);
 
   // Check if sidebar ad exists
   const { data: hasSidebarAd } = useQuery({
@@ -355,18 +354,13 @@ export default function SiteDetail() {
     trackView();
   }, [site?.id, viewTracked, queryClient]);
 
-  // Scroll tracking for sticky CTA with direction detection
+  // Scroll tracking for sticky CTA
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
+      lastScrollYRef.current = scrollPosition;
       
-      // Detect scroll direction
-      setScrollDirection(prev => {
-        setLastScrollY(scrollPosition);
-        return scrollPosition > lastScrollY ? 'down' : 'up';
-      });
-      
-      // Show sticky CTA only when scrolling down and past 400px
+      // Show sticky CTA when scrolled past 400px
       setShowStickyCTA(scrollPosition > 400);
     };
 
