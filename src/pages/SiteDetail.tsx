@@ -660,7 +660,10 @@ export default function SiteDetail() {
 
                 {/* Bonus Cards Grid */}
                 <div className="space-y-6">
-                  {bonusOffers.map((bonus: any, index: number) => (
+                  {bonusOffers.map((bonus: any, index: number) => {
+                    const [showFullTerms, setShowFullTerms] = useState(false);
+                    
+                    return (
                     <div 
                       key={bonus.id} 
                       className="group relative animate-fade-in hover-scale"
@@ -749,14 +752,29 @@ export default function SiteDetail() {
                                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent rounded-lg"></div>
                                   <div className="relative bg-muted/30 backdrop-blur-sm rounded-lg p-4 border border-border/50">
                                     <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
-                                      {bonus.terms.length > 300 ? (
+                                      {bonus.terms.length > 300 && !showFullTerms ? (
                                         <>
                                           {bonus.terms.substring(0, 300)}...
-                                          <button className="text-primary hover:underline ml-1 font-semibold">
+                                          <button 
+                                            onClick={() => setShowFullTerms(true)}
+                                            className="text-primary hover:underline ml-1 font-semibold"
+                                          >
                                             Devamını Oku
                                           </button>
                                         </>
-                                      ) : bonus.terms}
+                                      ) : (
+                                        <>
+                                          {bonus.terms}
+                                          {bonus.terms.length > 300 && (
+                                            <button 
+                                              onClick={() => setShowFullTerms(false)}
+                                              className="text-primary hover:underline ml-1 font-semibold"
+                                            >
+                                              Daha Az Göster
+                                            </button>
+                                          )}
+                                        </>
+                                      )}
                                     </p>
                                   </div>
                                 </div>
@@ -780,7 +798,7 @@ export default function SiteDetail() {
                         </CardContent>
                       </Card>
                     </div>
-                  ))}
+                  )})}
                 </div>
 
                 {/* Disclaimer */}
