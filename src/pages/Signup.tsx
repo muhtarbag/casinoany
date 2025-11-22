@@ -47,6 +47,7 @@ const Signup = () => {
   usePageLoadPerformance('signup');
 
   const [username, setUsername] = useState('');
+  const [siteOwnerUsername, setSiteOwnerUsername] = useState('');
 
   const [selectedSite, setSelectedSite] = useState('');
   const [newSiteName, setNewSiteName] = useState('');
@@ -105,6 +106,14 @@ const Signup = () => {
 
     switch (step) {
       case 0:
+        if (!siteOwnerUsername.trim()) {
+          toast({ title: 'Hata', description: 'Lütfen kullanıcı adı girin', variant: 'destructive' });
+          return false;
+        }
+        if (siteOwnerUsername.length < 3) {
+          toast({ title: 'Hata', description: 'Kullanıcı adı en az 3 karakter olmalıdır', variant: 'destructive' });
+          return false;
+        }
         if (!selectedSite) {
           toast({ title: 'Hata', description: 'Lütfen bir site seçin', variant: 'destructive' });
           return false;
@@ -181,6 +190,8 @@ const Signup = () => {
       if (userType === 'user') {
         metadata.username = username;
       } else {
+        // Site sahibi için username
+        metadata.username = siteOwnerUsername;
         // Kurumsal üyelik metadata - handle_new_user ile uyumlu field isimleri
         metadata.companyName = companyName;
         metadata.companyDescription = description;
@@ -273,7 +284,23 @@ const Signup = () => {
 
     switch (currentStep) {
       case 0:
-        return <Step1Basic selectedSite={selectedSite} setSelectedSite={setSelectedSite} newSiteName={newSiteName} setNewSiteName={setNewSiteName} companyName={companyName} setCompanyName={setCompanyName} description={description} setDescription={setDescription} logoUrl={logoUrl} setLogoUrl={setLogoUrl} sites={sites || []} disabled={loading} userEmail={userEmail} />;
+        return <Step1Basic 
+          username={siteOwnerUsername}
+          setUsername={setSiteOwnerUsername}
+          selectedSite={selectedSite} 
+          setSelectedSite={setSelectedSite} 
+          newSiteName={newSiteName} 
+          setNewSiteName={setNewSiteName} 
+          companyName={companyName} 
+          setCompanyName={setCompanyName} 
+          description={description} 
+          setDescription={setDescription} 
+          logoUrl={logoUrl} 
+          setLogoUrl={setLogoUrl} 
+          sites={sites || []} 
+          disabled={loading} 
+          userEmail={userEmail} 
+        />;
       case 1:
         return <Step2ContactSocial contactName={contactName} setContactName={setContactName} email={siteEmail} setEmail={setSiteEmail} telegram={siteTelegram} setTelegram={setSiteTelegram} whatsapp={siteWhatsapp} setWhatsapp={setSiteWhatsapp} facebook={siteFacebook} setFacebook={setSiteFacebook} twitter={siteTwitter} setTwitter={setSiteTwitter} instagram={siteInstagram} setInstagram={setSiteInstagram} youtube={siteYoutube} setYoutube={setSiteYoutube} disabled={loading} />;
       case 2:

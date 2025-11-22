@@ -2261,7 +2261,7 @@ export type Database = {
           telegram_notifications_enabled: boolean | null
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"]
-          username: string | null
+          username: string
         }
         Insert: {
           avatar_url?: string | null
@@ -2305,7 +2305,7 @@ export type Database = {
           telegram_notifications_enabled?: boolean | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
-          username?: string | null
+          username: string
         }
         Update: {
           avatar_url?: string | null
@@ -2349,7 +2349,7 @@ export type Database = {
           telegram_notifications_enabled?: boolean | null
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
-          username?: string | null
+          username?: string
         }
         Relationships: []
       }
@@ -4825,6 +4825,10 @@ export type Database = {
       }
       is_admin_user: { Args: never; Returns: boolean }
       is_site_owner_user: { Args: never; Returns: boolean }
+      is_username_available: {
+        Args: { check_username: string }
+        Returns: boolean
+      }
       log_change: {
         Args: {
           p_action_type: string
