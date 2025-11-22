@@ -34,11 +34,19 @@ export function AdBanner({ location, className = '' }: AdBannerProps) {
           p_limit: 1 
         });
 
-      if (error) throw error;
-      return data?.[0] ?? null;
+      if (error) {
+        console.error('Ad banner error:', error);
+        return null;
+      }
+      
+      // Always return null instead of undefined
+      if (!data || data.length === 0) return null;
+      return data[0] as BannerData;
     },
-    staleTime: 5 * 60 * 1000, // Cache 5 minutes
-    gcTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // Cache 10 minutes
+    gcTime: 15 * 60 * 1000,
+    retry: 1, // Only retry once
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Track impression when banner is visible
