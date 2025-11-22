@@ -4656,6 +4656,7 @@ export type Database = {
       }
     }
     Functions: {
+      auto_approve_verified_individual: { Args: never; Returns: undefined }
       award_achievement: {
         Args: { p_achievement_code: string; p_user_id: string }
         Returns: boolean
