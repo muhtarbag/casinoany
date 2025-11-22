@@ -695,6 +695,19 @@ export default function SiteDetail() {
                                     {bonus.bonus_amount}
                                   </Badge>
                                 </div>
+                                
+                                {/* Bonus Type */}
+                                {bonus.bonus_type && (
+                                  <div>
+                                    <Badge variant="secondary" className="px-3 py-1.5 text-sm font-semibold">
+                                      {bonus.bonus_type === 'no_deposit' && '🎁 Deneme Bonusu'}
+                                      {bonus.bonus_type === 'welcome' && '👋 Hoş Geldin'}
+                                      {bonus.bonus_type === 'deposit' && '💰 Yatırım Bonusu'}
+                                      {bonus.bonus_type === 'free_spins' && '🎰 Free Spin'}
+                                      {bonus.bonus_type === 'reload' && '🔄 Reload Bonusu'}
+                                    </Badge>
+                                  </div>
+                                )}
                               </div>
                               
                               {/* Info Grid */}
