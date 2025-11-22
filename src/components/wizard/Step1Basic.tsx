@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, X, AlertCircle, Loader2, Lock, Clock, CheckCircle, Mail, Star } from 'lucide-react';
 
 interface Step1BasicProps {
+  username: string;
+  setUsername: (value: string) => void;
   selectedSite: string;
   setSelectedSite: (value: string) => void;
   newSiteName: string;
@@ -29,6 +31,8 @@ interface Step1BasicProps {
 
 export const Step1Basic = memo((props: Step1BasicProps) => {
   const {
+    username,
+    setUsername,
     selectedSite,
     setSelectedSite,
     newSiteName,
@@ -146,6 +150,26 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Site ve Şirket Bilgileri</h3>
+      
+      {/* Kullanıcı Adı */}
+      <div className="space-y-2">
+        <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          Kullanıcı Adı *
+        </Label>
+        <Input
+          id="username"
+          type="text"
+          placeholder="kullaniciadi"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          disabled={disabled}
+          className="lowercase"
+        />
+        <p className="text-xs text-muted-foreground">
+          Sadece küçük harf, rakam ve alt çizgi kullanabilirsiniz. Min 3, max 30 karakter.
+        </p>
+      </div>
       
       {suggestedSite && (
         <Alert className="border-blue-500 bg-blue-50">
