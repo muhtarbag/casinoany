@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +23,7 @@ const NewComplaint = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
   const [siteId, setSiteId] = useState('');
   const [title, setTitle] = useState('');
@@ -31,6 +32,14 @@ const NewComplaint = () => {
   const [severity, setSeverity] = useState('normal');
   const [isPublic, setIsPublic] = useState('true');
   const [showAdditionDialog, setShowAdditionDialog] = useState(false);
+
+  // Set site ID from URL parameter
+  useEffect(() => {
+    const siteParam = searchParams.get('site');
+    if (siteParam) {
+      setSiteId(siteParam);
+    }
+  }, [searchParams]);
 
   // Redirect to login if not authenticated
   if (!user) {
