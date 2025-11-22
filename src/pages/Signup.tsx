@@ -160,16 +160,22 @@ const Signup = () => {
       return;
     }
     
-    if (!firstName.trim() || !lastName.trim() || !phone.trim()) {
-      toast({ title: 'Hata', description: 'Lütfen ad, soyad ve telefon alanlarını doldurun', variant: 'destructive' });
+    if (!firstName.trim() || !lastName.trim()) {
+      toast({ title: 'Hata', description: 'Lütfen ad ve soyad alanlarını doldurun', variant: 'destructive' });
       return;
     }
 
-    // Telefon validasyonu
-    const phoneNumber = phone.replace('+90', '').trim();
-    if (phoneNumber.length !== 10 || !phoneNumber.startsWith('5')) {
-      toast({ title: 'Hata', description: 'Telefon numarası 5 ile başlamalı ve 10 haneli olmalıdır (örn: 5325323232)', variant: 'destructive' });
-      return;
+    // Telefon validasyonu - sadece bireysel üyelik için
+    if (userType === 'user') {
+      if (!phone.trim()) {
+        toast({ title: 'Hata', description: 'Lütfen telefon numaranızı girin', variant: 'destructive' });
+        return;
+      }
+      const phoneNumber = phone.replace('+90', '').trim();
+      if (phoneNumber.length !== 10 || !phoneNumber.startsWith('5')) {
+        toast({ title: 'Hata', description: 'Telefon numarası 5 ile başlamalı ve 10 haneli olmalıdır (örn: 5325323232)', variant: 'destructive' });
+        return;
+      }
     }
 
     if (password !== confirmPassword) {
@@ -190,9 +196,13 @@ const Signup = () => {
       const metadata: any = {
         first_name: firstName,
         last_name: lastName,
-        phone: phone,
         accountType: userType
       };
+
+      // Telefon sadece bireysel üyelik için
+      if (userType === 'user') {
+        metadata.phone = phone;
+      }
 
       if (userType === 'user') {
         metadata.username = username;
@@ -424,39 +434,41 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Telefon Email Grid */}
+              {/* Telefon (Sadece bireysel) ve Email Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
-                    Telefon
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
-                      +90
-                    </span>
-                    <Input 
-                      id="phone" 
-                      type="tel" 
-                      placeholder="5325323232" 
-                      value={phone.replace('+90', '')} 
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                        setPhone('+90' + value);
-                      }} 
-                      required 
-                      disabled={loading}
-                      className="h-10 sm:h-11 pl-12 border-border/50 focus:border-primary transition-colors text-sm"
-                    />
+                {userType === 'user' && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="phone" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                      Telefon
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                        +90
+                      </span>
+                      <Input 
+                        id="phone" 
+                        type="tel" 
+                        placeholder="5325323232" 
+                        value={phone.replace('+90', '')} 
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          setPhone('+90' + value);
+                        }} 
+                        required 
+                        disabled={loading}
+                        className="h-10 sm:h-11 pl-12 border-border/50 focus:border-primary transition-colors text-sm"
+                      />
+                    </div>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      5 ile başlamalı, 10 haneli (örn: 5325323232)
+                    </p>
                   </div>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    5 ile başlamalı, 10 haneli (örn: 5325323232)
-                  </p>
-                </div>
-                <div className="space-y-1.5">
+                )}
+                <div className={`space-y-1.5 ${userType === 'site_owner' ? 'sm:col-span-2' : ''}`}>
                   <Label htmlFor="email" className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
                     E-posta
