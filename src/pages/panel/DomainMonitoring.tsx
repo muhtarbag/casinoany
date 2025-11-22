@@ -153,12 +153,59 @@ export default function DomainMonitoring() {
     },
   });
 
+  const whitelistMutation = useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('domain_tracking')
+        .update({
+          is_whitelisted: true,
+          whitelisted_by: user?.id,
+          whitelisted_at: new Date().toISOString(),
+          whitelist_reason: reason || 'Güvenli olarak işaretlendi',
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['domain-tracking'] });
+      toast({ title: 'Domain whitelist\'e eklendi', description: 'Bu domain artık güvenli olarak işaretlendi' });
+    },
+  });
+
+  const unwhitelistMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('domain_tracking')
+        .update({
+          is_whitelisted: false,
+          whitelisted_by: null,
+          whitelisted_at: null,
+          whitelist_reason: null,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['domain-tracking'] });
+      toast({ title: 'Domain whitelist\'ten çıkarıldı' });
+    },
+  });
+
   const allDomains = domains || [];
   const flaggedDomains = allDomains.filter((d) => d.is_flagged);
-  const unflaggedDomains = allDomains.filter((d) => !d.is_flagged);
+  const whitelistedDomains = allDomains.filter((d) => d.is_whitelisted);
 
   // Smart categorization
-  const categorizeDomain = (domain: string) => {
+  const categorizeDomain = (item: any) => {
+    // Whitelisted domains are always safe
+    if (item.is_whitelisted) {
+      return 'safe';
+    }
+    
+    const domain = item.domain;
     const suspiciousKeywords = ['link', 'bet', 'casino', 'porn', 'xxx', 'hack', 'seo'];
     const domainLower = domain.toLowerCase();
     
@@ -179,21 +226,26 @@ export default function DomainMonitoring() {
     if (!acc[curr.domain]) {
       acc[curr.domain] = {
         entries: [],
-        riskLevel: categorizeDomain(curr.domain),
+        riskLevel: categorizeDomain(curr),
         isFlagged: false,
+        isWhitelisted: curr.is_whitelisted,
       };
     }
     acc[curr.domain].entries.push(curr);
     if (curr.is_flagged) {
       acc[curr.domain].isFlagged = true;
     }
+    if (curr.is_whitelisted) {
+      acc[curr.domain].isWhitelisted = true;
+      acc[curr.domain].riskLevel = 'safe';
+    }
     return acc;
   }, {});
 
   // Categorize by risk
-  const highRiskDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'high-risk');
-  const mediumRiskDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'medium-risk');
-  const safeDomains = allDomains.filter(d => categorizeDomain(d.domain) === 'safe');
+  const highRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'high-risk');
+  const mediumRiskDomains = allDomains.filter(d => categorizeDomain(d) === 'medium-risk');
+  const safeDomains = allDomains.filter(d => categorizeDomain(d) === 'safe');
 
   const scanExistingContent = async () => {
     setIsScanning(true);
@@ -223,7 +275,7 @@ export default function DomainMonitoring() {
   };
 
   const DomainCard = ({ item }: { item: any }) => {
-    const riskLevel = categorizeDomain(item.domain);
+    const riskLevel = categorizeDomain(item);
     const riskColor = 
       riskLevel === 'high-risk' ? 'border-destructive/50 bg-destructive/5' :
       riskLevel === 'medium-risk' ? 'border-yellow-500/50 bg-yellow-50/50' :
@@ -237,13 +289,19 @@ export default function DomainMonitoring() {
               <CardTitle className="text-lg flex items-center gap-2">
                 <ExternalLink className="w-4 h-4" />
                 {item.domain}
-                {riskLevel === 'high-risk' && (
+                {item.is_whitelisted && (
+                  <Badge className="bg-blue-500 hover:bg-blue-600">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Whitelist
+                  </Badge>
+                )}
+                {riskLevel === 'high-risk' && !item.is_whitelisted && (
                   <Badge variant="destructive">🔴 Yüksek Risk</Badge>
                 )}
-                {riskLevel === 'medium-risk' && (
+                {riskLevel === 'medium-risk' && !item.is_whitelisted && (
                   <Badge className="bg-yellow-500 hover:bg-yellow-600">🟡 Orta Risk</Badge>
                 )}
-                {riskLevel === 'safe' && (
+                {riskLevel === 'safe' && !item.is_whitelisted && (
                   <Badge className="bg-green-500 hover:bg-green-600">🟢 Güvenli</Badge>
                 )}
                 {item.is_flagged && (
@@ -296,6 +354,28 @@ export default function DomainMonitoring() {
         )}
 
         <div className="flex gap-2 pt-2">
+          {item.is_whitelisted ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => unwhitelistMutation.mutate(item.id)}
+              disabled={unwhitelistMutation.isPending}
+            >
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Whitelist'ten Çıkar
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => whitelistMutation.mutate({ id: item.id })}
+              disabled={whitelistMutation.isPending}
+            >
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Whitelist Yap
+            </Button>
+          )}
+          
           {item.is_flagged ? (
             <Button
               size="sm"
@@ -303,7 +383,6 @@ export default function DomainMonitoring() {
               onClick={() => unflagMutation.mutate(item.id)}
               disabled={unflagMutation.isPending}
             >
-              <CheckCircle className="w-4 h-4 mr-1" />
               İşareti Kaldır
             </Button>
           ) : (
@@ -400,7 +479,7 @@ export default function DomainMonitoring() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Toplam Domain</CardTitle>
@@ -441,10 +520,18 @@ export default function DomainMonitoring() {
             <div className="text-2xl font-bold text-green-600">{safeDomains.length}</div>
           </CardContent>
         </Card>
+        <Card className="border-blue-500/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-blue-600">Whitelist</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{whitelistedDomains.length}</div>
+          </CardContent>
+        </Card>
       </div>
 
       <Tabs defaultValue="high-risk" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="high-risk" className="text-destructive">
             🔴 Yüksek Risk ({highRiskDomains.length})
           </TabsTrigger>
@@ -453,6 +540,9 @@ export default function DomainMonitoring() {
           </TabsTrigger>
           <TabsTrigger value="safe" className="text-green-600">
             🟢 Güvenli ({safeDomains.length})
+          </TabsTrigger>
+          <TabsTrigger value="whitelisted" className="text-blue-600">
+            ✅ Whitelist ({whitelistedDomains.length})
           </TabsTrigger>
           <TabsTrigger value="flagged">
             🚩 İşaretli ({flaggedDomains.length})
@@ -501,6 +591,18 @@ export default function DomainMonitoring() {
           )}
         </TabsContent>
 
+        <TabsContent value="whitelisted" className="space-y-4">
+          {whitelistedDomains.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Whitelist'te domain yok
+              </CardContent>
+            </Card>
+          ) : (
+            whitelistedDomains.map((item: any) => <DomainCard key={item.id} item={item} />)
+          )}
+        </TabsContent>
+
         <TabsContent value="flagged" className="space-y-4">
           {flaggedDomains.length === 0 ? (
             <Card>
@@ -543,12 +645,14 @@ export default function DomainMonitoring() {
         <TabsContent value="grouped" className="space-y-4">
           {Object.entries(domainGroups)
             .sort(([, a]: [string, any], [, b]: [string, any]) => {
-              // Sort by risk level first
+              // Whitelisted first, then by risk level
+              if (a.isWhitelisted && !b.isWhitelisted) return -1;
+              if (!a.isWhitelisted && b.isWhitelisted) return 1;
               const riskOrder = { 'high-risk': 0, 'medium-risk': 1, 'safe': 2 };
               return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
             })
             .map(([domain, data]: [string, any]) => {
-              const { entries, riskLevel, isFlagged } = data;
+              const { entries, riskLevel, isFlagged, isWhitelisted } = data;
               return (
                 <Card key={domain} className={
                   riskLevel === 'high-risk' ? 'border-destructive/50' :
@@ -562,16 +666,22 @@ export default function DomainMonitoring() {
                       {riskLevel === 'safe' && '🟢'}
                       {domain}
                       <Badge variant="secondary">{entries.length} kayıt</Badge>
+                      {isWhitelisted && (
+                        <Badge className="bg-blue-500 hover:bg-blue-600">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Whitelist
+                        </Badge>
+                      )}
                       {isFlagged && (
                         <Badge variant="destructive">
                           <AlertTriangle className="w-3 h-3 mr-1" />
                           İşaretli
                         </Badge>
                       )}
-                      {riskLevel === 'high-risk' && (
+                      {riskLevel === 'high-risk' && !isWhitelisted && (
                         <Badge variant="destructive">Yüksek Risk</Badge>
                       )}
-                      {riskLevel === 'medium-risk' && (
+                      {riskLevel === 'medium-risk' && !isWhitelisted && (
                         <Badge className="bg-yellow-500 hover:bg-yellow-600">Orta Risk</Badge>
                       )}
                     </CardTitle>

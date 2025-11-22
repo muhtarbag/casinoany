@@ -1692,11 +1692,15 @@ export type Database = {
           full_url: string
           id: string
           is_flagged: boolean | null
+          is_whitelisted: boolean | null
           source_column: string
           source_record_id: string
           source_table: string
           updated_at: string | null
           user_id: string | null
+          whitelist_reason: string | null
+          whitelisted_at: string | null
+          whitelisted_by: string | null
         }
         Insert: {
           context_text?: string | null
@@ -1708,11 +1712,15 @@ export type Database = {
           full_url: string
           id?: string
           is_flagged?: boolean | null
+          is_whitelisted?: boolean | null
           source_column: string
           source_record_id: string
           source_table: string
           updated_at?: string | null
           user_id?: string | null
+          whitelist_reason?: string | null
+          whitelisted_at?: string | null
+          whitelisted_by?: string | null
         }
         Update: {
           context_text?: string | null
@@ -1724,11 +1732,15 @@ export type Database = {
           full_url?: string
           id?: string
           is_flagged?: boolean | null
+          is_whitelisted?: boolean | null
           source_column?: string
           source_record_id?: string
           source_table?: string
           updated_at?: string | null
           user_id?: string | null
+          whitelist_reason?: string | null
+          whitelisted_at?: string | null
+          whitelisted_by?: string | null
         }
         Relationships: []
       }
