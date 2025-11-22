@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from '@/hooks/useFavorites';
 import { analytics } from "@/lib/analytics";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
+import { useSiteBanners } from '@/hooks/queries/useBettingSitesQueries';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,19 +65,9 @@ export default function SiteDetail() {
   const [expandedTerms, setExpandedTerms] = useState<Record<string, boolean>>({});
   const lastScrollYRef = useRef(0);
 
-  // Check if sidebar ad exists
-  const { data: hasSidebarAd } = useQuery({
-    queryKey: ['sidebar-ad-check'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc('get_active_banner', { 
-          p_location: 'sidebar',
-          p_limit: 1 
-        });
-      return !!data?.[0];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  // ✅ OPTIMIZED: Check if sidebar ad exists using centralized hook
+  const { data: sidebarAds } = useSiteBanners('sidebar');
+  const hasSidebarAd = !!sidebarAds?.[0];
 
   // Fetch bonus offers for this site
   const { data: bonusOffers } = useQuery({
@@ -105,7 +96,7 @@ export default function SiteDetail() {
     enabled: !!(slug || id),
   });
 
-  // Fetch site data by slug or id
+  // ✅ OPTIMIZED: Fetch site data with proper caching
   const { data: site, isLoading: siteLoading, error: siteError } = useQuery({
     queryKey: ["betting-site", slug || id],
     queryFn: async (): Promise<any> => {
@@ -139,6 +130,7 @@ export default function SiteDetail() {
       throw new Error("No slug or id provided");
     },
     retry: false,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Fetch AI-suggested internal links for casino pages
