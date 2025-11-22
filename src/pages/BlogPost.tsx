@@ -316,43 +316,37 @@ export default function BlogPost() {
       
       <Header />
 
-      {/* Premium Floating Action Bar - Mobile Only */}
+      {/* Mobile Stats Bar */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 md:hidden animate-fade-in">
-        <div className="flex items-center gap-2 bg-gradient-to-r from-card/98 to-card/95 backdrop-blur-xl border-2 border-border/50 rounded-full px-5 py-3.5 shadow-2xl shadow-primary/10">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="rounded-full w-11 h-11 p-0 hover:bg-primary/10 hover:text-primary transition-all"
-            onClick={shareArticle}
-          >
-            <Share2 className="w-4.5 h-4.5" />
-          </Button>
-          <div className="w-px h-7 bg-gradient-to-b from-transparent via-border to-transparent" />
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="rounded-full w-11 h-11 p-0 hover:bg-accent/10 hover:text-accent transition-all"
-          >
-            <Bookmark className="w-4.5 h-4.5" />
-          </Button>
-          <div className="w-px h-7 bg-gradient-to-b from-transparent via-border to-transparent" />
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className={cn(
-              "rounded-full w-11 h-11 p-0 transition-all",
-              likeStatus?.isLiked 
-                ? "bg-red-500/10 text-red-500" 
-                : "hover:bg-red-500/10 hover:text-red-500"
-            )}
-            onClick={handleLikeClick}
-            disabled={toggleLike.isPending}
-          >
-            <Heart className={cn(
-              "w-4.5 h-4.5 transition-all",
-              likeStatus?.isLiked && "fill-current"
-            )} />
-          </Button>
+        <div className="flex items-center gap-3 bg-gradient-to-r from-card/98 to-card/95 backdrop-blur-xl border-2 border-border/50 rounded-full px-5 py-3 shadow-2xl shadow-primary/10">
+          {post.published_at && (
+            <>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <time dateTime={post.published_at} className="text-xs font-medium text-muted-foreground">
+                  {format(new Date(post.published_at), 'd MMM yyyy', { locale: tr })}
+                </time>
+              </div>
+              <div className="w-px h-5 bg-gradient-to-b from-transparent via-border to-transparent" />
+            </>
+          )}
+          {post.read_time && (
+            <>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {post.read_time} dk
+                </span>
+              </div>
+              <div className="w-px h-5 bg-gradient-to-b from-transparent via-border to-transparent" />
+            </>
+          )}
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">
+              {post.view_count.toLocaleString('tr-TR')}
+            </span>
+          </div>
         </div>
       </div>
 
