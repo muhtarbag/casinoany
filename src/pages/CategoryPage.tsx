@@ -82,7 +82,18 @@ export default function CategoryPage() {
     return <SiteDetail />;
   }
 
-  if (siteLoading || categoryLoading) return <LoadingState variant="skeleton" rows={8} />;
+  if (siteLoading || categoryLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-muted pt-[72px] md:pt-[84px]">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <LoadingState variant="spinner" size="lg" text="Sayfa yükleniyor..." />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   if (!category) return <div className="min-h-screen flex items-center justify-center">Kategori bulunamadı</div>;
 
   return (
