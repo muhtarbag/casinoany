@@ -41,6 +41,7 @@ interface BonusOffer {
   validity_period: string | null;
   is_active: boolean;
   created_at: string;
+  image_url: string | null;
 }
 
 interface SiteBonusManagerProps {
@@ -61,6 +62,7 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
     terms: '',
     eligibility: '',
     validity_period: '',
+    image_url: '',
   });
 
   // Fetch bonuses for this site
@@ -180,6 +182,7 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
         terms: bonus.terms || '',
         eligibility: bonus.eligibility || '',
         validity_period: bonus.validity_period || '',
+        image_url: bonus.image_url || '',
       });
     } else {
       setEditingBonus(null);
@@ -191,6 +194,7 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
         terms: '',
         eligibility: '',
         validity_period: '',
+        image_url: '',
       });
     }
     setIsDialogOpen(true);
@@ -264,14 +268,30 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
           {bonuses.map((bonus) => (
             <Card key={bonus.id}>
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
+                  {bonus.image_url && (
+                    <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden border">
+                      <img 
+                        src={bonus.image_url} 
+                        alt={bonus.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{bonus.title}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {getBonusTypeName(bonus.bonus_type)}
-                    </CardDescription>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{bonus.title}</CardTitle>
+                        <CardDescription className="mt-1">
+                          {getBonusTypeName(bonus.bonus_type)}
+                        </CardDescription>
+                      </div>
+                      {getStatusBadge(bonus.is_active)}
+                    </div>
                   </div>
-                  {getStatusBadge(bonus.is_active)}
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -403,6 +423,29 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
                   required
                 />
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="image_url">Bonus Görseli (URL)</Label>
+              <Input
+                id="image_url"
+                type="url"
+                value={formData.image_url}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                placeholder="https://example.com/bonus-image.jpg"
+              />
+              {formData.image_url && (
+                <div className="mt-2 border rounded-lg overflow-hidden">
+                  <img 
+                    src={formData.image_url} 
+                    alt="Bonus önizleme" 
+                    className="w-full h-32 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
