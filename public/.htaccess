@@ -11,9 +11,6 @@
   RewriteRule ^sitemap-casinos\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-casinos [P,L]
   RewriteRule ^sitemap-blogs\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-blogs [P,L]
   RewriteRule ^sitemap-bonuses\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-bonuses [P,L]
-  RewriteRule ^sitemap-news\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-news [P,L]
-  RewriteRule ^sitemap-static\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-static [P,L]
-  RewriteRule ^sitemap-complaints\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-complaints [P,L]
   RewriteRule ^sitemap-images\.xml$ https://cpaukwimbfoembwwtqhj.supabase.co/functions/v1/sitemap-images [P,L]
 </IfModule>
 
