@@ -6,8 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -30,6 +39,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showEmailVerificationDialog, setShowEmailVerificationDialog] = useState(false);
   const [userType, setUserType] = useState<'user' | 'site_owner'>('user');
   const [currentStep, setCurrentStep] = useState(0);
   
@@ -232,23 +242,14 @@ const Signup = () => {
             variant: 'destructive' 
           });
         } else {
-          toast({ 
-            title: 'Başvuru Alındı!', 
-            description: 'E-posta adresinize bir doğrulama linki gönderdik. Lütfen e-postanızı doğrulayın. Ardından başvurunuz yönetici tarafından değerlendirilecektir.', 
-            duration: 8000 
-          });
+          setShowEmailVerificationDialog(true);
         }
       } else {
         analytics.trackSignup();
-        toast({ 
-          title: 'Kayıt Başarılı!', 
-          description: 'E-posta adresinize bir doğrulama linki gönderdik. Lütfen e-postanızı kontrol edin ve linke tıklayarak hesabınızı aktifleştirin.', 
-          duration: 8000 
-        });
+        setShowEmailVerificationDialog(true);
       }
 
       setLoading(false);
-      setTimeout(() => navigate('/login'), 2000);
     } catch (error: any) {
       setLoading(false);
       toast({ 
@@ -585,6 +586,36 @@ const Signup = () => {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showEmailVerificationDialog} onOpenChange={setShowEmailVerificationDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10">
+              <Mail className="w-6 h-6 text-primary" />
+            </div>
+            <AlertDialogTitle className="text-center text-xl">
+              E-Postanızı Kontrol Edin
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center space-y-3">
+              <p className="text-base">
+                <strong>{userEmail}</strong> adresine bir doğrulama linki gönderdik.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                E-postanızdaki linke tıklayarak hesabınızı aktifleştirin. 
+                Link 24 saat geçerlidir.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                E-posta gelmedi mi? Spam klasörünü kontrol edin.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => navigate('/login')} className="w-full">
+              Giriş Sayfasına Git
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
