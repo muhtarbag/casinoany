@@ -8,14 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Loader2, GripVertical, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, GripVertical, Check, X, CheckSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { BonusImageUploader } from '@/components/bonus/BonusImageUploader';
+import { BonusFilters } from '@/components/bonus/BonusFilters';
+import { BonusStats } from '@/components/bonus/BonusStats';
+import { useBonusFilters } from '@/hooks/useBonusFilters';
+import { VirtualizedList } from '@/components/Virtualized/VirtualizedList';
 
 interface BonusOffer {
   id: string;
@@ -30,6 +35,11 @@ interface BonusOffer {
   display_order: number;
   is_active: boolean;
   image_url: string | null;
+  betting_sites?: {
+    name: string;
+    logo_url: string;
+    slug: string;
+  };
 }
 
 export const BonusManagement = () => {
@@ -37,6 +47,7 @@ export const BonusManagement = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBonus, setEditingBonus] = useState<BonusOffer | null>(null);
+  const [selectedBonuses, setSelectedBonuses] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     site_id: '',
     title: '',
@@ -60,7 +71,7 @@ export const BonusManagement = () => {
         .select('*, betting_sites!inner(name, logo_url, slug)')
         .order('display_order', { ascending: true });
       if (error) throw error;
-      return data;
+      return data as BonusOffer[];
     },
   });
 
@@ -77,6 +88,21 @@ export const BonusManagement = () => {
       return data;
     },
   });
+
+  // Use filtering hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedSite,
+    setSelectedSite,
+    selectedStatus,
+    setSelectedStatus,
+    selectedType,
+    setSelectedType,
+    filteredBonuses,
+    stats,
+    clearFilters,
+  } = useBonusFilters(bonusOffers);
 
   // Create/Update mutation
   const saveMutation = useMutation({
@@ -138,6 +164,45 @@ export const BonusManagement = () => {
     },
   });
 
+  // Bulk operations
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, isActive }: { ids: string[]; isActive: boolean }) => {
+      const { error } = await supabase
+        .from('bonus_offers')
+        .update({ is_active: isActive })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers'] });
+      setSelectedBonuses(new Set());
+      toast({
+        title: 'Başarılı',
+        description: 'Seçili bonuslar güncellendi.',
+      });
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('bonus_offers')
+        .delete()
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['bonus-offers'] });
+      setSelectedBonuses(new Set());
+      toast({
+        title: 'Başarılı',
+        description: 'Seçili bonuslar silindi.',
+      });
+    },
+  });
+
   // Reorder mutation
   const reorderMutation = useMutation({
     mutationFn: async (items: BonusOffer[]) => {
@@ -159,13 +224,6 @@ export const BonusManagement = () => {
         description: 'Sıralama güncellendi.',
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: 'Hata',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
   });
 
   // Quick approve/reject mutations
@@ -185,13 +243,6 @@ export const BonusManagement = () => {
         description: variables.isActive ? 'Bonus onaylandı.' : 'Bonus reddedildi.',
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: 'Hata',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
   });
 
   const sensors = useSensors(
@@ -205,11 +256,11 @@ export const BonusManagement = () => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = bonusOffers?.findIndex((item) => item.id === active.id) ?? -1;
-      const newIndex = bonusOffers?.findIndex((item) => item.id === over.id) ?? -1;
+      const oldIndex = filteredBonuses?.findIndex((item) => item.id === active.id) ?? -1;
+      const newIndex = filteredBonuses?.findIndex((item) => item.id === over.id) ?? -1;
 
-      if (oldIndex !== -1 && newIndex !== -1 && bonusOffers) {
-        const newItems = arrayMove(bonusOffers, oldIndex, newIndex);
+      if (oldIndex !== -1 && newIndex !== -1 && filteredBonuses) {
+        const newItems = arrayMove(filteredBonuses, oldIndex, newIndex);
         reorderMutation.mutate(newItems);
       }
     }
@@ -260,6 +311,36 @@ export const BonusManagement = () => {
     saveMutation.mutate(formData);
   };
 
+  const handleSelectAll = () => {
+    if (selectedBonuses.size === filteredBonuses.length) {
+      setSelectedBonuses(new Set());
+    } else {
+      setSelectedBonuses(new Set(filteredBonuses.map(b => b.id)));
+    }
+  };
+
+  const handleSelectBonus = (id: string) => {
+    const newSelected = new Set(selectedBonuses);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedBonuses(newSelected);
+  };
+
+  const handleBulkApprove = () => {
+    bulkUpdateMutation.mutate({ ids: Array.from(selectedBonuses), isActive: true });
+  };
+
+  const handleBulkReject = () => {
+    bulkUpdateMutation.mutate({ ids: Array.from(selectedBonuses), isActive: false });
+  };
+
+  const handleBulkDelete = () => {
+    bulkDeleteMutation.mutate(Array.from(selectedBonuses));
+  };
+
   if (isLoadingBonuses) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -270,9 +351,15 @@ export const BonusManagement = () => {
 
   return (
     <div className="space-y-6">
+      <BonusStats
+        total={stats.total}
+        active={stats.active}
+        inactive={stats.inactive}
+      />
+
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <CardTitle>Bonus Yönetimi</CardTitle>
               <CardDescription>
@@ -429,31 +516,114 @@ export const BonusManagement = () => {
               </DialogContent>
             </Dialog>
           </div>
+
+          <BonusFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedSite={selectedSite}
+            onSiteChange={setSelectedSite}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            sites={sites || []}
+            onClearFilters={clearFilters}
+            totalCount={stats.total}
+            filteredCount={stats.filtered}
+          />
         </CardHeader>
         <CardContent>
+          {selectedBonuses.size > 0 && (
+            <div className="mb-4 p-3 bg-muted rounded-lg flex items-center justify-between">
+              <span className="text-sm font-medium">
+                {selectedBonuses.size} bonus seçildi
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={handleBulkApprove}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Toplu Onayla
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={handleBulkReject}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Toplu Pasifleştir
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Toplu Sil
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Seçili bonusları silmek istediğinize emin misiniz?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Bu işlem geri alınamaz. {selectedBonuses.size} bonus kalıcı olarak silinecektir.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>İptal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleBulkDelete}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Sil
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          )}
+
+          <div className="mb-3 flex items-center gap-2 px-2">
+            <Checkbox
+              checked={selectedBonuses.size === filteredBonuses.length && filteredBonuses.length > 0}
+              onCheckedChange={handleSelectAll}
+            />
+            <span className="text-sm text-muted-foreground">Tümünü Seç</span>
+          </div>
+
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={bonusOffers?.map(b => b.id) ?? []}
+              items={filteredBonuses?.map(b => b.id) ?? []}
               strategy={verticalListSortingStrategy}
             >
-              <div className="space-y-4">
-                {bonusOffers?.map((bonus: any) => (
+              <div className="space-y-3">
+                {filteredBonuses?.map((bonus) => (
                   <SortableBonusItem
                     key={bonus.id}
                     bonus={bonus}
+                    isSelected={selectedBonuses.has(bonus.id)}
+                    onSelect={handleSelectBonus}
                     onEdit={handleOpenDialog}
                     onDelete={deleteMutation.mutate}
                     onApprove={(id) => updateStatusMutation.mutate({ id, isActive: true })}
                     onReject={(id) => updateStatusMutation.mutate({ id, isActive: false })}
                   />
                 ))}
-                {bonusOffers?.length === 0 && (
+                {filteredBonuses?.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
-                    Henüz bonus eklenmemiş.
+                    {searchQuery || selectedSite !== 'all' || selectedStatus !== 'all' || selectedType !== 'all'
+                      ? 'Filtreye uygun bonus bulunamadı.'
+                      : 'Henüz bonus eklenmemiş.'}
                   </p>
                 )}
               </div>
@@ -466,14 +636,16 @@ export const BonusManagement = () => {
 };
 
 interface SortableBonusItemProps {
-  bonus: any;
-  onEdit: (bonus: any) => void;
+  bonus: BonusOffer;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  onEdit: (bonus: BonusOffer) => void;
   onDelete: (id: string) => void;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 }
 
-const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: SortableBonusItemProps) => {
+const SortableBonusItem = ({ bonus, isSelected, onSelect, onEdit, onDelete, onApprove, onReject }: SortableBonusItemProps) => {
   const {
     attributes,
     listeners,
@@ -493,8 +665,15 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 p-4 rounded-lg border bg-card"
+      className={`flex items-center gap-3 p-4 rounded-lg border bg-card transition-colors ${
+        isSelected ? 'border-primary bg-primary/5' : ''
+      }`}
     >
+      <Checkbox
+        checked={isSelected}
+        onCheckedChange={() => onSelect(bonus.id)}
+      />
+      
       <button
         className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-muted rounded"
         {...attributes}
@@ -503,9 +682,9 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
         <GripVertical className="w-5 h-5 text-muted-foreground" />
       </button>
       
-      <div className="flex items-center justify-between flex-1">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between flex-1 min-w-0">
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <div className="flex items-center gap-3 flex-shrink-0">
             {bonus.betting_sites?.logo_url && (
               <img
                 src={bonus.betting_sites.logo_url}
@@ -524,17 +703,29 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
               />
             )}
           </div>
-          <div>
-            <p className="font-medium">{bonus.title}</p>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium truncate">{bonus.title}</p>
+            <p className="text-sm text-muted-foreground truncate">
               {bonus.betting_sites?.name} - {bonus.bonus_amount}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {bonus.is_active ? '✓ Aktif' : '✗ Pasif'}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                bonus.is_active 
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              }`}>
+                {bonus.is_active ? 'Aktif' : 'Pasif'}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {bonus.bonus_type === 'no_deposit' && 'Deneme Bonusu'}
+                {bonus.bonus_type === 'welcome' && 'Hoş Geldin'}
+                {bonus.bonus_type === 'deposit' && 'Yatırım'}
+                {bonus.bonus_type === 'free_spins' && 'Free Spin'}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           {!bonus.is_active && (
             <Button
               variant="default"
@@ -543,7 +734,7 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
               className="bg-green-600 hover:bg-green-700"
             >
               <Check className="w-4 h-4 mr-1" />
-              Onay
+              Onayla
             </Button>
           )}
           {bonus.is_active && (
@@ -554,7 +745,7 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
               className="bg-red-600 hover:bg-red-700"
             >
               <X className="w-4 h-4 mr-1" />
-              Red
+              Pasifleştir
             </Button>
           )}
           <Button
