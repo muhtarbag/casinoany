@@ -4,16 +4,22 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 import viteCompression from 'vite-plugin-compression';
+import { PrerenderSPAPlugin } from 'vite-plugin-prerender';
+import { generateRoutes } from './scripts/generate-routes.js';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(), 
-    mode === "development" && componentTagger(),
+export default defineConfig(async ({ mode }) => {
+  // Generate routes for prerendering
+  const routes = mode === 'production' ? await generateRoutes() : ['/'];
+  
+  return {
+    server: {
+      host: "::",
+      port: 8080,
+    },
+    plugins: [
+      react(), 
+      mode === "development" && componentTagger(),
     viteCompression({
       verbose: true,
       disable: false,
@@ -185,6 +191,23 @@ export default defineConfig(({ mode }) => ({
       devOptions: {
         enabled: false
       }
+    }),
+    mode === 'production' && PrerenderSPAPlugin({
+      staticDir: path.join(__dirname, 'dist'),
+      routes: routes,
+      renderer: '@prerenderer/renderer-puppeteer',
+      rendererOptions: {
+        maxConcurrentRoutes: 4,
+        renderAfterTime: 5000,
+        headless: true
+      },
+      postProcess(renderedRoute) {
+        // Clean up unwanted attributes
+        renderedRoute.html = renderedRoute.html
+          .replace(/data-radix-\w+="[^"]*"/g, '')
+          .replace(/data-state="[^"]*"/g, '');
+        return renderedRoute;
+      }
     })
   ].filter(Boolean),
   resolve: {
@@ -294,4 +317,5 @@ export default defineConfig(({ mode }) => ({
       }
     }
   },
-}));
+  };
+});
