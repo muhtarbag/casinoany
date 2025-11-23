@@ -960,60 +960,6 @@ export type Database = {
           },
         ]
       }
-      betting_sites_encrypted_credentials: {
-        Row: {
-          affiliate_notes: string | null
-          affiliate_panel_password: string | null
-          affiliate_panel_username: string | null
-          created_at: string | null
-          created_by: string | null
-          id: string
-          last_accessed_at: string | null
-          last_accessed_by: string | null
-          site_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          affiliate_notes?: string | null
-          affiliate_panel_password?: string | null
-          affiliate_panel_username?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          last_accessed_by?: string | null
-          site_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          affiliate_notes?: string | null
-          affiliate_panel_password?: string | null
-          affiliate_panel_username?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          last_accessed_by?: string | null
-          site_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "betting_sites_encrypted_credentials_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: true
-            referencedRelation: "betting_sites"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "betting_sites_encrypted_credentials_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: true
-            referencedRelation: "betting_sites_full"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       betting_sites_social: {
         Row: {
           created_at: string | null
@@ -4872,14 +4818,6 @@ export type Database = {
           total_conversions: number
           total_views: number
           unique_sessions: number
-        }[]
-      }
-      get_encrypted_credentials: {
-        Args: { p_site_id: string }
-        Returns: {
-          affiliate_notes: string
-          affiliate_panel_password: string
-          affiliate_panel_username: string
         }[]
       }
       get_next_available_domain: { Args: never; Returns: string }
