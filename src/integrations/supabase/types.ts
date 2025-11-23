@@ -2028,10 +2028,13 @@ export type Database = {
           content_html: string | null
           created_at: string | null
           excerpt: string | null
+          featured_image: string | null
+          featured_image_alt: string | null
           id: string
           is_published: boolean | null
           meta_description: string | null
           meta_title: string | null
+          og_image: string | null
           published_at: string | null
           slug: string
           source_feed: string
@@ -2047,10 +2050,13 @@ export type Database = {
           content_html?: string | null
           created_at?: string | null
           excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
           id?: string
           is_published?: boolean | null
           meta_description?: string | null
           meta_title?: string | null
+          og_image?: string | null
           published_at?: string | null
           slug: string
           source_feed: string
@@ -2066,10 +2072,13 @@ export type Database = {
           content_html?: string | null
           created_at?: string | null
           excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
           id?: string
           is_published?: boolean | null
           meta_description?: string | null
           meta_title?: string | null
+          og_image?: string | null
           published_at?: string | null
           slug?: string
           source_feed?: string

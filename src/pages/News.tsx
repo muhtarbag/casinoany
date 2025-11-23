@@ -163,7 +163,16 @@ export default function News() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {paginatedArticles.map((article: any) => (
                       <Link key={article.id} to={`/haber/${article.slug}`}>
-                        <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-primary/50">
+                        <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
+                          {article.featured_image && (
+                            <div className="aspect-video w-full overflow-hidden">
+                              <img
+                                src={article.featured_image}
+                                alt={article.featured_image_alt || article.title}
+                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                          )}
                           <CardHeader>
                             <div className="flex items-center justify-between mb-3">
                               {article.category && (
