@@ -13,7 +13,7 @@ const platformConversionMap: Record<SocialPlatform, string> = {
 };
 
 /**
- * ✅ FIXED: Tracks social media clicks using conversions table (single source of truth)
+ * ✅ FIXED: Tracks social media clicks directly in conversions table
  * @param siteId - The ID of the betting site
  * @param platform - The social media platform
  * @param siteName - Optional site name for better toast messages
@@ -31,22 +31,30 @@ export const trackSocialClick = async (
       return;
     }
 
-    // Track in conversions table (single source of truth)
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Track directly in conversions table
     const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
     
-    const { error } = await supabase.rpc('track_conversion', {
-      p_conversion_type: conversionType,
-      p_page_path: window.location.pathname,
-      p_site_id: siteId,
-      p_conversion_value: 0,
-      p_session_id: sessionId,
-      p_metadata: { platform, site_name: siteName },
-    });
+    const { error } = await supabase
+      .from('conversions')
+      .insert({
+        conversion_type: conversionType,
+        page_path: window.location.pathname,
+        site_id: siteId,
+        conversion_value: 0,
+        session_id: sessionId,
+        user_id: user?.id || null,
+        metadata: { platform, site_name: siteName },
+      });
 
     if (error) {
       console.error('Social tracking error:', error);
       throw error;
     }
+    
+    console.log(`✅ Tracked ${platform} click for ${siteName || siteId}`);
   } catch (error) {
     console.error('Failed to track social click:', error);
     // Don't show error toast to user - tracking failure shouldn't affect UX
