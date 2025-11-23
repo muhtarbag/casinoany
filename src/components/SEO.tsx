@@ -16,6 +16,11 @@ interface SEOProps {
     tags?: string[];
   };
   structuredData?: any;
+  noindex?: boolean;
+  pagination?: {
+    prev?: string;
+    next?: string;
+  };
 }
 
 export const SEO = ({
@@ -28,6 +33,8 @@ export const SEO = ({
   ogImageAlt,
   article,
   structuredData,
+  noindex = false,
+  pagination,
 }: SEOProps) => {
   // Always use https://casinoany.com as primary domain for canonical and OG
   const siteUrl = 'https://casinoany.com';
@@ -105,6 +112,10 @@ export const SEO = ({
       <meta name="description" content={description} />
       {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
       <link rel="canonical" href={currentUrl} />
+      
+      {/* Pagination Links */}
+      {pagination?.prev && <link rel="prev" href={pagination.prev} />}
+      {pagination?.next && <link rel="next" href={pagination.next} />}
 
       {/* Open Graph Meta Tags */}
       <meta property="og:type" content={ogType} />
@@ -143,9 +154,9 @@ export const SEO = ({
       <meta name="twitter:image" content={finalOgImage} />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="robots" content={robotsTag} />
+      <meta name="robots" content={noindex ? 'noindex, follow' : robotsTag} />
       <meta name="googlebot" content={
-        isNoIndex 
+        (isNoIndex || noindex)
           ? "noindex, follow" 
           : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
       } />
