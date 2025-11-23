@@ -2271,7 +2271,6 @@ export type Database = {
           created_at: string | null
           district: string | null
           email: string | null
-          favorite_game_providers: string[] | null
           favorite_team: string | null
           first_name: string | null
           id: string
@@ -2315,7 +2314,6 @@ export type Database = {
           created_at?: string | null
           district?: string | null
           email?: string | null
-          favorite_game_providers?: string[] | null
           favorite_team?: string | null
           first_name?: string | null
           id: string
@@ -2359,7 +2357,6 @@ export type Database = {
           created_at?: string | null
           district?: string | null
           email?: string | null
-          favorite_game_providers?: string[] | null
           favorite_team?: string | null
           first_name?: string | null
           id?: string

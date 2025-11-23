@@ -1328,17 +1328,6 @@ const Users = () => {
                       </div>
                     </div>
                   )}
-                  
-                  {selectedUser.profile?.favorite_game_providers && selectedUser.profile.favorite_game_providers.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium">Favori Oyun Sağlayıcıları</label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {selectedUser.profile.favorite_game_providers.map((provider: string) => (
-                          <Badge key={provider} variant="outline">{provider}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
