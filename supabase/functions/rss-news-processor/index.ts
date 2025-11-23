@@ -84,40 +84,42 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 🔒 SECURITY: Check if user is authenticated and has admin role
+    // 🔒 SECURITY: Optional authentication
+    // Allow cron jobs (no auth) OR admin users (with auth)
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Missing auth token' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Get user from JWT token
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Invalid token' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    // If auth header exists, verify it's an admin
+    if (authHeader && authHeader !== 'Bearer undefined') {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+      
+      if (userError || !user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized - Invalid token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
 
-    // Check if user has admin role
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role, status')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .eq('status', 'approved')
-      .maybeSingle();
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .eq('status', 'approved')
+        .maybeSingle();
 
-    if (!roleData) {
-      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      console.log('✅ Admin authenticated:', user.email);
+    } else {
+      // Cron job or unauthenticated call - rely on rate limiting
+      console.log('🤖 Cron job or automated call detected');
     }
 
     const rateLimit = await checkRateLimit(supabase, ip, 'rss-news-processor');
