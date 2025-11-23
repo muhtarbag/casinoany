@@ -1263,19 +1263,13 @@ export type Database = {
       bonus_offers: {
         Row: {
           bonus_amount: string
-          bonus_code: string | null
           bonus_type: string
-          category: string | null
-          claim_url: string | null
           created_at: string | null
-          description: string | null
           display_order: number | null
           eligibility: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
-          max_bonus: string | null
-          min_deposit: string | null
           site_id: string | null
           terms: string | null
           title: string
@@ -1285,19 +1279,13 @@ export type Database = {
         }
         Insert: {
           bonus_amount: string
-          bonus_code?: string | null
           bonus_type?: string
-          category?: string | null
-          claim_url?: string | null
           created_at?: string | null
-          description?: string | null
           display_order?: number | null
           eligibility?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
-          max_bonus?: string | null
-          min_deposit?: string | null
           site_id?: string | null
           terms?: string | null
           title: string
@@ -1307,19 +1295,13 @@ export type Database = {
         }
         Update: {
           bonus_amount?: string
-          bonus_code?: string | null
           bonus_type?: string
-          category?: string | null
-          claim_url?: string | null
           created_at?: string | null
-          description?: string | null
           display_order?: number | null
           eligibility?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
-          max_bonus?: string | null
-          min_deposit?: string | null
           site_id?: string | null
           terms?: string | null
           title?: string

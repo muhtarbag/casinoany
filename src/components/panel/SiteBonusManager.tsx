@@ -59,16 +59,10 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
     title: '',
     bonus_amount: '',
     bonus_type: 'no_deposit',
-    category: 'all',
-    description: '',
     wagering_requirement: '',
     terms: '',
     eligibility: '',
     validity_period: '',
-    min_deposit: '',
-    max_bonus: '',
-    bonus_code: '',
-    claim_url: '',
     image_url: '',
   });
 
@@ -185,16 +179,10 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
         title: bonus.title,
         bonus_amount: bonus.bonus_amount,
         bonus_type: bonus.bonus_type,
-        category: (bonus as any).category || 'all',
-        description: (bonus as any).description || '',
         wagering_requirement: bonus.wagering_requirement || '',
         terms: bonus.terms || '',
         eligibility: bonus.eligibility || '',
         validity_period: bonus.validity_period || '',
-        min_deposit: (bonus as any).min_deposit || '',
-        max_bonus: (bonus as any).max_bonus || '',
-        bonus_code: (bonus as any).bonus_code || '',
-        claim_url: (bonus as any).claim_url || '',
         image_url: bonus.image_url || '',
       });
     } else {
@@ -203,16 +191,10 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
         title: '',
         bonus_amount: '',
         bonus_type: 'no_deposit',
-        category: 'all',
-        description: '',
         wagering_requirement: '',
         terms: '',
         eligibility: '',
         validity_period: '',
-        min_deposit: '',
-        max_bonus: '',
-        bonus_code: '',
-        claim_url: '',
         image_url: '',
       });
     }
@@ -410,7 +392,7 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="bonus_type">Bonus Türü *</Label>
                 <Select
@@ -433,23 +415,6 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
               </div>
 
               <div>
-                <Label htmlFor="category">Kategori *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">TÜM</SelectItem>
-                    <SelectItem value="casino">CASINO</SelectItem>
-                    <SelectItem value="spor">SPOR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
                 <Label htmlFor="bonus_amount">Bonus Tutarı *</Label>
                 <Input
                   id="bonus_amount"
@@ -459,17 +424,6 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
                   required
                 />
               </div>
-            </div>
-
-            <div>
-              <Label htmlFor="description">Bonus Açıklaması</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Bonusun detaylı açıklaması..."
-                rows={3}
-              />
             </div>
 
             <BonusImageUploader
@@ -498,52 +452,6 @@ export const SiteBonusManager = ({ siteId }: SiteBonusManagerProps) => {
                   placeholder="Örn: 30 gün"
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="min_deposit">Min. Yatırım</Label>
-                <Input
-                  id="min_deposit"
-                  value={formData.min_deposit}
-                  onChange={(e) => setFormData({ ...formData, min_deposit: e.target.value })}
-                  placeholder="Örn: 100 TL"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="max_bonus">Maks. Bonus</Label>
-                <Input
-                  id="max_bonus"
-                  value={formData.max_bonus}
-                  onChange={(e) => setFormData({ ...formData, max_bonus: e.target.value })}
-                  placeholder="Örn: 1000 TL"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="bonus_code">Bonus Kodu</Label>
-                <Input
-                  id="bonus_code"
-                  value={formData.bonus_code}
-                  onChange={(e) => setFormData({ ...formData, bonus_code: e.target.value })}
-                  placeholder="Örn: WELCOME100"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="claim_url">Bonus Talep URL (Opsiyonel)</Label>
-              <Input
-                id="claim_url"
-                type="url"
-                value={formData.claim_url}
-                onChange={(e) => setFormData({ ...formData, claim_url: e.target.value })}
-                placeholder="https://..."
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Boş bırakılırsa site affiliate linki kullanılır
-              </p>
             </div>
 
             <div>
