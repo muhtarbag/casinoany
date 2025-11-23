@@ -13,6 +13,7 @@ import { BreadcrumbSchema } from "@/components/StructuredData";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
 import { RelatedNews } from '@/components/news/RelatedNews';
+import { NewsImageSchema } from '@/components/news/NewsImageSchema';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -140,6 +141,10 @@ export default function NewsDetail() {
       />
       <Helmet>
         <link rel="canonical" href={`${window.location.origin}/haber/${article.slug}`} />
+        
+        {/* Language/Region */}
+        <link rel="alternate" hrefLang="tr" href={`${window.location.origin}/haber/${article.slug}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${window.location.origin}/haber/${article.slug}`} />
       </Helmet>
       
       {/* Breadcrumb Schema */}
@@ -148,6 +153,19 @@ export default function NewsDetail() {
         { name: 'Haberler', url: `${window.location.origin}/haberler` },
         { name: article.title, url: `${window.location.origin}/haber/${article.slug}` }
       ]} />
+      
+      {/* Image Schema */}
+      {article.featured_image && (
+        <NewsImageSchema
+          images={[{
+            url: article.featured_image,
+            alt: article.featured_image_alt || article.title,
+            caption: article.excerpt || article.title,
+          }]}
+          articleTitle={article.title}
+          articleUrl={`${window.location.origin}/haber/${article.slug}`}
+        />
+      )}
 
       <article className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-12 max-w-4xl">

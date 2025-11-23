@@ -21,6 +21,7 @@ import { SuperLigFixtures } from "@/components/SuperLigFixtures";
 import { NewsRssSyncButton } from "@/components/NewsRssSyncButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
+import { NewsFAQSchema } from '@/components/news/NewsFAQSchema';
 
 const categories = [
   "Tümü",
@@ -90,6 +91,24 @@ export default function News() {
       />
       <Helmet>
         <link rel="canonical" href="https://casinoany.com/haberler" />
+        
+        {/* Pagination Meta Tags */}
+        {currentPage > 1 && (
+          <link 
+            rel="prev" 
+            href={`https://casinoany.com/haberler${currentPage > 2 ? `?page=${currentPage - 1}` : ''}`} 
+          />
+        )}
+        {currentPage < totalPages && (
+          <link 
+            rel="next" 
+            href={`https://casinoany.com/haberler?page=${currentPage + 1}`} 
+          />
+        )}
+        
+        {/* Language/Region */}
+        <link rel="alternate" hrefLang="tr" href="https://casinoany.com/haberler" />
+        <link rel="alternate" hrefLang="x-default" href="https://casinoany.com/haberler" />
       </Helmet>
       
       {/* Breadcrumb Schema */}
@@ -105,10 +124,13 @@ export default function News() {
           items={paginatedArticles.map((article: any) => ({
             name: article.title,
             url: `${window.location.origin}/haber/${article.slug}`,
-            image: undefined
+            image: article.featured_image
           }))}
         />
       )}
+      
+      {/* FAQ Schema */}
+      <NewsFAQSchema category={selectedCategory !== 'Tümü' ? selectedCategory : undefined} />
 
       <Header />
 
