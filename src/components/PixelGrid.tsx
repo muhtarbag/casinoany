@@ -75,17 +75,18 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
     );
   }
 
+  const firstBatch = filteredSites.slice(0, 60);
+  const secondBatch = filteredSites.slice(60);
+
   return (
     <div className="space-y-8">
       {/* How It Works Section */}
       <HowItWorksSection />
 
-      {/* Site Grid */}
+      {/* First 60 Sites - Mobile: 1 column */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSites.map((site: any, index: number) => {
+        {firstBatch.map((site: any, index: number) => {
           const isPriority = index < 6;
-          
-          // Show between_sites ad after every 3 sites (index 2, 5, 8, etc.)
           const showBetweenSitesAd = (index + 1) % 3 === 0;
           
           return (
@@ -119,6 +120,46 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
           );
         })}
       </div>
+
+      {/* After 60 Sites - Mobile: 2 columns */}
+      {secondBatch.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {secondBatch.map((site: any, index: number) => {
+            const actualIndex = index + 60;
+            const showBetweenSitesAd = (actualIndex + 1) % 3 === 0;
+            
+            return (
+              <Fragment key={site.id}>
+                <BettingSiteCard
+                  id={site.id}
+                  slug={site.slug}
+                  name={site.name}
+                  logo={site.logo_url || ''}
+                  rating={site.rating || 0}
+                  bonus={site.bonus || ''}
+                  features={site.features || []}
+                  affiliateUrl={site.affiliate_link || ''}
+                  email={site.email || ''}
+                  whatsapp={site.whatsapp || ''}
+                  telegram={site.telegram || ''}
+                  twitter={site.twitter || ''}
+                  instagram={site.instagram || ''}
+                  facebook={site.facebook || ''}
+                  youtube={site.youtube || ''}
+                  reviewCount={site.review_count || 0}
+                  avgRating={site.avg_rating || 0}
+                  priority={false}
+                />
+                {showBetweenSitesAd && (
+                  <div className="col-span-2 md:col-span-2 lg:col-span-3">
+                    <AdBanner location="between_sites" className="w-full" />
+                  </div>
+                )}
+              </Fragment>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 });
