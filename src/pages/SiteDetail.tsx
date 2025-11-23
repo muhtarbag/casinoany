@@ -323,15 +323,20 @@ export default function SiteDetail() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // ✅ DÜZELTILDI: Thread-safe view tracking
+  // ✅ FIXED: Track views in conversions table
   useEffect(() => {
     if (!site?.id || viewTracked) return;
 
     const trackView = async () => {
-      // Atomic UPSERT - race condition yok
-      const { error } = await supabase.rpc('increment_site_stats', {
+      const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
+      
+      const { error } = await supabase.rpc('track_conversion', {
+        p_conversion_type: 'page_view',
+        p_page_path: window.location.pathname,
         p_site_id: site.id,
-        p_metric_type: 'view'
+        p_session_id: sessionId,
+        p_conversion_value: 0,
+        p_metadata: {},
       });
 
       if (error) {
@@ -364,14 +369,20 @@ export default function SiteDetail() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ✅ DÜZELTILDI: Thread-safe click tracking
+  // ✅ FIXED: Track clicks in conversions table
   const trackClickMutation = useMutation({
     mutationFn: async () => {
       if (!site?.id) return;
       
-      const { error } = await supabase.rpc('increment_site_stats', {
+      const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
+      
+      const { error } = await supabase.rpc('track_conversion', {
+        p_conversion_type: 'affiliate_click',
+        p_page_path: window.location.pathname,
         p_site_id: site.id,
-        p_metric_type: 'click'
+        p_session_id: sessionId,
+        p_conversion_value: 0,
+        p_metadata: { site_name: site.name },
       });
 
       if (error) throw error;

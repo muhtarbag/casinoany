@@ -1,9 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 
 type SocialPlatform = 'email' | 'whatsapp' | 'telegram' | 'twitter' | 'instagram' | 'facebook' | 'youtube';
 
-const platformMetricMap: Record<SocialPlatform, string> = {
+const platformConversionMap: Record<SocialPlatform, string> = {
   email: 'email_click',
   whatsapp: 'whatsapp_click',
   telegram: 'telegram_click',
@@ -14,7 +13,7 @@ const platformMetricMap: Record<SocialPlatform, string> = {
 };
 
 /**
- * Tracks social media link clicks for analytics
+ * ✅ FIXED: Tracks social media clicks using conversions table (single source of truth)
  * @param siteId - The ID of the betting site
  * @param platform - The social media platform
  * @param siteName - Optional site name for better toast messages
@@ -25,29 +24,29 @@ export const trackSocialClick = async (
   siteName?: string
 ): Promise<void> => {
   try {
-    const metricType = platformMetricMap[platform];
+    const conversionType = platformConversionMap[platform];
     
-    if (!metricType) {
+    if (!conversionType) {
       console.error(`Unknown platform: ${platform}`);
       return;
     }
 
-    // Call RPC function to increment stats atomically
-    const { error } = await supabase.rpc('increment_site_stats', {
+    // Track in conversions table (single source of truth)
+    const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
+    
+    const { error } = await supabase.rpc('track_conversion', {
+      p_conversion_type: conversionType,
+      p_page_path: window.location.pathname,
       p_site_id: siteId,
-      p_metric_type: metricType,
+      p_session_id: sessionId,
+      p_conversion_value: 0,
+      p_metadata: { platform, site_name: siteName },
     });
 
     if (error) {
       console.error('Social tracking error:', error);
       throw error;
     }
-
-    // Optional: Show success feedback (can be disabled for less intrusive UX)
-    // toast({
-    //   title: 'Yönlendiriliyorsunuz',
-    //   description: `${siteName || 'Site'} - ${platform}`,
-    // });
   } catch (error) {
     console.error('Failed to track social click:', error);
     // Don't show error toast to user - tracking failure shouldn't affect UX
