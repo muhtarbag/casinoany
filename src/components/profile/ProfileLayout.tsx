@@ -250,7 +250,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <Card className="sticky top-6">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 {/* User Profile Section */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <div className="relative mb-3">

@@ -197,7 +197,6 @@ All colors MUST be HSL.
   body {
     overflow-x: hidden;
     width: 100%;
-    height: 100%;
     position: relative;
   }
 

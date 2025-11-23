@@ -176,14 +176,14 @@ export default function Settings() {
         description="Profil bilgilerinizi ve tercihlerinizi yönetin"
       />
       <ProfileLayout>
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
+        <div className="max-w-2xl mx-auto px-0">
+          <div className="mb-4 md:mb-6">
             <Button variant="ghost" onClick={() => navigate('/profile/dashboard')}>
               ← Hesabıma Dön
             </Button>
           </div>
 
-          <Card className="mb-6">
+          <Card className="mb-4 md:mb-6">
             <CardHeader>
               <CardTitle>Profil Bilgileri</CardTitle>
               <CardDescription>
@@ -349,7 +349,7 @@ export default function Settings() {
             </CardContent>
           </Card>
 
-          <Card className="mb-6">
+          <Card className="mb-4 md:mb-6">
             <CardHeader>
               <CardTitle>Bildirim Tercihleri</CardTitle>
               <CardDescription>
