@@ -12,6 +12,7 @@ import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQue
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
 import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
+import { RelatedNews } from '@/components/news/RelatedNews';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -224,6 +225,14 @@ export default function NewsDetail() {
               </div>
             </div>
           )}
+
+          {/* Related News Section */}
+          <RelatedNews
+            currentArticleId={article.id}
+            category={article.category}
+            tags={article.tags}
+            limit={4}
+          />
 
           <div className="border-t pt-6">
             <a
