@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wallet } from "lucide-react";
+import DOMPurify from 'dompurify';
 
 interface WithdrawalGuideBlockProps {
   withdrawalGuide?: string;
@@ -7,6 +8,12 @@ interface WithdrawalGuideBlockProps {
 
 export const WithdrawalGuideBlock = ({ withdrawalGuide }: WithdrawalGuideBlockProps) => {
   if (!withdrawalGuide) return null;
+
+  // 🛡️ XSS Protection: Sanitize HTML content
+  const sanitizedGuide = DOMPurify.sanitize(withdrawalGuide, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+  });
 
   return (
     <Accordion type="single" collapsible className="border border-border/50 rounded-lg px-4">
@@ -20,7 +27,7 @@ export const WithdrawalGuideBlock = ({ withdrawalGuide }: WithdrawalGuideBlockPr
         <AccordionContent className="pb-4">
           <div 
             className="prose prose-sm max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: withdrawalGuide }}
+            dangerouslySetInnerHTML={{ __html: sanitizedGuide }}
           />
         </AccordionContent>
       </AccordionItem>
