@@ -8,7 +8,7 @@ import { useUserNotifications } from '@/hooks/useUserNotifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Bell, Check, CheckCheck, Trash2 } from 'lucide-react';
+import { Bell, Check, CheckCheck, Trash2, Trophy, MessageCircle, Star, Heart, Gift, Users, TrendingUp, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,34 @@ import { SEO } from '@/components/SEO';
 import { useToast } from '@/hooks/use-toast';
 
 const getNotificationIcon = (type: string, icon?: string) => {
-  if (icon) return icon;
+  if (icon) {
+    // If it's an emoji, display it directly
+    if (/^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(icon)) {
+      return icon;
+    }
+    
+    // Map icon names to Lucide components
+    const iconMap: Record<string, React.ReactNode> = {
+      'trophy': <Trophy className="w-8 h-8 text-yellow-500" />,
+      'check-circle': <CheckCircle className="w-8 h-8 text-green-500" />,
+      'message-circle': <MessageCircle className="w-8 h-8 text-blue-500" />,
+      'star': <Star className="w-8 h-8 text-yellow-500" />,
+      'heart': <Heart className="w-8 h-8 text-red-500" />,
+      'gift': <Gift className="w-8 h-8 text-purple-500" />,
+      'users': <Users className="w-8 h-8 text-blue-500" />,
+      'trending-up': <TrendingUp className="w-8 h-8 text-green-500" />,
+      'clock': <Clock className="w-8 h-8 text-orange-500" />,
+      'bell': <Bell className="w-8 h-8 text-blue-500" />,
+      'alert-triangle': <AlertTriangle className="w-8 h-8 text-yellow-500" />,
+    };
+
+    if (iconMap[icon]) {
+      return iconMap[icon];
+    }
+    
+    // If not a known icon, return the string
+    return icon;
+  }
   
   switch (type) {
     case 'bonus':
