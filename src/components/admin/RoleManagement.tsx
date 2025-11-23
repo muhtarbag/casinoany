@@ -12,6 +12,7 @@ import {
   Shield, UserCog, Loader2, Info, CheckCircle, XCircle, Clock, 
   Search, Mail, Calendar, UserCheck, UserX, Trash2 
 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -347,16 +348,36 @@ export function RoleManagement() {
             )}
             
             {user.status === 'rejected' && (
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => deleteUserMutation.mutate(user.user_id)}
-                disabled={deleteUserMutation.isPending}
-                className="flex-1"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Sil
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={deleteUserMutation.isPending}
+                    className="flex-1"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Sil
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Kullanıcıyı silmek istediğinize emin misiniz?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Bu işlem geri alınamaz. Kullanıcı kaydı kalıcı olarak silinecektir.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>İptal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteUserMutation.mutate(user.user_id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Sil
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </CardContent>

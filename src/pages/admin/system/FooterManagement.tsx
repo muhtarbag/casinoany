@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Plus, Pencil, Trash2, GripVertical, Link as LinkIcon } from 'lucide-react';
 import {
   useAllFooterLinks,
@@ -85,9 +86,7 @@ const FooterManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bu linki silmek istediğinizden emin misiniz?')) {
-      await deleteMutation.mutateAsync(id);
-    }
+    await deleteMutation.mutateAsync(id);
   };
 
   const resetForm = () => {
@@ -298,14 +297,34 @@ const FooterManagement = () => {
                           >
                             <Pencil className="w-4 h-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(link.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Link'i silmek istediğinize emin misiniz?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Bu işlem geri alınamaz. Link kalıcı olarak silinecektir.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>İptal</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(link.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Sil
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
