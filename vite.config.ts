@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 import viteCompression from 'vite-plugin-compression';
-import { PrerenderSPAPlugin } from 'vite-plugin-prerender';
+import PrerenderSPAPlugin from 'vite-plugin-prerender';
 import { generateRoutes } from './scripts/generate-routes.js';
 
 // https://vitejs.dev/config/
@@ -201,8 +201,7 @@ export default defineConfig(async ({ mode }) => {
         renderAfterTime: 5000,
         headless: true
       },
-      postProcess(renderedRoute) {
-        // Clean up unwanted attributes
+      postProcess(renderedRoute: any) {
         renderedRoute.html = renderedRoute.html
           .replace(/data-radix-\w+="[^"]*"/g, '')
           .replace(/data-state="[^"]*"/g, '');
@@ -281,7 +280,7 @@ export default defineConfig(async ({ mode }) => {
     },
     chunkSizeWarningLimit: 1000,
     sourcemap: false,
-    minify: 'esbuild',
+    minify: 'esbuild' as const,
     target: 'es2020',
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
