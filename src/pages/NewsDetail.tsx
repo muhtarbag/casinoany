@@ -93,7 +93,8 @@ export default function NewsDetail() {
         description={article.meta_description || article.excerpt || ""}
         keywords={article.tags || []}
         ogType="article"
-        ogImageAlt={article.title}
+        ogImage={article.featured_image || article.og_image}
+        ogImageAlt={article.featured_image_alt || article.title}
         article={{
           publishedTime: article.published_at,
           modifiedTime: article.updated_at,
@@ -165,12 +166,22 @@ export default function NewsDetail() {
               </p>
             )}
 
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 {format(new Date(article.published_at), "d MMMM yyyy, HH:mm", { locale: tr })}
               </div>
             </div>
+
+            {article.featured_image && (
+              <div className="rounded-xl overflow-hidden mb-8">
+                <img
+                  src={article.featured_image}
+                  alt={article.featured_image_alt || article.title}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            )}
           </header>
 
           <div
