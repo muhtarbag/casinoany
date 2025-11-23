@@ -155,11 +155,11 @@ export default function Dashboard() {
         description="Favori sitelerinizi yönetin, üyeliklerinizi takip edin ve bonus kampanyalarından haberdar olun."
       />
       <ProfileLayout>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           {/* Achievements Preview */}
           {!isLoadingAchievements && recentAchievements.length > 0 && (
             <Card className="border-l-4 border-yellow-500">
-              <CardContent className="p-5">
+              <CardContent className="p-4 lg:p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-yellow-500" />
@@ -203,7 +203,7 @@ export default function Dashboard() {
                 item.borderColor,
                 "hover:shadow-lg hover:bg-accent/5 active:scale-[0.98]"
               )}>
-                <CardContent className="p-5">
+                <CardContent className="p-4 lg:p-5">
                   <div className="flex items-center gap-4">
                     {/* Icon */}
                     <div className={cn(

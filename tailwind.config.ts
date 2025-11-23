@@ -8,11 +8,12 @@ export default {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
-        sm: "1.5rem",
-        md: "2rem",
-        lg: "2.5rem",
-        xl: "3rem",
+        DEFAULT: "1rem",      // 16px mobile (iOS HIG minimum)
+        sm: "1rem",           // 16px small phones
+        md: "1.5rem",         // 24px tablet
+        lg: "2rem",           // 32px desktop
+        xl: "2rem",           // 32px large desktop
+        "2xl": "2rem",        // 32px extra large
       },
       screens: {
         "2xl": "1400px",
