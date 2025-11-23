@@ -3,7 +3,7 @@ import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Hero } from '@/components/Hero';
-import { PixelGrid } from '@/components/PixelGrid';
+import { TieredSitesGrid } from '@/components/home/TieredSitesGrid';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { FeaturedSitesSection } from '@/components/FeaturedSitesSection';
 import { ComplaintsShowcase } from '@/components/ComplaintsShowcase';
@@ -123,7 +123,7 @@ const Index = () => {
         <Hero onSearch={handleSearch} searchTerm={searchTerm} />
         
         <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
-          <PixelGrid searchTerm={searchTerm} />
+          <TieredSitesGrid searchTerm={searchTerm} />
         </div>
 
         {/* Featured Casino Reviews Section */}
