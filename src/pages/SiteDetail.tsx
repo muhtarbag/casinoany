@@ -396,10 +396,10 @@ export default function SiteDetail() {
     }
   };
 
-  // Calculate average rating - use site.avg_rating as fallback during loading
+  // Calculate average rating - use site.rating if avg_rating is 0 or no reviews
   const averageRating = reviews?.length
     ? (reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length).toFixed(1)
-    : (site?.avg_rating?.toFixed(1) || site?.rating?.toFixed(1) || "0.0");
+    : (site?.avg_rating && site.avg_rating > 0 ? site.avg_rating : site?.rating || 0).toFixed(1);
 
   if (siteLoading) {
     return (
