@@ -1,9 +1,32 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 import viteCompression from 'vite-plugin-compression';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+// Custom plugin to run prerendering after build
+function prerenderPlugin(): Plugin {
+  return {
+    name: 'vite-plugin-custom-prerender',
+    apply: 'build',
+    async closeBundle() {
+      console.log('\n🚀 Starting prerendering process...\n');
+      try {
+        // Run the prerender script
+        const { stdout, stderr } = await execAsync('node scripts/prerender.js');
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
+      } catch (error: any) {
+        console.error('❌ Prerendering failed:', error.message);
+      }
+    }
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -185,7 +208,8 @@ export default defineConfig(({ mode }) => ({
       devOptions: {
         enabled: false
       }
-    })
+    }),
+    mode === 'production' && prerenderPlugin()
   ].filter(Boolean),
   resolve: {
     alias: {
