@@ -33,6 +33,7 @@ import { Textarea } from './ui/textarea';
 import { useNewsArticles, useDeleteNews, useToggleNewsPublish } from '@/hooks/queries/useNewsQueries';
 import { VirtualList } from '@/components/VirtualList';
 import { BonusImageUploader } from '@/components/bonus/BonusImageUploader';
+import { generateSlug, validateSlug, isSlugAvailable } from '@/lib/slugGenerator';
 
 export function NewsManagement() {
   const { toast } = useToast();
@@ -42,6 +43,7 @@ export function NewsManagement() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [slugError, setSlugError] = useState<string>('');
 
   const { data: articles, isLoading } = useNewsArticles();
   const deleteMutation = useDeleteNews();
@@ -74,10 +76,44 @@ export function NewsManagement() {
   const handleEdit = useCallback((article: any) => {
     setEditingArticle(article);
     setEditDialogOpen(true);
+    setSlugError('');
   }, []);
+
+  const handleSlugChange = useCallback((newSlug: string) => {
+    setEditingArticle({ ...editingArticle, slug: newSlug });
+    
+    // Validate format
+    const validation = validateSlug(newSlug);
+    if (!validation.valid) {
+      setSlugError(validation.error || '');
+    } else {
+      setSlugError('');
+    }
+  }, [editingArticle]);
+
+  const handleGenerateSlug = useCallback(() => {
+    if (!editingArticle?.title) return;
+    const newSlug = generateSlug(editingArticle.title);
+    setEditingArticle({ ...editingArticle, slug: newSlug });
+    setSlugError('');
+  }, [editingArticle]);
 
   const handleUpdateArticle = useCallback(async () => {
     if (!editingArticle) return;
+
+    // Validate slug
+    const validation = validateSlug(editingArticle.slug);
+    if (!validation.valid) {
+      setSlugError(validation.error || '');
+      return;
+    }
+
+    // Check slug availability
+    const available = await isSlugAvailable(editingArticle.slug, editingArticle.id);
+    if (!available) {
+      setSlugError('Bu slug zaten kullanımda');
+      return;
+    }
 
     setIsUpdating(true);
     try {
@@ -85,6 +121,7 @@ export function NewsManagement() {
         .from('news_articles')
         .update({
           title: editingArticle.title,
+          slug: editingArticle.slug,
           excerpt: editingArticle.excerpt,
           featured_image: editingArticle.featured_image,
           featured_image_alt: editingArticle.featured_image_alt,
@@ -103,6 +140,7 @@ export function NewsManagement() {
       queryClient.invalidateQueries({ queryKey: ['admin-news-articles'] });
       setEditDialogOpen(false);
       setEditingArticle(null);
+      setSlugError('');
     } catch (error) {
       toast({
         title: 'Hata',
@@ -275,6 +313,32 @@ export function NewsManagement() {
                   value={editingArticle.title}
                   onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="slug">URL Slug (SEO için önemli)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="slug"
+                    value={editingArticle.slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    className={slugError ? 'border-destructive' : ''}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGenerateSlug}
+                    disabled={!editingArticle.title}
+                  >
+                    Oluştur
+                  </Button>
+                </div>
+                {slugError && (
+                  <p className="text-sm text-destructive mt-1">{slugError}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  URL: /haber/{editingArticle.slug}
+                </p>
               </div>
 
               <div>

@@ -261,20 +261,8 @@ function cleanHtml(text: string): string {
     .trim();
 }
 
-function slugify(text: string): string {
-  const trMap: Record<string, string> = {
-    'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
-    'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u',
-  };
-  
-  return text
-    .split('')
-    .map(char => trMap[char] || char)
-    .join('')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+// Import shared slug generator
+import { generateUniqueSlug } from '../_shared/slugGenerator.ts';
 
 function categorizeContent(content: string): string {
   const lower = content.toLowerCase();
@@ -401,7 +389,20 @@ TAGS: [4-6 Türkçe tag, virgülle ayır]`,
     const tags = tagsRaw.split(',').map((t: string) => t.trim()).slice(0, 6);
 
     const category = categorizeContent(content);
-    const slug = slugify(title);
+    
+    // Generate unique slug (prevent duplicates)
+    const trMap: Record<string, string> = {
+      'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+      'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u',
+    };
+    const slug = title
+      .split('')
+      .map((char: string) => trMap[char] || char)
+      .join('')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 100);
 
     // Convert content to HTML
     const contentHtml = content
