@@ -26,13 +26,16 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
       const touchY = e.touches[0].clientY;
       const distance = touchY - touchStartY;
 
-      // Only prevent default if we're at the top and pulling down
-      if (distance > 0 && window.scrollY === 0) {
-        // Only prevent if we're actually pulling (not just touching)
-        if (distance > 5) {
+      // Only handle pull-to-refresh when at top AND pulling down significantly
+      if (distance > 10 && window.scrollY === 0) {
+        // Only prevent scroll when we're actively refreshing
+        if (distance > 20) {
           e.preventDefault();
         }
         setPullDistance(Math.min(distance, threshold * 1.5));
+      } else {
+        // Reset if scrolling up or not at top
+        setPullDistance(0);
       }
     };
 

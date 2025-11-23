@@ -329,7 +329,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </aside>
 
           {/* Main Content - Mobile Optimized */}
-          <main className="flex-1 min-w-0 relative">
+          <main className="flex-1 min-w-0 relative overflow-y-auto">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
                 <div className="w-full pb-6 safe-area-bottom">
