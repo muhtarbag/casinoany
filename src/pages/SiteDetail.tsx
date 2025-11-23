@@ -363,8 +363,8 @@ export default function SiteDetail() {
         p_conversion_type: 'page_view',
         p_page_path: window.location.pathname,
         p_site_id: site.id,
-        p_session_id: sessionId,
         p_conversion_value: 0,
+        p_session_id: sessionId,
         p_metadata: {},
       });
 
@@ -409,8 +409,8 @@ export default function SiteDetail() {
         p_conversion_type: 'affiliate_click',
         p_page_path: window.location.pathname,
         p_site_id: site.id,
-        p_session_id: sessionId,
         p_conversion_value: 0,
+        p_session_id: sessionId,
         p_metadata: { site_name: site.name },
       });
 
