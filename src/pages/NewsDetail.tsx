@@ -21,7 +21,7 @@ export default function NewsDetail() {
 
   // Fetch AI-suggested internal links
   const { data: internalLinks } = useInternalLinks(
-    article?.slug ? `/news/${article.slug}` : '',
+    article?.slug ? `/haber/${article.slug}` : '',
     !!article?.slug
   );
 
@@ -120,19 +120,19 @@ export default function NewsDetail() {
           },
           mainEntityOfPage: {
             '@type': 'WebPage',
-            '@id': `${window.location.origin}/news/${article.slug}`,
+            '@id': `${window.location.origin}/haber/${article.slug}`,
           },
         }}
       />
       <Helmet>
-        <link rel="canonical" href={`${window.location.origin}/news/${article.slug}`} />
+        <link rel="canonical" href={`${window.location.origin}/haber/${article.slug}`} />
       </Helmet>
       
       {/* Breadcrumb Schema */}
       <BreadcrumbSchema items={[
         { name: 'Ana Sayfa', url: window.location.origin },
-        { name: 'Haberler', url: `${window.location.origin}/news` },
-        { name: article.title, url: `${window.location.origin}/news/${article.slug}` }
+        { name: 'Haberler', url: `${window.location.origin}/haberler` },
+        { name: article.title, url: `${window.location.origin}/haber/${article.slug}` }
       ]} />
 
       <article className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-[72px] md:pt-[84px]">

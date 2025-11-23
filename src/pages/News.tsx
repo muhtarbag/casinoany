@@ -94,7 +94,7 @@ export default function News() {
       {/* Breadcrumb Schema */}
       <BreadcrumbSchema items={[
         { name: 'Ana Sayfa', url: window.location.origin },
-        { name: 'Haberler', url: `${window.location.origin}/news` }
+        { name: 'Haberler', url: `${window.location.origin}/haberler` }
       ]} />
       
       {/* News ItemList Schema */}
@@ -103,7 +103,7 @@ export default function News() {
           title="iGaming ve Casino Haberleri"
           items={paginatedArticles.map((article: any) => ({
             name: article.title,
-            url: `${window.location.origin}/news/${article.slug}`,
+            url: `${window.location.origin}/haber/${article.slug}`,
             image: undefined
           }))}
         />
@@ -162,7 +162,7 @@ export default function News() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {paginatedArticles.map((article: any) => (
-                      <Link key={article.id} to={`/news/${article.slug}`}>
+                      <Link key={article.id} to={`/haber/${article.slug}`}>
                         <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-primary/50">
                           <CardHeader>
                             <div className="flex items-center justify-between mb-3">
