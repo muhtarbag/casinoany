@@ -121,9 +121,9 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
         })}
       </div>
 
-      {/* After 60 Sites - Mobile: 2 columns */}
+      {/* After 60 Sites - Mobile: 2 columns with compact design */}
       {secondBatch.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {secondBatch.map((site: any, index: number) => {
             const actualIndex = index + 60;
             const showBetweenSitesAd = (actualIndex + 1) % 3 === 0;
@@ -149,6 +149,7 @@ export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
                   reviewCount={site.review_count || 0}
                   avgRating={site.avg_rating || 0}
                   priority={false}
+                  compact={true}
                 />
                 {showBetweenSitesAd && (
                   <div className="col-span-2 md:col-span-2 lg:col-span-3">
