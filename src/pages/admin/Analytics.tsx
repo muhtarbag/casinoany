@@ -10,96 +10,131 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function Analytics() {
-  // ✅ FIXED: Fetch from site_stats with proper JOIN
+  // ✅ FIXED: Fetch from conversions table (real data source)
   const { data: socialStats } = useQuery({
     queryKey: ['social-media-stats'],
     queryFn: async () => {
-      // Get sites with their stats using a single query with join
-      const { data, error } = await supabase
+      // Get all sites
+      const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
-        .select(`
-          id,
-          name,
-          slug,
-          site_stats (
-            email_clicks,
-            whatsapp_clicks,
-            telegram_clicks,
-            twitter_clicks,
-            instagram_clicks,
-            facebook_clicks,
-            youtube_clicks
-          )
-        `)
+        .select('id, name, slug')
         .eq('is_active', true);
 
-      if (error) throw error;
-      if (!data) return [];
+      if (sitesError) throw sitesError;
+      if (!sites) return [];
 
-      // Map to the expected format
-      return data.map(site => {
-        const stats = (site.site_stats as any)?.[0] || {};
-        return {
-          site_id: site.id,
-          site_name: site.name,
-          betting_sites: { name: site.name, is_active: true },
-          email_clicks: stats.email_clicks || 0,
-          whatsapp_clicks: stats.whatsapp_clicks || 0,
-          telegram_clicks: stats.telegram_clicks || 0,
-          twitter_clicks: stats.twitter_clicks || 0,
-          instagram_clicks: stats.instagram_clicks || 0,
-          facebook_clicks: stats.facebook_clicks || 0,
-          youtube_clicks: stats.youtube_clicks || 0,
+      // Get social media clicks from conversions table
+      const { data: conversions, error: conversionsError } = await supabase
+        .from('conversions')
+        .select('site_id, conversion_type')
+        .in('conversion_type', [
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ])
+        .not('site_id', 'is', null);
+
+      if (conversionsError) throw conversionsError;
+
+      // Aggregate clicks per site and platform
+      const clicksBySite = conversions?.reduce((acc, conv) => {
+        const siteId = conv.site_id!;
+        if (!acc[siteId]) {
+          acc[siteId] = {
+            email_clicks: 0,
+            whatsapp_clicks: 0,
+            telegram_clicks: 0,
+            twitter_clicks: 0,
+            instagram_clicks: 0,
+            facebook_clicks: 0,
+            youtube_clicks: 0,
+          };
+        }
+        
+        // Map conversion_type to clicks field
+        const platformMap: Record<string, keyof typeof acc[string]> = {
+          'email_click': 'email_clicks',
+          'whatsapp_click': 'whatsapp_clicks',
+          'telegram_click': 'telegram_clicks',
+          'twitter_click': 'twitter_clicks',
+          'instagram_click': 'instagram_clicks',
+          'facebook_click': 'facebook_clicks',
+          'youtube_click': 'youtube_clicks',
         };
-      });
+        
+        const field = platformMap[conv.conversion_type];
+        if (field) {
+          acc[siteId][field]++;
+        }
+        
+        return acc;
+      }, {} as Record<string, any>) || {};
+
+      // Combine sites with their click data
+      return sites.map(site => ({
+        site_id: site.id,
+        site_name: site.name,
+        betting_sites: { name: site.name, is_active: true },
+        email_clicks: clicksBySite[site.id]?.email_clicks || 0,
+        whatsapp_clicks: clicksBySite[site.id]?.whatsapp_clicks || 0,
+        telegram_clicks: clicksBySite[site.id]?.telegram_clicks || 0,
+        twitter_clicks: clicksBySite[site.id]?.twitter_clicks || 0,
+        instagram_clicks: clicksBySite[site.id]?.instagram_clicks || 0,
+        facebook_clicks: clicksBySite[site.id]?.facebook_clicks || 0,
+        youtube_clicks: clicksBySite[site.id]?.youtube_clicks || 0,
+      }));
     },
     staleTime: 30000,
     refetchOnMount: true,
   });
 
-  // ✅ FIXED: Fetch active sites with their stats
+  // ✅ FIXED: Fetch active sites with their conversion stats
   const { data: activeSites } = useQuery({
     queryKey: ['active-sites-for-analytics'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
-        .select(`
-          id,
-          name,
-          slug,
-          site_stats (
-            email_clicks,
-            whatsapp_clicks,
-            telegram_clicks,
-            twitter_clicks,
-            instagram_clicks,
-            facebook_clicks,
-            youtube_clicks
-          )
-        `)
+        .select('id, name, slug')
         .eq('is_active', true);
 
-      if (error) throw error;
-      if (!data) return [];
+      if (sitesError) throw sitesError;
+      if (!sites) return [];
 
-      // Calculate total social clicks and sort
-      const sitesWithTotals = data.map(site => {
-        const stats = (site.site_stats as any)?.[0] || {};
-        const totalClicks = (stats.email_clicks || 0) + 
-                           (stats.whatsapp_clicks || 0) + 
-                           (stats.telegram_clicks || 0) + 
-                           (stats.twitter_clicks || 0) + 
-                           (stats.instagram_clicks || 0) + 
-                           (stats.facebook_clicks || 0) + 
-                           (stats.youtube_clicks || 0);
-        
-        return {
-          id: site.id,
-          name: site.name,
-          slug: site.slug,
-          totalClicks
-        };
-      });
+      // Get social clicks from conversions
+      const { data: conversions, error: conversionsError } = await supabase
+        .from('conversions')
+        .select('site_id')
+        .in('conversion_type', [
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ])
+        .not('site_id', 'is', null);
+
+      if (conversionsError) throw conversionsError;
+
+      // Count clicks per site
+      const clicksBySite = conversions?.reduce((acc, conv) => {
+        const siteId = conv.site_id!;
+        acc[siteId] = (acc[siteId] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
+
+      // Map sites with total clicks
+      const sitesWithTotals = sites.map(site => ({
+        id: site.id,
+        name: site.name,
+        slug: site.slug,
+        totalClicks: clicksBySite[site.id] || 0
+      }));
       
       return sitesWithTotals.sort((a, b) => b.totalClicks - a.totalClicks);
     },
