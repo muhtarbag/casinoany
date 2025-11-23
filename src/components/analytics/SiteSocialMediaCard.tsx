@@ -28,7 +28,7 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
         .from('site_stats')
         .select('email_clicks, whatsapp_clicks, telegram_clicks, twitter_clicks, instagram_clicks, facebook_clicks, youtube_clicks')
         .eq('site_id', siteId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       
