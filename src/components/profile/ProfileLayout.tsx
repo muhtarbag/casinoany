@@ -329,7 +329,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0 pb-24 lg:pb-0 relative">
+          <main className="flex-1 min-w-0 pb-32 lg:pb-0 relative overflow-y-auto">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
                 <div className="w-full">
@@ -342,7 +342,7 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       </div>
 
       {/* Mobile Bottom Navigation - Optimized for Touch */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl safe-area-inset-bottom" style={{ zIndex: 9999 }}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl" style={{ zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="grid grid-cols-5 px-2 py-3">
           {mobileBottomNavItems.map((item) => {
             const isActive = location.pathname === item.href;
