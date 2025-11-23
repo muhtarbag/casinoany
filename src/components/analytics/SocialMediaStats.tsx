@@ -35,47 +35,6 @@ export const SocialMediaStats = ({ statsData }: SocialMediaStatsProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Toplam Sosyal Medya Tıklaması
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{totalSocialClicks}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Aktif Platform Sayısı
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {socialPlatforms.filter(p => platformTotals[p.key] > 0).length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Engagement Rate
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">%{engagementRate}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Site başına ortalama tıklama
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Platform Summary Cards */}
       <Card>
         <CardHeader>
