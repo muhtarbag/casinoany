@@ -128,8 +128,8 @@ const BettingSiteCardComponent = ({
         p_conversion_type: 'affiliate_click',
         p_page_path: window.location.pathname,
         p_site_id: id,
-        p_session_id: sessionId,
         p_conversion_value: 0,
+        p_session_id: sessionId,
         p_metadata: { site_name: name },
       });
       

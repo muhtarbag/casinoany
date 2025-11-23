@@ -38,8 +38,8 @@ export const trackSocialClick = async (
       p_conversion_type: conversionType,
       p_page_path: window.location.pathname,
       p_site_id: siteId,
-      p_session_id: sessionId,
       p_conversion_value: 0,
+      p_session_id: sessionId,
       p_metadata: { platform, site_name: siteName },
     });
 

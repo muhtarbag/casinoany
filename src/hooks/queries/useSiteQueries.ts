@@ -192,8 +192,8 @@ export const useUpdateSiteStats = () => {
         p_conversion_type: type,
         p_page_path: window.location.pathname,
         p_site_id: siteId,
-        p_session_id: sessionId,
         p_conversion_value: 0,
+        p_session_id: sessionId,
         p_metadata: {},
       });
 
