@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Eye, ExternalLink, Search, Filter } from "lucide-react";
+import { Calendar, Eye, ExternalLink, Search, Filter, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
@@ -20,6 +20,7 @@ import { SuperLigStandings } from "@/components/SuperLigStandings";
 import { SuperLigFixtures } from "@/components/SuperLigFixtures";
 import { NewsRssSyncButton } from "@/components/NewsRssSyncButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
 
 const categories = [
   "Tümü",
@@ -161,7 +162,10 @@ export default function News() {
               {paginatedArticles && paginatedArticles.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    {paginatedArticles.map((article: any) => (
+                    {paginatedArticles.map((article: any) => {
+                      const readTime = calculateReadingTime(article.content || article.content_html || '');
+                      
+                      return (
                       <Link key={article.id} to={`/haber/${article.slug}`}>
                         <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-primary/50 overflow-hidden">
                           {article.featured_image && (
@@ -178,9 +182,15 @@ export default function News() {
                               {article.category && (
                                 <Badge variant="secondary">{article.category}</Badge>
                               )}
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Eye className="w-4 h-4" />
-                                <span>{article.view_count || 0}</span>
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{formatReadingTime(readTime)}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Eye className="w-3 h-3" />
+                                  <span>{article.view_count || 0}</span>
+                                </div>
                               </div>
                             </div>
                             <CardTitle className="text-xl line-clamp-2 hover:text-primary transition-colors">
@@ -209,7 +219,8 @@ export default function News() {
                           </CardContent>
                         </Card>
                       </Link>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {totalPages > 1 && (

@@ -60,26 +60,39 @@ export const SEO = ({
     ],
   };
 
-  // Article structured data
+  // Article structured data with enhanced schema
   const articleStructuredData = article ? {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: title,
     description: description,
-    image: finalOgImage,
+    image: {
+      '@type': 'ImageObject',
+      url: finalOgImage,
+      width: '1200',
+      height: '630',
+    },
     datePublished: article.publishedTime,
     dateModified: article.modifiedTime,
     author: {
-      '@type': 'Person',
+      '@type': 'Organization',
       name: article.author || 'CasinoAny.com',
+      url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
       name: 'CasinoAny.com',
+      url: siteUrl,
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,
+        width: '600',
+        height: '60',
       },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': currentUrl,
     },
     keywords: article.tags?.join(', '),
   } : null;

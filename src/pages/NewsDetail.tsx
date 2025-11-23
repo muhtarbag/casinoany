@@ -5,12 +5,13 @@ import { tr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Calendar, Eye, ArrowLeft, ExternalLink } from "lucide-react";
+import { Calendar, Eye, ArrowLeft, ExternalLink, Clock } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Helmet } from "react-helmet-async";
 import { useNewsArticle, useIncrementNewsView } from "@/hooks/queries/useNewsQueries";
 import { BreadcrumbSchema } from "@/components/StructuredData";
 import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/useInternalLinking';
+import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -34,6 +35,12 @@ export default function NewsDetail() {
     }
     return applyInternalLinks(rawContent, internalLinks);
   }, [article?.content_html, article?.content, internalLinks]);
+
+  // Calculate reading time
+  const readingTime = useMemo(() => {
+    const content = article?.content || article?.content_html || '';
+    return calculateReadingTime(content);
+  }, [article?.content, article?.content_html]);
 
   useEffect(() => {
     if (article?.id && !viewTrackedRef.current) {
@@ -105,18 +112,23 @@ export default function NewsDetail() {
           '@type': 'NewsArticle',
           headline: article.title,
           description: article.excerpt || article.meta_description,
+          image: article.featured_image || `${window.location.origin}/og-default.jpg`,
           datePublished: article.published_at,
           dateModified: article.updated_at,
           author: {
             '@type': 'Organization',
             name: 'CasinoAny.com',
+            url: window.location.origin,
           },
           publisher: {
             '@type': 'Organization',
             name: 'CasinoAny.com',
+            url: window.location.origin,
             logo: {
               '@type': 'ImageObject',
               url: `${window.location.origin}/logo.png`,
+              width: '600',
+              height: '60',
             },
           },
           mainEntityOfPage: {
@@ -166,10 +178,21 @@ export default function NewsDetail() {
               </p>
             )}
 
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                {format(new Date(article.published_at), "d MMMM yyyy, HH:mm", { locale: tr })}
+                <time dateTime={article.published_at}>
+                  {format(new Date(article.published_at), "d MMMM yyyy", { locale: tr })}
+                </time>
+              </div>
+              <span>•</span>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{formatReadingTime(readingTime)}</span>
+              </div>
+              <span>•</span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">CasinoAny.com</span>
               </div>
             </div>
 
