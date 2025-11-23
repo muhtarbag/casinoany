@@ -57,7 +57,7 @@ const SiteManagement = () => {
       if (!effectiveUserId || ownedSites.length === 0) return null;
       
       // ✅ OPTIMIZED: Parallel execution with Promise.all - 80% faster
-      const [siteResult, favoriteResult, complaintsResult, statsResult] = await Promise.all([
+      const [siteResult, favoriteResult, complaintsResult, conversionsResult] = await Promise.all([
         supabase
           .from('betting_sites')
           .select('*')
@@ -72,11 +72,18 @@ const SiteManagement = () => {
           .select('*', { count: 'exact', head: true })
           .eq('site_id', ownedSites[0]),
         supabase
-          .from('site_stats')
-          .select('views, clicks')
+          .from('conversions')
+          .select('conversion_type')
           .eq('site_id', ownedSites[0])
-          .maybeSingle()
       ]);
+
+      // Aggregate stats from conversions
+      const stats = { views: 0, clicks: 0 };
+      conversionsResult.data?.forEach(conv => {
+        if (conv.conversion_type === 'page_view') stats.views++;
+        if (conv.conversion_type === 'affiliate_click') stats.clicks++;
+      });
+      const statsResult = { data: stats, error: null };
 
       // Handle errors
       if (siteResult.error) throw siteResult.error;
