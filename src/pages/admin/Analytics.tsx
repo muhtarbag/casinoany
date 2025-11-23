@@ -4,6 +4,7 @@ import SiteStats from "@/components/SiteStats";
 import { NotificationStats } from "@/components/notifications/NotificationStats";
 import { SocialPlatformTrends } from "@/components/analytics/SocialPlatformTrends";
 import { SiteSocialMediaCard } from "@/components/analytics/SiteSocialMediaCard";
+import { SocialMediaStats } from "@/components/analytics/SocialMediaStats";
 import { BarChart3, Bell, TrendingUp, Building2 } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -171,20 +172,12 @@ export default function Analytics() {
 
         {/* Social Media Analytics Tab */}
         <TabsContent value="social" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Sosyal Medya Analitiği
-              </CardTitle>
-              <CardDescription>
-                Platform bazında tıklama performansı ve engagement metrikleri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {socialStats && <SocialPlatformTrends statsData={socialStats} />}
-            </CardContent>
-          </Card>
+          {socialStats && (
+            <>
+              <SocialMediaStats statsData={socialStats} />
+              <SocialPlatformTrends statsData={socialStats} />
+            </>
+          )}
         </TabsContent>
 
         {/* Site-Specific Social Media Analytics Tab */}
