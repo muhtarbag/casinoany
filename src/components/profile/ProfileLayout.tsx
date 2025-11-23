@@ -198,9 +198,9 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
+      {/* Header - Safe Area Optimized */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-top">
+        <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-8 max-w-[1280px] mx-auto">
           <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img src={logo} alt="CasinoAny.com" className="h-8 w-auto" loading="eager" />
           </Link>
@@ -245,8 +245,8 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6">
+        <div className="flex gap-4 md:gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <Card className="sticky top-6">
@@ -328,11 +328,11 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
             </Card>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0 pb-32 lg:pb-0 relative overflow-y-auto">
+          {/* Main Content - Mobile Optimized */}
+          <main className="flex-1 min-w-0 relative">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
-                <div className="w-full">
+                <div className="w-full pb-6 safe-area-bottom">
                   {children}
                 </div>
               </PageTransition>

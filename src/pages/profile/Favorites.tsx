@@ -128,7 +128,7 @@ const Favorites = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav: any) => (
               <Card key={fav.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-start gap-4">
                     {fav.betting_sites.logo_url && (
                       <img

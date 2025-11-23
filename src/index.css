@@ -68,15 +68,32 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* Layout System - World Class Standards */
+    /* Layout System - Global Standards (44pt touch targets, 16/24/32px padding) */
     --header-height: 64px;
     --header-height-desktop: 72px;
     --container-max-width: 1280px;
-    --container-padding: 1rem;        /* 16px mobile */
-    --container-padding-md: 1.5rem;   /* 24px tablet */
-    --container-padding-lg: 2rem;     /* 32px desktop */
-    --section-spacing: 3rem;          /* 48px between sections */
-    --section-spacing-lg: 5rem;       /* 80px desktop sections */
+    
+    /* Progressive padding system - matches Apple HIG & Material Design */
+    --spacing-xs: 0.5rem;   /* 8px - tight spacing */
+    --spacing-sm: 0.75rem;  /* 12px - compact */
+    --spacing-md: 1rem;     /* 16px - mobile base */
+    --spacing-lg: 1.5rem;   /* 24px - tablet/comfortable */
+    --spacing-xl: 2rem;     /* 32px - desktop/spacious */
+    --spacing-2xl: 3rem;    /* 48px - section spacing */
+    --spacing-3xl: 4rem;    /* 64px - large sections */
+    
+    /* Container padding - responsive by default */
+    --container-padding: var(--spacing-md);      /* 16px mobile */
+    --container-padding-md: var(--spacing-lg);   /* 24px tablet */
+    --container-padding-lg: var(--spacing-xl);   /* 32px desktop */
+    
+    /* Card padding system */
+    --card-padding: var(--spacing-md);           /* 16px mobile */
+    --card-padding-lg: var(--spacing-lg);        /* 24px desktop */
+    
+    /* Section spacing */
+    --section-spacing: var(--spacing-2xl);       /* 48px sections */
+    --section-spacing-lg: 5rem;                  /* 80px desktop sections */
 
     /* Balanced gradients - not overwhelming purple */
     --gradient-primary: linear-gradient(135deg, hsl(280 98% 69%), hsl(260 85% 55%));
@@ -271,6 +288,37 @@ All colors MUST be HSL.
   
   .tap-highlight-none {
     -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Container utilities - responsive by default */
+  .container-padding {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+  }
+  
+  @media (min-width: 768px) {
+    .container-padding {
+      padding-left: var(--container-padding-md);
+      padding-right: var(--container-padding-md);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-padding {
+      padding-left: var(--container-padding-lg);
+      padding-right: var(--container-padding-lg);
+    }
+  }
+  
+  /* Card padding utilities */
+  .card-padding {
+    padding: var(--card-padding);
+  }
+  
+  @media (min-width: 1024px) {
+    .card-padding {
+      padding: var(--card-padding-lg);
+    }
   }
   
   /* Grid pattern for backgrounds */
