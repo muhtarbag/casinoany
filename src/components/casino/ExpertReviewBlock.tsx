@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FileText } from "lucide-react";
+import DOMPurify from 'dompurify';
 
 interface ExpertReviewBlockProps {
   expertReview?: string;
@@ -7,6 +8,12 @@ interface ExpertReviewBlockProps {
 
 export const ExpertReviewBlock = ({ expertReview }: ExpertReviewBlockProps) => {
   if (!expertReview) return null;
+
+  // 🛡️ XSS Protection: Sanitize HTML content
+  const sanitizedReview = DOMPurify.sanitize(expertReview, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+  });
 
   return (
     <Accordion type="single" collapsible className="border border-border/50 rounded-lg px-4">
@@ -20,7 +27,7 @@ export const ExpertReviewBlock = ({ expertReview }: ExpertReviewBlockProps) => {
         <AccordionContent className="pb-4">
           <div 
             className="prose prose-sm max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: expertReview }}
+            dangerouslySetInnerHTML={{ __html: sanitizedReview }}
           />
         </AccordionContent>
       </AccordionItem>

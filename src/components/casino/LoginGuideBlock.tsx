@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LogIn } from "lucide-react";
+import DOMPurify from 'dompurify';
 
 interface LoginGuideBlockProps {
   loginGuide?: string;
@@ -7,6 +8,12 @@ interface LoginGuideBlockProps {
 
 export const LoginGuideBlock = ({ loginGuide }: LoginGuideBlockProps) => {
   if (!loginGuide) return null;
+
+  // 🛡️ XSS Protection: Sanitize HTML content
+  const sanitizedGuide = DOMPurify.sanitize(loginGuide, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+  });
 
   return (
     <Accordion type="single" collapsible className="border border-border/50 rounded-lg px-4">
@@ -20,7 +27,7 @@ export const LoginGuideBlock = ({ loginGuide }: LoginGuideBlockProps) => {
         <AccordionContent className="pb-4">
           <div 
             className="prose prose-sm max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: loginGuide }}
+            dangerouslySetInnerHTML={{ __html: sanitizedGuide }}
           />
         </AccordionContent>
       </AccordionItem>

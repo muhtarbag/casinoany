@@ -14,6 +14,7 @@ import { useInternalLinks, applyInternalLinks, trackLinkClick } from '@/hooks/us
 import { calculateReadingTime, formatReadingTime } from '@/lib/readingTime';
 import { RelatedNews } from '@/components/news/RelatedNews';
 import { NewsImageSchema } from '@/components/news/NewsImageSchema';
+import DOMPurify from 'dompurify';
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,14 +29,21 @@ export default function NewsDetail() {
     !!article?.slug
   );
 
-  // Enrich content with internal links
+  // Enrich content with internal links and sanitize
   const enrichedContent = useMemo(() => {
     const rawContent = article?.content_html || article?.content || '';
     if (!rawContent) return '';
-    if (!internalLinks || internalLinks.length === 0) {
-      return rawContent;
-    }
-    return applyInternalLinks(rawContent, internalLinks);
+    
+    // First apply internal links
+    const contentWithLinks = (internalLinks && internalLinks.length > 0) 
+      ? applyInternalLinks(rawContent, internalLinks)
+      : rawContent;
+    
+    // 🛡️ XSS Protection: Sanitize HTML content
+    return DOMPurify.sanitize(contentWithLinks, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img'],
+      ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'data-link-id']
+    });
   }, [article?.content_html, article?.content, internalLinks]);
 
   // Calculate reading time
