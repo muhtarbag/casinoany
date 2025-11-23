@@ -158,45 +158,51 @@ export default function EnhancedReviewManagement() {
     return review.name || "Anonim";
   }, []);
 
-  // Calculate site statistics
-  const siteStats = useMemo<SiteStats[]>(() => {
-    if (!reviews) return [];
+  // Fetch real site statistics from database (not from paginated reviews)
+  const { data: siteStats = [] } = useQuery({
+    queryKey: ['review-site-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select(`
+          id,
+          name,
+          site_reviews!inner (
+            id,
+            is_approved,
+            rating
+          )
+        `)
+        .eq('is_active', true);
 
-    const statsMap = new Map<string, SiteStats>();
+      if (error) throw error;
 
-    reviews.forEach(review => {
-      const siteId = review.site_id;
-      const siteName = getSiteName(review);
+      // Calculate stats for each site
+      const stats: SiteStats[] = data
+        .filter(site => site.site_reviews.length > 0)
+        .map(site => {
+          const reviews = site.site_reviews;
+          const approved = reviews.filter(r => r.is_approved);
+          const pending = reviews.filter(r => !r.is_approved);
+          const avgRating = approved.length > 0
+            ? approved.reduce((sum, r) => sum + r.rating, 0) / approved.length
+            : 0;
 
-      if (!statsMap.has(siteId)) {
-        statsMap.set(siteId, {
-          site_id: siteId,
-          site_name: siteName,
-          total_reviews: 0,
-          pending_reviews: 0,
-          approved_reviews: 0,
-          avg_rating: 0
-        });
-      }
+          return {
+            site_id: site.id,
+            site_name: site.name,
+            total_reviews: reviews.length,
+            pending_reviews: pending.length,
+            approved_reviews: approved.length,
+            avg_rating: Math.round(avgRating * 10) / 10
+          };
+        })
+        .sort((a, b) => b.total_reviews - a.total_reviews);
 
-      const stats = statsMap.get(siteId)!;
-      stats.total_reviews += 1;
-      stats.avg_rating += review.rating;
-      
-      if (review.is_approved) {
-        stats.approved_reviews += 1;
-      } else {
-        stats.pending_reviews += 1;
-      }
-    });
-
-    return Array.from(statsMap.values())
-      .map(stats => ({
-        ...stats,
-        avg_rating: stats.total_reviews > 0 ? stats.avg_rating / stats.total_reviews : 0
-      }))
-      .sort((a, b) => b.total_reviews - a.total_reviews);
-  }, [reviews, getSiteName]);
+      return stats;
+    },
+    staleTime: 30000, // 30 seconds cache
+  });
 
   // Filter reviews with type-safe checks
   const filteredReviews = useMemo(() => {
