@@ -73,19 +73,12 @@ export const useFeaturedSites = () => {
   });
 };
 
-// ✅ FIXED: Site stats from conversions table (single source of truth)
+// ✅ FIXED: Site stats combining site_stats + conversions tables
 export const useSiteStats = () => {
   return useQuery({
     queryKey: queryKeys.sites.stats(),
     queryFn: async () => {
-      // Aggregate conversions by site
-      const { data: conversions, error: convError } = await supabase
-        .from('conversions')
-        .select('site_id, conversion_type');
-
-      if (convError) throw convError;
-
-      // Get all sites
+      // Get all sites with their site_stats data
       const { data: sites, error: sitesError } = await supabase
         .from('betting_sites')
         .select('id, name, slug')
@@ -93,7 +86,31 @@ export const useSiteStats = () => {
 
       if (sitesError) throw sitesError;
 
-      // Aggregate stats per site
+      // Get site_stats (views and clicks)
+      const { data: siteStats, error: statsError } = await supabase
+        .from('site_stats')
+        .select('site_id, views, clicks');
+
+      if (statsError) throw statsError;
+
+      // Get conversions for social media clicks
+      const { data: conversions, error: convError } = await supabase
+        .from('conversions')
+        .select('site_id, conversion_type')
+        .in('conversion_type', [
+          'affiliate_click',
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ]);
+
+      if (convError) throw convError;
+
+      // Create stats map
       const statsMap = new Map<string, {
         site_id: string;
         site_name: string;
@@ -109,14 +126,15 @@ export const useSiteStats = () => {
         youtube_clicks: number;
       }>();
 
-      // Initialize all sites with 0 stats
+      // Initialize all sites
       sites.forEach(site => {
+        const siteStat = siteStats?.find(s => s.site_id === site.id);
         statsMap.set(site.id, {
           site_id: site.id,
           site_name: site.name,
           site_slug: site.slug,
-          views: 0,
-          clicks: 0,
+          views: siteStat?.views || 0,
+          clicks: siteStat?.clicks || 0,
           email_clicks: 0,
           whatsapp_clicks: 0,
           telegram_clicks: 0,
@@ -127,16 +145,13 @@ export const useSiteStats = () => {
         });
       });
 
-      // Count conversions
+      // Add conversion counts (social media + additional affiliate clicks)
       conversions?.forEach(conv => {
         if (!conv.site_id) return;
         const stats = statsMap.get(conv.site_id);
         if (!stats) return;
 
         switch (conv.conversion_type) {
-          case 'page_view':
-            stats.views++;
-            break;
           case 'affiliate_click':
             stats.clicks++;
             break;
