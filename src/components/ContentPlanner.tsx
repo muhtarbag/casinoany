@@ -10,6 +10,7 @@ import { Calendar, TrendingUp, Target, Lightbulb, ArrowRight, Clock, BarChart, S
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface TopicSuggestion {
   title: string;
@@ -727,14 +728,34 @@ export const ContentPlanner = ({ onNavigateToBlog }: { onNavigateToBlog?: () => 
                             Düzenle
                           </Button>
                           
-                          <Button 
-                            size="sm" 
-                            variant="destructive"
-                            onClick={() => handleDeleteCalendarItem(index)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Sil
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Sil
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>İçeriği silmek istediğinize emin misiniz?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Bu işlem geri alınamaz. İçerik takvimden kalıcı olarak silinecektir.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>İptal</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteCalendarItem(index)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Sil
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     </CardContent>

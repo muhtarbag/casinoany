@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Loader2, GripVertical, Check, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -445,11 +446,7 @@ export const BonusManagement = () => {
                     key={bonus.id}
                     bonus={bonus}
                     onEdit={handleOpenDialog}
-                    onDelete={(id) => {
-                      if (confirm('Bu bonusu silmek istediğinize emin misiniz?')) {
-                        deleteMutation.mutate(id);
-                      }
-                    }}
+                    onDelete={deleteMutation.mutate}
                     onApprove={(id) => updateStatusMutation.mutate({ id, isActive: true })}
                     onReject={(id) => updateStatusMutation.mutate({ id, isActive: false })}
                   />
@@ -567,13 +564,33 @@ const SortableBonusItem = ({ bonus, onEdit, onDelete, onApprove, onReject }: Sor
           >
             <Edit className="w-4 h-4" />
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(bonus.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Bonusu silmek istediğinize emin misiniz?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bu işlem geri alınamaz. Bonus kalıcı olarak silinecektir.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>İptal</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onDelete(bonus.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Sil
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
