@@ -341,56 +341,6 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation - Optimized for Touch */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-2xl" style={{ zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="grid grid-cols-5 px-2 py-3">
-          {mobileBottomNavItems.map((item) => {
-            const isActive = location.pathname === item.href;
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  "relative flex flex-col items-center justify-center gap-1.5 rounded-xl transition-all duration-200 min-h-[56px]",
-                  "active:scale-95 active:bg-muted/50",
-                  "touch-manipulation select-none",
-                  isActive && "bg-primary/10"
-                )}
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                {/* Icon */}
-                <div className={cn(
-                  "h-7 w-7 flex items-center justify-center transition-all",
-                  isActive ? "scale-110" : "scale-100"
-                )}>
-                  <Icon className={cn(
-                    "h-6 w-6 transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )} />
-                </div>
-
-                {/* Label */}
-                <span className={cn(
-                  "text-[10px] font-medium leading-none transition-all",
-                  isActive ? "text-primary font-bold" : "text-muted-foreground"
-                )}>
-                  {item.label}
-                </span>
-
-                {/* Active Indicator */}
-                {isActive && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-t-full" />
-                )}
-              </Link>
-            );
-          })}
-          
-          {/* Menu Button - 5th item */}
-          <MobileProfileMenu badges={badges} currentPath={location.pathname} />
-        </div>
-      </nav>
     </div>
   );
 };
