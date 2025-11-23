@@ -59,6 +59,7 @@ interface BettingSiteCardProps {
   reviewCount?: number;
   avgRating?: number;
   priority?: boolean;
+  compact?: boolean;
 }
 
 const BettingSiteCardComponent = ({
@@ -82,6 +83,7 @@ const BettingSiteCardComponent = ({
   reviewCount = 0,
   avgRating = 0,
   priority = false,
+  compact = false,
 }: BettingSiteCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -203,14 +205,20 @@ const BettingSiteCardComponent = ({
 
   return (
     <Card 
-      className="group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer"
+      className={cn(
+        "group relative overflow-hidden bg-card border border-border hover:border-primary/50 hover:shadow-hover transition-all duration-300 cursor-pointer",
+        compact && "hover:scale-[1.02]"
+      )}
       onClick={handleCardClick}
       role="article"
       aria-label={`${name} - Bahis sitesi kartı`}
     >
-      <CardHeader className="space-y-4 p-6 relative">
+      <CardHeader className={cn("space-y-4 relative", compact ? "p-3" : "p-6")}>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-shrink-0 w-56 h-56 sm:w-44 sm:h-44 md:w-48 md:h-48 flex items-center justify-center relative group/logo" style={{ willChange: 'transform' }}>
+          <div className={cn(
+            "flex-shrink-0 flex items-center justify-center relative group/logo",
+            compact ? "w-16 h-16" : "w-56 h-56 sm:w-44 sm:h-44 md:w-48 md:h-48"
+          )} style={{ willChange: 'transform' }}>
             {/* Loading Skeleton */}
             {isLoading && !showFallback && (
               <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded-xl" />
@@ -223,8 +231,8 @@ const BettingSiteCardComponent = ({
                 className={`w-full h-full object-contain transition-all duration-300 group-hover/logo:scale-105 ${
                   isLoading ? 'opacity-0' : 'opacity-100'
                 }`}
-                width={224}
-                height={224}
+                width={compact ? 64 : 224}
+                height={compact ? 64 : 224}
                 objectFit="contain"
                 fetchPriority={priority ? 'high' : 'auto'}
                 priority={priority}
@@ -233,62 +241,76 @@ const BettingSiteCardComponent = ({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center animate-scale-in">
-                <span className="text-7xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className={cn(
+                  "font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent",
+                  compact ? "text-3xl" : "text-7xl sm:text-6xl md:text-7xl"
+                )}>
                   {name.charAt(0)}
                 </span>
               </div>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className={cn("flex flex-col items-end", compact ? "gap-1" : "gap-2")}>
             {/* Favorite Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "rounded-full transition-all duration-200",
-                "hover:scale-110 active:scale-95",
-                isFavorite 
-                  ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" 
-                  : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-              )}
-              onClick={handleFavoriteClick}
-              disabled={isToggling}
-              aria-label={isFavorite ? `${name} favorilerden çıkar` : `${name} favorilere ekle`}
-            >
-              <Heart 
+            {!compact && (
+              <Button
+                variant="ghost"
+                size="icon"
                 className={cn(
-                  "h-5 w-5 transition-all",
-                  isFavorite && "fill-current"
-                )} 
-                aria-hidden="true"
-              />
-            </Button>
+                  "rounded-full transition-all duration-200",
+                  "hover:scale-110 active:scale-95",
+                  isFavorite 
+                    ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" 
+                    : "text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                )}
+                onClick={handleFavoriteClick}
+                disabled={isToggling}
+                aria-label={isFavorite ? `${name} favorilerden çıkar` : `${name} favorilere ekle`}
+              >
+                <Heart 
+                  className={cn(
+                    "h-5 w-5 transition-all",
+                    isFavorite && "fill-current"
+                  )} 
+                  aria-hidden="true"
+                />
+              </Button>
+            )}
             
             {/* Rating */}
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-gold/10 rounded-lg border border-gold/20">
-              <Star className="w-4 h-4 fill-gold text-gold" />
-              <span className="font-bold text-sm">{rating.toFixed(1)}</span>
+            <div className={cn(
+              "flex items-center gap-1 bg-gold/10 rounded-lg border border-gold/20",
+              compact ? "px-2 py-1" : "px-3 py-1.5"
+            )}>
+              <Star className={cn("fill-gold text-gold", compact ? "w-3 h-3" : "w-4 h-4")} />
+              <span className={cn("font-bold", compact ? "text-xs" : "text-sm")}>{rating.toFixed(1)}</span>
             </div>
-            {reviewCount > 0 && (
+            {!compact && reviewCount > 0 && (
               <div className="text-xs text-muted-foreground">
                 {reviewCount} yorum
               </div>
             )}
           </div>
         </div>
-        <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+        <h3 className={cn(
+          "font-bold text-foreground group-hover:text-primary transition-colors",
+          compact ? "text-sm" : "text-xl"
+        )}>
           {name}
         </h3>
         {bonus && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-secondary/10 rounded-lg border border-secondary/20">
-            <Badge variant="secondary" className="border-0 text-xs">BONUS</Badge>
-            <span className="text-sm font-medium text-foreground">{bonus}</span>
+          <div className={cn(
+            "flex items-center gap-2 bg-secondary/10 rounded-lg border border-secondary/20",
+            compact ? "px-2 py-1" : "px-3 py-2"
+          )}>
+            <Badge variant="secondary" className={cn("border-0", compact ? "text-[10px] px-1" : "text-xs")}>BONUS</Badge>
+            <span className={cn("font-medium text-foreground", compact ? "text-xs" : "text-sm")}>{bonus}</span>
           </div>
         )}
       </CardHeader>
 
-      <CardContent className="space-y-4 px-6 pb-6">
-        {features && features.length > 0 && (
+      <CardContent className={cn("space-y-4", compact ? "px-3 pb-3" : "px-6 pb-6")}>
+        {features && features.length > 0 && !compact && (
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-muted-foreground">Özellikler</h4>
             <div className="flex flex-wrap gap-2">
@@ -303,7 +325,7 @@ const BettingSiteCardComponent = ({
             </div>
           </div>
         )}
-        {socialLinks.length > 0 && (
+        {socialLinks.length > 0 && !compact && (
           <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
             {socialLinks.map((link, idx) => {
               const Icon = link.icon;
@@ -354,32 +376,46 @@ const BettingSiteCardComponent = ({
         )}
       </CardContent>
 
-      <CardFooter className="px-6 pb-6 pt-0 gap-2">
-        <Button variant="outline" size="sm" className="flex-1 group/btn"
-          onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
-        >
-          Detaylar
-          <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
-        </Button>
-        <Button 
-          size="sm" 
-          className="flex-1 relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0"
-          onClick={handleAffiliateClick}
-        >
-          {/* Animated shimmer overlay - more visible and slower */}
-          <div className="absolute inset-0 w-full h-full">
-            <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
-          </div>
-          
-          {/* Subtle pulse glow background */}
-          <div className="absolute inset-0 bg-white/5 animate-glow" />
-          
-          {/* Button content */}
-          <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
-            Siteye Git
-            <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
-          </span>
-        </Button>
+      <CardFooter className={cn("pt-0 gap-2", compact ? "px-3 pb-3 flex-col" : "px-6 pb-6")}>
+        {!compact ? (
+          <>
+            <Button variant="outline" size="sm" className="flex-1 group/btn"
+              onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
+            >
+              Detaylar
+              <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+            </Button>
+            <Button 
+              size="sm" 
+              className="flex-1 relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] hover:scale-[1.02] text-white border-0"
+              onClick={handleAffiliateClick}
+            >
+              <div className="absolute inset-0 w-full h-full">
+                <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
+              </div>
+              <div className="absolute inset-0 bg-white/5 animate-glow" />
+              <span className="relative z-10 flex items-center gap-2 drop-shadow-lg">
+                Siteye Git
+                <ExternalLink className="w-4 h-4 group-hover/cta:translate-x-1 transition-all duration-300" />
+              </span>
+            </Button>
+          </>
+        ) : (
+          <Button 
+            size="sm" 
+            className="w-full relative font-bold overflow-hidden group/cta transition-all duration-500 bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.6),0_0_50px_rgba(236,72,153,0.4)] text-white border-0"
+            onClick={handleAffiliateClick}
+          >
+            <div className="absolute inset-0 w-full h-full">
+              <div className="absolute inset-0 translate-x-[-100%] animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent w-[150%]" />
+            </div>
+            <div className="absolute inset-0 bg-white/5 animate-glow" />
+            <span className="relative z-10 flex items-center gap-1 drop-shadow-lg text-xs">
+              Siteye Git
+              <ExternalLink className="w-3 h-3 group-hover/cta:translate-x-1 transition-all duration-300" />
+            </span>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
