@@ -117,14 +117,20 @@ const BettingSiteCardComponent = ({
     }
   }, [logo]);
 
-  // ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
+  // ✅ FIXED: Track clicks in conversions table
   const trackClickMutation = useMutation({
     mutationFn: async () => {
       if (!id) return;
       
-      const { error } = await supabase.rpc('increment_site_stats', {
+      const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
+      
+      const { error } = await supabase.rpc('track_conversion', {
+        p_conversion_type: 'affiliate_click',
+        p_page_path: window.location.pathname,
         p_site_id: id,
-        p_metric_type: 'click'
+        p_session_id: sessionId,
+        p_conversion_value: 0,
+        p_metadata: { site_name: name },
       });
       
       if (error) throw error;

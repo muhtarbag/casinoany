@@ -82,9 +82,11 @@ export const useFeaturedSites = (limit = 3) => {
 };
 
 /**
- * Fetch site stats
+ * ⚠️ DEPRECATED: Use useSiteStats from useSiteQueries.ts instead
+ * This hook is kept for backward compatibility but should not be used in new code
  */
-export const useSiteStats = () => {
+export const useSiteStatsLegacy = () => {
+  console.warn('⚠️ useSiteStatsLegacy is deprecated. Use useSiteStats from useSiteQueries.ts');
   return useQuery({
     queryKey: [QUERY_KEYS.siteStats],
     queryFn: async () => {
@@ -94,9 +96,9 @@ export const useSiteStats = () => {
         .order('views', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
-    ...QUERY_CONFIG.dynamic, // Stats change more frequently
+    ...QUERY_CONFIG.dynamic,
   });
 };
 
