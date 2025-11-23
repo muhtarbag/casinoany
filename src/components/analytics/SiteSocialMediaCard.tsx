@@ -20,28 +20,19 @@ const socialPlatforms = [
 ];
 
 export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardProps) => {
+  // ✅ FIXED: Fetch from site_stats table (real data source)
   const { data: stats, isLoading } = useQuery({
     queryKey: ['site-social-stats', siteId],
     queryFn: async () => {
-      // Fetch social media conversions for this site
-      const { data: conversions, error } = await supabase
-        .from('conversions')
-        .select('conversion_type')
+      const { data, error } = await supabase
+        .from('site_stats')
+        .select('email_clicks, whatsapp_clicks, telegram_clicks, twitter_clicks, instagram_clicks, facebook_clicks, youtube_clicks')
         .eq('site_id', siteId)
-        .in('conversion_type', [
-          'email_click',
-          'whatsapp_click',
-          'telegram_click',
-          'twitter_click',
-          'instagram_click',
-          'facebook_click',
-          'youtube_click'
-        ]);
+        .single();
 
-      if (error) throw error;
-
-      // Aggregate clicks by type
-      const stats = {
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      return data || {
         email_clicks: 0,
         whatsapp_clicks: 0,
         telegram_clicks: 0,
@@ -50,20 +41,6 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
         facebook_clicks: 0,
         youtube_clicks: 0,
       };
-
-      conversions?.forEach(conv => {
-        switch (conv.conversion_type) {
-          case 'email_click': stats.email_clicks++; break;
-          case 'whatsapp_click': stats.whatsapp_clicks++; break;
-          case 'telegram_click': stats.telegram_clicks++; break;
-          case 'twitter_click': stats.twitter_clicks++; break;
-          case 'instagram_click': stats.instagram_clicks++; break;
-          case 'facebook_click': stats.facebook_clicks++; break;
-          case 'youtube_click': stats.youtube_clicks++; break;
-        }
-      });
-
-      return stats;
     },
   });
 
