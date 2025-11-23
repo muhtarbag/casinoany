@@ -18,18 +18,50 @@ interface SiteMetricsGridProps {
 }
 
 export const SiteMetricsGrid = ({ siteId, siteData }: SiteMetricsGridProps) => {
-  // Fetch social media clicks
+  // Fetch social media clicks from conversions table
   const { data: socialStats } = useQuery({
     queryKey: ['site-social-stats', siteId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_stats')
-        .select('email_clicks, whatsapp_clicks, telegram_clicks, twitter_clicks, instagram_clicks, facebook_clicks, youtube_clicks')
+      const { data: conversions, error } = await supabase
+        .from('conversions')
+        .select('conversion_type')
         .eq('site_id', siteId)
-        .single();
+        .in('conversion_type', [
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ]);
 
       if (error) throw error;
-      return data;
+
+      // Aggregate clicks by type
+      const stats = {
+        email_clicks: 0,
+        whatsapp_clicks: 0,
+        telegram_clicks: 0,
+        twitter_clicks: 0,
+        instagram_clicks: 0,
+        facebook_clicks: 0,
+        youtube_clicks: 0,
+      };
+
+      conversions?.forEach(conv => {
+        switch (conv.conversion_type) {
+          case 'email_click': stats.email_clicks++; break;
+          case 'whatsapp_click': stats.whatsapp_clicks++; break;
+          case 'telegram_click': stats.telegram_clicks++; break;
+          case 'twitter_click': stats.twitter_clicks++; break;
+          case 'instagram_click': stats.instagram_clicks++; break;
+          case 'facebook_click': stats.facebook_clicks++; break;
+          case 'youtube_click': stats.youtube_clicks++; break;
+        }
+      });
+
+      return stats;
     },
     enabled: !!siteId,
   });

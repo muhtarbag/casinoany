@@ -213,19 +213,48 @@ export default function SiteDetail() {
     }
   }, [site?.logo_url]);
 
-  // Fetch site stats with staleTime
+  // Fetch site stats from conversions table with staleTime
   const { data: stats } = useQuery({
     queryKey: ["site-stats", site?.id],
     queryFn: async () => {
       if (!site?.id) return null;
-      const { data, error } = await supabase
-        .from("site_stats")
-        .select("*")
-        .eq("site_id", site.id)
-        .maybeSingle();
+      
+      const { data: conversions, error } = await supabase
+        .from("conversions")
+        .select("conversion_type")
+        .eq("site_id", site.id);
 
       if (error) throw error;
-      return data;
+
+      // Aggregate stats
+      const aggregated = {
+        site_id: site.id,
+        views: 0,
+        clicks: 0,
+        email_clicks: 0,
+        whatsapp_clicks: 0,
+        telegram_clicks: 0,
+        twitter_clicks: 0,
+        instagram_clicks: 0,
+        facebook_clicks: 0,
+        youtube_clicks: 0,
+      };
+
+      conversions?.forEach(conv => {
+        switch (conv.conversion_type) {
+          case 'page_view': aggregated.views++; break;
+          case 'affiliate_click': aggregated.clicks++; break;
+          case 'email_click': aggregated.email_clicks++; break;
+          case 'whatsapp_click': aggregated.whatsapp_clicks++; break;
+          case 'telegram_click': aggregated.telegram_clicks++; break;
+          case 'twitter_click': aggregated.twitter_clicks++; break;
+          case 'instagram_click': aggregated.instagram_clicks++; break;
+          case 'facebook_click': aggregated.facebook_clicks++; break;
+          case 'youtube_click': aggregated.youtube_clicks++; break;
+        }
+      });
+
+      return aggregated;
     },
     enabled: !!site?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes cache

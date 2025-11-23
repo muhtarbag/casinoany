@@ -208,12 +208,33 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     queryFn: async () => {
       if (!featuredSites || featuredSites.length === 0) return [];
       
-      const { data, error } = await supabase
-        .from('site_stats')
-        .select('site_id, views, clicks')
+      // Fetch conversions data
+      const { data: conversions, error } = await supabase
+        .from('conversions')
+        .select('site_id, conversion_type')
         .in('site_id', featuredIds);
+      
       if (error) throw error;
-      return data || [];
+
+      // Aggregate stats per site
+      const statsMap = new Map();
+      featuredIds.forEach(siteId => {
+        statsMap.set(siteId, { site_id: siteId, views: 0, clicks: 0 });
+      });
+
+      conversions?.forEach(conv => {
+        if (!conv.site_id) return;
+        const stats = statsMap.get(conv.site_id);
+        if (!stats) return;
+
+        if (conv.conversion_type === 'page_view') {
+          stats.views++;
+        } else if (conv.conversion_type === 'affiliate_click') {
+          stats.clicks++;
+        }
+      });
+
+      return Array.from(statsMap.values());
     },
     enabled: !!featuredSites && featuredSites.length > 0,
   });
