@@ -20,9 +20,9 @@ const socialPlatforms = [
 ];
 
 export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardProps) => {
-  // ✅ FIXED: Fetch from site_stats table (correct data source)
+  // ✅ Direct fetch from site_stats table
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['site-social-stats', siteId],
+    queryKey: ['site-social-stats-v2', siteId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_stats')
@@ -30,9 +30,12 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
         .eq('site_id', siteId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching site stats:', error);
+        throw error;
+      }
       
-      return data || {
+      const result = data || {
         email_clicks: 0,
         whatsapp_clicks: 0,
         telegram_clicks: 0,
@@ -41,7 +44,12 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
         facebook_clicks: 0,
         youtube_clicks: 0,
       };
+      
+      console.log(`📊 Stats for ${siteName}:`, result);
+      return result;
     },
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   if (isLoading) {

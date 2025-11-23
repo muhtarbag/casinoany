@@ -10,96 +10,116 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function Analytics() {
-  // ✅ FIXED: Fetch from site_stats table (correct data source with real data)
-  const { data: socialStats } = useQuery({
-    queryKey: ['social-media-stats'],
+  // ✅ Direct query to site_stats table - bypassing PostgREST embedding issues
+  const { data: socialStats, isLoading: socialStatsLoading } = useQuery({
+    queryKey: ['social-media-stats-v2'], // Changed key to force fresh fetch
     queryFn: async () => {
+      console.log('🔍 Fetching social stats...');
+      
+      // Query site_stats directly joined with betting_sites
       const { data, error } = await supabase
-        .from('betting_sites')
+        .from('site_stats')
         .select(`
-          id,
-          name,
-          slug,
-          site_stats (
-            email_clicks,
-            whatsapp_clicks,
-            telegram_clicks,
-            twitter_clicks,
-            instagram_clicks,
-            facebook_clicks,
-            youtube_clicks
+          site_id,
+          email_clicks,
+          whatsapp_clicks,
+          telegram_clicks,
+          twitter_clicks,
+          instagram_clicks,
+          facebook_clicks,
+          youtube_clicks,
+          betting_sites!inner (
+            name,
+            slug,
+            is_active
           )
         `)
-        .eq('is_active', true);
+        .eq('betting_sites.is_active', true);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Query error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Raw data:', data);
+      
       if (!data) return [];
 
-      return data.map(site => {
-        const stats = (site.site_stats as any)?.[0] || {};
+      // Transform the data to expected format
+      const transformed = data.map(stat => {
+        const site = (stat.betting_sites as any);
         return {
-          site_id: site.id,
-          site_name: site.name,
-          betting_sites: { name: site.name, is_active: true },
-          email_clicks: stats.email_clicks || 0,
-          whatsapp_clicks: stats.whatsapp_clicks || 0,
-          telegram_clicks: stats.telegram_clicks || 0,
-          twitter_clicks: stats.twitter_clicks || 0,
-          instagram_clicks: stats.instagram_clicks || 0,
-          facebook_clicks: stats.facebook_clicks || 0,
-          youtube_clicks: stats.youtube_clicks || 0,
+          site_id: stat.site_id,
+          site_name: site?.name || 'Unknown',
+          betting_sites: { name: site?.name || 'Unknown', is_active: true },
+          email_clicks: stat.email_clicks || 0,
+          whatsapp_clicks: stat.whatsapp_clicks || 0,
+          telegram_clicks: stat.telegram_clicks || 0,
+          twitter_clicks: stat.twitter_clicks || 0,
+          instagram_clicks: stat.instagram_clicks || 0,
+          facebook_clicks: stat.facebook_clicks || 0,
+          youtube_clicks: stat.youtube_clicks || 0,
         };
       });
+      
+      console.log('✅ Transformed data:', transformed);
+      return transformed;
     },
-    staleTime: 30000,
+    staleTime: 0, // No caching - always fetch fresh
     refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
-  // ✅ FIXED: Fetch active sites with their site_stats
+  // ✅ Fetch active sites sorted by social media clicks
   const { data: activeSites } = useQuery({
-    queryKey: ['active-sites-for-analytics'],
+    queryKey: ['active-sites-for-analytics-v2'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('betting_sites')
+        .from('site_stats')
         .select(`
-          id,
-          name,
-          slug,
-          site_stats (
-            email_clicks,
-            whatsapp_clicks,
-            telegram_clicks,
-            twitter_clicks,
-            instagram_clicks,
-            facebook_clicks,
-            youtube_clicks
+          site_id,
+          email_clicks,
+          whatsapp_clicks,
+          telegram_clicks,
+          twitter_clicks,
+          instagram_clicks,
+          facebook_clicks,
+          youtube_clicks,
+          betting_sites!inner (
+            name,
+            slug,
+            is_active
           )
         `)
-        .eq('is_active', true);
+        .eq('betting_sites.is_active', true);
 
       if (error) throw error;
       if (!data) return [];
 
-      const sitesWithTotals = data.map(site => {
-        const stats = (site.site_stats as any)?.[0] || {};
-        const totalClicks = (stats.email_clicks || 0) + 
-                           (stats.whatsapp_clicks || 0) + 
-                           (stats.telegram_clicks || 0) + 
-                           (stats.twitter_clicks || 0) + 
-                           (stats.instagram_clicks || 0) + 
-                           (stats.facebook_clicks || 0) + 
-                           (stats.youtube_clicks || 0);
+      const sitesWithTotals = data.map(stat => {
+        const site = (stat.betting_sites as any);
+        const totalClicks = (stat.email_clicks || 0) + 
+                           (stat.whatsapp_clicks || 0) + 
+                           (stat.telegram_clicks || 0) + 
+                           (stat.twitter_clicks || 0) + 
+                           (stat.instagram_clicks || 0) + 
+                           (stat.facebook_clicks || 0) + 
+                           (stat.youtube_clicks || 0);
         
         return {
-          id: site.id,
-          name: site.name,
-          slug: site.slug,
+          id: stat.site_id,
+          name: site?.name || 'Unknown',
+          slug: site?.slug || '',
           totalClicks
         };
       });
       
-      return sitesWithTotals.sort((a, b) => b.totalClicks - a.totalClicks);
+      return sitesWithTotals
+        .filter(site => site.totalClicks > 0)
+        .sort((a, b) => b.totalClicks - a.totalClicks);
     },
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   return (
@@ -153,11 +173,23 @@ export default function Analytics() {
 
         {/* Social Media Analytics Tab */}
         <TabsContent value="social" className="space-y-6">
-          {socialStats && (
+          {socialStatsLoading ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p>Veri yükleniyor...</p>
+              </CardContent>
+            </Card>
+          ) : socialStats && socialStats.length > 0 ? (
             <>
               <SocialMediaStats statsData={socialStats} />
               <SocialPlatformTrends statsData={socialStats} />
             </>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p>Henüz sosyal medya tıklama verisi bulunmuyor</p>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 
