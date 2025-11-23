@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bell, CheckCircle, Info, AlertTriangle, AlertCircle, X } from 'lucide-react';
+import { Bell, CheckCircle, Info, AlertTriangle, AlertCircle, X, Trophy, MessageCircle, Star, Heart, Gift, Users, TrendingUp, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ interface UserNotification {
   priority: 'low' | 'normal' | 'high' | 'urgent';
   action_url: string | null;
   action_label: string | null;
+  icon: string | null;
   created_at: string;
   is_read?: boolean;
 }
@@ -110,7 +111,34 @@ export function UserNotificationBell() {
     }
   };
 
-  const getIcon = (type: string) => {
+  const getIcon = (iconName: string | null, type: string) => {
+    // If it's an emoji, display it directly
+    if (iconName && /^[\u{1F300}-\u{1F9FF}]|^[\u{2600}-\u{26FF}]|^[\u{2700}-\u{27BF}]/u.test(iconName)) {
+      return <span className="text-2xl">{iconName}</span>;
+    }
+
+    // Map icon names to Lucide components
+    const iconMap: Record<string, React.ReactNode> = {
+      'trophy': <Trophy className="w-5 h-5 text-yellow-500" />,
+      'check-circle': <CheckCircle className="w-5 h-5 text-green-500" />,
+      'message-circle': <MessageCircle className="w-5 h-5 text-blue-500" />,
+      'star': <Star className="w-5 h-5 text-yellow-500" />,
+      'heart': <Heart className="w-5 h-5 text-red-500" />,
+      'gift': <Gift className="w-5 h-5 text-purple-500" />,
+      'users': <Users className="w-5 h-5 text-blue-500" />,
+      'trending-up': <TrendingUp className="w-5 h-5 text-green-500" />,
+      'clock': <Clock className="w-5 h-5 text-orange-500" />,
+      'bell': <Bell className="w-5 h-5 text-blue-500" />,
+      'alert-triangle': <AlertTriangle className="w-5 h-5 text-yellow-500" />,
+      'alert-circle': <AlertCircle className="w-5 h-5 text-red-500" />,
+    };
+
+    // Try to use the icon from the database first
+    if (iconName && iconMap[iconName]) {
+      return iconMap[iconName];
+    }
+
+    // Fallback to notification type
     switch (type) {
       case 'success':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -176,7 +204,7 @@ export function UserNotificationBell() {
                   } ${getPriorityColor(notification.priority)}`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5">{getIcon(notification.notification_type)}</div>
+                    <div className="mt-0.5">{getIcon(notification.icon, notification.notification_type)}</div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-medium text-sm leading-tight">
