@@ -44,14 +44,6 @@ const INTERESTS = [
   'Poker'
 ];
 
-// Oyun Sağlayıcıları
-const GAME_PROVIDERS = [
-  'Pragmatic Play', 'Evolution Gaming', 'EGT', 'Amusnet (EGT Interactive)', 'NetEnt', 'Microgaming',
-  'Play\'n GO', 'Yggdrasil', 'Red Tiger', 'Playtech', 'Endorphina', 'BGaming', 'Spinomenal',
-  'Hacksaw Gaming', 'Push Gaming', 'NoLimit City', 'Quickspin', 'Thunderkick', 'Blueprint Gaming',
-  'Big Time Gaming', 'Relax Gaming', 'iSoftBet', 'Wazdan', 'Booming Games', 'Tom Horn Gaming'
-];
-
 export default function Settings() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -64,8 +56,7 @@ export default function Settings() {
     city: '',
     district: '',
     favorite_team: '',
-    interests: [] as string[],
-    favorite_game_providers: [] as string[]
+    interests: [] as string[]
   });
 
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -89,8 +80,7 @@ export default function Settings() {
           city: data.city || '',
           district: data.district || '',
           favorite_team: data.favorite_team || '',
-          interests: data.interests || [],
-          favorite_game_providers: data.favorite_game_providers || []
+          interests: data.interests || []
         });
       }
       
@@ -301,39 +291,6 @@ export default function Settings() {
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         {interest}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label>En Sevdiğiniz Oyun Sağlayıcılar</Label>
-                <div className="space-y-3 mt-2">
-                  {GAME_PROVIDERS.map((provider) => (
-                    <div key={provider} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={provider}
-                        checked={profileData.favorite_game_providers.includes(provider)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setProfileData({
-                              ...profileData,
-                              favorite_game_providers: [...profileData.favorite_game_providers, provider]
-                            });
-                          } else {
-                            setProfileData({
-                              ...profileData,
-                              favorite_game_providers: profileData.favorite_game_providers.filter((p) => p !== provider)
-                            });
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor={provider}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {provider}
                       </label>
                     </div>
                   ))}
