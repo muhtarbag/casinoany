@@ -20,19 +20,54 @@ const socialPlatforms = [
 ];
 
 export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardProps) => {
-  // ✅ FIXED: Fetch from site_stats table (real data source)
+  // ✅ FIXED: Fetch from conversions table (real data source)
   const { data: stats, isLoading } = useQuery({
     queryKey: ['site-social-stats', siteId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_stats')
-        .select('email_clicks, whatsapp_clicks, telegram_clicks, twitter_clicks, instagram_clicks, facebook_clicks, youtube_clicks')
+      // Get social media clicks from conversions table
+      const { data: conversions, error } = await supabase
+        .from('conversions')
+        .select('conversion_type')
         .eq('site_id', siteId)
-        .maybeSingle();
+        .in('conversion_type', [
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ]);
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       
-      return data || {
+      // Aggregate clicks by platform
+      const clicks = conversions?.reduce((acc, conv) => {
+        const platformMap: Record<string, keyof typeof acc> = {
+          'email_click': 'email_clicks',
+          'whatsapp_click': 'whatsapp_clicks',
+          'telegram_click': 'telegram_clicks',
+          'twitter_click': 'twitter_clicks',
+          'instagram_click': 'instagram_clicks',
+          'facebook_click': 'facebook_clicks',
+          'youtube_click': 'youtube_clicks',
+        };
+        
+        const field = platformMap[conv.conversion_type];
+        if (field) {
+          acc[field]++;
+        }
+        
+        return acc;
+      }, {
+        email_clicks: 0,
+        whatsapp_clicks: 0,
+        telegram_clicks: 0,
+        twitter_clicks: 0,
+        instagram_clicks: 0,
+        facebook_clicks: 0,
+        youtube_clicks: 0,
+      }) || {
         email_clicks: 0,
         whatsapp_clicks: 0,
         telegram_clicks: 0,
@@ -41,6 +76,8 @@ export const SiteSocialMediaCard = ({ siteId, siteName }: SiteSocialMediaCardPro
         facebook_clicks: 0,
         youtube_clicks: 0,
       };
+      
+      return clicks;
     },
   });
 
