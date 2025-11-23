@@ -35,6 +35,7 @@ export default function Analytics() {
         const stats = siteStats?.find(s => s.site_id === site.id);
         return {
           site_id: site.id,
+          site_name: site.name, // ✅ Add site_name here
           betting_sites: { name: site.name, is_active: true },
           email_clicks: stats?.email_clicks || 0,
           whatsapp_clicks: stats?.whatsapp_clicks || 0,
