@@ -309,9 +309,11 @@ const BettingSiteCardComponent = ({
               const Icon = link.icon;
               return (
                 <a key={`social-${id}-${link.label}-${idx}`} href={link.href} target="_blank" rel="noopener noreferrer"
-                  onClick={(e) => {
+                  onClick={async (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
-                    trackSocialClick(id || '', link.platform as any, name);
+                    await trackSocialClick(id || '', link.platform as any, name);
+                    window.open(link.href, '_blank', 'noopener,noreferrer');
                   }}
                   className="flex items-center justify-center p-2 rounded-lg transition-all duration-300 group/social relative overflow-hidden"
                   aria-label={link.label}
