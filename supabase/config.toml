@@ -10,7 +10,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.rss-news-processor]
-verify_jwt = true
+verify_jwt = false
 
 [functions.ai-blog-info]
 verify_jwt = true
