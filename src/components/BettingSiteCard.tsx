@@ -312,7 +312,13 @@ const BettingSiteCardComponent = ({
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    await trackSocialClick(id || '', link.platform as any, name);
+                    console.log('🔥 Social link clicked:', link.platform, 'for site:', name);
+                    try {
+                      await trackSocialClick(id || '', link.platform as any, name);
+                      console.log('✅ Track completed successfully');
+                    } catch (error) {
+                      console.error('❌ Track failed:', error);
+                    }
                     window.open(link.href, '_blank', 'noopener,noreferrer');
                   }}
                   className="flex items-center justify-center p-2 rounded-lg transition-all duration-300 group/social relative overflow-hidden"
