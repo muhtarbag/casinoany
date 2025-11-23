@@ -284,16 +284,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Button
-              onClick={() => onSearch('')}
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto h-12 px-6 font-semibold border-2 hover:border-primary/50 transition-all"
-            >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              En İyi Siteleri Keşfet
-            </Button>
-            
-            <Button
               asChild
               variant="default"
               size="lg"
