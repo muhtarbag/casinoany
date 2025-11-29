@@ -32,20 +32,29 @@ export const GameOverviewBlock = ({ gameCategories }: GameOverviewBlockProps) =>
         </AccordionTrigger>
         <AccordionContent className="pb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(gameCategories).map(([category, description]) => (
-              <div
-                key={category}
-                className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">
-                    {categoryIcons[category.toLowerCase()] || "🎮"}
-                  </span>
-                  <h3 className="font-semibold capitalize">{category}</h3>
+            {Object.entries(gameCategories).map(([category, description]) => {
+              // Handle both string and object descriptions
+              const descriptionText = typeof description === 'string' 
+                ? description 
+                : typeof description === 'object' && description !== null
+                  ? (description as any).title || JSON.stringify(description)
+                  : '';
+              
+              return (
+                <div
+                  key={category}
+                  className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">
+                      {categoryIcons[category.toLowerCase()] || "🎮"}
+                    </span>
+                    <h3 className="font-semibold capitalize">{category}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{descriptionText}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">{description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </AccordionContent>
       </AccordionItem>
