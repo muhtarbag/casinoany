@@ -17,8 +17,8 @@ function prerenderPlugin(): Plugin {
     async closeBundle() {
       console.log('\n🚀 Starting prerendering process...\n');
       try {
-        // Run the prerender script
-        const { stdout, stderr } = await execAsync('node scripts/prerender.js');
+        // Run the prerender script using tsx for TypeScript support
+        const { stdout, stderr } = await execAsync('npx tsx scripts/prerender.ts');
         if (stdout) console.log(stdout);
         if (stderr) console.error(stderr);
       } catch (error: any) {
@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(), 
+    react(),
     mode === "development" && componentTagger(),
     viteCompression({
       verbose: true,
@@ -233,11 +233,11 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           // Core React - Most critical, loaded first
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          
+
           // Data Management - Frequently used
           'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
           'vendor-supabase': ['@supabase/supabase-js'],
-          
+
           // UI Components - Split by usage frequency
           'vendor-ui-core': [
             '@radix-ui/react-dialog',
@@ -258,23 +258,23 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-slider',
             '@radix-ui/react-switch'
           ],
-          
+
           // Icons & Visual
           'vendor-icons': ['lucide-react', 'react-icons'],
           'vendor-animation': ['framer-motion'],
-          
+
           // Charts - Heavy, load on demand
           'vendor-charts': ['recharts'],
-          
+
           // Forms & Validation
           'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-          
+
           // Rich Content - Heavy editor
           'vendor-editor': ['react-quill'],
-          
+
           // Utilities - Small but frequently used
           'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge', 'lodash-es'],
-          
+
           // Theme & SEO
           'vendor-misc': ['next-themes', 'react-helmet-async', 'sonner']
         }
@@ -290,8 +290,8 @@ export default defineConfig(({ mode }) => ({
   // Optimize dependencies - CRITICAL for preventing multiple React instances
   optimizeDeps: {
     include: [
-      'react', 
-      'react-dom', 
+      'react',
+      'react-dom',
       'react-router-dom',
       'react-router',
       '@tanstack/react-query',
