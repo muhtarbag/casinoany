@@ -11,7 +11,7 @@ export const HowItWorksSection = () => {
   const scrollToSites = () => {
     const sitesGrid = document.getElementById('sites-grid');
     if (sitesGrid) {
-      const offset = -450; // Scroll further to show more sites
+      const offset = -500;
       const elementPosition = sitesGrid.getBoundingClientRect().top + window.pageYOffset;
       window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
     }
