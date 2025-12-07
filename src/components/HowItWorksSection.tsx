@@ -9,7 +9,12 @@ export const HowItWorksSection = () => {
   const [touchEnd, setTouchEnd] = useState(0);
 
   const scrollToSites = () => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    const sitesGrid = document.getElementById('sites-grid');
+    if (sitesGrid) {
+      const offset = 100; // Header height offset
+      const elementPosition = sitesGrid.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+    }
   };
 
   const steps = [
