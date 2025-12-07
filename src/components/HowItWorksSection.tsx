@@ -11,7 +11,7 @@ export const HowItWorksSection = () => {
   const scrollToSites = () => {
     const sitesGrid = document.getElementById('sites-grid');
     if (sitesGrid) {
-      const offset = 100; // Header height offset
+      const offset = 20; // Minimal offset for smooth appearance
       const elementPosition = sitesGrid.getBoundingClientRect().top + window.pageYOffset;
       window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
     }
