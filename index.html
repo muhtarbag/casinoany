@@ -169,17 +169,156 @@
       </div>
     </noscript>
     
-    <!-- Clean loading state -->
+    <!-- Static SEO Content - Visible to Google bots before JS loads -->
     <div id="root">
-      <div id="initial-content" style="position: fixed; inset: 0; background: linear-gradient(180deg, hsl(220, 20%, 8%), hsl(220, 18%, 10%)); display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.3s ease-out;">
-        <div style="text-align: center;">
-          <div style="width: 48px; height: 48px; margin: 0 auto 16px; border: 4px solid hsl(220, 15%, 18%); border-top-color: hsl(280, 98%, 69%); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <div id="initial-content" style="background: linear-gradient(180deg, hsl(220, 20%, 8%), hsl(220, 18%, 10%)); min-height: 100vh; color: #fff; font-family: 'Inter', system-ui, sans-serif;">
+        
+        <!-- Header -->
+        <header style="padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+            <a href="/" style="font-size: 24px; font-weight: 700; color: #fff; text-decoration: none;">
+              Casino<span style="color: #c026d3;">Any</span>
+            </a>
+            <nav style="display: flex; gap: 24px;">
+              <a href="/casino-siteleri" style="color: rgba(255,255,255,0.8); text-decoration: none;">Casino Siteleri</a>
+              <a href="/bahis-siteleri" style="color: rgba(255,255,255,0.8); text-decoration: none;">Bahis Siteleri</a>
+              <a href="/blog" style="color: rgba(255,255,255,0.8); text-decoration: none;">Blog</a>
+              <a href="/hakkimizda" style="color: rgba(255,255,255,0.8); text-decoration: none;">Hakkımızda</a>
+            </nav>
+          </div>
+        </header>
+
+        <!-- Hero Section -->
+        <main style="max-width: 1200px; margin: 0 auto; padding: 60px 24px;">
+          <section style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 48px; font-weight: 800; margin-bottom: 24px; line-height: 1.2;">
+              Türkiye'nin En <span style="color: #c026d3;">Güvenilir</span> Casino Siteleri 2025
+            </h1>
+            <p style="font-size: 20px; color: rgba(255,255,255,0.7); max-width: 700px; margin: 0 auto 32px;">
+              50+ lisanslı casino sitesini karşılaştırın. %500'e varan hoş geldin bonusları, 
+              hızlı para çekme garantisi ve uzman incelemeleri ile en iyi casino deneyimini yaşayın.
+            </p>
+          </section>
+
+          <!-- Featured Sites Section -->
+          <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 24px; text-align: center;">
+              En Çok Tercih Edilen Casino Siteleri
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              
+              <article style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Lisanslı Casino Siteleri</h3>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 16px;">Malta, Curacao ve UKGC lisanslı, güvenilir casino siteleri. Yasal ve denetlenen platformlar.</p>
+                <span style="color: #22c55e; font-weight: 600;">⭐ 4.8/5 Ortalama Puan</span>
+              </article>
+
+              <article style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Yüksek Bonuslu Siteler</h3>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 16px;">%500'e varan hoş geldin bonusları, çevrimsiz freespin ve kayıp bonusları sunan siteler.</p>
+                <span style="color: #c026d3; font-weight: 600;">🎁 %500 Bonus</span>
+              </article>
+
+              <article style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Hızlı Ödeme Yapan Siteler</h3>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 16px;">5 dakikada para çekme, kripto para desteği ve 7/24 müşteri hizmetleri.</p>
+                <span style="color: #3b82f6; font-weight: 600;">⚡ 5 Dakika Çekim</span>
+              </article>
+
+            </div>
+          </section>
+
+          <!-- Features Section -->
+          <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 24px; text-align: center;">
+              Neden CasinoAny?
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: center;">
+              <div>
+                <div style="font-size: 36px; margin-bottom: 12px;">🔒</div>
+                <h3 style="font-weight: 600; margin-bottom: 8px;">Güvenilir İncelemeler</h3>
+                <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Bağımsız ve tarafsız uzman değerlendirmeleri</p>
+              </div>
+              <div>
+                <div style="font-size: 36px; margin-bottom: 12px;">💰</div>
+                <h3 style="font-weight: 600; margin-bottom: 8px;">Özel Bonuslar</h3>
+                <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Sadece CasinoAny üyelerine özel bonus fırsatları</p>
+              </div>
+              <div>
+                <div style="font-size: 36px; margin-bottom: 12px;">📊</div>
+                <h3 style="font-weight: 600; margin-bottom: 8px;">Karşılaştırma</h3>
+                <p style="color: rgba(255,255,255,0.7); font-size: 14px;">50+ siteyi detaylı olarak karşılaştırın</p>
+              </div>
+              <div>
+                <div style="font-size: 36px; margin-bottom: 12px;">🏆</div>
+                <h3 style="font-weight: 600; margin-bottom: 8px;">Güncel Listeler</h3>
+                <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Her gün güncellenen site sıralamaları</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Categories Section -->
+          <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 24px; text-align: center;">
+              Popüler Kategoriler
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+              <a href="/casino-siteleri" style="background: rgba(192,38,211,0.2); color: #c026d3; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500;">Casino Siteleri</a>
+              <a href="/bahis-siteleri" style="background: rgba(59,130,246,0.2); color: #3b82f6; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500;">Bahis Siteleri</a>
+              <a href="/slot-siteleri" style="background: rgba(34,197,94,0.2); color: #22c55e; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500;">Slot Siteleri</a>
+              <a href="/canli-casino" style="background: rgba(251,146,60,0.2); color: #fb923c; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500;">Canlı Casino</a>
+              <a href="/deneme-bonusu" style="background: rgba(236,72,153,0.2); color: #ec4899; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500;">Deneme Bonusu</a>
+            </div>
+          </section>
+
+          <!-- FAQ Section for SEO -->
+          <section>
+            <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 24px; text-align: center;">
+              Sıkça Sorulan Sorular
+            </h2>
+            <div style="max-width: 800px; margin: 0 auto;">
+              <details style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <summary style="font-weight: 600; cursor: pointer;">En güvenilir casino siteleri hangileri?</summary>
+                <p style="color: rgba(255,255,255,0.7); margin-top: 12px;">Malta Gaming Authority, Curacao eGaming veya UK Gambling Commission lisansına sahip siteler en güvenilir seçeneklerdir. CasinoAny olarak tüm siteleri detaylı inceleyerek güvenilirlik puanı veriyoruz.</p>
+              </details>
+              <details style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <summary style="font-weight: 600; cursor: pointer;">Casino siteleri yasal mı?</summary>
+                <p style="color: rgba(255,255,255,0.7); margin-top: 12px;">Uluslararası lisanslı casino siteleri kendi ülkelerinde yasal olarak faaliyet göstermektedir. Türkiye'de lisanslı site bulunmamaktadır, ancak yabancı lisanslı sitelere erişim mümkündür.</p>
+              </details>
+              <details style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <summary style="font-weight: 600; cursor: pointer;">Hoş geldin bonusu nasıl alınır?</summary>
+                <p style="color: rgba(255,255,255,0.7); margin-top: 12px;">Siteye üye olduktan sonra ilk yatırımınızla birlikte otomatik olarak hesabınıza tanımlanır. Bazı siteler bonus kodu isteyebilir, CasinoAny'de her site için güncel bonus kodlarını paylaşıyoruz.</p>
+              </details>
+            </div>
+          </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer style="border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 24px; margin-top: 60px;">
+          <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <p style="color: rgba(255,255,255,0.5); font-size: 14px;">
+              © 2025 CasinoAny. Tüm hakları saklıdır. 18+ | Sorumlu oyun oynayın.
+            </p>
+            <div style="margin-top: 16px; display: flex; gap: 24px; justify-content: center;">
+              <a href="/gizlilik-politikasi" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px;">Gizlilik Politikası</a>
+              <a href="/kullanim-kosullari" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px;">Kullanım Koşulları</a>
+              <a href="/iletisim" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px;">İletişim</a>
+            </div>
+          </div>
+        </footer>
+
+        <!-- Loading indicator overlay -->
+        <div id="loading-overlay" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+          <div style="width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #c026d3; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <span style="font-size: 14px; color: rgba(255,255,255,0.8);">Yükleniyor...</span>
           <style>
             @keyframes spin {
               to { transform: rotate(360deg); }
             }
           </style>
         </div>
+
       </div>
     </div>
     
