@@ -25,6 +25,30 @@ export async function generateRoutes(): Promise<string[]> {
     '/hakkimizda',
     '/gizlilik-politikasi',
     '/kullanim-kosullari',
+    '/canli-bahis',
+    '/free-spin',
+    '/kacak-bahis',
+    '/bonus-veren-siteler',
+    '/en-iyi-casino',
+    // Payment Methods
+    '/odeme/havale-eft',
+    '/odeme/kredi-karti',
+    '/odeme/kripto-para',
+    // Influencers
+    '/fenomen/ekrem-abi',
+    '/fenomen/dede',
+    '/fenomen/roshtein',
+    // Blog Posts
+    '/guvenilir-bahis-siteleri-nasil-anlasilir',
+    '/deneme-bonusu-veren-siteler-kazanc-taktikleri',
+    '/canli-bahis-kazanma-stratejileri',
+    '/slot-rtp-nedir-kazanma-oranlari',
+    '/papara-ile-bahis-para-yatirma',
+    '/blackjack-kart-sayma-taktikleri',
+    '/kripto-para-bitcoin-bahis',
+    '/belge-istemeyen-bahis-siteleri',
+    '/vip-casino-uyeligi-avantajlari',
+    '/sanal-bahis-hileleri-taktikleri',
   ];
 
   // Only fetch dynamic routes if Supabase is available
@@ -57,6 +81,8 @@ export async function generateRoutes(): Promise<string[]> {
     if (sites) {
       sites.forEach(site => {
         routes.push(`/site/${site.slug}`);
+        // Add AMP route for site
+        routes.push(`/amp/${site.slug}`);
       });
     }
 
@@ -71,6 +97,8 @@ export async function generateRoutes(): Promise<string[]> {
     if (posts) {
       posts.forEach(post => {
         routes.push(`/blog/${post.slug}`);
+        // Add AMP route for blog post
+        routes.push(`/amp/blog/${post.slug}`);
       });
     }
 

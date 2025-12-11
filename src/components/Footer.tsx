@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { FooterCategories } from './footer/FooterCategories';
+import { FooterPaymentSecurity } from './footer/FooterPaymentSecurity';
 import {
   Accordion,
   AccordionContent,
@@ -56,15 +57,15 @@ export const Footer = () => {
 
         {/* Main Footer Content */}
         {/* Desktop Version - Grid Layout */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-8 mb-8">
+        <div className="hidden lg:grid lg:grid-cols-8 gap-8 mb-8">
           {/* About Section */}
           <div className="lg:col-span-2">
             <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
-              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi. 
+              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
               2020'den beri sektörde, binlerce kullanıcıya en iyi bahis deneyimini yaşatıyoruz.
             </p>
-            
+
             <div className="space-y-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" />
@@ -78,33 +79,33 @@ export const Footer = () => {
                 <CreditCard className="w-4 h-4 text-primary" />
                 <span>Hızlı Ödemeler</span>
               </div>
-              
+
               {/* Trust Badges */}
               <div className="pt-2 flex items-center gap-4">
-                <a 
-                  href="https://www.trustpilot.com" 
-                  target="_blank" 
+                <a
+                  href="https://www.trustpilot.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="block hover:opacity-80 transition-opacity"
                   aria-label="Trustpilot"
                 >
-                  <img 
-                    src={trustpilotLogo} 
-                    alt="Trustpilot" 
+                  <img
+                    src={trustpilotLogo}
+                    alt="Trustpilot"
                     className="h-10 w-auto"
                   />
                 </a>
                 <div className="h-10 w-px bg-white/20"></div>
-                <a 
-                  href="https://visiontech.co" 
-                  target="_blank" 
+                <a
+                  href="https://visiontech.co"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="block hover:opacity-80 transition-opacity"
                   aria-label="VisionTech"
                 >
-                  <img 
-                    src={visiontechLogo} 
-                    alt="VisionTech" 
+                  <img
+                    src={visiontechLogo}
+                    alt="VisionTech"
                     className="h-10 w-auto"
                   />
                 </a>
@@ -149,13 +150,99 @@ export const Footer = () => {
             </ul>
           </div>
 
+          {/* Popular Searches - SEO Links */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Popüler</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/canli-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🔥 Canlı Bahis
+                </Link>
+              </li>
+              <li>
+                <Link to="/free-spin" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎰 Free Spin
+                </Link>
+              </li>
+              <li>
+                <Link to="/deneme-bonusu" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎁 Deneme Bonusu
+                </Link>
+              </li>
+              <li>
+                <Link to="/kacak-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ⚠️ Kaçak Bahis
+                </Link>
+              </li>
+              <li>
+                <Link to="/bonus-veren-siteler" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  💰 Bonus Veren Siteler
+                </Link>
+              </li>
+              <li>
+                <Link to="/en-iyi-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🏆 En İyi Casino
+                </Link>
+              </li>
+              <li>
+                <Link to="/guvenilir-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🛡️ Güvenilir Casino
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Payment Methods */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Ödeme</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/odeme/havale-eft" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🏦 Havale / EFT
+                </Link>
+              </li>
+              <li>
+                <Link to="/odeme/kredi-karti" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  💳 Kredi Kartı
+                </Link>
+              </li>
+              <li>
+                <Link to="/odeme/kripto-para" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ₿ Kripto Para
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Influencers */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Yayıncılar</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/fenomen/ekrem-abi" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎙️ Ekrem Abi
+                </Link>
+              </li>
+              <li>
+                <Link to="/fenomen/dede" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  👴 Dede (Zeus)
+                </Link>
+              </li>
+              <li>
+                <Link to="/fenomen/roshtein" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎰 Roshtein
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Categories - Dynamic */}
           <FooterCategories />
 
           {/* Contact & Social */}
           <div>
             <h3 className="font-bold text-lg mb-4">İletişim</h3>
-            
+
             <div className="space-y-3 text-sm text-muted-foreground mb-6">
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
@@ -183,27 +270,27 @@ export const Footer = () => {
 
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
             <div className="flex gap-2 justify-start items-center">
-              <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
+              <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Twitter/X">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Facebook">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Instagram">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="YouTube">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer" 
+              <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Pinterest">
                 <Pin className="w-5 h-5" />
@@ -220,32 +307,32 @@ export const Footer = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
             </p>
-            
+
             <div className="flex items-center gap-3 mb-4">
-              <a 
-                href="https://www.trustpilot.com" 
-                target="_blank" 
+              <a
+                href="https://www.trustpilot.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity"
                 aria-label="Trustpilot"
               >
-                <img 
-                  src={trustpilotLogo} 
-                  alt="Trustpilot" 
+                <img
+                  src={trustpilotLogo}
+                  alt="Trustpilot"
                   className="h-7 w-auto"
                 />
               </a>
               <div className="h-7 w-px bg-border"></div>
-              <a 
-                href="https://visiontech.co" 
-                target="_blank" 
+              <a
+                href="https://visiontech.co"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity"
                 aria-label="VisionTech"
               >
-                <img 
-                  src={visiontechLogo} 
-                  alt="VisionTech" 
+                <img
+                  src={visiontechLogo}
+                  alt="VisionTech"
                   className="h-7 w-auto"
                 />
               </a>
@@ -331,27 +418,27 @@ export const Footer = () => {
                   <div>
                     <h4 className="font-semibold mb-3 text-sm">Sosyal Medya</h4>
                     <div className="flex gap-2">
-                      <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
+                      <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                         aria-label="Twitter/X">
                         <Twitter className="w-5 h-5" />
                       </a>
-                      <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer" 
+                      <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                         aria-label="Facebook">
                         <Facebook className="w-5 h-5" />
                       </a>
-                      <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer" 
+                      <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                         aria-label="Instagram">
                         <Instagram className="w-5 h-5" />
                       </a>
-                      <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer" 
+                      <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                         aria-label="YouTube">
                         <Youtube className="w-5 h-5" />
                       </a>
-                      <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer" 
+                      <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                         aria-label="Pinterest">
                         <Pin className="w-5 h-5" />
@@ -365,44 +452,7 @@ export const Footer = () => {
         </div>
 
         {/* Payment Methods & Security */}
-        <div className="border-t border-border pt-8 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Popüler Ödeme Yöntemleri</h4>
-              <div className="flex flex-wrap gap-3 opacity-70">
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  💳 Papara
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  ₿ Kripto Para
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  🏦 Banka Havalesi
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  💰 CMT Cüzdan
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Güvenlik & Lisanslar</h4>
-              <div className="flex flex-wrap gap-3 opacity-70">
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium flex items-center gap-2">
-                  <Shield className="w-3 h-3" />
-                  SSL Güvenliği
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium flex items-center gap-2">
-                  <Lock className="w-3 h-3" />
-                  Curacao Lisanslı
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  18+ Yaş Sınırı
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FooterPaymentSecurity />
 
         {/* Bottom Bar */}
         <div className="border-t border-border pt-8 text-center space-y-3">
@@ -429,6 +479,6 @@ export const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 };

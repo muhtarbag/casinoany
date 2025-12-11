@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet-async';
+import { TypedQueries } from '@/lib/supabase-typed';
 
 // AMP-specific blog post page
 export default function AMPBlogPost() {
@@ -11,7 +12,9 @@ export default function AMPBlogPost() {
   const { data: post } = useQuery({
     queryKey: ['amp-blog-post', slug],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      // ... inside component
+
+      const { data, error } = await TypedQueries.blogPosts(supabase)
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
@@ -127,7 +130,16 @@ export default function AMPBlogPost() {
       <Helmet>
         <link rel="amphtml" href={`${window.location.origin}/amp/blog/${post.slug}`} />
       </Helmet>
-      <div dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Script for Prerenderer to extract clean AMP HTML */}
+      <script id="amp-source" type="text/plain" dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Preview for User/Dev (since this is a React route) */}
+      <iframe
+        srcDoc={ampHTML}
+        style={{ width: '100%', height: '100vh', border: 'none' }}
+        title={`AMP Preview: ${post.title}`}
+      />
     </>
   );
 }

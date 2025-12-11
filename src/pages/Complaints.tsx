@@ -1,5 +1,10 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
+
+type ComplaintWithSite = Database['public']['Tables']['site_complaints']['Row'] & {
+  betting_sites: Pick<Database['public']['Tables']['betting_sites']['Row'], 'name' | 'slug' | 'logo_url'> | null
+};
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -45,12 +50,12 @@ const Complaints = () => {
     queryKey: ['user-complaint-likes', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      
+
       const { data, error } = await supabase
         .from('complaint_likes')
         .select('complaint_id')
         .eq('user_id', user.id);
-      
+
       if (error) throw error;
       return data.map(like => like.complaint_id);
     },
@@ -102,15 +107,21 @@ const Complaints = () => {
     },
   });
 
+  type ComplaintWithSite = Database['public']['Tables']['site_complaints']['Row'] & {
+    betting_sites: Pick<Database['public']['Tables']['betting_sites']['Row'], 'name' | 'slug' | 'logo_url'> | null
+  };
+
+  // ... inside component
+
   // Client-side filtering for search term (includes site name)
-  const complaints = allComplaints?.filter((complaint: any) => {
+  const complaints = (allComplaints as ComplaintWithSite[] | null)?.filter((complaint) => {
     if (!searchTerm) return true;
-    
+
     const searchLower = searchTerm.toLowerCase();
     const titleMatch = complaint.title?.toLowerCase().includes(searchLower);
     const descMatch = complaint.description?.toLowerCase().includes(searchLower);
     const siteNameMatch = complaint.betting_sites?.name?.toLowerCase().includes(searchLower);
-    
+
     return titleMatch || descMatch || siteNameMatch;
   });
 
@@ -241,7 +252,7 @@ const Complaints = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Bahis Siteleri Şikayetleri 2025 | Kullanıcı Deneyimleri ve Çözümler"
         description="Bahis sitelerinde yaşanan sorunlar ve kullanıcı şikayetleri. Gerçek deneyimler, çözüm önerileri ve şeffaf değerlendirmeler. Şikayetinizi paylaşın veya diğer kullanıcıların deneyimlerinden faydalanın."
         keywords={[
@@ -268,16 +279,16 @@ const Complaints = () => {
                 <AlertCircle className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold">Kullanıcı Deneyimleri ve Şikayetler</span>
               </div>
-              
+
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent leading-tight">
                 Bahis Siteleri Şikayetleri
               </h1>
-              
+
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Bahis sitelerinde yaşadığınız sorunları paylaşın, diğer kullanıcıların deneyimlerinden faydalanın. 
+                Bahis sitelerinde yaşadığınız sorunları paylaşın, diğer kullanıcıların deneyimlerinden faydalanın.
                 Şeffaf ve güvenilir bir topluluk için şikayetlerinizi bildirin, çözüm önerilerini keşfedin.
               </p>
-              
+
               <div className="flex flex-wrap justify-center gap-4 pt-4">
                 <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-card border border-border">
                   <MessageSquare className="w-5 h-5 text-accent flex-shrink-0" />
@@ -301,7 +312,7 @@ const Complaints = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="pt-2">
                 <Button asChild size="lg" className="h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
                   <Link to="/sikayetler/yeni">
@@ -313,83 +324,83 @@ const Complaints = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
-          <div className="flex-1">
-            <h2 className="text-xl md:text-2xl font-bold mb-1">Tüm Şikayetler</h2>
-            <p className="text-xs md:text-sm text-muted-foreground">
-              Filtreleyerek aradığınız şikayeti bulabilirsiniz
-            </p>
-          </div>
-        </div>
-
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Input
-                placeholder="Şikayet veya site adı ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                  {Object.entries(categoryLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Durum" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tüm Durumlar</SelectItem>
-                  {Object.entries(statusLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {isLoading ? (
-          <div className="grid gap-3 md:gap-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-4 md:p-6">
-                  <div className="h-20 md:h-24 bg-muted rounded" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : complaints && complaints.length > 0 ? (
-          <div className="grid gap-4 md:gap-6">
-            {complaints.map((complaint: any) => (
-              <EnhancedComplaintCard
-                key={complaint.id}
-                complaint={complaint}
-                categoryLabels={categoryLabels}
-                statusLabels={statusLabels}
-                getStatusVariant={getStatusVariant}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                Henüz şikayet bulunmuyor
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="flex-1">
+              <h2 className="text-xl md:text-2xl font-bold mb-1">Tüm Şikayetler</h2>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                Filtreleyerek aradığınız şikayeti bulabilirsiniz
               </p>
+            </div>
+          </div>
+
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                <Input
+                  placeholder="Şikayet veya site adı ara..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tüm Kategoriler</SelectItem>
+                    {Object.entries(categoryLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Durum" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tüm Durumlar</SelectItem>
+                    {Object.entries(statusLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
-        )}
+
+          {isLoading ? (
+            <div className="grid gap-3 md:gap-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="h-20 md:h-24 bg-muted rounded" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : complaints && complaints.length > 0 ? (
+            <div className="grid gap-4 md:gap-6">
+              {complaints.map((complaint: any) => (
+                <EnhancedComplaintCard
+                  key={complaint.id}
+                  complaint={complaint}
+                  categoryLabels={categoryLabels}
+                  statusLabels={statusLabels}
+                  getStatusVariant={getStatusVariant}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  Henüz şikayet bulunmuyor
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
       <Footer />

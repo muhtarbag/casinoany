@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import * as Icons from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getIcon } from '@/lib/utils';
 
 interface AchievementBadgeProps {
   icon: string;
@@ -22,8 +23,8 @@ export const AchievementBadge = ({
   earnedAt,
   size = 'md'
 }: AchievementBadgeProps) => {
-  const Icon = (Icons as any)[icon] || Icons.Award;
-  
+  const Icon = getIcon(icon);
+
   const sizeClasses = {
     sm: 'h-12 w-12',
     md: 'h-16 w-16',
@@ -58,7 +59,7 @@ export const AchievementBadge = ({
             />
             {!isEarned && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-full">
-                <Icons.Lock className="h-4 w-4 text-muted-foreground" />
+                <Lock className="h-4 w-4 text-muted-foreground" />
               </div>
             )}
           </div>

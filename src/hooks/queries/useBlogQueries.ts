@@ -4,6 +4,8 @@ import { TypedDB, TypedRPC } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
+import { localBlogPosts } from '@/data/localBlogPosts';
+
 // Blog posts listesi
 export const useBlogPosts = (filters?: {
   isPublished?: boolean;
@@ -13,46 +15,83 @@ export const useBlogPosts = (filters?: {
   return useQuery({
     queryKey: queryKeys.blog.list(filters),
     queryFn: async () => {
-      let query = supabase
-        .from('blog_posts')
-        .select('*')
-        .order('published_at', { ascending: false });
+      try {
+        let query = supabase
+          .from('blog_posts')
+          .select('*')
+          .order('published_at', { ascending: false });
 
-      if (filters?.isPublished !== undefined) {
-        query = query.eq('is_published', filters.isPublished);
+        if (filters?.isPublished !== undefined) {
+          query = query.eq('is_published', filters.isPublished);
+        }
+
+        if (filters?.category) {
+          query = query.eq('category', filters.category);
+        }
+
+        if (filters?.limit) {
+          query = query.limit(filters.limit);
+        }
+
+        const { data, error } = await query;
+
+        // Return local posts if DB is empty or error occurs (Offline Mode / Local Dev)
+        if (error || !data || data.length === 0) {
+          console.log('Using local blog posts fallback');
+          let localData = [...localBlogPosts];
+          if (filters?.category) {
+            localData = localData.filter(p => p.category === filters.category);
+          }
+          if (filters?.limit) {
+            localData = localData.slice(0, filters.limit);
+          }
+          return localData;
+        }
+
+        return data || [];
+      } catch (err) {
+        // Fallback on catch as well
+        console.log('Using local blog posts fallback (error)');
+        let localData = [...localBlogPosts];
+        if (filters?.category) {
+          localData = localData.filter(p => p.category === filters.category);
+        }
+        if (filters?.limit) {
+          localData = localData.slice(0, filters.limit);
+        }
+        return localData;
       }
-
-      if (filters?.category) {
-        query = query.eq('category', filters.category);
-      }
-
-      if (filters?.limit) {
-        query = query.limit(filters.limit);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
 // Tek blog post
+import { TypedQueries } from '@/lib/supabase-typed';
+
 export const useBlogPost = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.blog.detail(slug),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
+      try {
+        const { data, error } = await TypedQueries.blogPosts(supabase)
+          .select('*')
+          .eq('slug', slug)
+          .eq('is_published', true)
+          .maybeSingle();
 
-      if (error) throw error;
-      if (!data) throw new Error('Blog post not found');
-      return data;
+        if (!data || error) {
+          const localPost = localBlogPosts.find(p => p.slug === slug);
+          if (localPost) return localPost;
+          if (error) throw error;
+          throw new Error('Blog post not found');
+        }
+        return data;
+      } catch (err) {
+        const localPost = localBlogPosts.find(p => p.slug === slug);
+        if (localPost) return localPost;
+        throw err;
+      }
     },
     staleTime: CACHE_TIMES.LONG,
     enabled: !!slug,
@@ -146,7 +185,7 @@ export const useIncrementBlogView = () => {
   return useMutation({
     mutationFn: async (postId: string) => {
       const { error } = await TypedRPC.incrementBlogViewCount(postId);
-      
+
       if (error) throw error;
     },
     onError: () => {
@@ -177,8 +216,8 @@ export const useAddBlogComment = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.blog.comments(variables.post_id) 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.blog.comments(variables.post_id)
       });
       toast.success('Yorumunuz onay bekliyor');
     },
@@ -224,8 +263,8 @@ export const useToggleBlogPostLike = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, userId, isLiked }: { 
-      postId: string; 
+    mutationFn: async ({ postId, userId, isLiked }: {
+      postId: string;
       userId: string;
       isLiked: boolean;
     }) => {
@@ -236,20 +275,20 @@ export const useToggleBlogPostLike = () => {
           .delete()
           .eq('post_id', postId)
           .eq('user_id', userId);
-        
+
         if (error) throw error;
       } else {
         // Like
         const { error } = await supabase
           .from('blog_post_likes')
           .insert({ post_id: postId, user_id: userId });
-        
+
         if (error) throw error;
       }
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['blog-post-like', variables.postId] 
+      queryClient.invalidateQueries({
+        queryKey: ['blog-post-like', variables.postId]
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.blog.detail(variables.postId)

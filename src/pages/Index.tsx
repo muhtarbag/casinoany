@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -12,12 +14,14 @@ import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 import { useFeaturedSites } from '@/hooks/queries/useBettingSitesQueries';
 import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 
+
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // ⚡ Performance monitoring
-  usePageLoadPerformance('homepage');
-  
+
+  // ⚡ Performance monitoring - dev only
+  // usePageLoadPerformance('homepage');
+
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     // Scroll to results after state update
@@ -26,8 +30,97 @@ const Index = () => {
     }, 100);
   };
 
-  // OPTIMIZED: Fetch featured sites for ItemList schema using centralized query
-  const { data: featuredSitesForSchema } = useFeaturedSites(10);
+  // --- CENTRALIZED DATA FETCHING START (Parallel Queries) ---
+
+  // 1. Fetch Featured Sites (Used by Hero & FeaturedSitesSection)
+  const { data: featuredSites, isLoading: isFeaturedLoading } = useFeaturedSites(10); // Fetch more to cover both components if needed, or stick to 3-10
+
+  // 2. Fetch CMS Content for Hero
+  const { data: cmsContent } = useQuery({
+    queryKey: ['hero-cms-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_key, setting_value')
+        .in('setting_key', ['hero_title', 'hero_description']);
+
+      if (error) {
+        return {
+          hero_title: 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu',
+          hero_description: 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
+        };
+      }
+
+      const contentMap: Record<string, string> = {};
+      data?.forEach(item => {
+        contentMap[item.setting_key] = item.setting_value;
+      });
+
+      return {
+        hero_title: contentMap['hero_title'] || 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu',
+        hero_description: contentMap['hero_description'] || 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
+      };
+    },
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour
+  });
+
+  // 3. Fetch Carousel Settings
+  const { data: carouselSettings } = useQuery({
+    queryKey: ['carousel-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_key, setting_value')
+        .in('setting_key', ['carousel_animation_type', 'carousel_auto_scroll_duration']);
+
+      if (error) return { animation: 'slide', duration: 2500 };
+
+      const settings = data?.reduce((acc: any, item: any) => {
+        if (item.setting_key === 'carousel_animation_type') acc.animation = item.setting_value;
+        if (item.setting_key === 'carousel_auto_scroll_duration') acc.duration = parseInt(item.setting_value);
+        return acc;
+      }, { animation: 'slide', duration: 2500 });
+
+      return settings;
+    },
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour
+  });
+
+  // 4. Fetch Site Stats (Dependent on featuredSites)
+  const featuredIds = featuredSites?.map((site: any) => site.id) || [];
+  const { data: siteStats } = useQuery({
+    queryKey: ['site-stats', ...featuredIds.sort()],
+    queryFn: async () => {
+      if (!featuredSites || featuredSites.length === 0) return [];
+
+      const { data: conversions, error } = await supabase
+        .from('conversions')
+        .select('site_id, conversion_type')
+        .in('site_id', featuredIds);
+
+      if (error) throw error;
+
+      const statsMap = new Map();
+      featuredIds.forEach((siteId: string) => {
+        statsMap.set(siteId, { site_id: siteId, views: 0, clicks: 0 });
+      });
+
+      conversions?.forEach(conv => {
+        if (!conv.site_id) return;
+        const stats = statsMap.get(conv.site_id);
+        if (!stats) return;
+
+        if (conv.conversion_type === 'page_view') stats.views++;
+        else if (conv.conversion_type === 'affiliate_click') stats.clicks++;
+      });
+
+      return Array.from(statsMap.values());
+    },
+    enabled: !!featuredSites && featuredSites.length > 0,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  // --- CENTRALIZED DATA FETCHING END ---
 
   const breadcrumbItems = [
     { name: 'Ana Sayfa', url: window.location.origin }
@@ -56,10 +149,6 @@ const Index = () => {
     }
   ];
 
-  // Create ItemList structured data - REMOVED to prevent duplication
-  // Google was detecting multiple ItemList schemas which caused validation errors
-  const itemListData = null;
-
   const faqSchemaData = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -84,15 +173,13 @@ const Index = () => {
     }))
   };
 
-  // Combine all structured data
   const allStructuredData = [
     breadcrumbSchemaData,
-    faqSchemaData,
-    ...(itemListData ? [itemListData] : [])
+    faqSchemaData
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
+    <div className="min-h-screen bg-gradient-dark" style={{ paddingTop: 'calc(4rem + max(env(safe-area-inset-top), 35px))' }}>
       <SEO
         title="En Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny"
         description="2025'in en güvenilir casino sitelerini inceleyin. Topluluk değerlendirmeleri, şikayet ve yorumlar, %500 hoş geldin bonusu. 50+ detaylı casino incelemesi."
@@ -118,10 +205,17 @@ const Index = () => {
       />
       <GamblingSEOEnhancer isMoneyPage={true} />
       <Header />
-      
+
       <main>
-        <Hero onSearch={handleSearch} searchTerm={searchTerm} />
-        
+        <Hero
+          onSearch={handleSearch}
+          searchTerm={searchTerm}
+          cmsContent={cmsContent}
+          carouselSettings={carouselSettings}
+          featuredSites={featuredSites?.slice(0, 3)} // Ensure only top 3 go to Hero carousel
+          siteStats={siteStats}
+        />
+
         <div id="sites-grid" className="container mx-auto px-4 py-6 md:py-12">
           <PixelGrid searchTerm={searchTerm} />
         </div>
@@ -133,16 +227,20 @@ const Index = () => {
               Öne Çıkan Casino İncelemeleri
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri. 
+              Uzman ekibimiz tarafından hazırlanan kapsamlı casino incelemeleri.
               Bonus şartları, ödeme süreleri ve kullanıcı deneyimleri.
             </p>
           </div>
-        
-        <FeaturedSitesSection searchTerm={searchTerm} />
+
+          <FeaturedSitesSection
+            searchTerm={searchTerm}
+            featuredSites={featuredSites?.slice(0, 3)} // Reuse same data, same cache
+            isLoading={isFeaturedLoading}
+          />
 
           {/* Bonus CTA */}
           <div className="text-center mt-8">
-            <Link 
+            <Link
               to="/deneme-bonusu"
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
             >
@@ -158,7 +256,7 @@ const Index = () => {
       </main>
 
       <Footer />
-      
+
       {/* Mobile Sticky Ad */}
       <MobileStickyAd />
     </div>

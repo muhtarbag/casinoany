@@ -15,7 +15,7 @@ export default function Analytics() {
     queryKey: ['social-media-stats-v2'], // Changed key to force fresh fetch
     queryFn: async () => {
       console.log('🔍 Fetching social stats...');
-      
+
       // Query site_stats directly joined with betting_sites
       const { data, error } = await supabase
         .from('site_stats')
@@ -40,14 +40,15 @@ export default function Analytics() {
         console.error('❌ Query error:', error);
         throw error;
       }
-      
+
       console.log('✅ Raw data:', data);
-      
+
       if (!data) return [];
 
       // Transform the data to expected format
       const transformed = data.map(stat => {
-        const site = (stat.betting_sites as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const site = stat.betting_sites as any;
         return {
           site_id: stat.site_id,
           site_name: site?.name || 'Unknown',
@@ -61,7 +62,7 @@ export default function Analytics() {
           youtube_clicks: stat.youtube_clicks || 0,
         };
       });
-      
+
       console.log('✅ Transformed data:', transformed);
       return transformed;
     },
@@ -97,15 +98,15 @@ export default function Analytics() {
       if (!data) return [];
 
       const sitesWithTotals = data.map(stat => {
-        const site = (stat.betting_sites as any);
-        const totalClicks = (stat.email_clicks || 0) + 
-                           (stat.whatsapp_clicks || 0) + 
-                           (stat.telegram_clicks || 0) + 
-                           (stat.twitter_clicks || 0) + 
-                           (stat.instagram_clicks || 0) + 
-                           (stat.facebook_clicks || 0) + 
-                           (stat.youtube_clicks || 0);
-        
+        const site = stat.betting_sites;
+        const totalClicks = (stat.email_clicks || 0) +
+          (stat.whatsapp_clicks || 0) +
+          (stat.telegram_clicks || 0) +
+          (stat.twitter_clicks || 0) +
+          (stat.instagram_clicks || 0) +
+          (stat.facebook_clicks || 0) +
+          (stat.youtube_clicks || 0);
+
         return {
           id: stat.site_id,
           name: site?.name || 'Unknown',
@@ -113,7 +114,7 @@ export default function Analytics() {
           totalClicks
         };
       });
-      
+
       return sitesWithTotals
         .filter(site => site.totalClicks > 0)
         .sort((a, b) => b.totalClicks - a.totalClicks);

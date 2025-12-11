@@ -4,7 +4,6 @@ import { ArrowRight, ExternalLink, FileText } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Category } from '@/hooks/queries/useCategoryQueries';
-import * as LucideIcons from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface CategoryCardProps {
@@ -14,34 +13,35 @@ interface CategoryCardProps {
   };
 }
 
+import { getIcon } from '@/lib/utils';
+// ... imports
+
 export const CategoryCard = memo(({ category }: CategoryCardProps) => {
   // Dinamik ikon yükleme - memoized
   const IconComponent = useMemo(() => {
-    return (LucideIcons as any)[
-      category.icon.charAt(0).toUpperCase() + category.icon.slice(1)
-    ] || LucideIcons.Folder;
+    return getIcon(category.icon);
   }, [category.icon]);
 
   return (
     <Link to={`/kategori/${category.slug}`} className="block group">
       <Card className="relative h-full overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:-translate-y-2 bg-card/60 backdrop-blur-xl border-border/50 hover:border-primary/40">
         {/* Background Gradient Overlay */}
-        <div 
+        <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-gradient-to-br"
           style={{
             backgroundImage: `linear-gradient(135deg, ${category.color}15, transparent 60%)`
           }}
         />
-        
+
         {/* Decorative Corner Accent */}
-        <div 
+        <div
           className="absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full blur-3xl opacity-0 group-hover:opacity-30 transition-all duration-700"
           style={{ backgroundColor: category.color }}
         />
 
         <CardHeader className="relative p-6 sm:p-8">
           {/* Icon */}
-          <motion.div 
+          <motion.div
             className="mb-6"
             whileHover={{ scale: 1.05, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -74,7 +74,7 @@ export const CategoryCard = memo(({ category }: CategoryCardProps) => {
           {(category.site_count !== undefined || category.blog_count !== undefined) && (
             <div className="flex items-center gap-3">
               {category.site_count !== undefined && (
-                <div 
+                <div
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full ring-1 ring-inset ring-border/50 transition-all duration-300 hover:ring-2"
                   style={{
                     backgroundColor: `${category.color}10`,
@@ -87,7 +87,7 @@ export const CategoryCard = memo(({ category }: CategoryCardProps) => {
                 </div>
               )}
               {category.blog_count !== undefined && (
-                <div 
+                <div
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full ring-1 ring-inset ring-border/50 transition-all duration-300 hover:ring-2"
                   style={{
                     backgroundColor: `${category.color}10`,
@@ -104,7 +104,7 @@ export const CategoryCard = memo(({ category }: CategoryCardProps) => {
         </CardContent>
 
         <CardFooter className="relative px-6 sm:px-8 pb-6 sm:pb-8">
-          <Button 
+          <Button
             size="lg"
             className="w-full h-11 text-sm font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300 border-0 relative overflow-hidden"
             style={{
@@ -114,7 +114,7 @@ export const CategoryCard = memo(({ category }: CategoryCardProps) => {
           >
             {/* Button shine effect */}
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-            
+
             <span className="relative flex items-center justify-center gap-2">
               Keşfet
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />

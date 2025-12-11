@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, Eye, Tag, TrendingUp, Share2, Bookmark, Heart, ChevronUp, Award, MessageCircle, FileText } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useEffect, useRef, useMemo, useState } from 'react';
@@ -22,6 +23,7 @@ import { AdBanner } from '@/components/advertising/AdBanner';
 import { MobileStickyAd } from '@/components/advertising/MobileStickyAd';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { TypedQueries } from '@/lib/supabase-typed';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -58,9 +60,9 @@ export default function BlogPost() {
     queryKey: ['sidebar-ad-check'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .rpc('get_active_banner', { 
+        .rpc('get_active_banner', {
           p_location: 'sidebar',
-          p_limit: 1 
+          p_limit: 1
         });
       return !!data?.[0];
     },
@@ -78,21 +80,22 @@ export default function BlogPost() {
     queryKey: ['related-posts', post?.id, post?.tags],
     queryFn: async () => {
       if (!post?.tags || post.tags.length === 0) return [];
-      
-      const { data, error } = await supabase
-        .from('blog_posts' as any)
+
+      // ... inside component
+
+      const { data, error } = await TypedQueries.blogPosts(supabase)
         .select('id, title, slug, excerpt, featured_image, tags, read_time, view_count, published_at')
         .eq('is_published', true)
         .neq('id', post.id)
         .limit(20);
-      
+
       if (error) throw error;
-      
+
       const scored = data.map((p: any) => {
         const matchingTags = p.tags?.filter((tag: string) => post.tags.includes(tag)).length || 0;
         return { ...p, score: matchingTags };
       });
-      
+
       return scored
         .sort((a, b) => b.score - a.score)
         .filter(p => p.score > 0)
@@ -114,13 +117,13 @@ export default function BlogPost() {
   useEffect(() => {
     const handleScroll = () => {
       if (!contentRef.current) return;
-      
+
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
       const trackLength = documentHeight - windowHeight;
       const progress = Math.min((scrollTop / trackLength) * 100, 100);
-      
+
       setReadingProgress(progress);
       setShowScrollTop(scrollTop > 500);
     };
@@ -140,13 +143,28 @@ export default function BlogPost() {
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('internal-link')) {
+        e.preventDefault();
         const linkId = target.getAttribute('data-link-id');
+        const href = target.getAttribute('href');
+
         if (linkId) {
           trackLinkClick(linkId);
         }
+
+        if (href) {
+          // Check if external link
+          if (href.startsWith('http') && !href.includes(window.location.origin)) {
+            window.open(href, '_blank', 'noopener,noreferrer');
+          } else {
+            // Internal link - use SPA navigation
+            const path = href.replace(window.location.origin, '');
+            navigate(path);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
       }
     };
-    
+
     document.addEventListener('click', handleLinkClick);
     return () => document.removeEventListener('click', handleLinkClick);
   }, []);
@@ -157,7 +175,7 @@ export default function BlogPost() {
 
   const shareArticle = async () => {
     if (!post) return;
-    
+
     // Web Share API destekleniyorsa kullan
     if (navigator.share) {
       try {
@@ -188,13 +206,18 @@ export default function BlogPost() {
           <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
         <Header />
-        <div className="container mx-auto px-4 py-32 text-center relative">
-          <div className="inline-flex items-center gap-3 p-6 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/30">
-            <div className="w-3 h-3 bg-gradient-to-r from-primary to-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-3 h-3 bg-gradient-to-r from-accent to-secondary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-3 h-3 bg-gradient-to-r from-secondary to-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="container mx-auto px-4 py-32 text-center relative max-w-4xl mx-auto space-y-8">
+          <Skeleton className="w-full h-8 max-w-sm mx-auto mb-8 rounded-full" />
+          <Skeleton className="w-full h-24 rounded-3xl" />
+          <div className="space-y-4">
+            <Skeleton className="w-full h-12 rounded-xl" />
+            <Skeleton className="w-2/3 h-12 rounded-xl mx-auto" />
+            <Skeleton className="w-3/4 h-12 rounded-xl mx-auto" />
           </div>
-          <p className="mt-6 text-muted-foreground font-medium">İçerik yükleniyor...</p>
+          <div className="flex justify-center gap-4 mt-8">
+            <Skeleton className="w-32 h-12 rounded-xl" />
+            <Skeleton className="w-32 h-12 rounded-xl" />
+          </div>
         </div>
         <Footer />
       </div>
@@ -218,7 +241,7 @@ export default function BlogPost() {
             <p className="text-lg text-muted-foreground">
               Aradığınız blog yazısı bulunamadı veya yayından kaldırılmış olabilir.
             </p>
-            <Button 
+            <Button
               onClick={() => navigate('/blog')}
               size="lg"
               className="gap-2 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
@@ -234,9 +257,12 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
+    <div
+      className="min-h-screen bg-gradient-dark"
+      style={{ paddingTop: 'var(--header-height)' }}
+    >
       {/* Reading Progress Bar */}
-      <div 
+      <div
         className="fixed top-[72px] md:top-[84px] left-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary transition-all duration-300 z-50"
         style={{ width: `${readingProgress}%` }}
       />
@@ -246,6 +272,7 @@ export default function BlogPost() {
         description={post.meta_description || (post.excerpt && post.excerpt.length > 160 ? post.excerpt.substring(0, 157) + '...' : post.excerpt)}
         keywords={post.meta_keywords || post.tags || ['casino', 'bahis', 'bonus']}
         canonical={`${window.location.origin}/${post.slug}`}
+        amphtml={`${window.location.origin}/amp/blog/${post.slug}`}
         ogType="article"
         ogImage={post.featured_image || undefined}
         ogImageAlt={post.title}
@@ -313,21 +340,21 @@ export default function BlogPost() {
           },
         }}
       />
-      
+
       <Header />
 
       {/* Premium Scroll to Top Button */}
       <Button
         size="icon"
         className={cn(
-          "fixed bottom-6 right-6 rounded-full shadow-2xl shadow-primary/20 transition-all duration-300 z-40 hidden md:flex bg-gradient-to-br from-primary to-accent hover:shadow-primary/30 hover:scale-110 border-2 border-border/20",
+          "fixed bottom-20 md:bottom-6 right-6 rounded-full shadow-2xl shadow-primary/20 transition-all duration-300 z-40 bg-gradient-to-br from-primary to-accent hover:shadow-primary/30 hover:scale-110 border-2 border-border/20",
           showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
         )}
         onClick={scrollToTop}
       >
         <ChevronUp className="w-5 h-5 text-white" />
       </Button>
-      
+
       <main className="flex-1 container mx-auto px-4 py-8 overflow-x-hidden relative">
         {/* Enhanced Decorative Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -337,15 +364,14 @@ export default function BlogPost() {
         </div>
 
         {/* Two-column layout: Main content + Sidebar (only if ad exists) */}
-        <div className={`grid gap-8 max-w-[1400px] mx-auto ${
-          hasSidebarAd ? 'grid-cols-1 lg:grid-cols-[1fr_300px]' : 'grid-cols-1'
-        }`}>
+        <div className={`grid gap-8 max-w-[1400px] mx-auto ${hasSidebarAd ? 'grid-cols-1 lg:grid-cols-[1fr_300px]' : 'grid-cols-1'
+          }`}>
           {/* Main Content */}
           <article className="w-full">
             {/* Premium Breadcrumb Navigation */}
             <div className="mb-6 animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card/30 backdrop-blur-sm border border-border/30">
-                <Breadcrumb 
+                <Breadcrumb
                   items={[
                     { label: 'Blog', href: '/blog' },
                     ...(post.category ? [{ label: post.category, href: `/blog?category=${post.category}` }] : []),
@@ -371,17 +397,17 @@ export default function BlogPost() {
               {/* Category & Tags */}
               <div className="flex flex-wrap items-center gap-2.5">
                 {post.category && (
-                  <Badge 
-                    variant="default" 
+                  <Badge
+                    variant="default"
                     className="text-sm font-semibold px-4 py-1.5 bg-gradient-to-r from-primary to-primary/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                   >
                     {post.category}
                   </Badge>
                 )}
                 {post.tags?.slice(0, 3).map((tag) => (
-                  <Badge 
-                    key={tag} 
-                    variant="outline" 
+                  <Badge
+                    key={tag}
+                    variant="outline"
                     className="text-xs font-medium px-3 py-1.5 border-border/70 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 group"
                   >
                     <Tag className="w-3 h-3 mr-1.5 group-hover:text-primary transition-colors" />
@@ -435,8 +461,8 @@ export default function BlogPost() {
 
               {/* Premium Share Buttons */}
               <div className="hidden md:flex items-center gap-3 pt-6 border-t border-border/30">
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={shareArticle}
                   className="gap-2.5 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all duration-300 group"
@@ -444,16 +470,16 @@ export default function BlogPost() {
                   <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span className="font-semibold">Paylaş</span>
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   className="gap-2.5 hover:bg-accent/10 hover:border-accent/50 hover:text-accent transition-all duration-300 group"
                 >
                   <Bookmark className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span className="font-semibold">Kaydet</span>
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={handleLikeClick}
                   disabled={toggleLike.isPending}
@@ -469,7 +495,7 @@ export default function BlogPost() {
                     likeStatus?.isLiked && "fill-current"
                   )} />
                   <span className="font-semibold">
-                    {likeStatus?.isLiked ? 'Beğenildi' : 'Beğen'} 
+                    {likeStatus?.isLiked ? 'Beğenildi' : 'Beğen'}
                     {likeStatus?.likeCount ? ` (${likeStatus.likeCount})` : ''}
                   </span>
                 </Button>
@@ -482,10 +508,10 @@ export default function BlogPost() {
                 <div className="relative rounded-3xl overflow-hidden border-2 border-border/30 shadow-2xl group">
                   {/* Gradient Overlay on Hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10" />
-                  
+
                   {/* Glow Effect */}
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-secondary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  
+
                   <img
                     src={post.featured_image}
                     alt={post.title}
@@ -497,12 +523,12 @@ export default function BlogPost() {
             )}
 
             {/* Article Content with Premium Typography */}
-            <div 
+            <div
               ref={contentRef}
-              className="animate-fade-in" 
+              className="animate-fade-in"
               style={{ animationDelay: '400ms' }}
             >
-              <div 
+              <div
                 className="prose prose-lg md:prose-xl prose-invert max-w-none
                   prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24
                   prose-h2:text-3xl md:prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:pb-4 prose-h2:border-b prose-h2:border-border/30
@@ -540,33 +566,33 @@ export default function BlogPost() {
               {/* Gradient Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-accent/10 to-secondary/15" />
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMC0xMGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMTBjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
-              
+
               <div className="relative p-8 md:p-12 text-center space-y-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg mb-4">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                
+
                 <h3 className="text-2xl md:text-3xl font-display font-bold text-foreground">
                   Bu yazıyı beğendiyseniz diğer içeriklerimize de göz atın
                 </h3>
-                
+
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   En güncel casino haberleri, bonuslar ve incelemeler için blog sayfamızı keşfedin
                 </p>
-                
+
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
-                  <Button 
-                    onClick={() => navigate('/blog')} 
-                    size="lg" 
+                  <Button
+                    onClick={() => navigate('/blog')}
+                    size="lg"
                     className="gap-2.5 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                   >
                     <Award className="w-5 h-5" />
                     Tüm Blog Yazıları
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    onClick={shareArticle} 
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={shareArticle}
                     className="gap-2.5 hover:bg-accent/10 hover:border-accent/50 transition-all duration-300"
                   >
                     <Share2 className="w-5 h-5" />
@@ -590,10 +616,10 @@ export default function BlogPost() {
                     <p className="text-muted-foreground mt-1">Sizin için seçtiklerimiz</p>
                   </div>
                 </div>
-                
+
                 <div className="grid md:grid-cols-3 gap-6">
                   {relatedPosts.map((relatedPost: any, index: number) => (
-                    <Card 
+                    <Card
                       key={relatedPost.id}
                       className="group cursor-pointer hover:border-primary/50 transition-all duration-500 overflow-hidden bg-card/50 backdrop-blur-sm animate-fade-in hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
                       style={{ animationDelay: `${index * 100}ms` }}
@@ -605,8 +631,8 @@ export default function BlogPost() {
                       {relatedPost.featured_image && (
                         <div className="relative h-48 overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10 opacity-60 group-hover:opacity-80 transition-opacity" />
-                          <img 
-                            src={relatedPost.featured_image} 
+                          <img
+                            src={relatedPost.featured_image}
                             alt={relatedPost.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             loading="lazy"
@@ -668,10 +694,10 @@ export default function BlogPost() {
                     <p className="text-muted-foreground mt-1">Düşüncelerinizi paylaşın</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-8">
                   <BlogCommentList postId={post.id} />
-                  
+
                   <div className="mt-10 p-6 md:p-8 rounded-2xl bg-card/30 backdrop-blur-sm border-2 border-border/50">
                     <h3 className="text-xl font-display font-bold mb-6">Yorum Yap</h3>
                     <BlogCommentForm postId={post.id} />
@@ -691,7 +717,7 @@ export default function BlogPost() {
       </main>
 
       <Footer />
-      
+
       {/* Mobile Sticky Ad */}
       <MobileStickyAd />
     </div>

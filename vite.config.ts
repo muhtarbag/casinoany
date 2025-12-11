@@ -37,10 +37,11 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
+    mode === "development" && componentTagger(),
     viteCompression({
       verbose: true,
       disable: false,
-      threshold: 10240, // Only compress files > 10KB
+      threshold: 10240,
       algorithm: 'gzip',
       ext: '.gz',
     }),
@@ -54,7 +55,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'prompt',
       injectRegister: 'inline',
-      includeAssets: ['favicon.ico', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
+      includeAssets: ['favicon.png', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
       manifest: {
         name: 'CasinoAny - Casino ve Bahis Siteleri',
         short_name: 'CasinoAny',

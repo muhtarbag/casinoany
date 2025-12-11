@@ -52,7 +52,7 @@ const Memberships = () => {
     queryKey: ['user-memberships', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_site_memberships')
         .select(`
           *,
@@ -66,7 +66,7 @@ const Memberships = () => {
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -82,7 +82,7 @@ const Memberships = () => {
         .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
-      
+
       if (error) throw error;
       return data;
     },
@@ -94,7 +94,7 @@ const Memberships = () => {
         throw new Error('Kullanıcı, site veya kullanıcı adı eksik');
       }
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .insert({
           user_id: user.id,
@@ -104,7 +104,7 @@ const Memberships = () => {
           registration_date: registrationDate,
           is_active: true,
         });
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -131,7 +131,7 @@ const Memberships = () => {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .update({ is_active: isActive })
         .eq('id', id);
@@ -148,7 +148,7 @@ const Memberships = () => {
 
   const deleteMembershipMutation = useMutation({
     mutationFn: async (membershipId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .delete()
         .eq('id', membershipId);
@@ -177,10 +177,10 @@ const Memberships = () => {
         registration_date: new Date().toISOString().split('T')[0],
       }));
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .insert(memberships);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -224,7 +224,7 @@ const Memberships = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Kayıtlı Olduğum Siteler"
         description="Kayıt olduğunuz bahis sitelerinizi görüntüleyin ve yönetin"
       />
@@ -236,7 +236,7 @@ const Memberships = () => {
               Üye olduğunuz bahis sitelerini takip edin
             </p>
           </div>
-          
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
@@ -251,7 +251,7 @@ const Memberships = () => {
                   Kayıtlı olduğunuz bahis sitesini ekleyin
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
@@ -276,8 +276,8 @@ const Memberships = () => {
                         <SelectItem key={site.id} value={site.id}>
                           <div className="flex items-center gap-2">
                             {site.logo_url && (
-                              <img 
-                                src={site.logo_url} 
+                              <img
+                                src={site.logo_url}
                                 alt={site.name}
                                 className="w-5 h-5 object-contain"
                                 loading="lazy"
@@ -375,7 +375,7 @@ const Memberships = () => {
                           {membership.is_active ? 'Aktif' : 'Pasif'}
                         </Badge>
                       </div>
-                      
+
                       <p className="text-sm text-muted-foreground mb-3">
                         Kayıt tarihi: {membership.registration_date ? format(new Date(membership.registration_date), 'dd MMMM yyyy', { locale: tr }) : 'Belirtilmemiş'}
                       </p>
@@ -393,9 +393,9 @@ const Memberships = () => {
                           asChild
                           className="w-full sm:w-auto"
                         >
-                          <a 
-                            href={membership.betting_sites.affiliate_link} 
-                            target="_blank" 
+                          <a
+                            href={membership.betting_sites.affiliate_link}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center"
                           >
@@ -444,7 +444,7 @@ const Memberships = () => {
             </CardContent>
           </Card>
         )}
-        
+
         {/* Bulk Site Selection Dialog */}
         <Dialog open={isSiteSelectionOpen} onOpenChange={setIsSiteSelectionOpen}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
@@ -454,7 +454,7 @@ const Memberships = () => {
                 Sistemdeki tüm sitelerden kayıtlı olduklarınızı seçin
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="flex-1 overflow-y-auto py-4">
               {/* Site Ekle Button - First Item */}
               <div className="mb-4">
@@ -481,17 +481,16 @@ const Memberships = () => {
                       (m: any) => m.betting_sites.id === site.id
                     );
                     const isSelected = selectedSiteIds.includes(site.id);
-                    
+
                     return (
                       <div
                         key={site.id}
-                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-                          isAlreadyMember
-                            ? 'opacity-50 cursor-not-allowed bg-muted'
-                            : isSelected
+                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${isAlreadyMember
+                          ? 'opacity-50 cursor-not-allowed bg-muted'
+                          : isSelected
                             ? 'border-primary bg-primary/5'
                             : 'hover:bg-muted/50'
-                        }`}
+                          }`}
                         onClick={() => !isAlreadyMember && toggleSiteSelection(site.id)}
                       >
                         <Checkbox
@@ -547,9 +546,9 @@ const Memberships = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        
+
         <SiteAdditionRequestDialog
-          open={isSiteRequestOpen} 
+          open={isSiteRequestOpen}
           onOpenChange={setIsSiteRequestOpen}
         />
       </ProfileLayout>

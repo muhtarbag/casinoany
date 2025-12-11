@@ -19,13 +19,30 @@ const LightRays = lazy(() => import('./LightRays'));
 interface HeroProps {
   onSearch: (searchTerm: string) => void;
   searchTerm: string;
+  cmsContent?: {
+    hero_title: string;
+    hero_description: string;
+  };
+  carouselSettings?: {
+    animation: string;
+    duration: number;
+  };
+  featuredSites?: any[];
+  siteStats?: any[];
 }
 
-export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
+export const Hero = ({
+  onSearch,
+  searchTerm,
+  cmsContent,
+  carouselSettings,
+  featuredSites,
+  siteStats
+}: HeroProps) => {
   const navigate = useNavigate();
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [showAnimations, setShowAnimations] = useState(false);
-  
+
   // Sync local search with prop changes
   useEffect(() => {
     setLocalSearch(searchTerm);
@@ -38,14 +55,22 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     }, 100); // Small delay to ensure content renders first
     return () => clearTimeout(timer);
   }, []);
+
   const [animationType, setAnimationType] = useState<string>('slide');
   const [autoScrollDuration, setAutoScrollDuration] = useState<number>(2500);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: true, 
+
+  // Sync settings from props
+  useEffect(() => {
+    if (carouselSettings?.animation) {
+      setAnimationType(carouselSettings.animation);
+    }
+    if (carouselSettings?.duration) {
+      setAutoScrollDuration(carouselSettings.duration);
+    }
+  }, [carouselSettings]);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
     align: 'start',
     skipSnaps: false,
     dragFree: false,
@@ -71,8 +96,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    
-    // FIX MEMORY LEAK: Cleanup event listeners
+
     return () => {
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
@@ -82,32 +106,26 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
   // Auto-scroll on mobile
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
 
     let autoScrollInterval: NodeJS.Timeout;
 
-    // Wait a bit to ensure carousel is fully initialized
     const initDelay = setTimeout(() => {
       const handleAutoScroll = () => {
         if (!emblaApi) return;
-        
-        // With loop:true, Embla handles looping automatically
-        // Just scroll to next slide, it will loop seamlessly
         emblaApi.scrollNext();
       };
 
-      // Start auto-scroll for mobile with the configured duration
       autoScrollInterval = setInterval(handleAutoScroll, autoScrollDuration);
 
-      // Clear interval on user interaction
       const clearAutoScroll = () => {
         if (autoScrollInterval) {
           clearInterval(autoScrollInterval);
         }
       };
-      
+
       emblaApi.on('pointerDown', clearAutoScroll);
 
       return () => {
@@ -116,7 +134,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         }
         emblaApi.off('pointerDown', clearAutoScroll);
       };
-    }, 300); // Small delay to ensure everything is ready
+    }, 300);
 
     return () => {
       clearTimeout(initDelay);
@@ -126,119 +144,6 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
     };
   }, [emblaApi, autoScrollDuration]);
 
-  // Fetch carousel settings (birleştirilmiş tek query)
-  const { data: carouselSettings } = useQuery({
-    queryKey: ['carousel-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('setting_key, setting_value')
-        .in('setting_key', ['carousel_animation_type', 'carousel_auto_scroll_duration']);
-      
-      if (error) {
-        return { animation: 'slide', duration: 2500 };
-      }
-      
-      const settings = data?.reduce((acc: any, item: any) => {
-        if (item.setting_key === 'carousel_animation_type') acc.animation = item.setting_value;
-        if (item.setting_key === 'carousel_auto_scroll_duration') acc.duration = parseInt(item.setting_value);
-        return acc;
-      }, { animation: 'slide', duration: 2500 });
-      
-      return settings;
-    },
-  });
-
-  // Fetch CMS content for hero title and description
-  const { data: cmsContent } = useQuery({
-    queryKey: ['hero-cms-content'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('setting_key, setting_value')
-        .in('setting_key', ['hero_title', 'hero_description']);
-      
-      if (error) {
-        return {
-          hero_title: 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu', 
-          hero_description: 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
-        };
-      }
-      
-      const contentMap: Record<string, string> = {};
-      data?.forEach(item => {
-        contentMap[item.setting_key] = item.setting_value;
-      });
-      
-      return {
-        hero_title: contentMap['hero_title'] || 'Türkiye\'nin En Güvenilir Casino ve Bahis Siteleri Karşılaştırma Platformu',
-        hero_description: contentMap['hero_description'] || 'Deneme bonusu veren siteler, yüksek oranlar ve güvenilir ödeme yöntemleri ile casino ve bahis sitelerini inceleyin. Uzman değerlendirmelerimiz ile en iyi seçimi yapın.'
-      };
-    },
-  });
-
-  useEffect(() => {
-    if (carouselSettings?.animation) {
-      setAnimationType(carouselSettings.animation);
-    }
-    if (carouselSettings?.duration) {
-      setAutoScrollDuration(carouselSettings.duration);
-    }
-  }, [carouselSettings]);
-
-  const { data: featuredSites, isLoading: isFeaturedLoading } = useQuery({
-    queryKey: ['featured-sites'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('id, name, slug, logo_url, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
-        .eq('is_active', true)
-        .eq('is_featured', true)
-        .order('rating', { ascending: false })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const featuredIds = featuredSites?.map((site: any) => site.id) || [];
-
-  const { data: siteStats } = useQuery({
-    queryKey: ['site-stats', ...featuredIds.sort()],
-    queryFn: async () => {
-      if (!featuredSites || featuredSites.length === 0) return [];
-      
-      // Fetch conversions data
-      const { data: conversions, error } = await supabase
-        .from('conversions')
-        .select('site_id, conversion_type')
-        .in('site_id', featuredIds);
-      
-      if (error) throw error;
-
-      // Aggregate stats per site
-      const statsMap = new Map();
-      featuredIds.forEach(siteId => {
-        statsMap.set(siteId, { site_id: siteId, views: 0, clicks: 0 });
-      });
-
-      conversions?.forEach(conv => {
-        if (!conv.site_id) return;
-        const stats = statsMap.get(conv.site_id);
-        if (!stats) return;
-
-        if (conv.conversion_type === 'page_view') {
-          stats.views++;
-        } else if (conv.conversion_type === 'affiliate_click') {
-          stats.clicks++;
-        }
-      });
-
-      return Array.from(statsMap.values());
-    },
-    enabled: !!featuredSites && featuredSites.length > 0,
-  });
-
 
   return (
     <div className="relative min-h-screen bg-background touch-manipulation">
@@ -247,7 +152,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
         <Suspense fallback={null}>
           {/* Lightweight FloatingLines - Optimized for all devices - Extended to full Hero height */}
           <div className="absolute inset-0 w-full min-h-full opacity-40 pointer-events-none z-0">
-            <FloatingLines 
+            <FloatingLines
               enabledWaves={['middle']}
               lineCount={10}
               lineDistance={6}
@@ -285,23 +190,36 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
             <span className="text-xs md:text-sm font-semibold">Türkiye'nin #1 Bahis Sitesi Rehberi</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold leading-tight">
-            <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent">
-              En İyi Bahis Siteleri
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">
-              Güvenilir ve Kazançlı
-            </span>
+            {cmsContent?.hero_title ? (
+              <span
+                className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent"
+                dangerouslySetInnerHTML={{ __html: cmsContent.hero_title.replace(/\n/g, '<br/>') }}
+              />
+            ) : (
+              <>
+                <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent">
+                  En İyi Bahis Siteleri
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent text-lg sm:text-xl md:text-3xl lg:text-5xl font-normal mt-1 md:mt-2 block">
+                  Güvenilir ve Kazançlı
+                </span>
+              </>
+            )}
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
+            {cmsContent?.hero_description || (
+              <>
+                Lisanslı ve güvenilir bahis sitelerini inceleyin. <span className="text-foreground font-semibold">Yüksek bonuslar</span>, <span className="text-foreground font-semibold">hızlı ödemeler</span> ve <span className="text-foreground font-semibold">7/24 destek</span> imkanı.
+              </>
+            )}
           </p>
-          <SmartSearch 
-            onSearch={onSearch} 
-            searchTerm={localSearch} 
+          <SmartSearch
+            onSearch={onSearch}
+            searchTerm={localSearch}
             onNavigate={(slug) => navigate(`/${slug}`)}
           />
-          
+
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Button
@@ -338,18 +256,18 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
           <AdBanner location="hero" />
         </div>
 
-        {isFeaturedLoading ? (
+        {!featuredSites ? (
           <LoadingSpinner size="lg" text="Öne çıkan siteler yükleniyor..." />
         ) : featuredSites && featuredSites.length > 0 ? (
           <div className="relative -mx-4 px-4 py-16 overflow-hidden">
-            
+
             <div className="relative z-10 space-y-8">
               {/* Premium Header */}
               <div className="text-center space-y-4">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent animate-fade-in">
                   Öne Çıkan Siteler
                 </h2>
-                
+
                 <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
                   En yüksek puanlı ve en çok tercih edilen bahis siteleri
                 </p>
@@ -367,7 +285,7 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                 )}
-                
+
                 {canScrollNext && (
                   <button
                     onClick={scrollNext}
@@ -379,39 +297,39 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                 )}
 
                 {/* Carousel */}
-                <div 
-                  className="overflow-hidden relative touch-pan-x rounded-2xl" 
+                <div
+                  className="overflow-hidden relative touch-pan-x rounded-2xl"
                   ref={emblaRef}
                 >
                   <div className="flex gap-4 md:gap-6">
                     {featuredSites.map((site, index) => {
                       const stats = (siteStats as any)?.find((s: any) => s.site_id === site.id);
                       return (
-                        <div 
-                          key={site.id} 
+                        <div
+                          key={site.id}
                           className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-0.75rem)] lg:flex-[0_0_calc(33.333%-1rem)] transition-all duration-300"
                         >
-                          
+
                           <div className="relative group/card">
                             {/* Glow Effect on Hover */}
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent to-primary rounded-2xl opacity-0 group-hover/card:opacity-75 blur transition-all duration-500" />
-                            
+
                             <div className="relative">
-                              <BettingSiteCard 
+                              <BettingSiteCard
                                 id={site.id}
                                 slug={site.slug}
-                                name={site.name} 
-                                logo={site.logo_url || undefined} 
-                                rating={Number(site.rating) || 0} 
-                                bonus={site.bonus || undefined} 
-                                features={site.features || undefined} 
-                                affiliateUrl={site.affiliate_link} 
-                                email={site.email || undefined} 
-                                whatsapp={site.whatsapp || undefined} 
-                                telegram={site.telegram || undefined} 
-                                twitter={site.twitter || undefined} 
-                                instagram={site.instagram || undefined} 
-                                facebook={site.facebook || undefined} 
+                                name={site.name}
+                                logo={site.logo_url || undefined}
+                                rating={Number(site.rating) || 0}
+                                bonus={site.bonus || undefined}
+                                features={site.features || undefined}
+                                affiliateUrl={site.affiliate_link}
+                                email={site.email || undefined}
+                                whatsapp={site.whatsapp || undefined}
+                                telegram={site.telegram || undefined}
+                                twitter={site.twitter || undefined}
+                                instagram={site.instagram || undefined}
+                                facebook={site.facebook || undefined}
                                 youtube={site.youtube || undefined}
                                 views={stats?.views || 0}
                                 clicks={stats?.clicks || 0}
@@ -430,11 +348,10 @@ export const Hero = ({ onSearch, searchTerm }: HeroProps) => {
                     <button
                       key={index}
                       onClick={() => emblaApi?.scrollTo(index)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        index === selectedIndex 
-                          ? 'w-8 bg-gradient-to-r from-primary to-accent shadow-lg' 
-                          : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                      }`}
+                      className={`h-2 rounded-full transition-all duration-300 ${index === selectedIndex
+                        ? 'w-8 bg-gradient-to-r from-primary to-accent shadow-lg'
+                        : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                        }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}

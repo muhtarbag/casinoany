@@ -21,6 +21,7 @@ interface SEOProps {
     prev?: string;
     next?: string;
   };
+  amphtml?: string;
 }
 
 export const SEO = ({
@@ -35,26 +36,27 @@ export const SEO = ({
   structuredData,
   noindex = false,
   pagination,
+  amphtml,
 }: SEOProps) => {
   // Always use https://casinoany.com as primary domain for canonical and OG
   const siteUrl = 'https://casinoany.com';
   const currentPath = window.location.pathname;
-  
+
   // Use canonical engine for clean URLs - always absolute URLs
   const currentUrl = canonical || buildCanonical(currentPath, { baseUrl: siteUrl });
-  
+
   // Determine if page should be noindexed
   const robotsTag = getRobotsMetaTag(currentPath);
   const isNoIndex = shouldNoIndex(currentPath);
-  
+
   // Title optimization: Keep under 60 chars for SERP display
-  const fullTitle = title.length > 50 
-    ? `${title} | CasinoAny` 
+  const fullTitle = title.length > 50
+    ? `${title} | CasinoAny`
     : `${title} | CasinoAny - İGaming Rehberi`;
-  
+
   const defaultOgImage = `${siteUrl}/og-default.jpg`;
   const finalOgImage = ogImage || defaultOgImage;
-  
+
   // Default structured data - Organization
   const defaultStructuredData = {
     '@context': 'https://schema.org',
@@ -112,7 +114,8 @@ export const SEO = ({
       <meta name="description" content={description} />
       {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
       <link rel="canonical" href={currentUrl} />
-      
+      {amphtml && <link rel="amphtml" href={amphtml} />}
+
       {/* Pagination Links */}
       {pagination?.prev && <link rel="prev" href={pagination.prev} />}
       {pagination?.next && <link rel="next" href={pagination.next} />}
@@ -157,33 +160,33 @@ export const SEO = ({
       <meta name="robots" content={noindex ? 'noindex, follow' : robotsTag} />
       <meta name="googlebot" content={
         (isNoIndex || noindex)
-          ? "noindex, follow" 
+          ? "noindex, follow"
           : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
       } />
       <meta name="bingbot" content="index, follow, max-image-preview:large" />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-      
+
       {/* Google-Specific Optimizations */}
       <meta name="google" content="notranslate" />
-      
+
       {/* Mobile Optimization for Google */}
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="application-name" content="CasinoAny" />
-      
+
       {/* Geo-Targeting for Turkey */}
       <meta name="geo.region" content="TR" />
       <meta name="geo.placename" content="Turkey" />
       <meta name="geo.position" content="39;35" />
       <meta name="ICBM" content="39, 35" />
-      
+
       {/* Content Classification */}
       <meta name="rating" content="general" />
       <meta name="audience" content="all" />
       <meta name="distribution" content="global" />
-      
+
       {/* Language */}
       <meta httpEquiv="content-language" content="tr" />
-      
+
       {/* Structured Data */}
       {!structuredData && !articleStructuredData && (
         <script type="application/ld+json">
@@ -196,15 +199,15 @@ export const SEO = ({
         </script>
       )}
       {structuredData && (
-        Array.isArray(structuredData) 
+        Array.isArray(structuredData)
           ? structuredData.map((data, index) => (
-              <script key={index} type="application/ld+json">
-                {JSON.stringify(data)}
-              </script>
-            ))
-          : <script type="application/ld+json">
-              {JSON.stringify(structuredData)}
+            <script key={index} type="application/ld+json">
+              {JSON.stringify(data)}
             </script>
+          ))
+          : <script type="application/ld+json">
+            {JSON.stringify(structuredData)}
+          </script>
       )}
     </Helmet>
   );

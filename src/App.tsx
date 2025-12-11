@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +18,7 @@ import { createAppQueryClient } from "@/lib/queryClient";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { cn } from "@/lib/utils";
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 // Create queryClient once outside component to avoid React dispatcher issues
 const queryClient = createAppQueryClient();
@@ -90,7 +91,15 @@ const CategoryDetail = lazy(() => import("./pages/CategoryDetail"));
 const GameProviders = lazy(() => import("./pages/GameProviders"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const SiteRedirect = lazy(() => import("./pages/SiteRedirect"));
-const DenemeBonusu = lazy(() => import("./pages/DenemeBonusuDynamic"));
+const DenemeBonusuDynamic = lazy(() => import('@/pages/DenemeBonusuDynamic'));
+const LiveBetting = lazy(() => import('@/pages/seo/LiveBetting'));
+const FreeSpin = lazy(() => import('@/pages/seo/FreeSpin'));
+const IllegalBetting = lazy(() => import('@/pages/seo/IllegalBetting'));
+const BonusSites = lazy(() => import('@/pages/seo/BonusSites'));
+const PaymentMethodPage = lazy(() => import('@/pages/seo/PaymentMethod'));
+const CalculatorPage = lazy(() => import('@/pages/tools/CalculatorPage'));
+const Influencer = lazy(() => import('@/pages/seo/Influencer'));
+// Other SEO pages can be added next
 
 // 👤 Profile Pages - Lazy loaded (authenticated users only)
 const ProfileDashboard = lazy(() => import("./pages/profile/Dashboard"));
@@ -138,14 +147,14 @@ const PageLoader = () => (
         <Skeleton className="h-12 w-48 mx-auto bg-muted/20" />
         <Skeleton className="h-6 w-64 mx-auto bg-muted/20" />
       </div>
-      
+
       {/* Content skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-64 w-full bg-muted/20" />
         ))}
       </div>
-      
+
       {/* Loading indicator */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 text-muted-foreground">
@@ -160,7 +169,7 @@ const PageLoader = () => (
 const AppContent = () => {
   usePageTracking();
   const { isImpersonating } = useAuth();
-  
+
   return (
     <div className={cn(
       "transition-all duration-300",
@@ -168,12 +177,12 @@ const AppContent = () => {
     )}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-        <Route path="/" element={<Index />} />
+          <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          
+
           {/* Admin routes - AdminRoot provides internal Suspense for lazy pages */}
           <Route path="/admin" element={<AdminRoot />}>
             <Route index element={<AdminDashboard />} />
@@ -182,7 +191,7 @@ const AppContent = () => {
             <Route path="sites" element={<AdminSitesHub />} />
             <Route path="system/users" element={<AdminUsers />} />
             <Route path="system/roles" element={<AdminRoleManagement />} />
-            
+
             <Route path="sites/featured" element={<AdminFeaturedSites />} />
             <Route path="sites/banners" element={<AdminBannerManagement />} />
             <Route path="sites/recommended" element={<AdminRecommendedSites />} />
@@ -195,7 +204,7 @@ const AppContent = () => {
             <Route path="complaints" element={<AdminComplaints />} />
             <Route path="notifications" element={<AdminNotifications />} />
             <Route path="news" element={<AdminNews />} />
-          <Route path="content/casino" element={<AdminCasinoContent />} />
+            <Route path="content/casino" element={<AdminCasinoContent />} />
             <Route path="content/categories" element={<AdminCategoryManagement />} />
             <Route path="content/categories/:slug/sites" element={<AdminCategorySites />} />
             <Route path="content/planner" element={<AdminContentPlanner />} />
@@ -210,18 +219,18 @@ const AppContent = () => {
             <Route path="system/domain-monitoring" element={<DomainMonitoring />} />
             <Route path="system/performance" element={<AdminPerformanceMonitoring />} />
             <Route path="site-owners" element={<AdminSiteOwners />} />
-            
+
             {/* Gamification Routes */}
             <Route path="gamification/dashboard" element={<GamificationDashboard />} />
             <Route path="gamification/achievements" element={<AchievementsManagement />} />
             <Route path="gamification/rewards" element={<RewardsManagement />} />
             <Route path="gamification/user-stats" element={<UserStatsManagement />} />
           </Route>
-          
+
           {/* User Panel Routes */}
           <Route path="/panel/dashboard" element={<UserDashboard />} />
           <Route path="/panel/site-management" element={<SiteManagement />} />
-          
+
           {/* Profile Routes */}
           <Route path="/profile/dashboard" element={<ProfileDashboard />} />
           <Route path="/profile/favorites" element={<Favorites />} />
@@ -234,22 +243,22 @@ const AppContent = () => {
           <Route path="/profile/referrals" element={<Referrals />} />
           <Route path="/profile/achievements" element={<Achievements />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
-          
+
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           {/* 301 Redirect old blog URLs to new structure */}
           <Route path="/blog/:slug" element={<BlogRedirect />} />
           <Route path="/haberler" element={<News />} />
           <Route path="/haber/:slug" element={<NewsDetail />} />
-          
+
           {/* Complaint Routes - Support both slug and ID for backward compatibility */}
           <Route path="/sikayetler" element={<Complaints />} />
           <Route path="/sikayetler/yeni" element={<NewComplaint />} />
           <Route path="/sikayetler/*" element={<ComplaintDetail />} />
-          
+
           {/* HTML Sitemap Page */}
           <Route path="/sitemap" element={<Sitemap />} />
-          
+
           <Route path="/site/:id" element={<SiteRedirect />} />
           <Route path="/about" element={<About />} />
           <Route path="/hakkimizda" element={<About />} />
@@ -264,23 +273,32 @@ const AppContent = () => {
           <Route path="/bonus-kampanyalari" element={<BonusCampaigns />} />
           <Route path="/mobil-bahis" element={<MobileBetting />} />
           <Route path="/canli-casino" element={<LiveCasino />} />
-          
+
           {/* SEO-optimized content pages */}
-          <Route path="/deneme-bonusu" element={<DenemeBonusu />} />
-          
+          {/* SEO Landing Pages */}
+          <Route path="/canli-bahis" element={<LiveBetting />} />
+          <Route path="/free-spin" element={<FreeSpin />} />
+          <Route path="/kacak-bahis" element={<IllegalBetting />} />
+          <Route path="/bonus-veren-siteler" element={<BonusSites />} />
+          <Route path="/odeme/:methodSlug" element={<PaymentMethodPage />} />
+          <Route path="/araclar/bahis-hesaplama" element={<CalculatorPage />} />
+          <Route path="/fenomen/:slug" element={<Influencer />} />
+
+          <Route path="/deneme-bonusu" element={<DenemeBonusuDynamic />} />
+
           {/* PWA Install page */}
           <Route path="/install" element={<Install />} />
-          
+
           {/* Category pages */}
           <Route path="/kategoriler" element={<Categories />} />
           <Route path="/kategori/:slug" element={<CategoryDetail />} />
-          
+
           {/* Game Providers */}
           <Route path="/oyun-saglayicilari" element={<GameProviders />} />
-          
+
           {/* Dynamic routing - checks blog posts first, then categories */}
           <Route path="/:slug" element={<SlugRouter />} />
-          
+
           {/* AMP pages keep old structure for compatibility */}
           <Route path="/amp/blog/:slug" element={<AMPBlogPost />} />
           <Route path="/amp/:slug" element={<AMPSiteDetail />} />
@@ -292,11 +310,25 @@ const AppContent = () => {
   );
 };
 
+
+
 const App = () => {
+  useEffect(() => {
+    const initStatusBar = async () => {
+      try {
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setOverlaysWebView({ overlay: true });
+      } catch (e) {
+        console.warn('StatusBar plugin not available or failed', e);
+      }
+    };
+    initStatusBar();
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-          <HelmetProvider>
+        <HelmetProvider>
           <AuthProvider>
             <TooltipProvider>
               <OfflineIndicator />
@@ -309,7 +341,7 @@ const App = () => {
                   v7_relativeSplatPath: true,
                 }}
               >
-                <SEOSnippets 
+                <SEOSnippets
                   includeAnalytics={true}
                   includeGTM={false}
                   includeFacebookPixel={false}
@@ -321,10 +353,10 @@ const App = () => {
                 <AppContent />
                 <MobileBottomNav />
               </BrowserRouter>
-              </TooltipProvider>
-            </AuthProvider>
-          </HelmetProvider>
-        </QueryClientProvider>
+            </TooltipProvider>
+          </AuthProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 };

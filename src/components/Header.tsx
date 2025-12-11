@@ -17,30 +17,30 @@ export const Header = () => {
     <header className={cn(
       "border-b border-border/40 bg-gradient-to-r from-background/80 via-background/60 to-background/80",
       "backdrop-blur-xl backdrop-saturate-150 fixed w-full shadow-sm",
-      "transition-all duration-500 ease-in-out h-16 md:h-[72px]",
+      "transition-all duration-500 ease-in-out h-auto min-h-16 md:min-h-[72px]",
       isImpersonating ? "top-[44px]" : "top-0",
       isMobileMenuOpen ? "-translate-y-full" : "translate-y-0",
-      "z-50"
-    )}>
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 h-full max-w-[1280px]">
-          <nav className="flex items-center justify-between h-full">
-            <NavLink to="/" className="group flex items-center transition-all duration-300 hover:scale-105">
-              <div className="relative">
-                <div className="absolute -inset-2 bg-primary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img 
-                  src={logo} 
-                  alt="CasinoAny.com" 
-                  className="h-10 md:h-12 w-auto relative z-10 drop-shadow-sm" 
-                  loading="eager" 
-                />
-              </div>
-            </NavLink>
+      "z-50 box-content"
+    )} style={{ paddingTop: 'max(env(safe-area-inset-top), 35px)' }}>
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-full py-2 md:py-0 max-w-[1280px]">
+        <nav className="flex items-center justify-between h-full">
+          <NavLink to="/" className="group flex items-center transition-all duration-300 hover:scale-105">
+            <div className="relative">
+              <div className="absolute -inset-2 bg-primary/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <img
+                src={logo}
+                alt="CasinoAny.com"
+                className="h-10 md:h-12 w-auto relative z-10 drop-shadow-sm"
+                loading="eager"
+              />
+            </div>
+          </NavLink>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-3 lg:gap-5 xl:gap-6">
             {location.pathname !== '/' && (
-              <NavLink 
-                to="/" 
+              <NavLink
+                to="/"
                 className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
                 activeClassName="text-primary"
               >
@@ -48,24 +48,24 @@ export const Header = () => {
                 <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </NavLink>
             )}
-            <NavLink 
-              to="/deneme-bonusu" 
+            <NavLink
+              to="/deneme-bonusu"
               className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Deneme Bonusu</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
-            <NavLink 
-              to="/kategoriler" 
+            <NavLink
+              to="/kategoriler"
               className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
               <span className="relative z-10">Kategoriler</span>
               <div className="absolute inset-0 bg-primary/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </NavLink>
-            <NavLink 
-              to="/sikayetler" 
+            <NavLink
+              to="/sikayetler"
               className="relative px-2.5 lg:px-3.5 py-2 text-sm lg:text-base font-medium text-muted-foreground hover:text-foreground transition-all duration-300 group whitespace-nowrap"
               activeClassName="text-primary"
             >
@@ -77,9 +77,9 @@ export const Header = () => {
               {user ? (
                 <>
                   <NavLink to="/profile/dashboard">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="gap-2 text-sm px-3 py-2 border-border/60 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 shadow-sm hover:shadow-md"
                     >
                       <Shield className="w-4 h-4" />
@@ -88,9 +88,9 @@ export const Header = () => {
                   </NavLink>
                   {isAdmin && (
                     <NavLink to="/admin">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="gap-2 text-sm px-3 py-2 border-primary/40 text-primary hover:bg-primary/10 transition-all duration-300 shadow-sm hover:shadow-md"
                       >
                         <Shield className="w-4 h-4" />
@@ -100,9 +100,9 @@ export const Header = () => {
                   )}
                   {isSiteOwner && (
                     <NavLink to="/panel/dashboard">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="gap-2 text-sm px-3 py-2 border-border/60 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300 shadow-sm hover:shadow-md"
                       >
                         <Shield className="w-4 h-4" />
@@ -110,9 +110,9 @@ export const Header = () => {
                       </Button>
                     </NavLink>
                   )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={signOut}
                     className="gap-2 text-sm px-3 py-2 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
                   >
@@ -123,8 +123,8 @@ export const Header = () => {
               ) : (
                 <>
                   <NavLink to="/login">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       className="text-sm px-4 py-2 font-medium hover:bg-primary/5 transition-all duration-300"
                     >
@@ -132,7 +132,7 @@ export const Header = () => {
                     </Button>
                   </NavLink>
                   <NavLink to="/signup">
-                    <Button 
+                    <Button
                       size="sm"
                       className="text-sm px-4 py-2 font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all duration-300"
                     >

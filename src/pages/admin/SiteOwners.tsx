@@ -8,13 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { ApplicationDetailModal } from '@/components/admin/ApplicationDetailModal';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Loader2, 
-  Building2, 
-  User, 
-  Mail, 
+import {
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Building2,
+  User,
+  Mail,
   Phone,
   Globe,
   FileText,
@@ -55,7 +55,7 @@ const SiteOwners = () => {
         .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
-      
+
       if (error) throw error;
       return data;
     },
@@ -87,7 +87,7 @@ const SiteOwners = () => {
           )
         `)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -124,13 +124,13 @@ const SiteOwners = () => {
       // Site Owner kaydını güncelle
       const { error: ownerError } = await supabase
         .from('site_owners')
-        .update({ 
+        .update({
           status: 'approved',
           approved_at: new Date().toISOString(),
           site_id: siteId
         })
         .eq('id', ownerId);
-      
+
       if (ownerError) throw ownerError;
 
       // User role'ü onayla
@@ -139,7 +139,7 @@ const SiteOwners = () => {
         .update({ status: 'approved' })
         .eq('user_id', userId)
         .eq('role', 'site_owner');
-      
+
       if (roleError) throw roleError;
 
       // Betting site'ın owner_id'sini güncelle
@@ -147,7 +147,7 @@ const SiteOwners = () => {
         .from('betting_sites')
         .update({ owner_id: userId, updated_at: new Date().toISOString() })
         .eq('id', siteId);
-      
+
       if (siteError) throw siteError;
 
       // Reject other pending applications for this site
@@ -180,20 +180,20 @@ const SiteOwners = () => {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ ownerId, userId }: { ownerId: string; userId: string }) => {
-      const { error: ownerError } = await (supabase as any)
+      const { error: ownerError } = await supabase
         .from('site_owners')
         .update({ status: 'rejected' })
         .eq('id', ownerId);
-      
+
       if (ownerError) throw ownerError;
 
       // Update user_roles status
-      const { error: roleError } = await (supabase as any)
+      const { error: roleError } = await supabase
         .from('user_roles')
         .update({ status: 'rejected' })
         .eq('user_id', userId)
-        .eq('role', 'site_owner' as any);
-      
+        .eq('role', 'site_owner');
+
       if (roleError) throw roleError;
     },
     onSuccess: () => {
@@ -212,14 +212,14 @@ const SiteOwners = () => {
     const siteApps = applications?.filter(app => app.site_id === siteId) || [];
     const hasApproved = siteApps.some(app => app.status === 'approved');
     const pendingCount = siteApps.filter(app => app.status === 'pending').length;
-    
+
     return { hasApproved, pendingCount, isAvailable: !hasApproved };
   };
 
   // Check if profile email matches site email
   const checkEmailMatch = (app: any) => {
-    return app.profiles?.email && app.betting_sites?.email && 
-           app.profiles.email === app.betting_sites.email;
+    return app.profiles?.email && app.betting_sites?.email &&
+      app.profiles.email === app.betting_sites.email;
   };
 
   if (!isAdmin) {
@@ -236,7 +236,7 @@ const SiteOwners = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Site Sahipleri Yönetimi"
         description="Site sahibi başvurularını yönetin"
       />
@@ -260,8 +260,8 @@ const SiteOwners = () => {
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       {app.betting_sites?.logo_url && (
-                        <img 
-                          src={app.betting_sites.logo_url} 
+                        <img
+                          src={app.betting_sites.logo_url}
                           alt={app.betting_sites.name}
                           className="w-8 h-8 object-contain"
                         />
@@ -270,10 +270,10 @@ const SiteOwners = () => {
                     </CardTitle>
                     <Badge variant={
                       app.status === 'approved' ? 'default' :
-                      app.status === 'rejected' ? 'destructive' : 'secondary'
+                        app.status === 'rejected' ? 'destructive' : 'secondary'
                     }>
                       {app.status === 'approved' ? 'Onaylandı' :
-                       app.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
+                        app.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -299,7 +299,7 @@ const SiteOwners = () => {
                         <span className="font-medium">Not:</span> {app.admin_notes}
                       </div>
                     )}
-                    
+
                     <div className="flex gap-2 mt-4">
                       <Button
                         size="sm"
@@ -388,11 +388,11 @@ const SiteOwners = () => {
                     {allSites?.map((site) => {
                       const status = getSiteStatus(site.id);
                       const emailMatches = selectedApplication?.betting_sites?.id === site.id &&
-                                         checkEmailMatch(selectedApplication);
-                      
+                        checkEmailMatch(selectedApplication);
+
                       return (
-                        <SelectItem 
-                          key={site.id} 
+                        <SelectItem
+                          key={site.id}
                           value={site.id}
                           disabled={status.hasApproved}
                         >
@@ -460,9 +460,9 @@ const SiteOwners = () => {
         }}
         onReject={() => {
           if (detailModalApplication) {
-            rejectMutation.mutate({ 
-              ownerId: detailModalApplication.id, 
-              userId: detailModalApplication.user_id 
+            rejectMutation.mutate({
+              ownerId: detailModalApplication.id,
+              userId: detailModalApplication.user_id
             });
           }
         }}

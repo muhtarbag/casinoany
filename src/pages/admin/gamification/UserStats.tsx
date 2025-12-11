@@ -25,7 +25,7 @@ export default function UserStatsManagement() {
         `)
         .order('lifetime_points', { ascending: false })
         .limit(50);
-      
+
       if (error) throw error;
       return data;
     },
@@ -43,7 +43,7 @@ export default function UserStatsManagement() {
         `)
         .order('total_referrals', { ascending: false })
         .limit(30);
-      
+
       if (error) throw error;
       return data;
     },
@@ -61,12 +61,22 @@ export default function UserStatsManagement() {
           profiles:user_id(username, avatar_url, display_name)
         `)
         .limit(100); // Reduced from 200
-      
+
       if (error) throw error;
-      
+
       // Group by user and count achievements
-      const grouped = data.reduce((acc: any, item: any) => {
+      // Group by user and count achievements
+      type GroupedAchievement = {
+        user_id: string;
+        profile: any;
+        count: number;
+      };
+
+      const grouped = data.reduce<Record<string, GroupedAchievement>>((acc, item) => {
         const userId = item.user_id;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (!userId) return acc;
+
         if (!acc[userId]) {
           acc[userId] = {
             user_id: userId,
@@ -77,8 +87,8 @@ export default function UserStatsManagement() {
         acc[userId].count++;
         return acc;
       }, {});
-      
-      return Object.values(grouped).sort((a: any, b: any) => b.count - a.count).slice(0, 30) as any[];
+
+      return Object.values(grouped).sort((a, b) => b.count - a.count).slice(0, 30);
     },
     ...QUERY_CONFIG.dynamic,
   });
@@ -86,7 +96,7 @@ export default function UserStatsManagement() {
   // ✅ OPTIMIZED: Memoized filtering
   const filteredLeaderboard = useMemo(() => {
     if (!leaderboard || !searchTerm.trim()) return leaderboard;
-    
+
     const searchLower = searchTerm.toLowerCase();
     return leaderboard.filter((user: any) => {
       const profile = user.profiles;

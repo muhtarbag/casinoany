@@ -13,12 +13,12 @@ export default function BonusCampaigns() {
   const { data: sites } = useQuery({
     queryKey: ['bonus-sites'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .order('rating', { ascending: false })
         .limit(6);
-      
+
       if (error) throw error;
       return data;
     },
@@ -32,16 +32,16 @@ export default function BonusCampaigns() {
         canonical="https://casinoany.com/bonus-kampanyalari"
         keywords={["casino bonusu", "bahis bonusu", "hoş geldin bonusu", "freespin", "kayıp bonusu", "bonus kampanyaları"]}
       />
-      
+
       <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <Header />
-        
+
         <main className="container mx-auto px-4 py-8">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
               { label: 'Ana Sayfa', href: '/' },
               { label: 'Bonus Kampanyaları' }
-            ]} 
+            ]}
           />
 
           <section className="mb-12 mt-8">
@@ -105,8 +105,8 @@ export default function BonusCampaigns() {
             <h2 className="text-3xl font-bold mb-6">En Yüksek Bonuslu Siteler</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard 
-                  key={site.id} 
+                <BettingSiteCard
+                  key={site.id}
                   id={site.id}
                   name={site.name}
                   logo={site.logo_url}
@@ -129,7 +129,7 @@ export default function BonusCampaigns() {
           <article className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-4">Bonus Türleri ve Kullanım Rehberi</h2>
-              
+
               <div className="prose prose-lg max-w-none">
                 <p className="text-muted-foreground mb-6">
                   Casino ve bahis bonusları, oyun deneyiminizi zenginleştiren ve bankrollünüzü artıran önemli fırsatlardır.
@@ -142,7 +142,7 @@ export default function BonusCampaigns() {
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   Yeni üyelere özel olarak sunulan ilk yatırım bonusudur. Genellikle %100 ile %300 arasında değişir.
-                  Örneğin %200 bonusta 1000 TL yatırım yaparsanız, 2000 TL bonus alırsınız ve toplam 3000 TL ile 
+                  Örneğin %200 bonusta 1000 TL yatırım yaparsanız, 2000 TL bonus alırsınız ve toplam 3000 TL ile
                   oynamaya başlarsınız. İlk yatırım bonusları genellikle en cömert bonuslardır ve tek seferlik kullanılır.
                   Çevrim şartları genellikle 20-40x arasındadır.
                 </p>
@@ -173,7 +173,7 @@ export default function BonusCampaigns() {
                   Freespin Bonusu
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Slot oyunlarında kullanabileceğiniz bedava dönüşlerdir. Yeni üyelere hoş geldin paketi olarak 
+                  Slot oyunlarında kullanabileceğiniz bedava dönüşlerdir. Yeni üyelere hoş geldin paketi olarak
                   50-200 freespin verilebilir. Belirli slot oyunlarında geçerlidir (genellikle popüler oyunlarda).
                   Freespin kazançları genellikle bonus olarak hesaba eklenir ve çevrim şartı gerektirir. Bazı siteler
                   günlük freespin kampanyaları düzenler.
@@ -184,7 +184,7 @@ export default function BonusCampaigns() {
                   Çevrimsiz Bonus (Wager-Free)
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Hiçbir çevrim şartı olmayan bonuslardır ve çok nadirdir. Bonus ile kazandığınız parayı hemen 
+                  Hiçbir çevrim şartı olmayan bonuslardır ve çok nadirdir. Bonus ile kazandığınız parayı hemen
                   çekebilirsiniz. Genellikle daha düşük oranlarda (%10-%50) sunulur ancak kullanımı çok kolaydır.
                   Bu bonuslar, yüksek çevrim şartlarından kaçınmak isteyen oyuncular için idealdir.
                 </p>
@@ -194,9 +194,9 @@ export default function BonusCampaigns() {
                   VIP ve Sadakat Programları
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Düzenli oyuncular için özel avantajlar sunar. Oynadıkça puan kazanır, seviyelerde yükselir ve 
-                  özel bonuslar, daha yüksek çekim limitleri, kişisel hesap yöneticisi, özel turnuvalara erişim 
-                  ve doğum günü bonusları gibi ayrıcalıklardan yararlanırsınız. VIP seviyeleri genellikle Bronz, 
+                  Düzenli oyuncular için özel avantajlar sunar. Oynadıkça puan kazanır, seviyelerde yükselir ve
+                  özel bonuslar, daha yüksek çekim limitleri, kişisel hesap yöneticisi, özel turnuvalara erişim
+                  ve doğum günü bonusları gibi ayrıcalıklardan yararlanırsınız. VIP seviyeleri genellikle Bronz,
                   Gümüş, Altın, Platin ve Elmas şeklinde sıralanır.
                 </p>
 
@@ -221,7 +221,7 @@ export default function BonusCampaigns() {
                     <h4 className="font-semibold text-lg mb-2">Bonus Stratejileri</h4>
                     <p className="text-sm text-muted-foreground">
                       Ekibimiz her bonus kampanyasını detaylı analiz eder. Çevrim şartları, maksimum bahis limitleri,
-                      katkı oranları ve bonus süreleri incelenir. Amacımız en avantajlı ve gerçekçi bonus fırsatlarını 
+                      katkı oranları ve bonus süreleri incelenir. Amacımız en avantajlı ve gerçekçi bonus fırsatlarını
                       size sunmaktır. Bonus kullanırken dikkat edilmesi gereken tüm detayları paylaşıyoruz.
                     </p>
                   </div>
@@ -233,12 +233,12 @@ export default function BonusCampaigns() {
           <section className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-6">Sıkça Sorulan Sorular</h2>
-              
+
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Bonus çevrim şartı nasıl tamamlanır?</h3>
                   <p className="text-muted-foreground">
-                    Bonus miktarı x çevrim katsayısı kadar bahis yapmanız gerekir. Örneğin 1000 TL bonus ve 30x çevrim 
+                    Bonus miktarı x çevrim katsayısı kadar bahis yapmanız gerekir. Örneğin 1000 TL bonus ve 30x çevrim
                     için 30.000 TL bahis oynamalısınız. Slot oyunları genellikle %100 katkı sağlar.
                   </p>
                 </div>
@@ -246,7 +246,7 @@ export default function BonusCampaigns() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Bonus kullanırken maksimum bahis limiti var mı?</h3>
                   <p className="text-muted-foreground">
-                    Evet, çoğu bonus kampanyasında maksimum bahis limiti bulunur (genellikle 20-50 TL). Bu limiti 
+                    Evet, çoğu bonus kampanyasında maksimum bahis limiti bulunur (genellikle 20-50 TL). Bu limiti
                     aşarsanız bonus ve kazançlarınız iptal edilebilir. Bonus kurallarını mutlaka okuyun.
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export default function BonusCampaigns() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Birden fazla bonus aynı anda kullanılabilir mi?</h3>
                   <p className="text-muted-foreground">
-                    Hayır, genellikle aynı anda sadece bir aktif bonus kullanabilirsiniz. Mevcut bonusunuzu tamamlamadan 
+                    Hayır, genellikle aynı anda sadece bir aktif bonus kullanabilirsiniz. Mevcut bonusunuzu tamamlamadan
                     veya iptal etmeden yeni bonus alamazsınız.
                   </p>
                 </div>
@@ -262,7 +262,7 @@ export default function BonusCampaigns() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Bonus almak zorunda mıyım?</h3>
                   <p className="text-muted-foreground">
-                    Hayır, bonus almak tamamen isteğe bağlıdır. İsterseniz bonussuz para yatırabilir ve çevrim şartı 
+                    Hayır, bonus almak tamamen isteğe bağlıdır. İsterseniz bonussuz para yatırabilir ve çevrim şartı
                     olmadan oynayabilirsiniz. Bazı oyuncular bu yöntemi tercih eder.
                   </p>
                 </div>

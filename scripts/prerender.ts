@@ -91,39 +91,58 @@ async function prerenderRoute(browser: any, route: string) {
             if (response?.status() === 404) return false;
         }
 
-        // Wait for React to dispatch render-event
-        await page.evaluate(() => {
-            return new Promise((resolve) => {
-                if (document.querySelector('[data-radix-root]')) {
-                    resolve(true);
-                } else {
-                    // Listen for a custom event if available, or just fallback to content check
-                    window.addEventListener('render-event', () => resolve(true));
-                    // Check periodically
-                    const interval = setInterval(() => {
-                        if (document.querySelector('[data-radix-root]')) {
+    } catch (error: any) {
+        console.error(`❌ Failed to prerender ${route}:`, error.message);
+        return false;
+    } finally {
+        // Just in case
+    }
+
+    try {
+        // Special handling for AMP Pages and AMP source extraction
+        const ampSourceElement = await page.$('#amp-source');
+        let finalHtml = '';
+
+        if (ampSourceElement) {
+            console.log(`⚡ Detected AMP page: ${route}`);
+            // Extract the pure AMP HTML from the script tag
+            finalHtml = await page.evaluate((el: any) => el.textContent, ampSourceElement);
+        } else {
+            // Standard Prerendering for React Pages
+            // Wait for React to dispatch render-event
+            await page.evaluate(() => {
+                return new Promise((resolve) => {
+                    if (document.querySelector('[data-radix-root]')) {
+                        resolve(true);
+                    } else {
+                        // Listen for a custom event if available, or just fallback to content check
+                        window.addEventListener('render-event', () => resolve(true));
+                        // Check periodically
+                        const interval = setInterval(() => {
+                            if (document.querySelector('[data-radix-root]')) {
+                                clearInterval(interval);
+                                resolve(true);
+                            }
+                        }, 500);
+                        setTimeout(() => {
                             clearInterval(interval);
-                            resolve(true);
-                        }
-                    }, 500);
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        resolve(false);
-                    }, 10000);
-                }
+                            resolve(false);
+                        }, 10000);
+                    }
+                });
             });
-        });
 
-        // Additional wait to ensure all content is loaded
-        await new Promise(r => setTimeout(r, 1000));
+            // Additional wait to ensure all content is loaded
+            await new Promise(r => setTimeout(r, 1000));
 
-        // Get the rendered HTML
-        const html = await page.content();
+            // Get the rendered HTML
+            const html = await page.content();
 
-        // Clean up the HTML
-        const cleanHtml = html
-            .replace(/data-radix-\w+="[^"]*"/g, '') // Remove Radix data attributes
-            .replace(/data-state="[^"]*"/g, ''); // Remove state data attributes
+            // Clean up the HTML
+            finalHtml = html
+                .replace(/data-radix-\w+="[^"]*"/g, '') // Remove Radix data attributes
+                .replace(/data-state="[^"]*"/g, ''); // Remove state data attributes
+        }
 
         // Determine output path
         const routePath = route === '/' ? 'index.html' : `${route}/index.html`;
@@ -136,13 +155,13 @@ async function prerenderRoute(browser: any, route: string) {
         }
 
         // Write the prerendered HTML
-        fs.writeFileSync(outputPath, cleanHtml, 'utf-8');
+        fs.writeFileSync(outputPath, finalHtml, 'utf-8');
 
-        console.log(`✅ Saved: ${routePath}`);
+        console.log(`✅ Saved: ${routePath} ${ampSourceElement ? '(AMP)' : ''}`);
         return true;
 
     } catch (error: any) {
-        console.error(`❌ Failed to prerender ${route}:`, error.message);
+        console.error(`❌ Failed to process content for ${route}:`, error.message);
         return false;
     } finally {
         await page.close();

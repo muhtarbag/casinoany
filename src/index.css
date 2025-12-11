@@ -38,19 +38,19 @@ All colors MUST be HSL.
     /* Success green for bonuses */
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
-    
+
     /* Gold for rating stars */
     --gold: 43 96% 56%;
     --gold-foreground: 0 0% 0%;
-    
+
     /* Warning for alerts */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
-    
+
     /* Info for notifications */
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
-    
+
     /* Chart colors for analytics */
     --chart-1: 280 98% 69%;
     --chart-2: 195 85% 55%;
@@ -69,31 +69,49 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     /* Layout System - Global Standards (44pt touch targets, 16/24/32px padding) */
-    --header-height: 64px;
-    --header-height-desktop: 72px;
-    --container-max-width: 1280px;
-    
+    /* Dynamic Header Height System */
+    --header-base-height-mobile: 64px;
+    --header-base-height-desktop: 72px;
+
+    /* Calculate actual occupied space including safe area */
+    --header-height: calc(var(--header-base-height-mobile) + env(safe-area-inset-top));
+    --header-height-desktop: calc(var(--header-base-height-desktop) + env(safe-area-inset-top));
+
     /* Progressive padding system - matches Apple HIG & Material Design */
-    --spacing-xs: 0.5rem;   /* 8px - tight spacing */
-    --spacing-sm: 0.75rem;  /* 12px - compact */
-    --spacing-md: 1rem;     /* 16px - mobile base */
-    --spacing-lg: 1.5rem;   /* 24px - tablet/comfortable */
-    --spacing-xl: 2rem;     /* 32px - desktop/spacious */
-    --spacing-2xl: 3rem;    /* 48px - section spacing */
-    --spacing-3xl: 4rem;    /* 64px - large sections */
-    
+    --spacing-xs: 0.5rem;
+    /* 8px - tight spacing */
+    --spacing-sm: 0.75rem;
+    /* 12px - compact */
+    --spacing-md: 1rem;
+    /* 16px - mobile base */
+    --spacing-lg: 1.5rem;
+    /* 24px - tablet/comfortable */
+    --spacing-xl: 2rem;
+    /* 32px - desktop/spacious */
+    --spacing-2xl: 3rem;
+    /* 48px - section spacing */
+    --spacing-3xl: 4rem;
+    /* 64px - large sections */
+
     /* Container padding - responsive by default */
-    --container-padding: var(--spacing-md);      /* 16px mobile */
-    --container-padding-md: var(--spacing-lg);   /* 24px tablet */
-    --container-padding-lg: var(--spacing-xl);   /* 32px desktop */
-    
+    --container-padding: var(--spacing-md);
+    /* 16px mobile */
+    --container-padding-md: var(--spacing-lg);
+    /* 24px tablet */
+    --container-padding-lg: var(--spacing-xl);
+    /* 32px desktop */
+
     /* Card padding system */
-    --card-padding: var(--spacing-md);           /* 16px mobile */
-    --card-padding-lg: var(--spacing-lg);        /* 24px desktop */
-    
+    --card-padding: var(--spacing-md);
+    /* 16px mobile */
+    --card-padding-lg: var(--spacing-lg);
+    /* 24px desktop */
+
     /* Section spacing */
-    --section-spacing: var(--spacing-2xl);       /* 48px sections */
-    --section-spacing-lg: 5rem;                  /* 80px desktop sections */
+    --section-spacing: var(--spacing-2xl);
+    /* 48px sections */
+    --section-spacing-lg: 5rem;
+    /* 80px desktop sections */
 
     /* Balanced gradients - not overwhelming purple */
     --gradient-primary: linear-gradient(135deg, hsl(280 98% 69%), hsl(260 85% 55%));
@@ -101,15 +119,15 @@ All colors MUST be HSL.
     --gradient-success: linear-gradient(135deg, hsl(142 70% 45%), hsl(142 65% 40%));
     --gradient-dark: linear-gradient(180deg, hsl(220 20% 8%), hsl(220 18% 10%));
     --gradient-premium: linear-gradient(135deg, hsl(280 60% 30%), hsl(220 30% 15%));
-    
+
     /* Subtle shadows with variety */
     --shadow-glow: 0 0 30px hsl(280 98% 69% / 0.15);
     --shadow-glow-gold: 0 0 25px hsl(35 95% 55% / 0.2);
     --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.6);
     --shadow-hover: 0 8px 30px -6px hsl(280 98% 69% / 0.25);
-    
+
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* Font optimization - faster load */
     font-feature-settings: 'kern' 1, 'liga' 1;
     -webkit-font-smoothing: antialiased;
@@ -122,28 +140,28 @@ All colors MUST be HSL.
     opacity: 0;
     transition: opacity 0.6s ease-in-out;
   }
-  
+
   .carousel-fade .embla__slide.is-snapped {
     opacity: 1;
   }
-  
+
   .carousel-zoom .embla__slide {
     opacity: 0;
     transform: scale(0.8);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .carousel-zoom .embla__slide.is-snapped {
     opacity: 1;
     transform: scale(1);
   }
-  
+
   .carousel-flip .embla__slide {
     opacity: 0;
     transform: perspective(1000px) rotateY(90deg);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .carousel-flip .embla__slide.is-snapped {
     opacity: 1;
     transform: perspective(1000px) rotateY(0deg);
@@ -173,7 +191,7 @@ All colors MUST be HSL.
 
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
-    
+
     /* Gold for rating stars */
     --gold: 43 96% 56%;
     --gold-foreground: 0 0% 0%;
@@ -197,6 +215,7 @@ All colors MUST be HSL.
   body {
     overflow-x: hidden;
     width: 100%;
+    height: 100%;
     position: relative;
   }
 
@@ -216,6 +235,9 @@ All colors MUST be HSL.
     /* Ensure scroll is not blocked */
     position: relative;
     min-height: 100vh;
+    /* Force safe area padding on body */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   /* Ensure root element allows scrolling */
@@ -253,113 +275,133 @@ All colors MUST be HSL.
   * {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Hide scrollbar but keep functionality */
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted)) transparent;
   }
-  
+
   *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   *::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   *::-webkit-scrollbar-thumb {
     background: hsl(var(--muted));
     border-radius: 4px;
   }
-  
+
   *::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground));
   }
 }
 
 @layer utilities {
+
   /* Touch-friendly utilities */
   .touch-manipulation {
     touch-action: manipulation;
   }
-  
+
   .tap-highlight-none {
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Container utilities - responsive by default */
   .container-padding {
     padding-left: var(--container-padding);
     padding-right: var(--container-padding);
   }
-  
+
   @media (min-width: 768px) {
     .container-padding {
       padding-left: var(--container-padding-md);
       padding-right: var(--container-padding-md);
     }
   }
-  
+
   @media (min-width: 1024px) {
     .container-padding {
       padding-left: var(--container-padding-lg);
       padding-right: var(--container-padding-lg);
     }
   }
-  
+
   /* Card padding utilities */
   .card-padding {
     padding: var(--card-padding);
   }
-  
+
   @media (min-width: 1024px) {
     .card-padding {
       padding: var(--card-padding-lg);
     }
   }
-  
+
   /* Grid pattern for backgrounds */
   .bg-grid-white\/\[0\.02\] {
     background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   }
-  
+
   /* Mobile-specific text sizes */
   @media (max-width: 640px) {
-    .text-mobile-xs { font-size: 0.75rem; }
-    .text-mobile-sm { font-size: 0.875rem; }
-    .text-mobile-base { font-size: 1rem; }
-    .text-mobile-lg { font-size: 1.125rem; }
-    .text-mobile-xl { font-size: 1.25rem; }
+    .text-mobile-xs {
+      font-size: 0.75rem;
+    }
+
+    .text-mobile-sm {
+      font-size: 0.875rem;
+    }
+
+    .text-mobile-base {
+      font-size: 1rem;
+    }
+
+    .text-mobile-lg {
+      font-size: 1.125rem;
+    }
+
+    .text-mobile-xl {
+      font-size: 1.25rem;
+    }
   }
-  
+
   /* Safe area for notched devices */
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .safe-left {
     padding-left: env(safe-area-inset-left);
   }
-  
+
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
-  
+
   /* Hide scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 }
-

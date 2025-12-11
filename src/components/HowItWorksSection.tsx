@@ -1,13 +1,8 @@
 import { Link } from "react-router-dom";
 import { Search, MessageSquare, Gift, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
-import { useState, useEffect } from "react";
 
 export const HowItWorksSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-
   const scrollToSites = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
@@ -22,7 +17,8 @@ export const HowItWorksSection = () => {
       action: scrollToSites,
       actionText: "Siteleri Karşılaştır",
       actionVariant: "default" as const,
-      buttonClass: "bg-primary hover:bg-primary/90"
+      buttonClass: "bg-primary hover:bg-primary/90",
+      badge: "Tarafsız ⚖️"
     },
     {
       icon: MessageSquare,
@@ -50,32 +46,6 @@ export const HowItWorksSection = () => {
     }
   ];
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) {
-      // Swiped left
-      setCurrentSlide((prev) => (prev + 1) % steps.length);
-    }
-    if (touchStart - touchEnd < -75) {
-      // Swiped right
-      setCurrentSlide((prev) => (prev - 1 + steps.length) % steps.length);
-    }
-  };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % steps.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [steps.length]);
-
   return (
     <section className="relative container mx-auto px-4 py-12 md:py-16 overflow-hidden">
       {/* Animated Background Effects */}
@@ -97,96 +67,68 @@ export const HowItWorksSection = () => {
       </div>
 
       {/* Mobile: Single Card Slider */}
-      <div className="md:hidden">
-        <div 
-          className="relative overflow-hidden"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div 
-            className="flex transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div key={index} className="w-full flex-shrink-0 px-2">
-                  <div className={`relative bg-gradient-to-br ${step.gradient} backdrop-blur-sm rounded-2xl p-6 border ${step.featured ? 'border-accent' : 'border-border/40'} min-h-[240px] flex flex-col`}>
-                    {step.badge && (
-                      <div className="absolute top-4 right-4">
-                        <span className="bg-gradient-to-r from-accent to-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          {step.badge}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-col items-center text-center flex-1">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${step.iconGradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
-                        <Icon className="w-8 h-8 text-primary-foreground" />
-                      </div>
-                      
-                      <div className="mb-auto">
-                        <h3 className="text-2xl font-bold mb-2">{step.title}</h3>
-                        <p className="text-muted-foreground text-sm mb-6">
-                          {step.description}
-                        </p>
-                      </div>
-                      
-                      {typeof step.action === 'function' ? (
-                        <Button
-                          variant={step.actionVariant}
-                          size="lg"
-                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : step.buttonClass || ''}`}
-                          onClick={step.action}
-                        >
-                          {step.actionText}
-                          <ChevronRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      ) : (
-                        <Button
-                          asChild
-                          variant={step.actionVariant}
-                          size="lg"
-                          className={`w-full shadow-lg ${step.featured ? 'bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90' : step.buttonClass || ''}`}
-                        >
-                          <Link to={step.action}>
-                            {step.actionText}
-                            <ChevronRight className="w-4 h-4 ml-2" />
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
+      <div className="md:hidden space-y-6">
+        {steps.map((step, index) => {
+          const Icon = step.icon;
+          return (
+            <div key={index} className="relative">
+              {/* Connecting Line (except for last item) */}
+              {index !== steps.length - 1 && (
+                <div className="absolute left-8 top-20 bottom-[-24px] w-0.5 bg-gradient-to-b from-primary/50 to-primary/10 z-0" />
+              )}
+
+              <div className={`relative bg-card/50 backdrop-blur-sm rounded-2xl p-5 border ${step.featured ? 'border-accent shadow-lg shadow-accent/5' : 'border-border/40'} flex gap-5 items-start`}>
+                {/* Icon */}
+                <div className={`relative z-10 w-16 h-16 bg-gradient-to-br ${step.iconGradient} rounded-2xl flex items-center justify-center shrink-0 shadow-lg mt-1`}>
+                  <Icon className="w-7 h-7 text-primary-foreground" />
+                  {/* Step Number Badge */}
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-background rounded-full border-2 border-primary flex items-center justify-center text-xs font-bold text-foreground">
+                    {index + 1}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Progress Dots */}
-        <div className="flex justify-center gap-2 mt-6">
-          {steps.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentSlide 
-                  ? 'w-8 bg-gradient-to-r from-primary to-accent' 
-                  : 'w-2 bg-muted-foreground/30'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+                <div className="flex-1 min-w-0 pt-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-bold leading-tight">{step.title}</h3>
+                    {step.badge && (
+                      <span className="bg-gradient-to-r from-accent to-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm ml-2 shrink-0">
+                        {step.badge}
+                      </span>
+                    )}
+                  </div>
 
-        {/* Swipe Indicator */}
-        <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
-          <div className="flex gap-1">
-            <ChevronRight className="w-4 h-4 animate-pulse" />
-            <span>Kaydır</span>
-          </div>
-        </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                    {step.description}
+                  </p>
+
+                  {typeof step.action === 'function' ? (
+                    <Button
+                      variant={step.actionVariant}
+                      size="sm"
+                      className={`w-full shadow-sm ${step.featured ? 'bg-gradient-to-r from-accent to-primary' : step.buttonClass || ''}`}
+                      onClick={step.action}
+                    >
+                      {step.actionText}
+                      <ChevronRight className="w-3.5 h-3.5 ml-1.5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      asChild
+                      variant={step.actionVariant}
+                      size="sm"
+                      className={`w-full shadow-sm ${step.featured ? 'bg-gradient-to-r from-accent to-primary' : step.buttonClass || ''}`}
+                    >
+                      <Link to={step.action}>
+                        {step.actionText}
+                        <ChevronRight className="w-3.5 h-3.5 ml-1.5" />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Desktop: Grid */}
@@ -202,19 +144,19 @@ export const HowItWorksSection = () => {
                   </span>
                 </div>
               )}
-              
+
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              
+
               <div className="relative z-10">
                 <div className={`w-16 h-16 bg-gradient-to-br ${step.iconGradient} rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform`}>
                   <Icon className="w-8 h-8 text-primary-foreground" />
                 </div>
-                
+
                 <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
                 <p className="text-muted-foreground mb-6">
                   {step.description}
                 </p>
-                
+
                 {typeof step.action === 'function' ? (
                   <Button
                     variant={step.actionVariant}
