@@ -107,17 +107,24 @@ export const SiteDetailHeader = ({
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full md:w-auto border-2 hover:border-primary transition-all duration-300"
+                  className={`w-full md:w-auto border-2 transition-all duration-300 group ${
+                    isFavorite 
+                      ? 'bg-gradient-to-r from-rose-500/20 to-pink-500/20 border-rose-400/50 hover:border-rose-400 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]' 
+                      : 'border-muted-foreground/30 hover:border-rose-400/50 hover:bg-rose-500/10'
+                  }`}
                   onClick={onToggleFavorite}
                   disabled={favoriteLoading}
                 >
                   <Heart
-                    className={`w-5 h-5 transition-all duration-300 ${isFavorite
-                        ? 'fill-red-500 text-red-500'
-                        : 'text-foreground/70 hover:text-red-500'
-                      }`}
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      isFavorite
+                        ? 'fill-rose-500 text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                        : 'text-muted-foreground group-hover:text-rose-500 group-hover:scale-110'
+                    }`}
                   />
-                  <span className="ml-2">{isFavorite ? 'Favorilerde' : 'Favoriye Ekle'}</span>
+                  <span className={`ml-2 font-medium ${isFavorite ? 'text-rose-500' : ''}`}>
+                    {isFavorite ? 'Favorilerde' : 'Favoriye Ekle'}
+                  </span>
                 </Button>
               )}
             </div>
