@@ -38,7 +38,7 @@ export default function BonusTracking() {
     queryKey: ['user-bonuses', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      
+
       const { data, error } = await supabase
         .from('user_bonus_tracking')
         .select(`
@@ -172,7 +172,7 @@ export default function BonusTracking() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Bonus Takibi"
         description="Aktif bonuslarınızı takip edin"
       />
@@ -185,200 +185,200 @@ export default function BonusTracking() {
                 Bonus Ekle
               </Button>
             </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Yeni Bonus Ekle</DialogTitle>
-                  <DialogDescription>
-                    Aldığınız bonusu takip etmek için bilgilerini girin
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Site</Label>
-                      <Select
-                        value={formData.site_id}
-                        onValueChange={(value) => setFormData({ ...formData, site_id: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Site seçin" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {sites?.map((site) => (
-                            <SelectItem key={site.id} value={site.id}>
-                              {site.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Bonus Türü</Label>
-                      <Input
-                        value={formData.bonus_type}
-                        onChange={(e) => setFormData({ ...formData, bonus_type: e.target.value })}
-                        placeholder="Ör: Hoş Geldin Bonusu"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Bonus Miktarı (TL)</Label>
-                      <Input
-                        type="number"
-                        value={formData.bonus_amount}
-                        onChange={(e) => setFormData({ ...formData, bonus_amount: e.target.value })}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <Label>Çevrim Şartı</Label>
-                      <Input
-                        value={formData.wagering_requirement}
-                        onChange={(e) => setFormData({ ...formData, wagering_requirement: e.target.value })}
-                        placeholder="Ör: 10x"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Alındığı Tarih</Label>
-                      <Input
-                        type="date"
-                        value={formData.received_date}
-                        onChange={(e) => setFormData({ ...formData, received_date: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label>Son Kullanma Tarihi</Label>
-                      <Input
-                        type="date"
-                        value={formData.expiry_date}
-                        onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-                      />
-                    </div>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Yeni Bonus Ekle</DialogTitle>
+                <DialogDescription>
+                  Aldığınız bonusu takip etmek için bilgilerini girin
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Site</Label>
+                    <Select
+                      value={formData.site_id}
+                      onValueChange={(value) => setFormData({ ...formData, site_id: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Site seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sites?.map((site) => (
+                          <SelectItem key={site.id} value={site.id}>
+                            {site.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Notlar</Label>
-                    <Textarea
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="Bonus hakkında notlarınız"
-                      rows={3}
+                    <Label>Bonus Türü</Label>
+                    <Input
+                      value={formData.bonus_type}
+                      onChange={(e) => setFormData({ ...formData, bonus_type: e.target.value })}
+                      placeholder="Ör: Hoş Geldin Bonusu"
                     />
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button
-                    onClick={() => createBonusMutation.mutate(formData)}
-                    disabled={!formData.site_id || !formData.bonus_type || !formData.bonus_amount || !formData.received_date || createBonusMutation.isPending}
-                  >
-                    Bonus Ekle
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Bonus Miktarı (TL)</Label>
+                    <Input
+                      type="number"
+                      value={formData.bonus_amount}
+                      onChange={(e) => setFormData({ ...formData, bonus_amount: e.target.value })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <Label>Çevrim Şartı</Label>
+                    <Input
+                      value={formData.wagering_requirement}
+                      onChange={(e) => setFormData({ ...formData, wagering_requirement: e.target.value })}
+                      placeholder="Ör: 10x"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Alındığı Tarih</Label>
+                    <Input
+                      type="date"
+                      value={formData.received_date}
+                      onChange={(e) => setFormData({ ...formData, received_date: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Son Kullanma Tarihi</Label>
+                    <Input
+                      type="date"
+                      value={formData.expiry_date}
+                      onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Notlar</Label>
+                  <Textarea
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Bonus hakkında notlarınız"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={() => createBonusMutation.mutate(formData)}
+                  disabled={!formData.site_id || !formData.bonus_type || !formData.bonus_amount || !formData.received_date || createBonusMutation.isPending}
+                >
+                  Bonus Ekle
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Bonus Takibi</CardTitle>
-          <CardDescription>
-            Aldığınız bonusları takip edin ve çevrim şartlarını yönetin
-          </CardDescription>
-        </CardHeader>
-      </Card>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Bonus Takibi</CardTitle>
+            <CardDescription>
+              Aldığınız bonusları takip edin ve çevrim şartlarını yönetin
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
-      {isLoading ? (
-        <ProfileSkeleton />
-      ) : bonuses && bonuses.length > 0 ? (
-            <div className="space-y-4">
-              {bonuses.map((bonus: any) => (
-                <Card key={bonus.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
-                        {bonus.betting_sites?.logo_url && (
-                          <img 
-                            src={bonus.betting_sites.logo_url} 
-                            alt={bonus.betting_sites.name}
-                            className="w-12 h-12 rounded object-contain"
-                          />
-                        )}
-                        <div>
-                          <CardTitle className="text-lg">{bonus.bonus_type}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-muted-foreground">
-                              {bonus.betting_sites?.name}
-                            </span>
-                            <Badge variant={statusColors[bonus.status] as any}>
-                              {statusLabels[bonus.status]}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={bonus.status}
-                          onValueChange={(value) => updateBonusStatusMutation.mutate({ id: bonus.id, status: value })}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Aktif</SelectItem>
-                            <SelectItem value="completed">Tamamlandı</SelectItem>
-                            <SelectItem value="expired">Süresi Doldu</SelectItem>
-                            <SelectItem value="cancelled">İptal Edildi</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteBonusMutation.mutate(bonus.id)}
-                          disabled={deleteBonusMutation.isPending}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Bonus Miktarı</p>
-                        <p className="text-xl font-bold text-primary">
-                          {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(bonus.bonus_amount)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Çevrim Şartı</p>
-                        <p className="font-semibold">{bonus.wagering_requirement || '-'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Alındığı Tarih</p>
-                        <p className="font-semibold">
-                          {format(new Date(bonus.received_date), 'dd MMM yyyy', { locale: tr })}
-                        </p>
-                      </div>
-                      {bonus.expiry_date && (
-                        <div>
-                          <p className="text-sm text-muted-foreground">Son Kullanma</p>
-                          <p className="font-semibold">
-                            {format(new Date(bonus.expiry_date), 'dd MMM yyyy', { locale: tr })}
-                          </p>
-                        </div>
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : bonuses && bonuses.length > 0 ? (
+          <div className="space-y-4">
+            {bonuses.map((bonus: any) => (
+              <Card key={bonus.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      {bonus.betting_sites?.logo_url && (
+                        <img
+                          src={bonus.betting_sites.logo_url}
+                          alt={bonus.betting_sites.name}
+                          className="w-12 h-12 rounded object-contain"
+                        />
                       )}
+                      <div>
+                        <CardTitle className="text-lg">{bonus.bonus_type}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm text-muted-foreground">
+                            {bonus.betting_sites?.name}
+                          </span>
+                          <Badge variant={(statusColors[bonus.status] as "default" | "secondary" | "destructive" | "outline") || "default"}>
+                            {statusLabels[bonus.status]}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                    {bonus.notes && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <p className="text-sm">{bonus.notes}</p>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={bonus.status}
+                        onValueChange={(value) => updateBonusStatusMutation.mutate({ id: bonus.id, status: value })}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Aktif</SelectItem>
+                          <SelectItem value="completed">Tamamlandı</SelectItem>
+                          <SelectItem value="expired">Süresi Doldu</SelectItem>
+                          <SelectItem value="cancelled">İptal Edildi</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteBonusMutation.mutate(bonus.id)}
+                        disabled={deleteBonusMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Bonus Miktarı</p>
+                      <p className="text-xl font-bold text-primary">
+                        {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(bonus.bonus_amount)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Çevrim Şartı</p>
+                      <p className="font-semibold">{bonus.wagering_requirement || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Alındığı Tarih</p>
+                      <p className="font-semibold">
+                        {format(new Date(bonus.received_date), 'dd MMM yyyy', { locale: tr })}
+                      </p>
+                    </div>
+                    {bonus.expiry_date && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Son Kullanma</p>
+                        <p className="font-semibold">
+                          {format(new Date(bonus.expiry_date), 'dd MMM yyyy', { locale: tr })}
+                        </p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                  {bonus.notes && (
+                    <div className="bg-muted/50 p-3 rounded-lg">
+                      <p className="text-sm">{bonus.notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : (
           <Card>
             <CardContent className="pt-6 text-center">

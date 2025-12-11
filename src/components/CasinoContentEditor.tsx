@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
@@ -53,8 +54,15 @@ export const CasinoContentEditor = ({
   faq,
   setFaq,
 }: CasinoContentEditorProps) => {
+  // Track editing state for category names
+  const [editingCategoryKey, setEditingCategoryKey] = React.useState<string | null>(null);
+  const [tempCategoryName, setTempCategoryName] = React.useState<string>('');
   const addPro = () => setPros([...pros, ""]);
-  const removePro = (index: number) => setPros(pros.filter((_, i) => i !== index));
+  const removePro = (index: number) => {
+    // ✅ Filter out empty values when removing
+    const filtered = pros.filter((_, i) => i !== index);
+    setPros(filtered.filter(p => p.trim() !== ''));
+  };
   const updatePro = (index: number, value: string) => {
     const newPros = [...pros];
     newPros[index] = value;
@@ -62,7 +70,11 @@ export const CasinoContentEditor = ({
   };
 
   const addCon = () => setCons([...cons, ""]);
-  const removeCon = (index: number) => setCons(cons.filter((_, i) => i !== index));
+  const removeCon = (index: number) => {
+    // ✅ Filter out empty values when removing
+    const filtered = cons.filter((_, i) => i !== index);
+    setCons(filtered.filter(c => c.trim() !== ''));
+  };
   const updateCon = (index: number, value: string) => {
     const newCons = [...cons];
     newCons[index] = value;
@@ -70,7 +82,9 @@ export const CasinoContentEditor = ({
   };
 
   const addGameCategory = () => {
-    setGameCategories({ ...gameCategories, "": "" });
+    // ✅ Use unique temporary key to avoid conflicts
+    const tempKey = `new_category_${Date.now()}`;
+    setGameCategories({ ...gameCategories, [tempKey]: "" });
   };
 
   const removeGameCategory = (key: string) => {
@@ -79,17 +93,31 @@ export const CasinoContentEditor = ({
     setGameCategories(newCategories);
   };
 
-  const updateGameCategory = (oldKey: string, newKey: string, value: string) => {
+  const updateCategoryName = (oldKey: string, newKey: string) => {
+    if (oldKey === newKey) return;
+    
     const newCategories = { ...gameCategories };
-    if (oldKey !== newKey && oldKey !== "") {
-      delete newCategories[oldKey];
+    const value = newCategories[oldKey] || '';
+    
+    delete newCategories[oldKey];
+    
+    if (newKey.trim() !== '') {
+      newCategories[newKey] = value;
     }
-    newCategories[newKey] = value;
+    
     setGameCategories(newCategories);
   };
 
+  const updateCategoryValue = (key: string, value: string) => {
+    setGameCategories({ ...gameCategories, [key]: value });
+  };
+
   const addFaq = () => setFaq([...faq, { question: "", answer: "" }]);
-  const removeFaq = (index: number) => setFaq(faq.filter((_, i) => i !== index));
+  const removeFaq = (index: number) => {
+    // ✅ Filter out empty FAQs when removing
+    const filtered = faq.filter((_, i) => i !== index);
+    setFaq(filtered.filter(f => f.question.trim() !== '' || f.answer.trim() !== ''));
+  };
   const updateFaq = (index: number, field: 'question' | 'answer', value: string) => {
     const newFaq = [...faq];
     newFaq[index][field] = value;
@@ -116,7 +144,7 @@ export const CasinoContentEditor = ({
                   </Button>
                 </div>
                 {pros.map((pro, index) => (
-                  <div key={`pro-edit-${pro.slice(0, 15)}-${index}`} className="flex gap-2">
+                  <div key={`pro-${index}`} className="flex gap-2">
                     <Input
                       value={pro}
                       onChange={(e) => updatePro(index, e.target.value)}
@@ -138,7 +166,7 @@ export const CasinoContentEditor = ({
                   </Button>
                 </div>
                 {cons.map((con, index) => (
-                  <div key={`con-edit-${con.slice(0, 15)}-${index}`} className="flex gap-2">
+                  <div key={`con-${index}`} className="flex gap-2">
                     <Input
                       value={con}
                       onChange={(e) => updateCon(index, e.target.value)}
@@ -185,25 +213,45 @@ export const CasinoContentEditor = ({
                 <Plus className="w-4 h-4 mr-1" />
                 Kategori Ekle
               </Button>
-              {Object.entries(gameCategories).map(([key, value], index) => (
-                <div key={`game-cat-${key}-${index}`} className="grid grid-cols-2 gap-2">
-                  <Input
-                    value={key}
-                    onChange={(e) => updateGameCategory(key, e.target.value, value)}
-                    placeholder="Kategori (örn: slot)"
-                  />
-                  <div className="flex gap-2">
+              {Object.entries(gameCategories).map(([key, value]) => {
+                const displayKey = key.startsWith('new_category_') ? '' : key;
+                const isEditing = editingCategoryKey === key;
+                const currentValue = isEditing ? tempCategoryName : displayKey;
+                
+                return (
+                  <div key={key} className="grid grid-cols-2 gap-2">
                     <Input
-                      value={value}
-                      onChange={(e) => updateGameCategory(key, key, e.target.value)}
-                      placeholder="Açıklama (örn: 500+ slot oyunu)"
+                      value={currentValue}
+                      onChange={(e) => {
+                        setTempCategoryName(e.target.value);
+                        if (!isEditing) {
+                          setEditingCategoryKey(key);
+                          setTempCategoryName(e.target.value);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const newName = e.target.value.trim();
+                        if (newName && newName !== key) {
+                          updateCategoryName(key, newName);
+                        }
+                        setEditingCategoryKey(null);
+                        setTempCategoryName('');
+                      }}
+                      placeholder="Kategori (örn: slot)"
                     />
-                    <Button type="button" size="icon" variant="ghost" onClick={() => removeGameCategory(key)}>
-                      <X className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Input
+                        value={value}
+                        onChange={(e) => updateCategoryValue(key, e.target.value)}
+                        placeholder="Açıklama (örn: 500+ slot oyunu)"
+                      />
+                      <Button type="button" size="icon" variant="ghost" onClick={() => removeGameCategory(key)}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </AccordionContent>
           </AccordionItem>
 
@@ -240,7 +288,7 @@ export const CasinoContentEditor = ({
                 Soru Ekle
               </Button>
               {faq.map((item, index) => (
-                <div key={`faq-edit-${item.question.slice(0, 15)}-${index}`} className="space-y-2 p-4 border rounded-lg">
+                <div key={`faq-${index}`} className="space-y-2 p-4 border rounded-lg">
                   <div className="flex justify-between items-start">
                     <Label>Soru {index + 1}</Label>
                     <Button type="button" size="icon" variant="ghost" onClick={() => removeFaq(index)}>

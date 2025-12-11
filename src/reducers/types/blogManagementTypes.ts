@@ -11,6 +11,7 @@ export interface BlogFormData {
   tags: string;
   read_time: string;
   is_published: boolean;
+  scheduled_publish_at: string; // Zamanlı yayınlama tarihi
   primary_site_id: string;
   category_id: string;
 }

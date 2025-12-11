@@ -45,11 +45,11 @@ export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
       <CardContent className="p-5 sm:p-4 relative">
-        {/* Logo Section - Kompakt */}
-        <div className="flex items-center justify-center h-16 sm:h-14 mb-4 sm:mb-3 relative">
+        {/* Logo Section - Mobil-First BIG */}
+        <div className="flex items-center justify-center h-28 sm:h-20 mb-4 sm:mb-3 relative border-3 border-primary/30 rounded-xl bg-gradient-to-br from-card to-card/80 shadow-xl p-3 sm:p-2 ring-2 ring-primary/20 group-hover:border-primary/50 group-hover:shadow-2xl group-hover:ring-primary/40 transition-all">
           {/* Loading Skeleton */}
           {isLoading && !showFallback && (
-            <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded" />
+            <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse rounded-xl" />
           )}
           
           {!showFallback ? (
@@ -57,7 +57,7 @@ export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
               src={site.logo_url}
               alt={`${site.name} logo`}
               className={cn(
-                "max-h-full max-w-full object-contain transition-opacity duration-300",
+                "max-h-full max-w-full object-contain transition-all duration-300 group-hover:scale-110",
                 isLoading ? "opacity-0" : "opacity-100 animate-fade-in"
               )}
               onLoad={handleImageLoad}
@@ -65,8 +65,8 @@ export const CompactSiteCard = memo(({ site }: CompactSiteCardProps) => {
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-lg flex items-center justify-center animate-scale-in">
-              <span className="text-4xl sm:text-3xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+            <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 rounded-xl flex items-center justify-center animate-scale-in">
+              <span className="text-6xl sm:text-4xl font-bold bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
                 {site.name.charAt(0)}
               </span>
             </div>

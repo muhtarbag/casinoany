@@ -4,10 +4,7 @@ import { BannerManagement } from '@/components/BannerManagement';
 import { RecommendedSitesManagement } from '@/components/RecommendedSitesManagement';
 import { FeaturedSitesManagement } from '@/components/FeaturedSitesManagement';
 import { Globe, Star, Link2, Image, BarChart3 } from 'lucide-react';
-import { lazy, Suspense } from 'react';
-import { LoadingState } from '@/components/ui/loading-state';
-
-const SiteAnalytics = lazy(() => import('./SiteAnalytics'));
+import SiteAnalytics from './SiteAnalytics';
 
 export default function SitesHub() {
   return (
@@ -48,9 +45,7 @@ export default function SitesHub() {
         </TabsContent>
 
         <TabsContent value="analytics">
-          <Suspense fallback={<LoadingState variant="skeleton" rows={6} />}>
-            <SiteAnalytics />
-          </Suspense>
+          <SiteAnalytics />
         </TabsContent>
 
         <TabsContent value="featured">

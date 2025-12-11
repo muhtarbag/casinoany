@@ -12,7 +12,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-const commentSchema = z.object({
+// Authenticated users don't need name/email
+const commentSchemaAuth = z.object({
+  comment: z.string()
+    .min(10, 'Yorum en az 10 karakter olmalıdır')
+    .max(1000, 'Yorum en fazla 1000 karakter olabilir')
+    .regex(/^[^<>{}]*$/, 'Yorum geçersiz karakterler içeriyor'),
+});
+
+// Anonymous users need name/email
+const commentSchemaAnon = z.object({
   name: z.string()
     .min(2, 'Ad en az 2 karakter olmalıdır')
     .max(100, 'Ad en fazla 100 karakter olabilir')
@@ -35,8 +44,8 @@ export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
   const { toast } = useToast();
   const submitCommentMutation = useAddBlogComment();
 
-  const form = useForm<z.infer<typeof commentSchema>>({
-    resolver: zodResolver(commentSchema),
+  const form = useForm<z.infer<typeof commentSchemaAnon>>({
+    resolver: zodResolver(user ? commentSchemaAuth : commentSchemaAnon),
     defaultValues: {
       name: '',
       email: '',
@@ -44,7 +53,7 @@ export const BlogCommentForm = ({ postId }: BlogCommentFormProps) => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof commentSchema>) => {
+  const handleSubmit = (values: z.infer<typeof commentSchemaAnon>) => {
     const commentData: any = {
       post_id: postId,
       comment: values.comment.trim(),

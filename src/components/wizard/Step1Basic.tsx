@@ -1,15 +1,19 @@
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, X, AlertCircle, Loader2, Lock, Clock, CheckCircle, Mail, Star } from 'lucide-react';
 
 interface Step1BasicProps {
+  username: string;
+  setUsername: (value: string) => void;
   selectedSite: string;
   setSelectedSite: (value: string) => void;
   newSiteName: string;
@@ -22,10 +26,13 @@ interface Step1BasicProps {
   setLogoUrl: (value: string) => void;
   sites: any[];
   disabled?: boolean;
+  userEmail?: string;
 }
 
 export const Step1Basic = memo((props: Step1BasicProps) => {
   const {
+    username,
+    setUsername,
     selectedSite,
     setSelectedSite,
     newSiteName,
@@ -37,12 +44,109 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
     logoUrl,
     setLogoUrl,
     sites,
-    disabled
+    disabled,
+    userEmail
   } = props;
   
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(logoUrl || null);
+
+  // Fetch extended site data with owner and pending info
+  const { data: siteStatuses } = useQuery({
+    queryKey: ['site-statuses-for-signup'],
+    queryFn: async () => {
+      const [sitesData, pendingAppsData] = await Promise.all([
+        supabase
+          .from('betting_sites')
+          .select('id, name, slug, owner_id, email, logo_url')
+          .eq('is_active', true)
+          .order('name'),
+        supabase
+          .from('site_owners')
+          .select('site_id, status')
+          .in('status', ['pending', 'approved'])
+      ]);
+
+      if (sitesData.error) throw sitesData.error;
+      if (pendingAppsData.error) throw pendingAppsData.error;
+
+      return {
+        sites: sitesData.data || [],
+        pendingApps: pendingAppsData.data || []
+      };
+    },
+  });
+
+  const categorizeSites = () => {
+    if (!siteStatuses) return [];
+    
+    return siteStatuses.sites.map(site => {
+      const hasOwner = site.owner_id !== null;
+      const hasPendingApp = siteStatuses.pendingApps.some(
+        app => app.site_id === site.id && app.status === 'pending'
+      );
+      const emailMatches = site.email && userEmail && site.email.toLowerCase() === userEmail.toLowerCase();
+      
+      return {
+        ...site,
+        status: hasOwner ? 'taken' : hasPendingApp ? 'pending' : 'available',
+        emailMatch: emailMatches,
+        disabled: hasOwner || hasPendingApp
+      };
+    });
+  };
+
+  const categorizedSites = categorizeSites();
+  const suggestedSite = categorizedSites.find(s => s.emailMatch && s.status === 'available');
+
+  // Site seçildiğinde veya yeni site adı girildiğinde username'i otomatik oluştur
+  useEffect(() => {
+    if (selectedSite === 'new_site' && newSiteName.trim()) {
+      // Yeni site adından username oluştur
+      const generatedUsername = newSiteName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Özel karakterleri kaldır
+        .replace(/\s+/g, '_') // Boşlukları alt çizgi yap
+        .substring(0, 30); // Max 30 karakter
+      setUsername(generatedUsername);
+    } else if (selectedSite && selectedSite !== 'new_site') {
+      // Seçilen siteden username oluştur
+      const selectedSiteData = categorizedSites.find(s => s.id === selectedSite);
+      if (selectedSiteData) {
+        const generatedUsername = selectedSiteData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .substring(0, 30);
+        setUsername(generatedUsername);
+      }
+    }
+  }, [selectedSite, newSiteName, categorizedSites]);
+
+  // Site seçildiğinde veya yeni site adı girildiğinde username'i otomatik oluştur
+  useEffect(() => {
+    if (selectedSite === 'new_site' && newSiteName.trim()) {
+      // Yeni site adından username oluştur
+      const generatedUsername = newSiteName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Özel karakterleri kaldır
+        .replace(/\s+/g, '_') // Boşlukları alt çizgi yap
+        .substring(0, 30); // Max 30 karakter
+      setUsername(generatedUsername);
+    } else if (selectedSite && selectedSite !== 'new_site') {
+      // Seçilen siteden username oluştur
+      const selectedSiteData = categorizedSites.find(s => s.id === selectedSite);
+      if (selectedSiteData) {
+        const generatedUsername = selectedSiteData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .substring(0, 30);
+        setUsername(generatedUsername);
+      }
+    }
+  }, [selectedSite, newSiteName, categorizedSites, setUsername]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,6 +191,44 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Site ve Şirket Bilgileri</h3>
+      
+      {/* Kullanıcı Adı - Otomatik oluşturuluyor */}
+      <div className="space-y-2">
+        <Label htmlFor="username" className="text-sm font-medium flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          Kullanıcı Adı
+          <span className="text-xs font-normal text-muted-foreground">(Otomatik oluşturulur)</span>
+        </Label>
+        <Input
+          id="username"
+          type="text"
+          value={username}
+          readOnly
+          disabled
+          className="lowercase bg-muted/30 cursor-not-allowed"
+          placeholder="Site seçtikten sonra otomatik oluşturulacak"
+        />
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Site isminden otomatik oluşturulur
+        </p>
+      </div>
+      
+      {suggestedSite && (
+        <Alert className="border-blue-500 bg-blue-50">
+          <Star className="h-4 w-4" />
+          <AlertTitle>Önerilen Site</AlertTitle>
+          <AlertDescription>
+            Email adresiniz <strong>{suggestedSite.name}</strong> sitesinin kayıtlı emaili ile eşleşiyor. 
+            <Button onClick={() => setSelectedSite(suggestedSite.id)} size="sm" className="ml-2">
+              Bu Siteyi Seç
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="site">Site Seçimi *</Label>
         <Select value={selectedSite} onValueChange={setSelectedSite} disabled={disabled}>
@@ -97,13 +239,18 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
             <SelectItem value="new_site" className="font-semibold text-primary">
               ➕ Yeni Site Ekle
             </SelectItem>
-            {sites && sites.length > 0 ? (
-              sites.map((site) => (
-                <SelectItem key={site.id} value={site.id}>
-                  {site.name}
-                </SelectItem>
-              ))
-            ) : (
+            {categorizedSites.map((site) => (
+              <SelectItem key={site.id} value={site.id} disabled={site.disabled}>
+                <div className="flex items-center gap-2">
+                  {site.logo_url && <img src={site.logo_url} alt={site.name} className="w-4 h-4 object-contain" />}
+                  <span>{site.name}</span>
+                  {site.emailMatch && <Badge variant="outline" className="gap-1"><Mail className="h-3 w-3" />Eşleşiyor</Badge>}
+                  {site.status === 'taken' && <Badge variant="secondary"><Lock className="h-3 w-3" /></Badge>}
+                  {site.status === 'pending' && <Badge variant="outline"><Clock className="h-3 w-3" /></Badge>}
+                </div>
+              </SelectItem>
+            ))}
+            {categorizedSites.length === 0 && (
               <SelectItem value="no_sites" disabled>
                 Sistemde kayıtlı site bulunmuyor
               </SelectItem>
@@ -126,6 +273,7 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
             placeholder="Örn: Sahabet, Betboo"
             value={newSiteName}
             onChange={(e) => setNewSiteName(e.target.value)}
+            required
             disabled={disabled}
           />
           <p className="text-xs text-muted-foreground">
@@ -142,6 +290,7 @@ export const Step1Basic = memo((props: Step1BasicProps) => {
           placeholder="Şirket adınız"
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
+          required
           disabled={disabled}
         />
       </div>

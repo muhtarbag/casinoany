@@ -36,7 +36,7 @@ export const WeeklyComparisonTable = memo(({ data }: WeeklyComparisonTableProps)
                 ) : (
                   <TrendingDown className="w-4 h-4" />
                 )}
-                <span className="font-bold">{Math.abs(item.change).toFixed(1)}%</span>
+                <span className="font-bold">{(item.change != null && !isNaN(item.change) ? Math.abs(item.change).toFixed(1) : '0')}%</span>
               </div>
             </div>
           ))}

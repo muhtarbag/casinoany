@@ -12,7 +12,7 @@ const Cookies = () => {
         description="CasinoAny.com çerez politikası. Web sitemizde kullanılan çerezler, türleri ve amaçları hakkında detaylı bilgi."
         canonical="/cookies"
       />
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90 pt-[72px] md:pt-[84px]">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <Breadcrumb 

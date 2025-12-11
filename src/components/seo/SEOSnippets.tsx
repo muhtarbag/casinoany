@@ -32,22 +32,20 @@ export const SEOSnippets = ({
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      
-      {/* Robots Meta */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      
+
+      {/* Robots Meta - Removed to avoid conflict with SEO component */}
+
       {/* Language and Regional */}
       <meta httpEquiv="content-language" content="tr" />
       <meta name="geo.region" content="TR" />
       <meta name="geo.placename" content="Turkey" />
-      
+
       {/* Cache Control */}
       <meta httpEquiv="Cache-Control" content="public, max-age=31536000, immutable" />
-      
+
       {/* Format Detection */}
       <meta name="format-detection" content="telephone=no" />
-      
+
       {/* Theme Color */}
       <meta name="theme-color" content="#8b5cf6" />
       <meta name="msapplication-TileColor" content="#8b5cf6" />
@@ -102,6 +100,7 @@ export const SEOSnippets = ({
       )}
 
       {/* Structured Data Schemas */}
+      {/* Structured Data Schemas - Global schemas (Organization, WebSite) are in index.html for better initial crawl 
       {includeSchemas && (
         <>
           <script type="application/ld+json">
@@ -112,6 +111,11 @@ export const SEOSnippets = ({
           </script>
         </>
       )}
+      */
+        includeSchemas && (
+          // Place for page-specific schemas if any passed via props in future
+          null
+        )}
     </Helmet>
   );
 };

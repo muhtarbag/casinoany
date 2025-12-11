@@ -6,7 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function checkRateLimit(supabase: any, ip: string, functionName: string): Promise<{ allowed: boolean; retryAfter?: number }> {
+  const now = new Date();
+  const { data: banned } = await supabase.from('api_rate_limits').select('banned_until').eq('ip_address', ip).eq('function_name', functionName).gte('banned_until', now.toISOString()).maybeSingle();
+  if (banned) return { allowed: false, retryAfter: Math.ceil((new Date(banned.banned_until).getTime() - now.getTime()) / 1000) };
+  const windowStart = new Date(now.getTime() - 60000);
+  const { data: existing } = await supabase.from('api_rate_limits').select('*').eq('ip_address', ip).eq('function_name', functionName).gte('window_start', windowStart.toISOString()).maybeSingle();
+  if (existing) {
+    if (existing.request_count >= 10) {
+      await supabase.from('api_rate_limits').update({ banned_until: new Date(now.getTime() + 60000).toISOString(), updated_at: now.toISOString() }).eq('id', existing.id);
+      return { allowed: false, retryAfter: 60 };
+    }
+    await supabase.from('api_rate_limits').update({ request_count: existing.request_count + 1, updated_at: now.toISOString() }).eq('id', existing.id);
+    return { allowed: true };
+  }
+  await supabase.from('api_rate_limits').insert({ ip_address: ip, function_name: functionName, request_count: 1, window_start: now.toISOString() });
+  return { allowed: true };
+}
+
 const RSS_FEEDS = [
+  // Türkiye Spor Haberleri (öncelikli)
+  'https://www.spormaraton.com/rss/anasayfa/',
+  'https://www.fanatik.com.tr/rss/mansetxml.xml',
+  'https://www.ntvspor.net/rss',
+  'https://www.hurriyet.com.tr/rss/spor',
+  'https://www.milliyet.com.tr/rss/rssnew/sporrss.xml',
+  'https://www.sporx.com/rss.xml',
+  'https://www.fotomac.com.tr/rss/anasayfa.xml',
+  
+  // iGaming Global Feeds
   'https://igamingbusiness.com/feed/',
   'https://sbcnews.co.uk/feed/',
   'https://www.gamblinginsider.com/rss',
@@ -47,12 +75,60 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip') || 'unknown';
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // 🔒 SECURITY: Optional authentication
+    // Allow cron jobs (no auth) OR admin users (with auth)
+    const authHeader = req.headers.get('Authorization');
+    
+    // If auth header exists, verify it's an admin
+    if (authHeader && authHeader !== 'Bearer undefined') {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+      
+      if (userError || !user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized - Invalid token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .eq('status', 'approved')
+        .maybeSingle();
+
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      console.log('✅ Admin authenticated:', user.email);
+    } else {
+      // Cron job or unauthenticated call - rely on rate limiting
+      console.log('🤖 Cron job or automated call detected');
+    }
+
+    const rateLimit = await checkRateLimit(supabase, ip, 'rss-news-processor');
+    if (!rateLimit.allowed) {
+      return new Response(JSON.stringify({ error: 'Too Many Requests' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(rateLimit.retryAfter || 60) }
+      });
+    }
 
     console.log('Starting RSS processing...');
     const processedArticles: ProcessedArticle[] = [];
@@ -187,24 +263,18 @@ function cleanHtml(text: string): string {
     .trim();
 }
 
-function slugify(text: string): string {
-  const trMap: Record<string, string> = {
-    'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
-    'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u',
-  };
-  
-  return text
-    .split('')
-    .map(char => trMap[char] || char)
-    .join('')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+// Import shared slug generator
+import { generateUniqueSlug } from '../_shared/slugGenerator.ts';
 
 function categorizeContent(content: string): string {
   const lower = content.toLowerCase();
   
+  // Spor içeriği kontrolü (önce)
+  if (lower.includes('futbol') || lower.includes('maç') || lower.includes('gol') || 
+      lower.includes('lig') || lower.includes('takım') || lower.includes('football') || 
+      lower.includes('soccer') || lower.includes('süper lig') || lower.includes('goal')) {
+    return 'Spor Haberleri';
+  }
   if (lower.includes('slot') || lower.includes('rtp') || lower.includes('provider')) {
     return 'Slot Haberleri';
   }
@@ -321,7 +391,20 @@ TAGS: [4-6 Türkçe tag, virgülle ayır]`,
     const tags = tagsRaw.split(',').map((t: string) => t.trim()).slice(0, 6);
 
     const category = categorizeContent(content);
-    const slug = slugify(title);
+    
+    // Generate unique slug (prevent duplicates)
+    const trMap: Record<string, string> = {
+      'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+      'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u',
+    };
+    const slug = title
+      .split('')
+      .map((char: string) => trMap[char] || char)
+      .join('')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 100);
 
     // Convert content to HTML
     const contentHtml = content

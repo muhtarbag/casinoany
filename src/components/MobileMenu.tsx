@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NavLink } from '@/components/NavLink';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -6,16 +6,25 @@ import { Menu, Home, Info, FileText, Shield, LogOut, Gift, Folder, AlertTriangle
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/casinodoo-logo.svg';
 
-export const MobileMenu = () => {
+interface MobileMenuProps {
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const MobileMenu = ({ onOpenChange }: MobileMenuProps) => {
   const [open, setOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    onOpenChange?.(newOpen);
+  };
+
   const handleNavClick = () => {
-    setOpen(false);
+    handleOpenChange(false);
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button 
           variant="ghost" 
@@ -26,7 +35,7 @@ export const MobileMenu = () => {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[280px] sm:w-[350px]">
+      <SheetContent side="right" className="w-[280px] sm:w-[350px] z-[80]">
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center gap-3">
             <img src={logo} alt="CasinoAny.com" className="h-6 w-auto" />

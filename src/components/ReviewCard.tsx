@@ -1,10 +1,13 @@
 import { memo } from 'react';
 import { Star } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserMiniProfile } from "@/components/UserMiniProfile";
 
 interface ReviewCardProps {
   review: {
     id: string;
+    user_id?: string;
     rating: number;
     title: string;
     comment: string;
@@ -43,12 +46,28 @@ const ReviewCard = memo(({ review }: ReviewCardProps) => {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center flex-shrink-0"
-              aria-hidden="true"
-            >
-              <span className="text-sm font-bold text-foreground">{getInitials(username)}</span>
-            </div>
+            {review.user_id ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button 
+                    className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center flex-shrink-0 hover:border-primary/50 transition-colors cursor-pointer"
+                    aria-label="Kullanıcı profilini görüntüle"
+                  >
+                    <span className="text-sm font-bold text-foreground">{getInitials(username)}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="start">
+                  <UserMiniProfile userId={review.user_id} showStats={true} />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <div 
+                className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center flex-shrink-0"
+                aria-hidden="true"
+              >
+                <span className="text-sm font-bold text-foreground">{getInitials(username)}</span>
+              </div>
+            )}
             <div>
               <p className="font-semibold text-foreground">{username}</p>
               <time className="text-xs text-muted-foreground" dateTime={review.created_at}>

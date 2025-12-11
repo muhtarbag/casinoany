@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { SEO } from '@/components/SEO';
 import { Loader2 } from 'lucide-react';
@@ -14,13 +14,20 @@ import { SiteBasicInfoEditor } from '@/components/panel/SiteBasicInfoEditor';
 import { SiteReportsExport } from '@/components/panel/SiteReportsExport';
 import { NotificationCenter } from '@/components/panel/NotificationCenter';
 import { UserFeedbackManager } from '@/components/panel/UserFeedbackManager';
+import { SiteBonusManager } from '@/components/panel/SiteBonusManager';
 import { KeyboardShortcuts, useGlobalKeyboardShortcuts } from '@/components/panel/KeyboardShortcuts';
+import { SiteOwnerProfileEditor } from '@/components/panel/SiteOwnerProfileEditor';
+// Advanced Analytics removed
 
 const SiteManagement = () => {
-  const { user, isSiteOwner, ownedSites } = useAuth();
+  const { user, isAdmin, isSiteOwner, ownedSites, impersonatedUserId, isImpersonating } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Impersonate ediliyorsa impersonatedUserId kullan, yoksa user?.id kullan
+  const effectiveUserId = isImpersonating ? impersonatedUserId : user?.id;
 
   // Enable keyboard shortcuts
   useGlobalKeyboardShortcuts(ownedSites[0]);
@@ -37,13 +44,20 @@ const SiteManagement = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Redirect admin users without sites to admin panel
+  useEffect(() => {
+    if (!isSiteOwner && isAdmin && !isImpersonating) {
+      navigate('/admin');
+    }
+  }, [isSiteOwner, isAdmin, isImpersonating, navigate]);
+
   const { data: siteData, isLoading } = useQuery({
-    queryKey: ['owned-site-full', user?.id],
+    queryKey: ['owned-site-full', effectiveUserId],
     queryFn: async () => {
-      if (!user || ownedSites.length === 0) return null;
+      if (!effectiveUserId || ownedSites.length === 0) return null;
       
       // ✅ OPTIMIZED: Parallel execution with Promise.all - 80% faster
-      const [siteResult, favoriteResult, complaintsResult, statsResult] = await Promise.all([
+      const [siteResult, favoriteResult, complaintsResult, conversionsResult] = await Promise.all([
         supabase
           .from('betting_sites')
           .select('*')
@@ -58,11 +72,18 @@ const SiteManagement = () => {
           .select('*', { count: 'exact', head: true })
           .eq('site_id', ownedSites[0]),
         supabase
-          .from('site_stats')
-          .select('views, clicks')
+          .from('conversions')
+          .select('conversion_type')
           .eq('site_id', ownedSites[0])
-          .maybeSingle()
       ]);
+
+      // Aggregate stats from conversions
+      const stats = { views: 0, clicks: 0 };
+      conversionsResult.data?.forEach(conv => {
+        if (conv.conversion_type === 'page_view') stats.views++;
+        if (conv.conversion_type === 'affiliate_click') stats.clicks++;
+      });
+      const statsResult = { data: stats, error: null };
 
       // Handle errors
       if (siteResult.error) throw siteResult.error;
@@ -77,10 +98,36 @@ const SiteManagement = () => {
         stats: statsResult.data || { views: 0, clicks: 0 },
       };
     },
-    enabled: !!user && isSiteOwner && ownedSites.length > 0,
+    enabled: !!effectiveUserId && (isSiteOwner || isAdmin) && ownedSites.length > 0,
   });
 
-  if (!user || !isSiteOwner) {
+  // ✅ Real-time updates for site changes
+  useEffect(() => {
+    if (!ownedSites[0]) return;
+
+    const channel = supabase
+      .channel('site-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'betting_sites',
+          filter: `id=eq.${ownedSites[0]}`
+        },
+        () => {
+          // Refetch site data when changes occur
+          queryClient.invalidateQueries({ queryKey: ['owned-site-full', effectiveUserId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [ownedSites, effectiveUserId, queryClient]);
+
+  if (!user || (!isSiteOwner && !isAdmin)) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card>
@@ -124,7 +171,8 @@ const SiteManagement = () => {
       'complaints': 'Şikayetler',
       'feedback': 'Geri Bildirimler',
       'notifications': 'Bildirimler',
-      'reports': 'Raporlar ve İstatistikler'
+      'reports': 'Raporlar ve İstatistikler',
+      'profile': 'Profil Ayarları'
     };
     
     return [{ label: breadcrumbMap[activeTab] || 'Dashboard' }];
@@ -150,6 +198,8 @@ const SiteManagement = () => {
         );
       case 'content':
         return <SiteContentEditor siteId={siteData.id} />;
+      case 'bonuses':
+        return <SiteBonusManager siteId={siteData.id} />;
       case 'complaints':
         return <SiteComplaintsManager siteId={siteData.id} />;
       case 'feedback':
@@ -164,6 +214,9 @@ const SiteManagement = () => {
             siteData={siteData}
           />
         );
+      // Advanced analytics removed
+      case 'profile':
+        return <SiteOwnerProfileEditor />;
       default:
         return (
           <SiteOwnerDashboard 

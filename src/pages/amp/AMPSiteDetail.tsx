@@ -11,7 +11,7 @@ export default function AMPSiteDetail() {
   const { data: site } = useQuery({
     queryKey: ['amp-site', slug],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('*')
         .eq('slug', slug)
@@ -198,7 +198,16 @@ export default function AMPSiteDetail() {
       <Helmet>
         <link rel="amphtml" href={`${window.location.origin}/amp/${site.slug}`} />
       </Helmet>
-      <div dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Script for Prerenderer to extract clean AMP HTML */}
+      <script id="amp-source" type="text/plain" dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Preview for User/Dev */}
+      <iframe
+        srcDoc={ampHTML}
+        style={{ width: '100%', height: '100vh', border: 'none' }}
+        title={`AMP Preview: ${site.name}`}
+      />
     </>
   );
 }

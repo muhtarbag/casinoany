@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { errorTracker } from '@/lib/errorTracking';
 import { prodLogger } from '@/lib/productionLogger';
 
@@ -6,7 +6,7 @@ import { prodLogger } from '@/lib/productionLogger';
  * Global Error Tracking Provider
  * Sets up unhandled error tracking for the entire application
  */
-export const ErrorTrackingProvider = ({ children }: { children: React.ReactNode }) => {
+export const ErrorTrackingProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Global unhandled error handler
     const handleError = (event: ErrorEvent) => {

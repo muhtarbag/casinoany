@@ -16,7 +16,7 @@ export default function SiteRedirect() {
         .from('betting_sites')
         .select('slug')
         .eq('id', id)
-        .maybeSingle() as any; // ✅ FIX: Use maybeSingle to prevent crash
+        .maybeSingle();
 
       if (error) throw error;
       return data;

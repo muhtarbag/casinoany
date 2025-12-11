@@ -13,12 +13,12 @@ export default function CasinoSites() {
   const { data: sites } = useQuery({
     queryKey: ['casino-sites'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .order('rating', { ascending: false })
         .limit(6);
-      
+
       if (error) throw error;
       return data;
     },
@@ -32,16 +32,16 @@ export default function CasinoSites() {
         canonical="https://casinoany.com/casino-siteleri"
         keywords={["casino siteleri", "online casino", "güvenilir casino", "casino bonusu", "canlı casino"]}
       />
-      
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
+
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <Header />
-        
+
         <main className="container mx-auto px-4 py-8">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
               { label: 'Ana Sayfa', href: '/' },
               { label: 'Casino Siteleri' }
-            ]} 
+            ]}
           />
 
           {/* Hero Section */}
@@ -55,7 +55,7 @@ export default function CasinoSites() {
                 En İyi Casino Siteleri
               </h1>
               <p className="text-lg text-muted-foreground mb-6">
-                Uzman ekibimiz tarafından detaylı olarak incelenmiş, lisanslı ve güvenilir casino sitelerini keşfedin. 
+                Uzman ekibimiz tarafından detaylı olarak incelenmiş, lisanslı ve güvenilir casino sitelerini keşfedin.
                 2020'den beri binlerce kullanıcıya en iyi casino deneyimini sunuyoruz.
               </p>
             </div>
@@ -108,8 +108,8 @@ export default function CasinoSites() {
             <h2 className="text-3xl font-bold mb-6">Önerilen Casino Siteleri</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard 
-                  key={site.id} 
+                <BettingSiteCard
+                  key={site.id}
                   id={site.id}
                   name={site.name}
                   logo={site.logo_url}
@@ -133,10 +133,10 @@ export default function CasinoSites() {
           <article className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-4">Casino Sitesi Seçerken Nelere Dikkat Edilmeli?</h2>
-              
+
               <div className="prose prose-lg max-w-none">
                 <p className="text-muted-foreground mb-6">
-                  Online casino dünyası gün geçtikçe büyürken, güvenilir bir platform seçmek kritik önem taşımaktadır. 
+                  Online casino dünyası gün geçtikçe büyürken, güvenilir bir platform seçmek kritik önem taşımaktadır.
                   2020 yılından bu yana sektörde olan uzman ekibimiz, sizler için en güvenilir casino sitelerini titizlikle incelemektedir.
                 </p>
 
@@ -145,8 +145,8 @@ export default function CasinoSites() {
                   Lisans ve Güvenlik
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Güvenilir bir casino sitesinin mutlaka Curacao, Malta Gaming Authority veya benzeri saygın bir otoriteden 
-                  lisansa sahip olması gerekmektedir. Lisanslı siteler, düzenli denetimlere tabi tutulur ve oyuncuların 
+                  Güvenilir bir casino sitesinin mutlaka Curacao, Malta Gaming Authority veya benzeri saygın bir otoriteden
+                  lisansa sahip olması gerekmektedir. Lisanslı siteler, düzenli denetimlere tabi tutulur ve oyuncuların
                   haklarını koruma altına alır. SSL şifreleme teknolojisi kullanımı da güvenlik açısından olmazsa olmazdır.
                 </p>
 
@@ -155,8 +155,8 @@ export default function CasinoSites() {
                   Oyun Çeşitliliği ve Yazılım Sağlayıcıları
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Kaliteli bir casino sitesi, Evolution Gaming, Pragmatic Play, NetEnt gibi dünyaca ünlü yazılım sağlayıcılarıyla 
-                  çalışmalıdır. Geniş slot seçenekleri, canlı casino masaları, masa oyunları ve jackpot oyunları sunmalıdır. 
+                  Kaliteli bir casino sitesi, Evolution Gaming, Pragmatic Play, NetEnt gibi dünyaca ünlü yazılım sağlayıcılarıyla
+                  çalışmalıdır. Geniş slot seçenekleri, canlı casino masaları, masa oyunları ve jackpot oyunları sunmalıdır.
                   Oyun çeşitliliği, kullanıcı deneyimini doğrudan etkileyen en önemli faktörlerden biridir.
                 </p>
 
@@ -165,8 +165,8 @@ export default function CasinoSites() {
                   Ödeme Yöntemleri ve Çekim Süreleri
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Hızlı ve güvenilir para yatırma ve çekme işlemleri, iyi bir casino sitesinin vazgeçilmez özelliklerindendir. 
-                  Papara, Paykasa, kripto para, banka havalesi gibi çeşitli ödeme seçenekleri sunmalı ve çekim talepleri 
+                  Hızlı ve güvenilir para yatırma ve çekme işlemleri, iyi bir casino sitesinin vazgeçilmez özelliklerindendir.
+                  Papara, Paykasa, kripto para, banka havalesi gibi çeşitli ödeme seçenekleri sunmalı ve çekim talepleri
                   24-48 saat içinde işleme konulmalıdır. Yüksek çekim limitleri ve düşük komisyon oranları da tercih edilirlik açısından önemlidir.
                 </p>
 
@@ -175,8 +175,8 @@ export default function CasinoSites() {
                   Bonus ve Promosyonlar
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Cömert hoş geldin bonusları, haftalık cashback teklifleri, kayıp bonusları ve sadakat programları, 
-                  oyuncular için büyük avantaj sağlar. Ancak bonus çevrim şartlarının adil ve ulaşılabilir olması çok önemlidir. 
+                  Cömert hoş geldin bonusları, haftalık cashback teklifleri, kayıp bonusları ve sadakat programları,
+                  oyuncular için büyük avantaj sağlar. Ancak bonus çevrim şartlarının adil ve ulaşılabilir olması çok önemlidir.
                   Şeffaf bonus politikası sunan siteler her zaman tercih edilmelidir.
                 </p>
 
@@ -185,7 +185,7 @@ export default function CasinoSites() {
                   Müşteri Hizmetleri
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  7/24 canlı destek hizmeti, Türkçe dil desteği ve hızlı yanıt süreleri, kaliteli bir casino sitesinin 
+                  7/24 canlı destek hizmeti, Türkçe dil desteği ve hızlı yanıt süreleri, kaliteli bir casino sitesinin
                   olmazsa olmazlarıdır. WhatsApp, Telegram gibi farklı iletişim kanalları sunması da kullanıcı memnuniyetini artırır.
                 </p>
               </div>
@@ -199,9 +199,9 @@ export default function CasinoSites() {
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Uzman Değerlendirme</h4>
                     <p className="text-sm text-muted-foreground">
-                      CasinoAny.com uzman ekibi, 2020 yılından beri online bahis ve casino sektöründe faaliyet göstermektedir. 
-                      Her site minimum 2 haftalık test sürecinden geçirilir, güvenlik, oyun çeşitliliği, ödeme hızı ve müşteri 
-                      hizmetleri gibi kritik faktörler detaylıca incelenir. Amacımız, kullanıcılarımıza en güvenilir ve kaliteli 
+                      CasinoAny.com uzman ekibi, 2020 yılından beri online bahis ve casino sektöründe faaliyet göstermektedir.
+                      Her site minimum 2 haftalık test sürecinden geçirilir, güvenlik, oyun çeşitliliği, ödeme hızı ve müşteri
+                      hizmetleri gibi kritik faktörler detaylıca incelenir. Amacımız, kullanıcılarımıza en güvenilir ve kaliteli
                       casino deneyimini sunmaktır.
                     </p>
                   </div>
@@ -214,12 +214,12 @@ export default function CasinoSites() {
           <section className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-6">Sıkça Sorulan Sorular</h2>
-              
+
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Türkiye'de online casino legal mi?</h3>
                   <p className="text-muted-foreground">
-                    Türkiye'de yerli casino siteleri yasal değildir ancak yurtdışı lisanslı (Curacao, Malta vb.) 
+                    Türkiye'de yerli casino siteleri yasal değildir ancak yurtdışı lisanslı (Curacao, Malta vb.)
                     sitelere erişim mümkündür. Bu siteler uluslararası lisanslarla çalışmaktadır.
                   </p>
                 </div>
@@ -227,7 +227,7 @@ export default function CasinoSites() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Casino sitelerinde kazanılan paralar ödenirmi?</h3>
                   <p className="text-muted-foreground">
-                    Lisanslı ve güvenilir casino siteleri kazançları eksiksiz öder. Sitelerimiz düzenli olarak 
+                    Lisanslı ve güvenilir casino siteleri kazançları eksiksiz öder. Sitelerimiz düzenli olarak
                     test edilir ve ödeme güvenilirliği garanti altındadır.
                   </p>
                 </div>
@@ -235,7 +235,7 @@ export default function CasinoSites() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Hangi ödeme yöntemlerini kullanabilirim?</h3>
                   <p className="text-muted-foreground">
-                    Papara, Paykasa, Cepbank, havale, kripto para (Bitcoin, Ethereum) gibi çeşitli yöntemler 
+                    Papara, Paykasa, Cepbank, havale, kripto para (Bitcoin, Ethereum) gibi çeşitli yöntemler
                     kullanılabilir. Her sitenin desteklediği yöntemler farklılık gösterebilir.
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export default function CasinoSites() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Casino bonuslarını nasıl kullanabilirim?</h3>
                   <p className="text-muted-foreground">
-                    Bonuslar genellikle ilk para yatırma işleminde otomatik olarak hesabınıza tanımlanır. 
+                    Bonuslar genellikle ilk para yatırma işleminde otomatik olarak hesabınıza tanımlanır.
                     Çevrim şartlarını tamamladıktan sonra bonus kazançlarınızı çekebilirsiniz.
                   </p>
                 </div>

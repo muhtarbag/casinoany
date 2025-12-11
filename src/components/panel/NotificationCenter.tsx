@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TelegramSettings } from './TelegramSettings';
 
 interface NotificationCenterProps {
   siteId: string;
@@ -81,11 +82,11 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
     );
   }
 
-  // Stats - Safe null handling
-  const complaints = notifications?.complaints ?? [];
-  const reviews = notifications?.reviews ?? [];
+  // Stats - Safe null handling with explicit checks
+  const complaints = Array.isArray(notifications?.complaints) ? notifications.complaints : [];
+  const reviews = Array.isArray(notifications?.reviews) ? notifications.reviews : [];
   
-  const unreadComplaints = complaints.filter(c => c.status === 'pending').length;
+  const unreadComplaints = complaints.filter(c => c && c.status === 'pending').length;
   const totalNotifications = complaints.length + reviews.length;
 
   const getNotificationIcon = (type: string) => {
@@ -128,7 +129,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
             <CardTitle className="text-sm font-medium text-muted-foreground">Yeni Yorumlar</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{notifications?.reviews.length || 0}</div>
+            <div className="text-2xl font-bold text-blue-600">{reviews.length}</div>
             <p className="text-xs text-muted-foreground">Son 7 gün</p>
           </CardContent>
         </Card>
@@ -222,6 +223,9 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
         </CardContent>
       </Card>
 
+      {/* Telegram Settings */}
+      <TelegramSettings />
+
       {/* Notifications List */}
       <Card>
         <CardHeader>
@@ -255,7 +259,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                 ) : (
                   <>
                     {/* Şikayetler */}
-                    {complaints.map((complaint) => (
+                    {complaints.filter(c => c).map((complaint) => (
                   <div
                     key={`complaint-${complaint.id}`}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -281,8 +285,8 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                   </div>
                 ))}
 
-                {/* Yorumlar */}
-                {reviews.map((review) => (
+                    {/* Yorumlar */}
+                    {reviews.filter(r => r).map((review) => (
                   <div
                     key={`review-${review.id}`}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -322,7 +326,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                     </p>
                   </div>
                 ) : (
-                  complaints.map((complaint) => (
+                  complaints.filter(c => c).map((complaint) => (
                   <div
                     key={complaint.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -360,7 +364,7 @@ export const NotificationCenter = ({ siteId }: NotificationCenterProps) => {
                     </p>
                   </div>
                 ) : (
-                  reviews.map((review) => (
+                  reviews.filter(r => r).map((review) => (
                   <div
                     key={review.id}
                     className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"

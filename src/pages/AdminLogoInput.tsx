@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 interface AdminLogoInputProps {
   logoPreview: string | null;
-  onLogoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onLogoChange: (file: File | null, preview?: string) => void;
   onClearLogo: () => void;
 }
 
@@ -32,13 +32,27 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
-      // Create a synthetic event
-      const syntheticEvent = {
-        target: {
-          files: files
-        }
-      } as unknown as React.ChangeEvent<HTMLInputElement>;
-      onLogoChange(syntheticEvent);
+      if (file.type.startsWith('image/')) {
+        // Önce dosyayı oku ve preview oluştur
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onLogoChange(file, reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const preview = reader.result as string;
+        onLogoChange(file, preview);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -71,7 +85,7 @@ export const AdminLogoInput = ({ logoPreview, onLogoChange, onClearLogo }: Admin
           id="logo"
           type="file"
           accept="image/jpeg,image/jpg,image/png,image/webp,image/svg+xml"
-          onChange={onLogoChange}
+          onChange={handleFileChange}
           className="hidden"
         />
 

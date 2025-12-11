@@ -13,12 +13,12 @@ export default function SportsBetting() {
   const { data: sites } = useQuery({
     queryKey: ['sports-betting-sites'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('betting_sites')
         .select('id, name, logo_url, slug, rating, bonus, features, affiliate_link, email, whatsapp, telegram, twitter, instagram, facebook, youtube')
         .order('rating', { ascending: false })
         .limit(6);
-      
+
       if (error) throw error;
       return data;
     },
@@ -32,16 +32,16 @@ export default function SportsBetting() {
         canonical="https://casinoany.com/spor-bahisleri"
         keywords={["spor bahisleri", "canlı bahis", "yüksek oranlar", "iddaa siteleri", "bahis oranları"]}
       />
-      
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background">
+
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pt-[72px] md:pt-[84px]">
         <Header />
-        
+
         <main className="container mx-auto px-4 py-8">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
               { label: 'Ana Sayfa', href: '/' },
               { label: 'Spor Bahisleri' }
-            ]} 
+            ]}
           />
 
           <section className="mb-12 mt-8">
@@ -105,8 +105,8 @@ export default function SportsBetting() {
             <h2 className="text-3xl font-bold mb-6">Önerilen Bahis Siteleri</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sites?.map((site) => (
-                <BettingSiteCard 
-                  key={site.id} 
+                <BettingSiteCard
+                  key={site.id}
                   id={site.id}
                   name={site.name}
                   logo={site.logo_url}
@@ -129,7 +129,7 @@ export default function SportsBetting() {
           <article className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-4">Spor Bahis Sitesi Nasıl Seçilir?</h2>
-              
+
               <div className="prose prose-lg max-w-none">
                 <p className="text-muted-foreground mb-6">
                   Spor bahisleri, dünya çapında milyonlarca kişinin ilgi duyduğu heyecan verici bir eğlence alanıdır.
@@ -141,8 +141,8 @@ export default function SportsBetting() {
                   Bahis Oranları ve Marjlar
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Bahis oranları, sitenin size ne kadar kazanç sağlayacağını belirler. Kaliteli bahis siteleri %95-98 
-                  arası oran sunar. Düşük marj oranı, oyuncular için daha fazla kazanç anlamına gelir. Özellikle futbol 
+                  Bahis oranları, sitenin size ne kadar kazanç sağlayacağını belirler. Kaliteli bahis siteleri %95-98
+                  arası oran sunar. Düşük marj oranı, oyuncular için daha fazla kazanç anlamına gelir. Özellikle futbol
                   ve basketbol gibi popüler spor dallarında yüksek oranlar sunan siteleri tercih etmelisiniz.
                 </p>
 
@@ -151,8 +151,8 @@ export default function SportsBetting() {
                   Canlı Bahis ve Maç İzleme
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Modern bahis deneyimi için canlı bahis özellikleri çok önemlidir. Maç devam ederken anlık bahis yapabilme, 
-                  canlı maç izleme (live streaming) ve güncel istatistikler sunmalıdır. Özellikle futbol, tenis ve basketbol 
+                  Modern bahis deneyimi için canlı bahis özellikleri çok önemlidir. Maç devam ederken anlık bahis yapabilme,
+                  canlı maç izleme (live streaming) ve güncel istatistikler sunmalıdır. Özellikle futbol, tenis ve basketbol
                   maçlarında canlı bahis seçeneklerinin zengin olması tercih sebebidir.
                 </p>
 
@@ -161,8 +161,8 @@ export default function SportsBetting() {
                   Spor Çeşitliliği
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  İyi bir bahis sitesi sadece futbol değil, basketbol, tenis, voleybol, hentbol, Amerikan futbolu, 
-                  buz hokeyi, e-spor ve daha birçok spor dalında bahis imkanı sunmalıdır. Türkiye liglerinden dünya 
+                  İyi bir bahis sitesi sadece futbol değil, basketbol, tenis, voleybol, hentbol, Amerikan futbolu,
+                  buz hokeyi, e-spor ve daha birçok spor dalında bahis imkanı sunmalıdır. Türkiye liglerinden dünya
                   ligLerine kadar geniş bir karşılaşma yelpazesi olmalıdır.
                 </p>
 
@@ -171,7 +171,7 @@ export default function SportsBetting() {
                   Bahis Türleri ve Pazar Çeşitliliği
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Maç sonucu, alt-üst, handikap, ilk yarı sonucu, gol atan oyuncu, korner sayısı gibi çeşitli bahis 
+                  Maç sonucu, alt-üst, handikap, ilk yarı sonucu, gol atan oyuncu, korner sayısı gibi çeşitli bahis
                   türleri sunmalıdır. Kombin bahis, sistem bahsi ve özel bahis seçenekleri deneyiminizi zenginleştirir.
                   Her maç için 100+ bahis seçeneği sunan siteler tercih edilmelidir.
                 </p>
@@ -181,8 +181,8 @@ export default function SportsBetting() {
                   Bahis Bonusları ve Promosyonlar
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Hoş geldin bonusu, ilk yatırım bonusu, kayıp bonusu, kombine bonusu ve sadakat programları, 
-                  bankrollünüzü artırır. Ancak çevrim şartlarının makul olması kritik önem taşır. Bonus şartlarının 
+                  Hoş geldin bonusu, ilk yatırım bonusu, kayıp bonusu, kombine bonusu ve sadakat programları,
+                  bankrollünüzü artırır. Ancak çevrim şartlarının makul olması kritik önem taşır. Bonus şartlarının
                   şeffaf ve ulaşılabilir olduğundan emin olun.
                 </p>
 
@@ -191,8 +191,8 @@ export default function SportsBetting() {
                   Mobil Uyumluluk
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Günümüzde bahis severlerin büyük çoğunluğu mobil cihazlardan bahis yapar. Responsive tasarım, 
-                  mobil uygulama desteği ve hızlı yükleme süreleri çok önemlidir. iOS ve Android uygulamaları 
+                  Günümüzde bahis severlerin büyük çoğunluğu mobil cihazlardan bahis yapar. Responsive tasarım,
+                  mobil uygulama desteği ve hızlı yükleme süreleri çok önemlidir. iOS ve Android uygulamaları
                   kesintisiz bahis deneyimi sağlamalıdır.
                 </p>
               </div>
@@ -205,8 +205,8 @@ export default function SportsBetting() {
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Uzman Analizleri</h4>
                     <p className="text-sm text-muted-foreground">
-                      Spor bahisleri konusunda 5 yıllık deneyime sahip ekibimiz, her siteyi minimum 100 bahis üzerinden 
-                      test eder. Oran karşılaştırmaları, ödeme süreleri, müşteri hizmetleri kalitesi ve platform 
+                      Spor bahisleri konusunda 5 yıllık deneyime sahip ekibimiz, her siteyi minimum 100 bahis üzerinden
+                      test eder. Oran karşılaştırmaları, ödeme süreleri, müşteri hizmetleri kalitesi ve platform
                       performansı detaylı şekilde incelenir. Verdiğimiz puanlar, gerçek kullanıcı deneyimlerine dayanır.
                     </p>
                   </div>
@@ -218,12 +218,12 @@ export default function SportsBetting() {
           <section className="mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-6">Sıkça Sorulan Sorular</h2>
-              
+
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold text-lg mb-2">En yüksek oranları hangi siteler sunuyor?</h3>
                   <p className="text-muted-foreground">
-                    Sayfamızda listelediğimiz siteler %95-98 arası oranlar sunmaktadır. Futbol maçlarında genellikle 
+                    Sayfamızda listelediğimiz siteler %95-98 arası oranlar sunmaktadır. Futbol maçlarında genellikle
                     3-5% marj oranı ile çalışırlar. Oran karşılaştırması yaparak en iyi fırsatları bulabilirsiniz.
                   </p>
                 </div>
@@ -231,7 +231,7 @@ export default function SportsBetting() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Canlı bahis nasıl yapılır?</h3>
                   <p className="text-muted-foreground">
-                    Canlı bahis bölümüne girip devam eden maçları seçebilirsiniz. Maç sırasında değişen oranlara 
+                    Canlı bahis bölümüne girip devam eden maçları seçebilirsiniz. Maç sırasında değişen oranlara
                     göre bahis yapabilir, anlık gelişmeleri takip ederek stratejinizi belirleyebilirsiniz.
                   </p>
                 </div>
@@ -239,7 +239,7 @@ export default function SportsBetting() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Minimum bahis tutarı ne kadardır?</h3>
                   <p className="text-muted-foreground">
-                    Çoğu sitede minimum bahis tutarı 10-20 TL arasındadır. Maximum bahis limitleri ise spor dalı 
+                    Çoğu sitede minimum bahis tutarı 10-20 TL arasındadır. Maximum bahis limitleri ise spor dalı
                     ve lig seviyesine göre değişir, genellikle 10.000-50.000 TL arasındadır.
                   </p>
                 </div>
@@ -247,7 +247,7 @@ export default function SportsBetting() {
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Kombine bahis nedir ve nasıl yapılır?</h3>
                   <p className="text-muted-foreground">
-                    Kombine bahis, birden fazla maçı tek bir kupona ekleyerek oynamanızdır. Her doğru tahmin 
+                    Kombine bahis, birden fazla maçı tek bir kupona ekleyerek oynamanızdır. Her doğru tahmin
                     oranları çarpar ve potansiyel kazancınızı artırır. En az 2, en fazla 20-30 maç kombine edilebilir.
                   </p>
                 </div>

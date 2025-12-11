@@ -117,11 +117,7 @@ export const OptimizedImage = ({
             isLoaded ? 'opacity-100' : 'opacity-70',
             className
           )}
-          style={{
-            objectFit,
-            ...(width && { width: `${width}px` }),
-            ...(height && { height: `${height}px` })
-          }}
+          style={{ objectFit }}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           {...{ fetchpriority: priority ? 'high' : fetchPriority }}
@@ -144,11 +140,7 @@ export const OptimizedImage = ({
         isLoaded ? 'opacity-100' : 'opacity-70',
         className
       )}
-      style={{
-        objectFit,
-        ...(width && { width: `${width}px` }),
-        ...(height && { height: `${height}px` })
-      }}
+      style={{ objectFit }}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       {...{ fetchpriority: priority ? 'high' : fetchPriority }}

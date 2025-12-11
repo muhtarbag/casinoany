@@ -148,7 +148,7 @@ export const RecommendedSitesManagement = () => {
       }
 
       const currentCount = localRecommendations?.length || 0;
-      const availableSlots = 8 - currentCount;
+      const availableSlots = 15 - currentCount;
 
       if (siteIds.length > availableSlots) {
         throw new Error(`Maksimum ${availableSlots} site daha ekleyebilirsiniz`);
@@ -271,7 +271,7 @@ export const RecommendedSitesManagement = () => {
     if (newSelected.has(siteId)) {
       newSelected.delete(siteId);
     } else {
-      const remainingSlots = 8 - (localRecommendations?.length || 0);
+      const remainingSlots = 15 - (localRecommendations?.length || 0);
       if (newSelected.size >= remainingSlots) {
         toast({
           title: 'Uyarı',
@@ -286,7 +286,7 @@ export const RecommendedSitesManagement = () => {
   };
 
   const handleSelectAll = () => {
-    const remainingSlots = 8 - (localRecommendations?.length || 0);
+    const remainingSlots = 15 - (localRecommendations?.length || 0);
     if (!filteredSites) return;
     
     const sitesToSelect = filteredSites.slice(0, remainingSlots);
@@ -309,7 +309,7 @@ export const RecommendedSitesManagement = () => {
       <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
         <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
         <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Nasıl Çalışır?</strong> Buradan seçtiğiniz siteler, <strong>TÜM</strong> site detay sayfalarında "Önerilen Siteler" bölümünde gösterilecek. Maksimum 8 site ekleyebilirsiniz.
+          <strong>Nasıl Çalışır?</strong> Buradan seçtiğiniz siteler, <strong>TÜM</strong> site detay sayfalarında "Önerilen Siteler" bölümünde gösterilecek. Maksimum 15 site ekleyebilirsiniz.
         </AlertDescription>
       </Alert>
 
@@ -319,12 +319,12 @@ export const RecommendedSitesManagement = () => {
             <div>
               <CardTitle className="text-xl">Önerilen Siteler</CardTitle>
               <CardDescription className="mt-1.5">
-                Maksimum 8 site seçebilirsiniz
+                Maksimum 15 site seçebilirsiniz
               </CardDescription>
             </div>
             {localRecommendations?.length > 0 && (
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {localRecommendations.length}/8 Site
+                {localRecommendations.length}/15 Site
               </Badge>
             )}
           </div>
@@ -373,11 +373,11 @@ export const RecommendedSitesManagement = () => {
               />
             </div>
 
-            {localRecommendations?.length >= 8 ? (
+            {localRecommendations?.length >= 15 ? (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Maksimum 8 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
+                  Maksimum 15 site eklenmiş. Yeni site eklemek için önce mevcut sitelerden birini kaldırın.
                 </AlertDescription>
               </Alert>
             ) : filteredSites && filteredSites.length > 0 ? (
@@ -417,7 +417,7 @@ export const RecommendedSitesManagement = () => {
 
                 <div className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">
-                    {8 - (localRecommendations?.length || 0)} slot boş
+                    {15 - (localRecommendations?.length || 0)} slot boş
                   </p>
                   <Button
                     onClick={() => addMutation.mutate(Array.from(selectedSites))}
@@ -456,7 +456,7 @@ export const RecommendedSitesManagement = () => {
                   Mevcut Öneriler
                   {localRecommendations && localRecommendations.length > 0 && (
                     <span className="text-muted-foreground font-normal ml-2">
-                      ({localRecommendations.length}/8)
+                      ({localRecommendations.length}/15)
                     </span>
                   )}
                 </label>

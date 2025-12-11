@@ -35,7 +35,6 @@ export const useNewsArticles = (filters?: {
       return data || [];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 
@@ -50,8 +49,6 @@ export const useNewsArticle = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false, // News content rarely changes
     enabled: !!slug,
   });
 };

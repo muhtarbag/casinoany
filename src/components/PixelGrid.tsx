@@ -1,49 +1,71 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { memo, Fragment, useMemo } from 'react';
 import { BettingSiteCard } from './BettingSiteCard';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Search } from 'lucide-react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { EmptyState } from './EmptyState';
-import { DynamicBanner } from './DynamicBanner';
+import { HowItWorksSection } from './HowItWorksSection';
+import { AdBanner } from './advertising/AdBanner';
+import { useBettingSites } from '@/hooks/queries/useBettingSitesQueries';
 
-export const PixelGrid = () => {
-  const { data: sites, isLoading } = useQuery({
-    queryKey: ['betting-sites-active'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('betting_sites')
-        .select('id, name, logo_url, rating, bonus, features, affiliate_link, slug, email, whatsapp, telegram, twitter, instagram, facebook, youtube, is_active, display_order, review_count, avg_rating')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
+interface PixelGridProps {
+  searchTerm?: string;
+}
 
-      if (error) throw error;
-      return data;
-    },
+export const PixelGrid = memo(({ searchTerm = '' }: PixelGridProps) => {
+  // OPTIMIZED: Using centralized queries with proper caching
+  const { data: sites, isLoading } = useBettingSites({ 
+    isActive: true,
+    orderBy: 'display_order'
   });
 
-  const { data: banners } = useQuery({
-    queryKey: ['site-banners-home'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_banners')
-        .select('*')
-        .eq('is_active', true)
-        .contains('display_pages', ['home'])
-        .order('position', { ascending: true })
-        .order('display_order', { ascending: true });
+  // Filter sites based on search term
+  const filteredSites = useMemo(() => {
+    if (!sites || !searchTerm.trim()) {
+      return sites || [];
+    }
 
-      if (error) throw error;
-      return data;
-    },
-  });
+    const searchLower = searchTerm.toLowerCase().trim();
+    return sites.filter(site =>
+      site.name.toLowerCase().includes(searchLower) ||
+      site.bonus?.toLowerCase().includes(searchLower) ||
+      site.features?.some((feature: string) => 
+        feature.toLowerCase().includes(searchLower)
+      )
+    );
+  }, [sites, searchTerm]);
 
   if (isLoading) {
-    return <LoadingSpinner size="lg" text="Siteler yükleniyor..." fullScreen={false} className="py-20" />;
+    return (
+      <div className="py-20 space-y-8 animate-fade-in">
+        <div className="container mx-auto px-4">
+          {/* Clean loading skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="rounded-xl border border-border/40 bg-card/50 p-6 space-y-4">
+                <div className="w-24 h-24 bg-muted/20 rounded-lg mx-auto animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-6 bg-muted/20 rounded animate-pulse" />
+                  <div className="h-4 bg-muted/20 rounded w-3/4 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  if (!sites || sites.length === 0) {
+  if (!filteredSites || filteredSites.length === 0) {
+    if (searchTerm.trim()) {
+      return (
+        <EmptyState
+          icon={Search}
+          title={`"${searchTerm}" için Sonuç Bulunamadı`}
+          description="Farklı bir arama terimi deneyin veya filtreleri temizleyin."
+        />
+      );
+    }
     return (
       <EmptyState
         icon={Search}
@@ -55,68 +77,19 @@ export const PixelGrid = () => {
 
   return (
     <div className="space-y-8">
-      {/* Animasyonlu CTA */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 p-8 md:p-12 backdrop-blur-sm border border-primary/20 group hover:border-primary/40 transition-all duration-500">
-        {/* Animated Background Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 animate-pulse opacity-50" />
-        
-        {/* Content */}
-        <div className="relative z-10 text-center space-y-6">
-          <div className="flex items-center justify-center gap-2 animate-fade-in">
-            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              En İyi Seçimler
-            </span>
-            <Sparkles className="w-6 h-6 text-primary animate-pulse" />
-          </div>
-          
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground animate-fade-in">
-            Güvenilir Casino Sitelerini Keşfedin
-          </h2>
-          
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in px-4">
-            Yüksek bonuslar, hızlı ödemeler ve 7/24 destek sunan lisanslı casino sitelerini karşılaştırın
-          </p>
-          
-          <div className="flex items-center justify-center gap-4 pt-4 animate-fade-in">
-            <Button 
-              size="lg" 
-              className="shadow-glow hover:shadow-hover transition-all duration-300 hover:scale-105 group"
-            >
-              <TrendingUp className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-              Siteleri İncele
-            </Button>
-          </div>
-          
-          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span>50+ Lisanslı Site</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span>Güncel Bonuslar</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span>Detaylı İncelemeler</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+      {/* How It Works Section */}
+      <HowItWorksSection />
 
       {/* Site Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site: any, index: number) => {
-          // Find banners for this position
-          const bannersAtPosition = banners?.filter(banner => banner.position === index) || [];
+        {filteredSites.map((site: any, index: number) => {
+          const isPriority = index < 6;
+          
+          // Show between_sites ad after every 3 sites (index 2, 5, 8, etc.)
+          const showBetweenSitesAd = (index + 1) % 3 === 0;
           
           return (
-            <React.Fragment key={site.id}>
+            <Fragment key={site.id}>
               <BettingSiteCard
                 id={site.id}
                 slug={site.slug}
@@ -135,25 +108,17 @@ export const PixelGrid = () => {
                 youtube={site.youtube || ''}
                 reviewCount={site.review_count || 0}
                 avgRating={site.avg_rating || 0}
+                priority={isPriority}
               />
-              {bannersAtPosition.length > 0 && (
+              {showBetweenSitesAd && (
                 <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                  {bannersAtPosition.map(banner => (
-                    <DynamicBanner
-                      key={banner.id}
-                      imageUrl={banner.image_url}
-                      mobileImageUrl={banner.mobile_image_url}
-                      altText={banner.alt_text}
-                      targetUrl={banner.target_url}
-                      title={banner.title}
-                    />
-                  ))}
+                  <AdBanner location="between_sites" className="w-full" />
                 </div>
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </div>
     </div>
   );
-};
+});

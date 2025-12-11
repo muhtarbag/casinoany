@@ -32,6 +32,11 @@ export interface SiteData {
   instagram?: string | null;
   facebook?: string | null;
   youtube?: string | null;
+  linkedin?: string | null;
+  telegram_channel?: string | null;
+  kick?: string | null;
+  discord?: string | null;
+  pinterest?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   owner_id?: string | null;

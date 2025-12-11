@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Check, X, Shield, Clock, CreditCard, Users } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { CasinoReviewSchema, ExpertReviewSchema } from '@/components/seo/GamblingSEOSchemas';
 import { OptimizedImage } from '@/components/OptimizedImage';
 
@@ -26,7 +27,7 @@ interface CasinoReviewTemplateProps {
   features: {
     title: string;
     description: string;
-    icon?: React.ReactNode;
+    icon?: ReactNode;
   }[];
   paymentMethods: string[];
   gameProviders: string[];
@@ -291,7 +292,7 @@ export const CasinoReviewTemplate = ({
   );
 };
 
-const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+const InfoItem = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => (
   <div className="flex items-center gap-2">
     <div className="text-primary">{icon}</div>
     <div>

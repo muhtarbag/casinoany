@@ -59,7 +59,7 @@ export const WebSiteSchema = () => {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'BahisSiteleri',
+    name: 'CasinoAny',
     url: window.location.origin,
     potentialAction: {
       '@type': 'SearchAction',

@@ -1,11 +1,12 @@
-import { useReducer, useEffect, useMemo, useCallback } from 'react';
+import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { X, Mail, MessageCircle, Send, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { X, Mail, Send, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
+import { SiDiscord, SiPinterest, SiKick, SiWhatsapp } from 'react-icons/si';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { siteBasicInfoSchema, type SiteBasicInfoFormData } from '@/lib/validation/siteInfoSchema';
@@ -29,6 +30,8 @@ interface SiteBasicInfoEditorProps {
 export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef(true);
   
   // Reducer-based state management
   const [state, dispatch] = useReducer(siteBasicInfoReducer, createInitialState());
@@ -45,7 +48,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         twitter: siteData.twitter || '',
         instagram: siteData.instagram || '',
         facebook: siteData.facebook || '',
-        youtube: siteData.youtube || ''
+        youtube: siteData.youtube || '',
+        linkedin: siteData.linkedin || '',
+        telegram_channel: siteData.telegram_channel || '',
+        kick: siteData.kick || '',
+        discord: siteData.discord || '',
+        pinterest: siteData.pinterest || ''
       };
       
       dispatch({
@@ -55,6 +63,60 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       });
     }
   }, [siteData]);
+
+  // ✅ Real-time updates for basic info changes
+  useEffect(() => {
+    if (!siteId) return;
+
+    const channel = supabase
+      .channel('site-basic-info-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'betting_sites',
+          filter: `id=eq.${siteId}`
+        },
+        (payload) => {
+          const newData = payload.new as any;
+          if (newData) {
+            const data = {
+              bonus: newData.bonus || '',
+              features: newData.features || [],
+              email: newData.email || '',
+              whatsapp: newData.whatsapp || '',
+              telegram: newData.telegram || '',
+              twitter: newData.twitter || '',
+              instagram: newData.instagram || '',
+              facebook: newData.facebook || '',
+              youtube: newData.youtube || '',
+              linkedin: newData.linkedin || '',
+              telegram_channel: newData.telegram_channel || '',
+              kick: newData.kick || '',
+              discord: newData.discord || '',
+              pinterest: newData.pinterest || ''
+            };
+            
+            dispatch({
+              type: 'SET_INITIAL_DATA',
+              data,
+              logoUrl: newData.logo_url || ''
+            });
+            
+            toast({
+              title: "Bilgiler Güncellendi",
+              description: "Site bilgileri real-time olarak güncellendi.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [siteId, toast]);
 
   // Check if form is dirty
   const isDirty = useMemo(() => isStateDirty(state), [state]);
@@ -77,7 +139,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         twitter: state.twitter,
         instagram: state.instagram,
         facebook: state.facebook,
-        youtube: state.youtube
+        youtube: state.youtube,
+        linkedin: state.linkedin,
+        telegram_channel: state.telegram_channel,
+        kick: state.kick,
+        discord: state.discord,
+        pinterest: state.pinterest
       };
 
       siteBasicInfoSchema.parse(formData);
@@ -95,7 +162,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       }
       return false;
     }
-  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube]);
+  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube, state.linkedin, state.telegram_channel, state.kick, state.discord, state.pinterest]);
 
   // Upload logo mutation
   const uploadLogoMutation = useMutation({
@@ -140,6 +207,11 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
           bonus: state.bonus,
           features: state.features,
           logo_url: logoUrl,
+          linkedin: state.linkedin || null,
+          telegram_channel: state.telegram_channel || null,
+          kick: state.kick || null,
+          discord: state.discord || null,
+          pinterest: state.pinterest || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', siteId);
@@ -181,7 +253,12 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
           twitter: state.twitter,
           instagram: state.instagram,
           facebook: state.facebook,
-          youtube: state.youtube
+          youtube: state.youtube,
+          linkedin: state.linkedin,
+          telegram_channel: state.telegram_channel,
+          kick: state.kick,
+          discord: state.discord,
+          pinterest: state.pinterest
         },
         logoUrl: data.logoUrl
       });
@@ -189,8 +266,8 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       dispatch({ type: 'SET_LAST_SAVED', date: new Date() });
       
       toast({
-        title: 'Başarılı',
-        description: 'Site bilgileri kaydedildi',
+        title: '✓ Otomatik Kaydedildi',
+        description: 'Değişiklikler siteye yansıtıldı',
       });
     },
     onError: (error: any) => {
@@ -209,6 +286,34 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
       }
     },
   });
+
+  // Auto-save effect - saves 2 seconds after last change
+  useEffect(() => {
+    // Skip auto-save on initial load
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Only auto-save if there are changes and no validation errors
+    if (isDirty && Object.keys(state.errors).length === 0) {
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        saveMutation.mutate();
+      }, 2000); // 2 seconds debounce
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [state.bonus, state.features, state.email, state.whatsapp, state.telegram, state.twitter, state.instagram, state.facebook, state.youtube, state.linkedin, state.telegram_channel, state.kick, state.discord, state.pinterest, isDirty, state.errors]);
 
   const handleSave = useCallback(() => {
     saveMutation.mutate();
@@ -338,12 +443,17 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
               value={state.bonus}
               onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'bonus', value: e.target.value })}
               placeholder="Örn: %100 Hoş Geldin Bonusu + 100 Free Spin"
-              maxLength={500}
+              maxLength={50}
             />
             <FormFieldError error={state.errors.bonus} />
-            <p className="text-xs text-muted-foreground">
-              Kullanıcıları cezbedecek şekilde bonus bilgisini yazın
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">
+                Kullanıcıları cezbedecek şekilde bonus bilgisini yazın
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {state.bonus.length}/50 karakter
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -418,7 +528,7 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
               <div className="relative">
-                <MessageCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <SiWhatsapp className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="whatsapp"
                   value={state.whatsapp}
@@ -505,6 +615,81 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
               </div>
               <FormFieldError error={state.errors.youtube} />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn</Label>
+              <div className="relative">
+                <Linkedin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="linkedin"
+                  value={state.linkedin}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'linkedin', value: e.target.value })}
+                  placeholder="https://linkedin.com/company/..."
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.linkedin} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telegram_channel">Telegram Kanalı</Label>
+              <div className="relative">
+                <Send className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="telegram_channel"
+                  value={state.telegram_channel}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'telegram_channel', value: e.target.value })}
+                  placeholder="https://t.me/channel"
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.telegram_channel} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="kick">Kick</Label>
+              <div className="relative">
+                <SiKick className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="kick"
+                  value={state.kick}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'kick', value: e.target.value })}
+                  placeholder="https://kick.com/channel"
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.kick} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discord">Discord</Label>
+              <div className="relative">
+                <SiDiscord className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="discord"
+                  value={state.discord}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'discord', value: e.target.value })}
+                  placeholder="Discord sunucu davet linki"
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.discord} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="pinterest">Pinterest</Label>
+              <div className="relative">
+                <SiPinterest className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="pinterest"
+                  value={state.pinterest}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'pinterest', value: e.target.value })}
+                  placeholder="https://pinterest.com/..."
+                  className="pl-10"
+                />
+              </div>
+              <FormFieldError error={state.errors.pinterest} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -518,6 +703,16 @@ export const SiteBasicInfoEditor = ({ siteId, siteData }: SiteBasicInfoEditorPro
         onCancel={handleCancel}
         variant="fixed"
       />
+      
+      {/* Auto-save indicator */}
+      {isDirty && !saveMutation.isPending && Object.keys(state.errors).length === 0 && (
+        <div className="fixed bottom-20 right-8 z-50 animate-in fade-in slide-in-from-bottom-2">
+          <Badge variant="secondary" className="gap-2 shadow-lg">
+            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+            2 saniye içinde otomatik kaydedilecek...
+          </Badge>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { buildCanonical, getRobotsMetaTag, shouldNoIndex } from '@/lib/seo/canonical';
 
 interface SEOProps {
   title: string;
@@ -15,6 +16,12 @@ interface SEOProps {
     tags?: string[];
   };
   structuredData?: any;
+  noindex?: boolean;
+  pagination?: {
+    prev?: string;
+    next?: string;
+  };
+  amphtml?: string;
 }
 
 export const SEO = ({
@@ -27,23 +34,34 @@ export const SEO = ({
   ogImageAlt,
   article,
   structuredData,
+  noindex = false,
+  pagination,
+  amphtml,
 }: SEOProps) => {
-  const siteUrl = window.location.origin;
-  const currentUrl = canonical || window.location.href;
-  
+  // Always use https://casinoany.com as primary domain for canonical and OG
+  const siteUrl = 'https://casinoany.com';
+  const currentPath = window.location.pathname;
+
+  // Use canonical engine for clean URLs - always absolute URLs
+  const currentUrl = canonical || buildCanonical(currentPath, { baseUrl: siteUrl });
+
+  // Determine if page should be noindexed
+  const robotsTag = getRobotsMetaTag(currentPath);
+  const isNoIndex = shouldNoIndex(currentPath);
+
   // Title optimization: Keep under 60 chars for SERP display
-  const fullTitle = title.length > 50 
-    ? `${title} | CasinoAny` 
+  const fullTitle = title.length > 50
+    ? `${title} | CasinoAny`
     : `${title} | CasinoAny - İGaming Rehberi`;
-  
+
   const defaultOgImage = `${siteUrl}/og-default.jpg`;
   const finalOgImage = ogImage || defaultOgImage;
-  
+
   // Default structured data - Organization
   const defaultStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'BahisSiteleri',
+    name: 'CasinoAny.com',
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     sameAs: [
@@ -51,26 +69,39 @@ export const SEO = ({
     ],
   };
 
-  // Article structured data
+  // Article structured data with enhanced schema
   const articleStructuredData = article ? {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: title,
     description: description,
-    image: finalOgImage,
+    image: {
+      '@type': 'ImageObject',
+      url: finalOgImage,
+      width: '1200',
+      height: '630',
+    },
     datePublished: article.publishedTime,
     dateModified: article.modifiedTime,
     author: {
-      '@type': 'Person',
-      name: article.author || 'BahisSiteleri',
+      '@type': 'Organization',
+      name: article.author || 'CasinoAny.com',
+      url: siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'BahisSiteleri',
+      name: 'CasinoAny.com',
+      url: siteUrl,
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,
+        width: '600',
+        height: '60',
       },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': currentUrl,
     },
     keywords: article.tags?.join(', '),
   } : null;
@@ -83,6 +114,11 @@ export const SEO = ({
       <meta name="description" content={description} />
       {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
       <link rel="canonical" href={currentUrl} />
+      {amphtml && <link rel="amphtml" href={amphtml} />}
+
+      {/* Pagination Links */}
+      {pagination?.prev && <link rel="prev" href={pagination.prev} />}
+      {pagination?.next && <link rel="next" href={pagination.next} />}
 
       {/* Open Graph Meta Tags */}
       <meta property="og:type" content={ogType} />
@@ -93,7 +129,7 @@ export const SEO = ({
       {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="BahisSiteleri" />
+      <meta property="og:site_name" content="CasinoAny.com" />
       <meta property="og:locale" content="tr_TR" />
 
       {/* Article specific OG tags */}
@@ -121,23 +157,36 @@ export const SEO = ({
       <meta name="twitter:image" content={finalOgImage} />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
-      <meta name="bingbot" content="index, follow" />
+      <meta name="robots" content={noindex ? 'noindex, follow' : robotsTag} />
+      <meta name="googlebot" content={
+        (isNoIndex || noindex)
+          ? "noindex, follow"
+          : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+      } />
+      <meta name="bingbot" content="index, follow, max-image-preview:large" />
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-      
+
+      {/* Google-Specific Optimizations */}
+      <meta name="google" content="notranslate" />
+
+      {/* Mobile Optimization for Google */}
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="application-name" content="CasinoAny" />
+
       {/* Geo-Targeting for Turkey */}
       <meta name="geo.region" content="TR" />
       <meta name="geo.placename" content="Turkey" />
-      
+      <meta name="geo.position" content="39;35" />
+      <meta name="ICBM" content="39, 35" />
+
       {/* Content Classification */}
       <meta name="rating" content="general" />
       <meta name="audience" content="all" />
-      
+      <meta name="distribution" content="global" />
+
       {/* Language */}
       <meta httpEquiv="content-language" content="tr" />
-      <meta httpEquiv="content-language" content="tr" />
-      
+
       {/* Structured Data */}
       {!structuredData && !articleStructuredData && (
         <script type="application/ld+json">
@@ -150,9 +199,15 @@ export const SEO = ({
         </script>
       )}
       {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
+        Array.isArray(structuredData)
+          ? structuredData.map((data, index) => (
+            <script key={index} type="application/ld+json">
+              {JSON.stringify(data)}
+            </script>
+          ))
+          : <script type="application/ld+json">
+            {JSON.stringify(structuredData)}
+          </script>
       )}
     </Helmet>
   );

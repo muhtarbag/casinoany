@@ -91,7 +91,6 @@ export const useCategories = (filters?: {
       return data as Category[];
     },
     staleTime: CACHE_TIMES.LONG,
-    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 
@@ -102,50 +101,40 @@ export const useCategoriesWithStats = () => {
   return useQuery({
     queryKey: categoryKeys.stats(),
     queryFn: async () => {
-      // ✅ OPTIMIZED: Single parallel query instead of N+1
-      const [
-        { data: categories, error: catError },
-        { data: siteCounts, error: siteError },
-        { data: blogCounts, error: blogError }
-      ] = await Promise.all([
-        supabase
-          .from('categories')
-          .select('*')
-          .order('display_order', { ascending: true }),
-        supabase
-          .from('site_categories')
-          .select('category_id'),
-        supabase
-          .from('blog_posts')
-          .select('category_id')
-          .eq('is_published', true)
-      ]);
+      const { data: categories, error: catError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('display_order', { ascending: true });
 
       if (catError) throw catError;
-      if (siteError) throw siteError;
-      if (blogError) throw blogError;
 
-      // Count in memory instead of N database queries
-      const siteCountMap = new Map<string, number>();
-      siteCounts?.forEach((sc) => {
-        siteCountMap.set(sc.category_id, (siteCountMap.get(sc.category_id) || 0) + 1);
-      });
+      // Her kategori için site ve blog sayısını getir
+      const categoriesWithStats = await Promise.all(
+        (categories || []).map(async (category) => {
+          // Site sayısı
+          const { count: siteCount } = await supabase
+            .from('site_categories')
+            .select('*', { count: 'exact', head: true })
+            .eq('category_id', category.id);
 
-      const blogCountMap = new Map<string, number>();
-      blogCounts?.forEach((bc) => {
-        blogCountMap.set(bc.category_id, (blogCountMap.get(bc.category_id) || 0) + 1);
-      });
+          // Blog sayısı
+          const { count: blogCount } = await supabase
+            .from('blog_posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('category_id', category.id)
+            .eq('is_published', true);
 
-      const categoriesWithStats = (categories || []).map((category) => ({
-        ...category,
-        site_count: siteCountMap.get(category.id) || 0,
-        blog_count: blogCountMap.get(category.id) || 0,
-      }));
+          return {
+            ...category,
+            site_count: siteCount || 0,
+            blog_count: blogCount || 0,
+          };
+        })
+      );
 
       return categoriesWithStats as CategoryWithStats[];
     },
     staleTime: CACHE_TIMES.MEDIUM,
-    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 };
 
@@ -168,8 +157,6 @@ export const useCategory = (slug: string) => {
       return data as Category;
     },
     staleTime: CACHE_TIMES.VERY_LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false, // Category detail rarely changes
     enabled: !!slug,
   });
 };
@@ -181,6 +168,9 @@ export const useCategoryWithRelations = (slug: string) => {
   return useQuery({
     queryKey: [...categoryKeys.detail(slug), 'relations'],
     queryFn: async () => {
+      console.log('[Category Query] Starting fetch:', { slug });
+      const startTime = performance.now();
+      
       // 1. Kategori bilgisini al
       const { data: category, error: catError } = await supabase
         .from('categories')
@@ -189,9 +179,19 @@ export const useCategoryWithRelations = (slug: string) => {
         .eq('is_active', true)
         .single();
 
-      if (catError) throw catError;
+      if (catError) {
+        console.error('[Category Query] Category fetch error:', catError);
+        throw catError;
+      }
+      
+      console.log('[Category Query] Category fetched:', { 
+        id: category.id, 
+        name: category.name,
+        duration: performance.now() - startTime 
+      });
 
       // 2. İlişkili siteleri al
+      const sitesStartTime = performance.now();
       const { data: siteRelations, error: siteError } = await supabase
         .from('site_categories')
         .select(`
@@ -201,14 +201,23 @@ export const useCategoryWithRelations = (slug: string) => {
         .eq('category_id', category.id)
         .order('display_order', { ascending: true });
 
-      if (siteError) throw siteError;
+      if (siteError) {
+        console.error('[Category Query] Sites fetch error:', siteError);
+        throw siteError;
+      }
 
       const sites = (siteRelations || [])
         .map((rel: any) => rel.betting_sites)
         .filter(Boolean)
         .filter((site: any) => site.is_active);
+      
+      console.log('[Category Query] Sites fetched:', { 
+        count: sites.length,
+        duration: performance.now() - sitesStartTime 
+      });
 
       // 3. İlişkili blog yazılarını al
+      const blogsStartTime = performance.now();
       const { data: blogs, error: blogError } = await supabase
         .from('blog_posts')
         .select('*')
@@ -217,7 +226,23 @@ export const useCategoryWithRelations = (slug: string) => {
         .order('published_at', { ascending: false })
         .limit(10);
 
-      if (blogError) throw blogError;
+      if (blogError) {
+        console.error('[Category Query] Blogs fetch error:', blogError);
+        throw blogError;
+      }
+
+      console.log('[Category Query] Blogs fetched:', { 
+        count: blogs?.length || 0,
+        duration: performance.now() - blogsStartTime 
+      });
+
+      const totalDuration = performance.now() - startTime;
+      console.log('[Category Query] Complete:', {
+        slug,
+        totalDuration,
+        sitesCount: sites.length,
+        blogsCount: blogs?.length || 0
+      });
 
       return {
         ...category,

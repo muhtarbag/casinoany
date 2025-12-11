@@ -3,6 +3,7 @@ import { GamblingSEOEnhancer } from "@/components/seo/GamblingSEOEnhancer";
 import { StructuredData } from "@/components/StructuredData";
 import { Link } from "react-router-dom";
 import { Calendar, User } from "lucide-react";
+import DOMPurify from 'dompurify';
 
 interface CategoryArticleSectionProps {
   categoryName: string;
@@ -24,6 +25,12 @@ export const CategoryArticleSection = ({
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+  });
+
+  // 🛡️ XSS Protection: Sanitize HTML content
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
   });
 
   // Article structured data
@@ -92,7 +99,7 @@ export const CategoryArticleSection = ({
                 prose-strong:text-foreground prose-strong:font-semibold
                 prose-ul:text-foreground/90 prose-ol:text-foreground/90
                 prose-li:marker:text-primary"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
 
             {/* Internal Links Section */}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useRef, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { prodLogger } from '@/lib/productionLogger';
@@ -11,6 +11,10 @@ interface AuthContextType {
   ownedSites: string[];
   userRoles: string[];
   loading: boolean;
+  impersonatedUserId: string | null;
+  isImpersonating: boolean;
+  impersonateUser: (userId: string) => void;
+  stopImpersonation: () => void;
   signUp: (
     email: string, 
     password: string, 
@@ -45,9 +49,82 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [ownedSites, setOwnedSites] = useState<string[]>([]);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
+  
+  // Impersonate edilen kullanıcının rolleri için ayrı state'ler
+  const [impersonatedIsAdmin, setImpersonatedIsAdmin] = useState(false);
+  const [impersonatedIsSiteOwner, setImpersonatedIsSiteOwner] = useState(false);
+  const [impersonatedOwnedSites, setImpersonatedOwnedSites] = useState<string[]>([]);
+  const [impersonatedUserRoles, setImpersonatedUserRoles] = useState<string[]>([]);
+
+  const checkImpersonatedUserRoles = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role, status')
+        .eq('user_id', userId);
+      
+      if (error) {
+        prodLogger.error('Failed to fetch impersonated user roles', error, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+        return;
+      }
+      
+      // Only set roles if user is approved
+      const approvedRoles = data?.filter(r => r.status === 'approved') || [];
+      const roles = approvedRoles.map(r => r.role);
+      
+      // Check site ownership independently from roles
+      const { data: ownedSitesData, error: ownershipError } = await (supabase as any)
+        .from('site_owners')
+        .select('site_id')
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+      
+      if (ownershipError) {
+        prodLogger.error('Failed to fetch impersonated user site ownership', ownershipError, { 
+          component: 'auth',
+          metadata: { userId } 
+        });
+      }
+      
+      const sites = ownedSitesData?.map((s: any) => s.site_id).filter(Boolean) || [];
+      
+      setImpersonatedUserRoles(roles);
+      setImpersonatedIsAdmin(roles.includes('admin'));
+      setImpersonatedIsSiteOwner(sites.length > 0);
+      setImpersonatedOwnedSites(sites);
+    } catch (error) {
+      prodLogger.error('Unexpected error in checkImpersonatedUserRoles', error, { 
+        component: 'auth',
+        metadata: { userId } 
+      });
+    }
+  };
+
+  // Impersonate edildiğinde impersonate edilen kullanıcının rollerini çek
+  useEffect(() => {
+    if (impersonatedUserId) {
+      checkImpersonatedUserRoles(impersonatedUserId);
+    } else {
+      // Impersonation durdurulduğunda impersonate state'lerini temizle
+      setImpersonatedIsAdmin(false);
+      setImpersonatedIsSiteOwner(false);
+      setImpersonatedOwnedSites([]);
+      setImpersonatedUserRoles([]);
+    }
+  }, [impersonatedUserId]);
 
   useEffect(() => {
     let mounted = true;
+    
+    // Restore impersonation state from localStorage
+    const savedImpersonatedUserId = localStorage.getItem('impersonated_user_id');
+    if (savedImpersonatedUserId) {
+      setImpersonatedUserId(savedImpersonatedUserId);
+    }
     
     // Get initial session first
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -76,6 +153,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsSiteOwner(false);
           setOwnedSites([]);
           setUserRoles([]);
+          setImpersonatedUserId(null);
+          localStorage.removeItem('impersonated_user_id');
         }
       }
     );
@@ -88,6 +167,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const checkUserRoles = async (userId: string) => {
     try {
+      // Auto-approve individual users if email is verified
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser?.email_confirmed_at) {
+        await supabase.rpc('auto_approve_verified_individual');
+      }
+      
       const { data, error } = await supabase
         .from('user_roles')
         .select('role, status')
@@ -132,6 +217,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     }
   };
+
 
   const signUp = async (
     email: string, 
@@ -227,6 +313,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setImpersonatedUserId(null);
+    localStorage.removeItem('impersonated_user_id');
+  };
+
+  const impersonateUser = (userId: string) => {
+    if (!isAdmin) {
+      prodLogger.warn('Unauthorized impersonation attempt', { userId });
+      return;
+    }
+    setImpersonatedUserId(userId);
+    localStorage.setItem('impersonated_user_id', userId);
+  };
+
+  const stopImpersonation = () => {
+    setImpersonatedUserId(null);
+    localStorage.removeItem('impersonated_user_id');
   };
 
   // ✅ FIX: Memoize context value AFTER function definitions
@@ -234,16 +336,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       user,
       session,
-      isAdmin,
-      isSiteOwner,
-      ownedSites,
-      userRoles,
+      isAdmin: impersonatedUserId ? impersonatedIsAdmin : isAdmin,
+      isSiteOwner: impersonatedUserId ? impersonatedIsSiteOwner : isSiteOwner,
+      ownedSites: impersonatedUserId ? impersonatedOwnedSites : ownedSites,
+      userRoles: impersonatedUserId ? impersonatedUserRoles : userRoles,
       loading,
+      impersonatedUserId,
+      isImpersonating: !!impersonatedUserId,
+      impersonateUser,
+      stopImpersonation,
       signUp,
       signIn,
       signOut,
     }),
-    [user, session, isAdmin, isSiteOwner, ownedSites, userRoles, loading]
+    [
+      user, 
+      session, 
+      isAdmin, 
+      isSiteOwner, 
+      ownedSites, 
+      userRoles, 
+      loading, 
+      impersonatedUserId,
+      impersonatedIsAdmin,
+      impersonatedIsSiteOwner,
+      impersonatedOwnedSites,
+      impersonatedUserRoles
+    ]
   );
 
   return (

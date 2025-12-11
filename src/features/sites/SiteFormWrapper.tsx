@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteFormSchema, SiteFormData, generateSlug } from '@/schemas/siteValidation';
@@ -14,7 +14,7 @@ interface SiteFormWrapperProps {
   sites: any[];
   logoFile: File | null;
   logoPreview: string | null;
-  onLogoFileChange: (file: File | null) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onLogoPreviewChange: (preview: string | null) => void;
   createSiteMutation: UseMutationResult<void, Error, { formData: SiteFormData; logoFile: File | null }>;
   updateSiteMutation: UseMutationResult<void, Error, { id: string; formData: SiteFormData; logoFile: File | null }>;
@@ -34,6 +34,9 @@ export function SiteFormWrapper({
   const editingSite = sites.find((s) => s.id === editingId);
   const updateCategoriesMutation = useUpdateSiteCategories();
   const [isFormReady, setIsFormReady] = useState(false);
+  
+  // Track previous success state to detect new successful mutations
+  const prevIsSuccessRef = useRef(false);
 
   const form = useForm<SiteFormData>({
     resolver: zodResolver(siteFormSchema),
@@ -117,7 +120,10 @@ export function SiteFormWrapper({
           affiliate_commission_percentage: editingSite.affiliate_commission_percentage || undefined,
           category_ids: categoryIds,
         });
-        if (editingSite.logo_url) onLogoPreviewChange(editingSite.logo_url);
+        // Only load existing logo if user hasn't selected a new one
+        if (editingSite.logo_url && !logoFile) {
+          onLogoPreviewChange(editingSite.logo_url);
+        }
       } else {
         form.reset();
         onLogoFileChange(null);
@@ -131,13 +137,20 @@ export function SiteFormWrapper({
     loadSiteData();
   }, [editingSite, form, onLogoFileChange, onLogoPreviewChange]);
 
+  // Reset form and logo states only when mutation just succeeded (transition from false to true)
   useEffect(() => {
-    if (createSiteMutation.isSuccess || updateSiteMutation.isSuccess) {
+    const isCurrentlySuccess = createSiteMutation.isSuccess || updateSiteMutation.isSuccess;
+    const justSucceeded = isCurrentlySuccess && !prevIsSuccessRef.current;
+    
+    if (justSucceeded) {
       form.reset();
       onLogoFileChange(null);
       onLogoPreviewChange(null);
       onEditingIdChange(null);
     }
+    
+    // Update ref to track state for next render
+    prevIsSuccessRef.current = isCurrentlySuccess;
   }, [createSiteMutation.isSuccess, updateSiteMutation.isSuccess, form, onLogoFileChange, onLogoPreviewChange, onEditingIdChange]);
 
   const onSubmit = useCallback(async (data: SiteFormData) => {

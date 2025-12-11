@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from '@/components/ui/skeleton';
+import { lazyWithRetry } from '@/components/Performance/LazyComponent';
 
-const BulkCasinoContentGenerator = lazy(() => import('@/pages/admin/content/BulkCasinoContentGenerator'));
+const BulkCasinoContentGenerator = lazyWithRetry(() => import('@/pages/admin/content/BulkCasinoContentGenerator'));
 
 export const CasinoContentManagement = () => {
   const { toast } = useToast();

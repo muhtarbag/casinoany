@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,75 +14,225 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 const ComplaintDetail = () => {
-  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  // Get the slug/id part - everything after /sikayetler/
+  const slugOrId = pathParts.slice(1).join('/'); // Join back for multi-part slugs
+  
   const { user, isSiteOwner, ownedSites, isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [responseText, setResponseText] = useState('');
 
   const { data: complaint, isLoading } = useQuery({
-    queryKey: ['complaint', id],
+    queryKey: ['complaint', slugOrId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try to fetch by slug first, then by ID for backward compatibility
+      let query = supabase
         .from('site_complaints')
         .select(`
           *,
           betting_sites (name, slug, logo_url)
-        `)
-        .eq('id', id)
-        .maybeSingle(); // ✅ FIX: Use maybeSingle to prevent crash
+        `);
+      
+      // Check if it looks like a UUID (ID) or a slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+      
+      if (isUUID) {
+        query = query.eq('id', slugOrId);
+      } else {
+        query = query.eq('slug', slugOrId);
+      }
+      
+      const { data, error } = await query.maybeSingle();
       
       if (error) throw error;
       if (!data) throw new Error('Complaint not found');
+      
+      // Check if user can view this complaint
+      const canView = isAdmin || 
+                      data.user_id === user?.id || 
+                      data.approval_status === 'approved';
+      
+      if (!canView) {
+        throw new Error('Bu şikayet henüz yayınlanmamış');
+      }
+      
       return data;
     },
   });
 
+  // Redirect to slug-based URL if user came via UUID
+  useEffect(() => {
+    if (complaint?.slug && slugOrId !== complaint.slug) {
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+      if (isUUID) {
+        navigate(`/sikayetler/${complaint.slug}`, { replace: true });
+      }
+    }
+  }, [complaint, slugOrId, navigate]);
+
   const { data: responses } = useQuery({
-    queryKey: ['complaint-responses', id],
+    queryKey: ['complaint-responses', slugOrId],
     queryFn: async () => {
+      if (!complaint?.id) return [];
       const { data, error } = await supabase
         .from('complaint_responses')
         .select(`
           *,
           profiles (username, email, first_name, last_name)
         `)
-        .eq('complaint_id', id)
+        .eq('complaint_id', complaint.id)
         .order('created_at', { ascending: true });
       
       if (error) throw error;
       return data;
     },
+    enabled: !!complaint?.id,
+  });
+
+  // Check if user has liked this complaint
+  const { data: userLike } = useQuery({
+    queryKey: ['complaint-like', slugOrId, user?.id],
+    queryFn: async () => {
+      if (!user || !complaint?.id) return null;
+      const { data, error } = await supabase
+        .from('complaint_likes')
+        .select('id')
+        .eq('complaint_id', complaint.id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!complaint?.id,
+  });
+
+  // Get total like count
+  const { data: likeCount } = useQuery({
+    queryKey: ['complaint-likes-count', slugOrId],
+    queryFn: async () => {
+      if (!complaint?.id) return 0;
+      const { count, error } = await supabase
+        .from('complaint_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('complaint_id', complaint.id);
+      
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!complaint?.id,
   });
 
   const isOwnerOfThisSite = complaint && isSiteOwner && ownedSites.includes(complaint.site_id);
 
+  // Realtime subscriptions for complaint updates and responses
+  useEffect(() => {
+    if (!complaint?.id) return;
+
+    const channel = supabase
+      .channel(`complaint-detail-${complaint.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_complaints',
+          filter: `id=eq.${complaint.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_responses',
+          filter: `complaint_id=eq.${complaint.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint-responses', slugOrId] });
+          queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] }); // Update response count
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'complaint_likes',
+          filter: `complaint_id=eq.${complaint.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', slugOrId] });
+          queryClient.invalidateQueries({ queryKey: ['complaint-like', slugOrId, user?.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [complaint?.id, user?.id, queryClient, slugOrId]);
+
   const upvoteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('site_complaints')
-        .update({ upvotes: (complaint?.upvotes || 0) + 1 })
-        .eq('id', id);
-      if (error) throw error;
+      if (!user) {
+        throw new Error('Like yapmak için giriş yapmalısınız');
+      }
+      if (!complaint?.id) return;
+
+      if (userLike) {
+        // Unlike - remove the like
+        const { error } = await supabase
+          .from('complaint_likes')
+          .delete()
+          .eq('complaint_id', complaint.id)
+          .eq('user_id', user.id);
+        if (error) throw error;
+      } else {
+        // Like - add the like
+        const { error } = await supabase
+          .from('complaint_likes')
+          .insert({
+            complaint_id: complaint.id,
+            user_id: user.id,
+          });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-like', slugOrId, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-likes-count', slugOrId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Hata',
+        description: error.message || 'Bir hata oluştu',
+        variant: 'destructive',
+      });
     },
   });
 
   const addResponseMutation = useMutation({
     mutationFn: async (text: string) => {
       if (!user) throw new Error('Giriş yapmalısınız');
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       
       const { error } = await supabase
         .from('complaint_responses')
         .insert({
-          complaint_id: id,
+          complaint_id: complaint.id,
           user_id: user.id,
           response_text: text,
           is_site_owner_response: isOwnerOfThisSite || false,
@@ -91,7 +241,7 @@ const ComplaintDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint-responses', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint-responses', slugOrId] });
       setResponseText('');
       toast({
         title: 'Başarılı',
@@ -109,17 +259,18 @@ const ComplaintDetail = () => {
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       const { error } = await supabase
         .from('site_complaints')
         .update({ 
           status: newStatus,
           resolved_at: newStatus === 'resolved' ? new Date().toISOString() : null
         })
-        .eq('id', id);
+        .eq('id', complaint.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
       toast({
         title: 'Başarılı',
         description: 'Şikayet durumu güncellendi',
@@ -129,14 +280,15 @@ const ComplaintDetail = () => {
 
   const togglePublicMutation = useMutation({
     mutationFn: async (isPublic: boolean) => {
+      if (!complaint?.id) throw new Error('Şikayet bulunamadı');
       const { error } = await supabase
         .from('site_complaints')
         .update({ is_public: isPublic })
-        .eq('id', id);
+        .eq('id', complaint.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['complaint', id] });
+      queryClient.invalidateQueries({ queryKey: ['complaint', slugOrId] });
       toast({
         title: 'Başarılı',
         description: 'Görünürlük ayarı güncellendi',
@@ -165,6 +317,18 @@ const ComplaintDetail = () => {
     in_review: 'İnceleniyor',
     resolved: 'Çözüldü',
     closed: 'Kapalı',
+  };
+
+  const approvalLabels: Record<string, string> = {
+    pending: 'İnceleme Bekliyor',
+    approved: 'Yayında',
+    rejected: 'Reddedildi',
+  };
+
+  const approvalColors: Record<string, 'default' | 'destructive' | 'secondary'> = {
+    pending: 'default',
+    approved: 'secondary',
+    rejected: 'destructive',
   };
 
   const severityLabels: Record<string, string> = {
@@ -211,7 +375,7 @@ const ComplaintDetail = () => {
       <>
         <SEO title="Şikayet Bulunamadı" description="Aradığınız şikayet bulunamadı" />
         <Header />
-        <div className="min-h-screen bg-gradient-dark">
+        <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
           <div className="container mx-auto px-4 py-8">
             <Card>
               <CardContent className="pt-6 text-center">
@@ -231,12 +395,21 @@ const ComplaintDetail = () => {
   return (
     <>
       <SEO 
-        title={complaint.title}
-        description={complaint.description.substring(0, 160)}
+        title={`${complaint.betting_sites?.name} Şikayeti: ${complaint.title} | Kullanıcı Deneyimi`}
+        description={complaint.description.substring(0, 155) + '...'}
+        keywords={[
+          complaint.betting_sites?.name || '',
+          'şikayet',
+          'kullanıcı deneyimi',
+          complaint.category,
+          'bahis sitesi şikayeti',
+          'casino şikayeti'
+        ]}
+        canonical={`https://casinoany.com/sikayetler/${complaint.slug || complaint.id}`}
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="min-h-screen bg-gradient-dark pt-16 md:pt-[72px]">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 py-8 max-w-4xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -316,6 +489,11 @@ const ComplaintDetail = () => {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  {(isAdmin || isOwnComplaint) && (
+                    <Badge variant={approvalColors[complaint.approval_status || 'pending']}>
+                      {approvalLabels[complaint.approval_status || 'pending']}
+                    </Badge>
+                  )}
                   <Badge variant={getStatusVariant(complaint.status)}>
                     {statusLabels[complaint.status]}
                   </Badge>
@@ -350,13 +528,14 @@ const ComplaintDetail = () => {
 
             <div className="flex items-center gap-4 pt-4 border-t">
               <Button
-                variant="outline"
+                variant={userLike ? "default" : "outline"}
                 size="sm"
                 onClick={() => upvoteMutation.mutate()}
-                disabled={upvoteMutation.isPending}
+                disabled={upvoteMutation.isPending || !user}
+                className={userLike ? "bg-primary" : ""}
               >
-                <ThumbsUp className="w-4 h-4 mr-1" />
-                {complaint.upvotes}
+                <ThumbsUp className={`w-4 h-4 mr-1 ${userLike ? "fill-current" : ""}`} />
+                {likeCount || 0}
               </Button>
               <span className="text-sm text-muted-foreground">
                 <MessageSquare className="w-4 h-4 inline mr-1" />
@@ -397,7 +576,10 @@ const ComplaintDetail = () => {
                   </p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>
-                      {response.profiles?.first_name || response.profiles?.username || response.profiles?.email}
+                      {response.is_site_owner_response 
+                        ? `${complaint.betting_sites?.name || 'Site'} Destek Ekibi`
+                        : (response.profiles?.first_name || response.profiles?.username || response.profiles?.email)
+                      }
                     </span>
                     <span>
                       {format(new Date(response.created_at), 'dd MMMM yyyy HH:mm', { locale: tr })}

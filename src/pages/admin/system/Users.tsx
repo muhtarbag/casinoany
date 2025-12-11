@@ -1,157 +1,126 @@
+
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useImpersonation } from '@/hooks/useImpersonation';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Trash2, Loader2, Building2, User, Shield, UserCircle, UserCog } from 'lucide-react';
+import { User, Building2, Loader2, X, CheckCircle, XCircle, Trash2, Shield } from 'lucide-react';
+import { EnhancedTableToolbar } from '@/components/table/EnhancedTableToolbar';
+import { EnhancedTablePagination } from '@/components/table/EnhancedTablePagination';
+import { Progress } from '@/components/ui/progress';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import { useUsers } from '@/hooks/admin/useUsers';
+import { IndividualUserTable } from '@/components/admin/users/IndividualUserTable';
+import { CorporateUserTable } from '@/components/admin/users/CorporateUserTable';
+import { UserDetailsDialog } from '@/components/admin/users/UserDetailsDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Users = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, impersonateUser, stopImpersonation } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('individual');
   const [selectedUser, setSelectedUser] = useState<any>(null);
-  const { impersonateUser, loading: impersonating } = useImpersonation();
 
-  const { data: users, isLoading } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: async () => {
-      // Önce tüm profilleri çek (email artık profiles'da)
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (profilesError) throw profilesError;
-      if (!profiles) return [];
+  // Bulk Action Dialog States
+  const [showBulkApproveDialog, setShowBulkApproveDialog] = useState(false);
+  const [showBulkRejectDialog, setShowBulkRejectDialog] = useState(false);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [showBulkVerifyDialog, setShowBulkVerifyDialog] = useState(false);
 
-      // Tüm rolleri çek
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('*');
+  const {
+    // State
+    activeTab, setActiveTab,
+    currentPage, setCurrentPage,
+    pageSize, setPageSize,
+    searchQuery, setSearchQuery,
+    roleFilter, setRoleFilter,
+    statusFilter, setStatusFilter,
+    verificationFilter, setVerificationFilter,
+    selectedUserIds, setSelectedUserIds,
+    isBulkProcessing, bulkProgress,
 
-      // Her profile için role bilgisini ekle
-      return profiles.map(profile => {
-        const role = roles?.find(r => r.user_id === profile.id);
-        
-        return {
-          id: role?.id || `profile-${profile.id}`,
-          user_id: profile.id,
-          role: role?.role || null,
-          status: role?.status || 'pending',
-          created_at: role?.created_at || profile.created_at,
-          profile: {
-            ...profile,
-            email: profile.email || 'Email bilgisi yok'
-          }
-        };
+    // Data
+    users,
+    totalCount,
+    isLoading,
+
+    // Actions
+    verifyMutation,
+    approveMutation,
+    rejectMutation,
+    deleteMutation,
+    handleBulkApprove,
+    handleBulkReject,
+    handleBulkDelete,
+    handleBulkVerify
+  } = useUsers();
+
+  const handleImpersonate = async (user: any) => {
+    try {
+      stopImpersonation();
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const userId = user.user_id;
+      const userName = user.profile?.company_name || user.profile?.first_name || user.profile?.email || 'User';
+
+      impersonateUser(userId);
+
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const targetPath = user.profile?.user_type === 'corporate'
+        ? '/panel/dashboard'
+        : '/profile/dashboard';
+
+      toast({
+        title: 'Başarılı',
+        description: `${userName} olarak görüntüleniyorsunuz`
       });
-    },
-    enabled: isAdmin,
-  });
 
-  const verifyMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_verified: true })
-        .eq('id', userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setSelectedUser(null);
-      toast({ title: 'Başarılı', description: 'Kurumsal kullanıcı doğrulandı' });
-    },
-  });
+      navigate(targetPath);
+    } catch (error) {
+      console.error('Impersonation error:', error);
+      toast({
+        title: 'Hata',
+        description: 'Kullanıcı taklit edilirken hata oluştu',
+        variant: 'destructive'
+      });
+    }
+  };
 
-  const approveMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      // Önce user_roles'u onayla
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .update({ status: 'approved' })
-        .eq('user_id', userId);
-      if (roleError) throw roleError;
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setRoleFilter('all');
+    setStatusFilter('all');
+    setVerificationFilter('all');
+    setCurrentPage(1);
+  };
 
-      // Kurumsal kullanıcı ise profile'ı da doğrulanmış olarak işaretle
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ is_verified: true })
-        .eq('id', userId)
-        .eq('user_type', 'corporate');
-      if (profileError) throw profileError;
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds(prev =>
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
 
-      // site_owners tablosundaki kaydı da onayla
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError) throw new Error('Oturum bilgisi alınamadı');
-      
-      const { error: siteOwnerError } = await (supabase as any)
-        .from('site_owners')
-        .update({ 
-          status: 'approved',
-          approved_at: new Date().toISOString(),
-          approved_by: user?.id
-        })
-        .eq('user_id', userId);
-      if (siteOwnerError) throw siteOwnerError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({ title: 'Başarılı', description: 'Kullanıcı onaylandı ve doğrulandı' });
-    },
-  });
-
-  const rejectMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .update({ status: 'rejected' })
-        .eq('user_id', userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({ title: 'Başarılı', description: 'Kullanıcı reddedildi' });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast({ title: 'Başarılı', description: 'Kullanıcı silindi' });
-    },
-  });
+  const toggleSelectAll = () => {
+    if (users && selectedUserIds.length === users.length) {
+      setSelectedUserIds([]);
+    } else {
+      setSelectedUserIds(users?.map(u => u.user_id) || []);
+    }
+  };
 
   if (!isAdmin) {
     return (
@@ -165,234 +134,85 @@ const Users = () => {
     );
   }
 
-  // Kullanıcıları user_type'a göre ayır - varsayılan 'individual'
-  const individualUsers = users?.filter(u => {
-    const userType = u.profile?.user_type || 'individual';
-    return userType === 'individual';
-  }) || [];
-  
-  const corporateUsers = users?.filter(u => {
-    const userType = u.profile?.user_type;
-    return userType === 'corporate';
-  }) || [];
+  const totalPages = Math.ceil((totalCount || 0) / pageSize);
 
-  const renderIndividualTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Email</TableHead>
-          <TableHead>Ad Soyad</TableHead>
-          <TableHead>Telefon</TableHead>
-          <TableHead>Kullanıcı Adı</TableHead>
-          <TableHead>Rol</TableHead>
-          <TableHead>Durum</TableHead>
-          <TableHead>Kayıt Tarihi</TableHead>
-          <TableHead className="text-right">İşlemler</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {individualUsers.length > 0 ? (
-          individualUsers.map((user: any) => (
-            <TableRow 
-              key={user.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setSelectedUser(user)}
+  const BulkActionsBar = () => (
+    selectedUserIds.length > 0 ? (
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="text-sm">
+              {selectedUserIds.length} seçildi
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedUserIds([])}
+              className="h-8"
             >
-              <TableCell>{user.profile?.email || '-'}</TableCell>
-              <TableCell>
-                {user.profile?.first_name && user.profile?.last_name
-                  ? `${user.profile.first_name} ${user.profile.last_name}`
-                  : '-'}
-              </TableCell>
-              <TableCell>{user.profile?.phone || '-'}</TableCell>
-              <TableCell>{user.profile?.username || '-'}</TableCell>
-              <TableCell>
-                <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                  {user.role === 'admin' ? 'Admin' : user.role === 'moderator' ? 'Moderatör' : 'Kullanıcı'}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    user.status === 'approved'
-                      ? 'default'
-                      : user.status === 'rejected'
-                      ? 'destructive'
-                      : 'secondary'
-                  }
-                >
-                  {user.status === 'approved'
-                    ? 'Onaylandı'
-                    : user.status === 'rejected'
-                    ? 'Reddedildi'
-                    : 'Bekliyor'}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {user.profile?.created_at
-                  ? new Date(user.profile.created_at).toLocaleDateString('tr-TR')
-                  : '-'}
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                  {user.status === 'pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => approveMutation.mutate(user.user_id)}
-                        disabled={approveMutation.isPending}
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectMutation.mutate(user.user_id)}
-                        disabled={rejectMutation.isPending}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => deleteMutation.mutate(user.user_id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={7} className="text-center text-muted-foreground">
-              Henüz bireysel kullanıcı bulunmuyor
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
-  );
-
-  const renderCorporateTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Şirket Adı</TableHead>
-          <TableHead>Vergi No</TableHead>
-          <TableHead>Yetkili Kişi</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Telefon</TableHead>
-          <TableHead>Doğrulama</TableHead>
-          <TableHead>Durum</TableHead>
-          <TableHead className="text-right">İşlemler</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {corporateUsers.length > 0 ? (
-          corporateUsers.map((user: any) => (
-            <TableRow 
-              key={user.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setSelectedUser(user)}
+              <X className="w-4 h-4 mr-1" />
+              Temizle
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setShowBulkApproveDialog(true)}
+              className="h-8"
+              disabled={isBulkProcessing}
             >
-              <TableCell className="font-medium">{user.profile?.company_name || '-'}</TableCell>
-              <TableCell>{user.profile?.company_tax_number || '-'}</TableCell>
-              <TableCell>{user.profile?.company_authorized_person || '-'}</TableCell>
-              <TableCell>{user.profile?.company_email || user.profile?.email || '-'}</TableCell>
-              <TableCell>{user.profile?.company_phone || '-'}</TableCell>
-              <TableCell>
-                <Badge variant={user.profile?.is_verified ? 'default' : 'secondary'}>
-                  {user.profile?.is_verified ? (
-                    <span className="flex items-center gap-1">
-                      <Shield className="w-3 h-3" /> Doğrulandı
-                    </span>
-                  ) : (
-                    'Doğrulanmadı'
-                  )}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    user.status === 'approved'
-                      ? 'default'
-                      : user.status === 'rejected'
-                      ? 'destructive'
-                      : 'secondary'
-                  }
-                >
-                  {user.status === 'approved'
-                    ? 'Onaylandı'
-                    : user.status === 'rejected'
-                    ? 'Reddedildi'
-                    : 'Bekliyor'}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                  {!user.profile?.is_verified && (
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => verifyMutation.mutate(user.user_id)}
-                      disabled={verifyMutation.isPending}
-                      title="Kurumsal Kullanıcıyı Doğrula"
-                    >
-                      <Shield className="w-4 h-4" />
-                    </Button>
-                  )}
-                  {user.status === 'pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => approveMutation.mutate(user.user_id)}
-                        disabled={approveMutation.isPending}
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectMutation.mutate(user.user_id)}
-                        disabled={rejectMutation.isPending}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => deleteMutation.mutate(user.user_id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={8} className="text-center text-muted-foreground">
-              Henüz kurumsal kullanıcı bulunmuyor
-            </TableCell>
-          </TableRow>
+              <CheckCircle className="w-4 h-4 mr-1" />
+              Onayla
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBulkRejectDialog(true)}
+              className="h-8"
+              disabled={isBulkProcessing}
+            >
+              <XCircle className="w-4 h-4 mr-1" />
+              Reddet
+            </Button>
+            {activeTab === 'corporate' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowBulkVerifyDialog(true)}
+                className="h-8"
+                disabled={isBulkProcessing}
+              >
+                <Shield className="w-4 h-4 mr-1" />
+                Doğrula
+              </Button>
+            )}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowBulkDeleteDialog(true)}
+              className="h-8"
+              disabled={isBulkProcessing}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Sil
+            </Button>
+          </div>
+        </div>
+        {isBulkProcessing && (
+          <div className="mt-3">
+            <Progress value={bulkProgress} className="h-2" />
+            <p className="text-sm text-muted-foreground mt-1">İşleniyor... %{Math.round(bulkProgress)}</p>
+          </div>
         )}
-      </TableBody>
-    </Table>
+      </div>
+    ) : null
   );
 
   return (
     <>
-      <SEO 
-        title="Kullanıcı Yönetimi" 
+      <SEO
+        title="Kullanıcı Yönetimi"
         description="Sistem kullanıcılarını yönetin"
       />
 
@@ -411,17 +231,17 @@ const Users = () => {
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{users?.length || 0}</div>
+              <div className="text-2xl font-bold">{totalCount || 0}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Bireysel</CardTitle>
               <User className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{individualUsers.length}</div>
+              <div className="text-2xl font-bold">{activeTab === 'individual' ? (totalCount || 0) : '-'}</div>
             </CardContent>
           </Card>
 
@@ -431,10 +251,7 @@ const Users = () => {
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{corporateUsers.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {corporateUsers.filter(u => u.profile && 'is_verified' in u.profile && u.profile.is_verified).length} doğrulandı
-              </p>
+              <div className="text-2xl font-bold">{activeTab === 'corporate' ? (totalCount || 0) : '-'}</div>
             </CardContent>
           </Card>
         </div>
@@ -446,169 +263,216 @@ const Users = () => {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="individual" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Bireysel Kullanıcılar
-                    <Badge variant="secondary" className="ml-2">
-                      {individualUsers.length}
-                    </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger value="corporate" className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Kurumsal Kullanıcılar
-                    <Badge variant="secondary" className="ml-2">
-                      {corporateUsers.length}
-                    </Badge>
-                  </TabsTrigger>
-                </TabsList>
+              <>
+                <EnhancedTableToolbar
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  statusFilter={statusFilter}
+                  onStatusFilterChange={setStatusFilter}
+                  ratingFilter={roleFilter}
+                  onRatingFilterChange={setRoleFilter}
+                  totalItems={totalCount || 0}
+                  filteredItems={users?.length || 0}
+                  onClearFilters={handleClearFilters}
+                  searchPlaceholder="Email, ad, soyad veya şirket adı ile ara..."
+                  statusOptions={[
+                    { value: 'all', label: 'Tüm Durumlar' },
+                    { value: 'approved', label: 'Onaylı' },
+                    { value: 'pending', label: 'Beklemede' },
+                    { value: 'rejected', label: 'Reddedildi' },
+                  ]}
+                  ratingOptions={[
+                    { value: 'all', label: 'Tüm Roller' },
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'user', label: 'Kullanıcı' },
+                    { value: 'site_owner', label: 'Site Sahibi' },
+                  ]}
+                />
 
-                <TabsContent value="individual" className="mt-6">
-                  {renderIndividualTable()}
-                </TabsContent>
+                <Tabs value={activeTab} onValueChange={(val) => {
+                  setActiveTab(val);
+                  handleClearFilters();
+                  setSelectedUserIds([]);
+                }} className="mt-6">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="individual" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Bireysel Kullanıcılar
+                    </TabsTrigger>
+                    <TabsTrigger value="corporate" className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      Kurumsal Kullanıcılar
+                      {activeTab === 'corporate' && verificationFilter !== 'all' && (
+                        <Badge variant="secondary" className="ml-2">
+                          {verificationFilter === 'verified' ? 'Doğrulanmış' : 'Doğrulanmamış'}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="corporate" className="mt-6">
-                  {renderCorporateTable()}
-                </TabsContent>
-              </Tabs>
+                  <TabsContent value="individual" className="mt-6 space-y-4">
+                    <BulkActionsBar />
+                    <IndividualUserTable
+                      users={users || []}
+                      selectedUserIds={selectedUserIds}
+                      onToggleSelectAll={toggleSelectAll}
+                      onToggleUserSelection={toggleUserSelection}
+                      onSelectUser={setSelectedUser}
+                      onApprove={(id) => approveMutation.mutate(id)}
+                      onReject={(id) => rejectMutation.mutate(id)}
+                      onDelete={(id) => deleteMutation.mutate(id)}
+                      onImpersonate={handleImpersonate}
+                      approvePending={approveMutation.isPending}
+                      rejectPending={rejectMutation.isPending}
+                      deletePending={deleteMutation.isPending}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="corporate" className="mt-6 space-y-4">
+                    <BulkActionsBar />
+                    {activeTab === 'corporate' && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant={verificationFilter === 'all' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('all')}
+                        >
+                          Tümü
+                        </Button>
+                        <Button
+                          variant={verificationFilter === 'verified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('verified')}
+                        >
+                          <Shield className="w-4 h-4 mr-2" />
+                          Doğrulanmış
+                        </Button>
+                        <Button
+                          variant={verificationFilter === 'unverified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setVerificationFilter('unverified')}
+                        >
+                          Doğrulanmamış
+                        </Button>
+                      </div>
+                    )}
+                    <CorporateUserTable
+                      users={users || []}
+                      selectedUserIds={selectedUserIds}
+                      onToggleSelectAll={toggleSelectAll}
+                      onToggleUserSelection={toggleUserSelection}
+                      onSelectUser={setSelectedUser}
+                      onApprove={(id) => approveMutation.mutate(id)}
+                      onReject={(id) => rejectMutation.mutate(id)}
+                      onDelete={(id) => deleteMutation.mutate(id)}
+                      onVerify={(id) => verifyMutation.mutate(id)}
+                      onImpersonate={handleImpersonate}
+                      approvePending={approveMutation.isPending}
+                      rejectPending={rejectMutation.isPending}
+                      deletePending={deleteMutation.isPending}
+                      verifyPending={verifyMutation.isPending}
+                    />
+                  </TabsContent>
+                </Tabs>
+
+                {totalPages > 1 && (
+                  <EnhancedTablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalItems={totalCount || 0}
+                    onPageChange={setCurrentPage}
+                    onPageSizeChange={(size) => {
+                      setPageSize(size);
+                      setCurrentPage(1);
+                    }}
+                  />
+                )}
+              </>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Corporate User Detail Dialog */}
-      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Kurumsal Kullanıcı Detayları</DialogTitle>
-            <DialogDescription>
-              {selectedUser?.profile?.company_name}
-            </DialogDescription>
-          </DialogHeader>
+      <UserDetailsDialog
+        user={selectedUser}
+        open={!!selectedUser}
+        onOpenChange={(open) => !open && setSelectedUser(null)}
+        onVerify={(id) => verifyMutation.mutate(id)}
+        verifyPending={verifyMutation.isPending}
+      />
 
-          {selectedUser && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Şirket Adı</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_name || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Vergi Numarası</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_tax_number || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Şirket Tipi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_type || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Yetkili Kişi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_authorized_person || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Email</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_email || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Telefon</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_phone || '-'}
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <label className="text-sm font-medium">Adres</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_address || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Website</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.company_website || '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Kayıt Tarihi</label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.profile?.created_at 
-                      ? new Date(selectedUser.profile.created_at).toLocaleDateString('tr-TR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })
-                      : '-'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Doğrulama Durumu</label>
-                  <Badge variant={selectedUser.profile?.is_verified ? 'default' : 'secondary'} className="mt-1">
-                    {selectedUser.profile?.is_verified ? (
-                      <span className="flex items-center gap-1">
-                        <Shield className="w-3 h-3" /> Doğrulandı
-                      </span>
-                    ) : (
-                      'Doğrulanmadı'
-                    )}
-                  </Badge>
-                </div>
-              </div>
+      <AlertDialog open={showBulkApproveDialog} onOpenChange={setShowBulkApproveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Onay</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı onaylamak istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkApprove} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Onayla
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-              {!selectedUser.profile?.is_verified && (
-                <div className="pt-4 border-t">
-                  <Button
-                    onClick={() => verifyMutation.mutate(selectedUser.user_id)}
-                    disabled={verifyMutation.isPending}
-                    className="w-full"
-                  >
-                    {verifyMutation.isPending ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Doğrulanıyor...</>
-                    ) : (
-                      <><Shield className="w-4 h-4 mr-2" /> Kurumsal Kullanıcıyı Doğrula</>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+      <AlertDialog open={showBulkRejectDialog} onOpenChange={setShowBulkRejectDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Reddetme</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı reddetmek istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkReject} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Reddet
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-          <DialogFooter className="flex gap-2">
-            {/* ✅ YENİ: Üye gibi davran butonu */}
-            <Button
-              variant="outline"
-              onClick={async () => {
-                const userName = selectedUser?.profile?.company_name || 
-                  `${selectedUser?.profile?.first_name || ''} ${selectedUser?.profile?.last_name || ''}` ||
-                  selectedUser?.profile?.email;
-                
-                const success = await impersonateUser(selectedUser?.user_id, userName);
-                if (success) {
-                  setSelectedUser(null);
-                }
-              }}
-              disabled={impersonating || selectedUser?.status !== 'approved'}
-              className="flex items-center gap-2"
-            >
-              <UserCog className="h-4 w-4" />
-              {impersonating ? 'Giriş yapılıyor...' : 'Üye gibi davran'}
-            </Button>
+      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Silme</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} disabled={isBulkProcessing} className="bg-destructive hover:bg-destructive/90">
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Sil
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-            <Button variant="ghost" onClick={() => setSelectedUser(null)}>
-              Kapat
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog open={showBulkVerifyDialog} onOpenChange={setShowBulkVerifyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Toplu Doğrulama</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUserIds.length} kullanıcıyı doğrulamak istediğinizden emin misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkProcessing}>İptal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkVerify} disabled={isBulkProcessing}>
+              {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Doğrula
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

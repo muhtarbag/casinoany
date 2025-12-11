@@ -185,7 +185,7 @@ export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: S
     }
 
     // Declining views
-    if (comparison?.changes.views && comparison.changes.views < -15) {
+    if (comparison?.changes?.views != null && comparison.changes.views < -15) {
       alerts.push({
         id: 'declining-views',
         type: 'warning' as const,
@@ -198,13 +198,13 @@ export const SiteOwnerDashboard = ({ siteId, siteName, siteData, onNavigate }: S
     }
 
     // Low rating
-    const avgRating = siteData?.avg_rating || 0;
+    const avgRating = siteData?.avg_rating ?? 0;
     if (avgRating > 0 && avgRating < 3) {
       alerts.push({
         id: 'low-rating',
         type: 'warning' as const,
         title: 'Düşük ortalama puan',
-        description: `Mevcut puan: ${avgRating.toFixed(1)}. Kullanıcı deneyimini iyileştirin`,
+        description: `Mevcut puan: ${Number(avgRating).toFixed(1)}. Kullanıcı deneyimini iyileştirin`,
         action: 'feedback',
         actionLabel: 'Geri Bildirimleri İncele',
         priority: 7

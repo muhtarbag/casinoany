@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet-async';
+import { TypedQueries } from '@/lib/supabase-typed';
 
 // AMP-specific blog post page
 export default function AMPBlogPost() {
@@ -11,7 +12,9 @@ export default function AMPBlogPost() {
   const { data: post } = useQuery({
     queryKey: ['amp-blog-post', slug],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      // ... inside component
+
+      const { data, error } = await TypedQueries.blogPosts(supabase)
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
@@ -36,7 +39,7 @@ export default function AMPBlogPost() {
   <meta charset="utf-8">
   <script async src="https://cdn.ampproject.org/v0.js"></script>
   <title>${post.meta_title || post.title}</title>
-  <link rel="canonical" href="${window.location.origin}/blog/${post.slug}">
+  <link rel="canonical" href="${window.location.origin}/${post.slug}">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <meta name="description" content="${post.meta_description || post.excerpt}">
   <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
@@ -115,7 +118,7 @@ export default function AMPBlogPost() {
   </article>
   
   <footer style="margin-top: 3em; padding-top: 2em; border-top: 1px solid #eee;">
-    <p><a href="${window.location.origin}/blog/${post.slug}">Tam sürümü görüntüle</a></p>
+    <p><a href="${window.location.origin}/${post.slug}">Tam sürümü görüntüle</a></p>
     <p><a href="${window.location.origin}">Ana Sayfaya Dön</a></p>
   </footer>
 </body>
@@ -127,7 +130,16 @@ export default function AMPBlogPost() {
       <Helmet>
         <link rel="amphtml" href={`${window.location.origin}/amp/blog/${post.slug}`} />
       </Helmet>
-      <div dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Script for Prerenderer to extract clean AMP HTML */}
+      <script id="amp-source" type="text/plain" dangerouslySetInnerHTML={{ __html: ampHTML }} />
+
+      {/* Preview for User/Dev (since this is a React route) */}
+      <iframe
+        srcDoc={ampHTML}
+        style={{ width: '100%', height: '100vh', border: 'none' }}
+        title={`AMP Preview: ${post.title}`}
+      />
     </>
   );
 }

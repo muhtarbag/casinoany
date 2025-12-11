@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,7 +11,7 @@ import { BarChart3, TrendingUp, Eye, MousePointer } from 'lucide-react';
 
 type SortOption = 'views' | 'clicks' | 'ctr' | 'revenue';
 
-export default function SiteAnalytics() {
+const SiteAnalytics: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('views');
   const [selectedSite, setSelectedSite] = useState<{
     id: string;
@@ -216,4 +216,6 @@ export default function SiteAnalytics() {
       />
     </div>
   );
-}
+};
+
+export default SiteAnalytics;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -94,10 +94,12 @@ export const NotificationPopup = () => {
   const [formPhone, setFormPhone] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scrollDepth, setScrollDepth] = useState(0);
   const sessionId = getSessionId();
 
   // Admin paneldeyse bildirimleri gösterme
   const isAdminPanel = location.pathname.startsWith('/admin');
+  const isPanelPage = location.pathname.startsWith('/panel');
   
   // Kullanıcı segmentini belirle
   const userSegment = getUserSegment(user);
@@ -106,8 +108,8 @@ export const NotificationPopup = () => {
   const { data: notifications } = useQuery({
     queryKey: ['active-notifications', location.pathname, userSegment],
     queryFn: async () => {
-      // Admin paneldeyse boş dön
-      if (isAdminPanel) return [];
+      // Admin panel veya kullanıcı panelindeyse boş dön
+      if (isAdminPanel || isPanelPage) return [];
       
       const now = new Date().toISOString();
       
@@ -122,7 +124,17 @@ export const NotificationPopup = () => {
       
       if (error) throw error;
       
-      const currentPage = location.pathname === '/' ? 'home' : location.pathname.split('/')[1];
+      // Sayfa tipini belirle
+      let currentPage = 'home';
+      if (location.pathname === '/') {
+        currentPage = 'home';
+      } else if (location.pathname.match(/^\/[^/]+$/)) {
+        // Site detail pages (e.g., /havanabet, /fenomenbet)
+        currentPage = 'site_detail';
+      } else {
+        // Other pages
+        currentPage = location.pathname.split('/')[1];
+      }
       
       // Sayfa ve kullanıcı segmentine göre filtrele
       return (data as Notification[]).filter(n => {
@@ -206,38 +218,100 @@ export const NotificationPopup = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // ✅ INFINITE RE-RENDER FIX: useCallback to stabilize function reference
-  const checkTrigger = useCallback((notification: Notification) => {
-    const { trigger_type, trigger_conditions } = notification;
+  // Scroll depth tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrolled = (scrollTop / (documentHeight - windowHeight)) * 100;
+      setScrollDepth(Math.round(scrolled));
+    };
 
-    switch (trigger_type) {
-      case 'instant':
-        setShouldShow(true);
-        return true;
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Exit intent tracking - Desktop & Mobile
+  useEffect(() => {
+    let exitIntentTriggered = false;
+    const isMobile = window.innerWidth <= 768;
+
+    // Desktop: Mouse leave from top
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !exitIntentTriggered) {
+        exitIntentTriggered = true;
+        triggerExitIntent();
+        resetTrigger();
+      }
+    };
+
+    // Mobile: Back button / browser back detection
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!exitIntentTriggered && isMobile) {
+        exitIntentTriggered = true;
+        triggerExitIntent();
+        // Note: Can't prevent default on mobile, but we still track the intent
+      }
+    };
+
+    // Mobile: Rapid scroll up detection (exit intent gesture)
+    let lastScrollY = window.scrollY;
+    let scrollUpCount = 0;
+    const handleScroll = () => {
+      if (!isMobile) return;
       
-      case 'time_on_page':
-        const requiredTime = trigger_conditions?.seconds || 10;
-        if (timeOnPage >= requiredTime) {
-          setShouldShow(true);
-          return true;
+      const currentScrollY = window.scrollY;
+      
+      // User scrolled up rapidly while at the top of page
+      if (currentScrollY < lastScrollY && currentScrollY < 100) {
+        scrollUpCount++;
+        
+        // If user scrolled up 3 times quickly at top of page
+        if (scrollUpCount >= 3 && !exitIntentTriggered) {
+          exitIntentTriggered = true;
+          triggerExitIntent();
+          resetTrigger();
+          scrollUpCount = 0;
         }
-        return false;
+      } else {
+        scrollUpCount = 0;
+      }
       
-      case 'scroll_depth':
-        // Can be implemented with scroll tracking
-        return false;
-      
-      case 'exit_intent':
-        // Can be implemented with mouse tracking
-        return false;
-      
-      default:
-        setShouldShow(true);
-        return true;
-    }
-  }, [timeOnPage]);
+      lastScrollY = currentScrollY;
+    };
 
-  // ✅ INFINITE RE-RENDER FIX: Memoize notification logic  
+    const triggerExitIntent = () => {
+      if (notifications && notifications.length > 0) {
+        const exitNotification = notifications.find(n => n.trigger_type === 'exit_intent');
+        if (exitNotification && !openNotificationId) {
+          setShouldShow(true);
+        }
+      }
+    };
+
+    const resetTrigger = () => {
+      setTimeout(() => {
+        exitIntentTriggered = false;
+        scrollUpCount = 0;
+      }, 5000);
+    };
+
+    // Attach listeners based on device
+    if (!isMobile) {
+      document.addEventListener('mouseleave', handleMouseLeave);
+    } else {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [notifications, openNotificationId]);
+
   useEffect(() => {
     if (!notifications || !viewedNotifications) return;
     // Zaten bir bildirim açıksa tekrar kontrol etme
@@ -286,7 +360,42 @@ export const NotificationPopup = () => {
       setOpenNotificationId(notificationToShow.id);
       trackViewMutation.mutate(notificationToShow.id);
     }
-  }, [notifications, viewedNotifications, shouldShow, openNotificationId, checkTrigger, trackViewMutation]);
+  }, [notifications, viewedNotifications, shouldShow, openNotificationId]);
+
+  const checkTrigger = (notification: Notification) => {
+    const { trigger_type, trigger_conditions } = notification;
+
+    switch (trigger_type) {
+      case 'instant':
+        setShouldShow(true);
+        return true;
+      
+      case 'time_on_page':
+        const requiredTime = trigger_conditions?.seconds || 10;
+        if (timeOnPage >= requiredTime) {
+          setShouldShow(true);
+          return true;
+        }
+        return false;
+      
+      case 'scroll_depth':
+        const requiredScroll = trigger_conditions?.scroll_percentage || 30;
+        if (scrollDepth >= requiredScroll) {
+          setShouldShow(true);
+          return true;
+        }
+        return false;
+      
+      case 'exit_intent':
+        // Exit intent is handled via mouse tracking
+        // When user moves mouse to leave the page, shouldShow is set to true
+        return shouldShow;
+      
+      default:
+        setShouldShow(true);
+        return true;
+    }
+  };
 
   const handleClose = () => {
     if (openNotificationId) {
@@ -298,16 +407,37 @@ export const NotificationPopup = () => {
     }
   };
 
-  const handleButtonClick = (url: string | null) => {
+  const handleButtonClick = async (url: string | null) => {
     if (openNotificationId) {
       trackClickMutation.mutate(openNotificationId);
     }
     
     if (url) {
-      if (url.startsWith('http')) {
-        window.open(url, '_blank');
+      let finalUrl = url;
+      
+      // Site detay sayfasındaysak ve {affiliate_link} placeholder'ı varsa, gerçek affiliate link'i al
+      if (url.includes('{affiliate_link}')) {
+        const slug = location.pathname.substring(1); // Remove leading slash
+        
+        try {
+          const { data: site } = await supabase
+            .from('betting_sites')
+            .select('affiliate_link')
+            .eq('slug', slug)
+            .single();
+          
+          if (site?.affiliate_link) {
+            finalUrl = url.replace('{affiliate_link}', site.affiliate_link);
+          }
+        } catch (error) {
+          console.error('Failed to fetch affiliate link:', error);
+        }
+      }
+      
+      if (finalUrl.startsWith('http')) {
+        window.open(finalUrl, '_blank');
       } else {
-        navigate(url);
+        navigate(finalUrl);
       }
       handleClose();
     }
