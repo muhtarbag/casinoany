@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useBettingSites } from '@/hooks/queries/useBettingSitesQueries';
 import { BettingSiteCard } from '@/components/BettingSiteCard';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Bitcoin, CreditCard, Building2, Wallet } from 'lucide-react';
+import { Bitcoin, CreditCard, Building2, Wallet, Zap } from 'lucide-react';
 import { usePageLoadPerformance } from '@/hooks/usePerformanceMonitor';
 import { GamblingSEOEnhancer } from '@/components/seo/GamblingSEOEnhancer';
 import { LoadingSpinner } from '@/components/LoadingSpinner';

@@ -4,7 +4,12 @@ import { Button } from "./ui/button";
 
 export const HowItWorksSection = () => {
   const scrollToSites = () => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    const sitesGrid = document.getElementById('sites-grid');
+    if (sitesGrid) {
+      const offset = -500;
+      const elementPosition = sitesGrid.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+    }
   };
 
   const steps = [
