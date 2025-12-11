@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,11 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sparkles, Loader2, X, Save, Eye, Link as LinkIcon, Calendar } from 'lucide-react';
-import { RichTextEditor } from '@/components/BlogManagement'; // Assuming this is kept or moved, we'll need to check imports
-
-// We need to import RichTextEditor properly. 
-// If it was internal to BlogManagement, we might need to extract it too or import from where it is.
-// Looking at original file: import { RichTextEditor } from './RichTextEditor';
 import { RichTextEditor } from '@/components/RichTextEditor';
 
 interface BlogFormProps {
