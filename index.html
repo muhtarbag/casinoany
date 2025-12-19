@@ -6,6 +6,16 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
 
+  <!-- Prevent initial static SEO markup from flashing for JS-enabled users -->
+  <script>
+    document.documentElement.classList.add('js');
+  </script>
+  <style>
+    html.js #initial-content {
+      display: none !important;
+    }
+  </style>
+
   <!-- Google tag (gtag.js) - Deferred for better FCP -->
   <script defer src="https://www.googletagmanager.com/gtag/js?id=G-JF61BVV6P9"></script>
   <script>
@@ -364,21 +374,6 @@
 
   <script type="module" src="/src/main.tsx" defer></script>
 
-  <!-- Hide initial content after React loads -->
-  <script>
-    // Simple timeout-based removal for better PageSpeed compatibility
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        var initialContent = document.getElementById('initial-content');
-        if (initialContent) {
-          initialContent.style.opacity = '0';
-          setTimeout(function () {
-            initialContent.remove();
-          }, 300);
-        }
-      }, 500);
-    });
-  </script>
 
   <!-- Service Worker is auto-registered by vite-plugin-pwa -->
 </body>
