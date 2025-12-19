@@ -4,6 +4,12 @@ import "./index.css";
 import "./styles/mobile-optimizations.css";
 import "./styles/mobile-touch.css";
 
+// Hide static SEO content immediately when React starts loading
+const initialContent = document.getElementById("initial-content");
+if (initialContent) {
+  initialContent.style.display = "none";
+}
+
 createRoot(document.getElementById("root")!).render(<App />);
 
 // Dispatch render event for prerendering (SSG optimization)
