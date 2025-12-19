@@ -4,7 +4,7 @@ import { TypedDB } from '@/lib/supabase-extended';
 import { queryKeys, CACHE_TIMES, REFETCH_INTERVALS } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-// Sites listesi - Optimized caching
+// Sites listesi
 export const useSites = (filters?: {
   isActive?: boolean;
   isFeatured?: boolean;
@@ -34,11 +34,7 @@ export const useSites = (filters?: {
       if (error) throw error;
       return data || [];
     },
-    staleTime: CACHE_TIMES.VERY_LONG, // 1 hour - sites rarely change
-    gcTime: 2 * 60 * 60 * 1000, // 2 hours
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
+    staleTime: 30 * 60 * 1000, // 30 minutes - sites rarely change
   });
 };
 
@@ -53,8 +49,6 @@ export const useSite = (slug: string) => {
       return data;
     },
     staleTime: CACHE_TIMES.VERY_LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false, // Site detail rarely changes
     enabled: !!slug,
   });
 };
@@ -76,31 +70,126 @@ export const useFeaturedSites = () => {
       return data || [];
     },
     staleTime: CACHE_TIMES.VERY_LONG,
-    gcTime: 60 * 60 * 1000, // 1 hour
   });
 };
 
-// Site stats - Optimized for analytics
+// ✅ FIXED: Site stats combining site_stats + conversions tables
 export const useSiteStats = () => {
   return useQuery({
     queryKey: queryKeys.sites.stats(),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_stats_with_details')
-        .select('*')
-        .order('views', { ascending: false });
+      // Get all sites with their site_stats data
+      const { data: sites, error: sitesError } = await supabase
+        .from('betting_sites')
+        .select('id, name, slug')
+        .eq('is_active', true);
 
-      if (error) throw error;
-      return data || [];
+      if (sitesError) throw sitesError;
+
+      // Get site_stats (views and clicks)
+      const { data: siteStats, error: statsError } = await supabase
+        .from('site_stats')
+        .select('site_id, views, clicks');
+
+      if (statsError) throw statsError;
+
+      // Get conversions for social media clicks
+      const { data: conversions, error: convError } = await supabase
+        .from('conversions')
+        .select('site_id, conversion_type')
+        .in('conversion_type', [
+          'affiliate_click',
+          'email_click',
+          'whatsapp_click',
+          'telegram_click',
+          'twitter_click',
+          'instagram_click',
+          'facebook_click',
+          'youtube_click'
+        ]);
+
+      if (convError) throw convError;
+
+      // Create stats map
+      const statsMap = new Map<string, {
+        site_id: string;
+        site_name: string;
+        site_slug: string;
+        views: number;
+        clicks: number;
+        email_clicks: number;
+        whatsapp_clicks: number;
+        telegram_clicks: number;
+        twitter_clicks: number;
+        instagram_clicks: number;
+        facebook_clicks: number;
+        youtube_clicks: number;
+      }>();
+
+      // Initialize all sites
+      sites.forEach(site => {
+        const siteStat = siteStats?.find(s => s.site_id === site.id);
+        statsMap.set(site.id, {
+          site_id: site.id,
+          site_name: site.name,
+          site_slug: site.slug,
+          views: siteStat?.views || 0,
+          clicks: siteStat?.clicks || 0,
+          email_clicks: 0,
+          whatsapp_clicks: 0,
+          telegram_clicks: 0,
+          twitter_clicks: 0,
+          instagram_clicks: 0,
+          facebook_clicks: 0,
+          youtube_clicks: 0,
+        });
+      });
+
+      // Add conversion counts (social media + additional affiliate clicks)
+      conversions?.forEach(conv => {
+        if (!conv.site_id) return;
+        const stats = statsMap.get(conv.site_id);
+        if (!stats) return;
+
+        switch (conv.conversion_type) {
+          case 'affiliate_click':
+            stats.clicks++;
+            break;
+          case 'email_click':
+            stats.email_clicks++;
+            break;
+          case 'whatsapp_click':
+            stats.whatsapp_clicks++;
+            break;
+          case 'telegram_click':
+            stats.telegram_clicks++;
+            break;
+          case 'twitter_click':
+            stats.twitter_clicks++;
+            break;
+          case 'instagram_click':
+            stats.instagram_clicks++;
+            break;
+          case 'facebook_click':
+            stats.facebook_clicks++;
+            break;
+          case 'youtube_click':
+            stats.youtube_clicks++;
+            break;
+        }
+      });
+
+      const result = Array.from(statsMap.values())
+        .sort((a, b) => b.views - a.views);
+
+      return result;
     },
-    staleTime: CACHE_TIMES.LONG, // 15 minutes - stats don't need real-time
-    gcTime: CACHE_TIMES.VERY_LONG, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: 30000, // 30 seconds
+    refetchOnMount: true,
   });
 };
 
-// ✅ DÜZELTILDI: Thread-safe UPSERT kullanıyor (race condition yok)
+// ✅ FIXED: Track using conversions table
 export const useUpdateSiteStats = () => {
   const queryClient = useQueryClient();
 
@@ -110,11 +199,17 @@ export const useUpdateSiteStats = () => {
       type 
     }: { 
       siteId: string; 
-      type: 'view' | 'click' | 'email_click' | 'whatsapp_click' | 'telegram_click' | 'twitter_click' | 'instagram_click' | 'facebook_click' | 'youtube_click';
+      type: 'page_view' | 'affiliate_click' | 'email_click' | 'whatsapp_click' | 'telegram_click' | 'twitter_click' | 'instagram_click' | 'facebook_click' | 'youtube_click';
     }) => {
-      const { error } = await supabase.rpc('increment_site_stats', {
+      const sessionId = sessionStorage.getItem('analytics_session_id') || `session_${Date.now()}`;
+      
+      const { error } = await supabase.rpc('track_conversion', {
+        p_conversion_type: type,
+        p_page_path: window.location.pathname,
         p_site_id: siteId,
-        p_metric_type: type
+        p_conversion_value: 0,
+        p_session_id: sessionId,
+        p_metadata: {},
       });
 
       if (error) throw error;

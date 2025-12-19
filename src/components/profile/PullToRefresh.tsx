@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef, useEffect } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -11,15 +11,11 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [touchStartY, setTouchStartY] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const threshold = 80;
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const handleTouchStart = (e: TouchEvent) => {
-      if (container.scrollTop === 0) {
+      if (window.scrollY === 0) {
         setTouchStartY(e.touches[0].clientY);
       }
     };
@@ -30,9 +26,16 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
       const touchY = e.touches[0].clientY;
       const distance = touchY - touchStartY;
 
-      if (distance > 0 && container.scrollTop === 0) {
-        e.preventDefault();
+      // Only handle pull-to-refresh when at top AND pulling down significantly
+      if (distance > 10 && window.scrollY === 0) {
+        // Only prevent scroll when we're actively refreshing
+        if (distance > 20) {
+          e.preventDefault();
+        }
         setPullDistance(Math.min(distance, threshold * 1.5));
+      } else {
+        // Reset if scrolling up or not at top
+        setPullDistance(0);
       }
     };
 
@@ -49,14 +52,14 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
       setTouchStartY(0);
     };
 
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [pullDistance, isRefreshing, touchStartY, threshold, onRefresh]);
 
@@ -64,10 +67,10 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
   const rotation = (pullDistance / threshold) * 360;
 
   return (
-    <div ref={containerRef} className="relative h-full overflow-auto">
+    <div className="relative w-full">
       {/* Pull indicator */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-center justify-center transition-transform"
+        className="fixed top-16 left-0 right-0 flex items-center justify-center transition-transform z-50"
         style={{
           transform: `translateY(${Math.min(pullDistance - 40, 40)}px)`,
           opacity,
@@ -89,7 +92,7 @@ export const PullToRefresh = ({ children, onRefresh }: PullToRefreshProps) => {
 
       {/* Content */}
       <div
-        className="transition-transform duration-200"
+        className="transition-transform duration-200 w-full"
         style={{
           transform: `translateY(${isRefreshing ? 60 : 0}px)`
         }}

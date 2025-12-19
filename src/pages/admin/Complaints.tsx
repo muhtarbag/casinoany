@@ -10,23 +10,26 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Search, Eye, EyeOff, MessageSquare, CheckCircle, XCircle, Clock, Filter } from 'lucide-react';
+import { Search, Eye, EyeOff, MessageSquare, CheckCircle, XCircle, Clock, Filter, Check, Ban, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminComplaints() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [approvalFilter, setApprovalFilter] = useState<string>('all');
   const [siteFilter, setSiteFilter] = useState<string>('all');
   const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [responseText, setResponseText] = useState('');
 
   const { data: complaints, isLoading } = useQuery({
-    queryKey: ['admin-complaints', statusFilter, siteFilter, searchTerm],
+    queryKey: ['admin-complaints', statusFilter, approvalFilter, siteFilter, searchTerm],
     queryFn: async () => {
       let query = supabase
         .from('site_complaints')
@@ -39,6 +42,10 @@ export default function AdminComplaints() {
 
       if (statusFilter !== 'all') {
         query = query.eq('status', statusFilter);
+      }
+
+      if (approvalFilter !== 'all') {
+        query = query.eq('approval_status', approvalFilter);
       }
 
       if (siteFilter !== 'all') {
@@ -106,6 +113,106 @@ export default function AdminComplaints() {
     },
   });
 
+  const approveComplaintMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // Get complaint details for notification
+      const { data: complaint } = await supabase
+        .from('site_complaints')
+        .select('user_id, title')
+        .eq('id', id)
+        .single();
+
+      const { error } = await supabase
+        .from('site_complaints')
+        .update({ 
+          approval_status: 'approved',
+          is_public: true,
+          approved_at: new Date().toISOString(),
+          approved_by: user?.id
+        })
+        .eq('id', id);
+      if (error) throw error;
+
+      // Send notification to user
+      if (complaint?.user_id) {
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: complaint.user_id,
+            notification_type: 'complaint_approved',
+            title: 'Şikayetiniz Onaylandı',
+            message: `"${complaint.title}" başlıklı şikayetiniz onaylanarak yayınlandı.`
+          });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet yayınlandı ve kullanıcıya bildirim gönderildi',
+      });
+      setSelectedComplaint(null);
+    },
+  });
+
+  const rejectComplaintMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // Get complaint details for notification
+      const { data: complaint } = await supabase
+        .from('site_complaints')
+        .select('user_id, title')
+        .eq('id', id)
+        .single();
+
+      const { error } = await supabase
+        .from('site_complaints')
+        .update({ 
+          approval_status: 'rejected',
+          is_public: false
+        })
+        .eq('id', id);
+      if (error) throw error;
+
+      // Send notification to user
+      if (complaint?.user_id) {
+        await supabase
+          .from('user_status_notifications')
+          .insert({
+            user_id: complaint.user_id,
+            notification_type: 'complaint_rejected',
+            title: 'Şikayetiniz İncelendi',
+            message: `"${complaint.title}" başlıklı şikayetiniz incelendi ancak yayınlanamadı. Detaylı bilgi için destek ekibimizle iletişime geçebilirsiniz.`
+          });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet reddedildi ve kullanıcıya bildirim gönderildi',
+      });
+      setSelectedComplaint(null);
+    },
+  });
+
+  const deleteComplaintMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('site_complaints')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-complaints'] });
+      toast({
+        title: 'Başarılı',
+        description: 'Şikayet silindi',
+      });
+      setSelectedComplaint(null);
+    },
+  });
+
   const toggleVisibilityMutation = useMutation({
     mutationFn: async ({ id, isPublic }: { id: string; isPublic: boolean }) => {
       const { error } = await supabase
@@ -161,6 +268,18 @@ export default function AdminComplaints() {
     closed: 'Kapalı',
   };
 
+  const approvalLabels: Record<string, string> = {
+    pending: 'İnceleme Bekliyor',
+    approved: 'Yayında',
+    rejected: 'Reddedildi',
+  };
+
+  const approvalColors: Record<string, 'default' | 'destructive' | 'secondary'> = {
+    pending: 'default',
+    approved: 'secondary',
+    rejected: 'destructive',
+  };
+
   const statusColors: Record<string, 'destructive' | 'default' | 'secondary' | 'outline'> = {
     open: 'destructive',
     in_review: 'default',
@@ -208,7 +327,7 @@ export default function AdminComplaints() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <Label>Ara</Label>
                 <div className="relative">
@@ -220,6 +339,21 @@ export default function AdminComplaints() {
                     className="pl-10"
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label>Onay Durumu</Label>
+                <Select value={approvalFilter} onValueChange={setApprovalFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tümü</SelectItem>
+                    <SelectItem value="pending">İnceleme Bekliyor</SelectItem>
+                    <SelectItem value="approved">Yayında</SelectItem>
+                    <SelectItem value="rejected">Reddedildi</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -284,8 +418,11 @@ export default function AdminComplaints() {
                         />
                       )}
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <h3 className="font-semibold text-lg">{complaint.title}</h3>
+                          <Badge variant={approvalColors[complaint.approval_status || 'pending']}>
+                            {approvalLabels[complaint.approval_status || 'pending']}
+                          </Badge>
                           <Badge variant={statusColors[complaint.status]}>
                             {statusLabels[complaint.status]}
                           </Badge>
@@ -327,11 +464,62 @@ export default function AdminComplaints() {
                     </div>
 
                     <div className="flex flex-col gap-2">
+                      {complaint.approval_status === 'pending' && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => approveComplaintMutation.mutate(complaint.id)}
+                            disabled={approveComplaintMutation.isPending}
+                            className="gap-2"
+                          >
+                            <Check className="w-4 h-4" />
+                            Yayınla
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => rejectComplaintMutation.mutate(complaint.id)}
+                            disabled={rejectComplaintMutation.isPending}
+                            className="gap-2"
+                          >
+                            <Ban className="w-4 h-4" />
+                            Reddet
+                          </Button>
+                        </>
+                      )}
+                      {complaint.approval_status === 'rejected' && (
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => approveComplaintMutation.mutate(complaint.id)}
+                          disabled={approveComplaintMutation.isPending}
+                          className="gap-2"
+                        >
+                          <Check className="w-4 h-4" />
+                          Yayınla
+                        </Button>
+                      )}
                       <Button
                         size="sm"
+                        variant="outline"
                         onClick={() => setSelectedComplaint(complaint)}
                       >
                         Detaylar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm('Bu şikayeti silmek istediğinize emin misiniz?')) {
+                            deleteComplaintMutation.mutate(complaint.id);
+                          }
+                        }}
+                        disabled={deleteComplaintMutation.isPending}
+                        className="gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Sil
                       </Button>
                       <Select
                         value={complaint.status}

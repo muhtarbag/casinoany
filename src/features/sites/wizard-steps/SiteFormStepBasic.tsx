@@ -15,7 +15,7 @@ interface SiteFormStepBasicProps {
   form: UseFormReturn<SiteFormData>;
   logoFile: File | null;
   logoPreview: string | null;
-  onLogoFileChange: (file: File | null) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onLogoPreviewChange: (preview: string | null) => void;
 }
 
@@ -31,6 +31,7 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
   
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    
     if (file) {
       const validationError = validateLogoFile(file);
       if (validationError) {
@@ -38,9 +39,13 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
         e.target.value = '';
         return;
       }
-      onLogoFileChange(file);
+      
       const reader = new FileReader();
-      reader.onloadend = () => onLogoPreviewChange(reader.result as string);
+      reader.onloadend = () => {
+        const preview = reader.result as string;
+        onLogoFileChange(file, preview);
+        onLogoPreviewChange(preview);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -125,7 +130,12 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
               label="Bonus"
               helpText="Sitenin sunduğu hoşgeldin bonusu"
             >
-              <Input placeholder="%100 Hoşgeldin Bonusu" {...field} />
+              <div className="space-y-1">
+                <Input placeholder="%100 Hoşgeldin Bonusu" maxLength={50} {...field} />
+                <p className="text-xs text-muted-foreground text-right">
+                  {field.value?.length || 0}/50 karakter
+                </p>
+              </div>
             </FormFieldWrapper>
           )}
         />
@@ -202,7 +212,16 @@ const SiteFormStepBasicComponent = (props: SiteFormStepBasicProps) => {
                 <img
                   src={logoPreview}
                   alt="Logo preview"
-                  className="h-20 w-auto rounded-lg border bg-muted"
+                  className="h-20 w-auto rounded-lg border bg-muted p-2"
+                  onLoad={() => {
+                    console.log('✅ SiteFormStepBasic - Logo preview loaded successfully');
+                  }}
+                  onError={(e) => {
+                    console.error('❌ SiteFormStepBasic - Logo preview failed:', {
+                      src: logoPreview?.substring(0, 100),
+                      error: e
+                    });
+                  }}
                 />
                 <Button
                   type="button"

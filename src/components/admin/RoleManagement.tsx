@@ -12,6 +12,7 @@ import {
   Shield, UserCog, Loader2, Info, CheckCircle, XCircle, Clock, 
   Search, Mail, Calendar, UserCheck, UserX, Trash2 
 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { showSuccessToast, showErrorToast } from '@/lib/toastHelpers';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -201,6 +202,29 @@ export function RoleManagement() {
     },
   });
 
+  // Remove role from user (moves to pending status)
+  const removeRoleMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ 
+          status: 'pending',
+          approved_at: null,
+          approved_by: null
+        })
+        .eq('user_id', userId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users-with-roles-status'] });
+      showSuccessToast('Rol geri alındı. Kullanıcı bekleyenler listesine taşındı');
+    },
+    onError: (error) => {
+      showErrorToast(error, 'Rol geri alınırken hata oluştu');
+    },
+  });
+
   const UserCard = ({ user }: { user: UserWithRole }) => {
     const StatusIcon = STATUS_CONFIG[user.status].icon;
     const isPending = user.status === 'pending';
@@ -305,18 +329,55 @@ export function RoleManagement() {
                 </Button>
               </>
             )}
-            
-            {user.status === 'rejected' && (
+
+            {isApproved && (
               <Button
                 size="sm"
-                variant="destructive"
-                onClick={() => deleteUserMutation.mutate(user.user_id)}
-                disabled={deleteUserMutation.isPending}
+                variant="outline"
+                onClick={() => removeRoleMutation.mutate(user.user_id)}
+                disabled={removeRoleMutation.isPending}
                 className="flex-1"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Sil
+                {removeRoleMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <XCircle className="w-4 h-4 mr-2" />
+                )}
+                Rolü Geri Al
               </Button>
+            )}
+            
+            {user.status === 'rejected' && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={deleteUserMutation.isPending}
+                    className="flex-1"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Sil
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Kullanıcıyı silmek istediğinize emin misiniz?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Bu işlem geri alınamaz. Kullanıcı kaydı kalıcı olarak silinecektir.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>İptal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteUserMutation.mutate(user.user_id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Sil
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </CardContent>

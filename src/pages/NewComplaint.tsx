@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,17 +10,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 
 const NewComplaint = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
   const [siteId, setSiteId] = useState('');
   const [title, setTitle] = useState('');
@@ -28,6 +31,15 @@ const NewComplaint = () => {
   const [category, setCategory] = useState('');
   const [severity, setSeverity] = useState('normal');
   const [isPublic, setIsPublic] = useState('true');
+  const [showAdditionDialog, setShowAdditionDialog] = useState(false);
+
+  // Set site ID from URL parameter
+  useEffect(() => {
+    const siteParam = searchParams.get('site');
+    if (siteParam) {
+      setSiteId(siteParam);
+    }
+  }, [searchParams]);
 
   // Redirect to login if not authenticated
   if (!user) {
@@ -35,7 +47,7 @@ const NewComplaint = () => {
       <>
         <SEO title="Giriş Gerekli" description="Şikayet oluşturmak için giriş yapmalısınız" />
         <Header />
-        <div className="min-h-screen bg-gradient-dark">
+        <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
           <div className="container mx-auto px-4 py-8 max-w-3xl">
             <Card>
               <CardContent className="pt-6 text-center py-12">
@@ -59,7 +71,7 @@ const NewComplaint = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, slug')
+        .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
       if (error) throw error;
@@ -89,9 +101,9 @@ const NewComplaint = () => {
     onSuccess: (data) => {
       toast({
         title: 'Başarılı',
-        description: 'Şikayetiniz kaydedildi',
+        description: 'Şikayetiniz kaydedildi ve CasinoAny ekibi tarafından incelenmek üzere gönderildi. İnceleme sonrası yayınlanacaktır.',
       });
-      navigate(`/sikayetler/${data.id}`);
+      navigate(`/sikayetler/${data.slug || data.id}`);
     },
     onError: () => {
       toast({
@@ -133,7 +145,7 @@ const NewComplaint = () => {
         description="Bahis siteleri hakkında şikayetinizi paylaşın"
       />
       <Header />
-      <div className="min-h-screen bg-gradient-dark">
+      <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
         <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/sikayetler">
@@ -147,17 +159,49 @@ const NewComplaint = () => {
             <CardTitle className="text-2xl">Yeni Şikayet</CardTitle>
           </CardHeader>
           <CardContent>
+            <Alert className="mb-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Şikayetiniz gönderildikten sonra CasinoAny ekibi tarafından incelenecek ve uygun bulunması durumunda yayınlanacaktır.
+              </AlertDescription>
+            </Alert>
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="site">Site Seçimi *</Label>
                 <Select value={siteId} onValueChange={setSiteId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background border-input">
                     <SelectValue placeholder="Şikayet edeceğiniz siteyi seçin" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background border border-border z-50 max-h-[300px] overflow-y-auto">
+                    <div className="border-b border-border mb-2 pb-2 px-2 pt-2">
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
+                        onClick={() => {
+                          setShowAdditionDialog(true);
+                        }}
+                      >
+                        <span className="text-lg font-bold">+</span>
+                        <span>Sitemi bulamıyorum, eklemek istiyorum</span>
+                      </button>
+                    </div>
                     {sites?.map((site) => (
                       <SelectItem key={site.id} value={site.id}>
-                        {site.name}
+                        <div className="flex items-center gap-3">
+                          {site.logo_url ? (
+                            <img 
+                              src={site.logo_url} 
+                              alt={site.name}
+                              className="w-6 h-6 object-contain rounded"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 bg-muted rounded flex items-center justify-center text-xs font-bold">
+                              {site.name.charAt(0)}
+                            </div>
+                          )}
+                          <span>{site.name}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -252,11 +296,15 @@ const NewComplaint = () => {
             </form>
           </CardContent>
         </Card>
-        </div>
       </div>
-      <Footer />
-    </>
-  );
+    </div>
+    <Footer />
+    <SiteAdditionRequestDialog 
+      open={showAdditionDialog} 
+      onOpenChange={setShowAdditionDialog} 
+    />
+  </>
+);
 };
 
 export default NewComplaint;

@@ -5,7 +5,7 @@ import { createSocialUrlSchema, safeTextSchema } from './common';
 const socialUrlSchema = (platform: string, domain: string) => createSocialUrlSchema(platform, domain);
 
 export const siteBasicInfoSchema = z.object({
-  bonus: safeTextSchema(1, 500, 'Bonus bilgisi'),
+  bonus: safeTextSchema(1, 50, 'Bonus bilgisi'),
   
   features: z.array(
     safeTextSchema(1, 100, 'Özellik')
@@ -34,6 +34,20 @@ export const siteBasicInfoSchema = z.object({
   facebook: socialUrlSchema('Facebook', 'facebook.com'),
   
   youtube: socialUrlSchema('YouTube', 'youtube.com'),
+  
+  linkedin: socialUrlSchema('LinkedIn', 'linkedin.com'),
+  
+  telegram_channel: socialUrlSchema('Telegram Kanalı', 't.me'),
+  
+  kick: socialUrlSchema('Kick', 'kick.com'),
+  
+  discord: z.string()
+    .trim()
+    .max(500, { message: 'Discord linki en fazla 500 karakter olabilir' })
+    .optional()
+    .or(z.literal('')),
+  
+  pinterest: socialUrlSchema('Pinterest', 'pinterest.com'),
 });
 
 export type SiteBasicInfoFormData = z.infer<typeof siteBasicInfoSchema>;

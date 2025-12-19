@@ -2,10 +2,13 @@ import { ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { PanelSidebar } from './PanelSidebar';
 import { NotificationBell } from './notifications/NotificationBell';
+import { UserNotificationBell } from './UserNotificationBell';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Kbd } from '@/components/ui/kbd';
 import { SiteData } from '@/types/site';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 
 interface PanelLayoutProps {
   siteData: SiteData;
@@ -24,6 +27,8 @@ export function PanelLayout({
   breadcrumbs = [],
   siteId
 }: PanelLayoutProps) {
+  const { isImpersonating } = useAuth();
+  
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full">
@@ -35,7 +40,10 @@ export function PanelLayout({
         
         <SidebarInset className="flex-1">
           {/* Header with Breadcrumbs & Notifications */}
-          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
+          <header className={cn(
+            "sticky z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4",
+            isImpersonating ? "top-[44px]" : "top-0"
+          )}>
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="h-6" />
             
@@ -72,6 +80,7 @@ export function PanelLayout({
                 <Kbd>?</Kbd>
                 <span>basın</span>
               </div>
+              <UserNotificationBell />
               {siteId && <NotificationBell siteId={siteId} />}
             </div>
           </header>

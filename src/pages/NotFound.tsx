@@ -14,7 +14,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gradient-dark">
+    <div className="min-h-screen bg-gradient-dark pt-[72px] md:pt-[84px]">
       <SEO
         title="Sayfa Bulunamadı - 404 | CasinoAny.com"
         description="Aradığınız sayfa bulunamadı. Ana sayfaya dönün veya casino ve bahis siteleri arasında arama yapın."

@@ -138,11 +138,7 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
-      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["betting-sites"] });
       toast({
         title: "Başarılı",
         description: "Yorum onaylandı",
@@ -167,10 +163,7 @@ export default function ReviewManagement() {
       if (error) throw error;
     },
     onSuccess: () => {
-      // ✅ STALE DATA FIX: Comprehensive query invalidation
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["site-reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       toast({
         title: "Başarılı",
         description: "Yorum reddedildi ve silindi",
@@ -194,24 +187,8 @@ export default function ReviewManagement() {
 
       if (error) throw error;
     },
-    onSuccess: (_, reviewIds) => {
-      // ✅ OPTIMIZED: Specific cache invalidation
-      // Get affected site IDs from the reviews being approved
-      const affectedSiteIds = (pendingReviews || [])
-        .filter(r => reviewIds.includes(r.id))
-        .map(r => r.site_id);
-
-      // Invalidate only admin review lists
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      
-      // Invalidate specific site reviews (not all)
-      affectedSiteIds.forEach(siteId => {
-        queryClient.invalidateQueries({ queryKey: ["site-reviews", siteId] });
-      });
-      
-      // Invalidate admin stats (counts changed)
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      
       toast({
         title: "Başarılı",
         description: `${selectedReviews.length} yorum onaylandı`,
@@ -236,20 +213,8 @@ export default function ReviewManagement() {
 
       if (error) throw error;
     },
-    onSuccess: (_, reviewIds) => {
-      // ✅ OPTIMIZED: Specific cache invalidation for rejected reviews
-      const affectedSiteIds = (pendingReviews || [])
-        .filter(r => reviewIds.includes(r.id))
-        .map(r => r.site_id);
-
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
-      
-      affectedSiteIds.forEach(siteId => {
-        queryClient.invalidateQueries({ queryKey: ["site-reviews", siteId] });
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      
       toast({
         title: "Başarılı",
         description: `${selectedReviews.length} yorum silindi`,

@@ -2,9 +2,26 @@
 export const seoConfig = {
   siteName: 'CasinoAny',
   siteUrl: typeof window !== 'undefined' ? window.location.origin : 'https://casinoany.com',
-  defaultTitle: 'CasinoAny - Türkiye\'nin En Güvenilir Bahis ve Casino Siteleri',
-  defaultDescription: 'En iyi bahis ve casino sitelerini karşılaştırın. Yüksek bonuslar, güvenilir ödeme yöntemleri ve detaylı site incelemeleri.',
-  defaultKeywords: ['bahis siteleri', 'casino siteleri', 'deneme bonusu', 'online bahis', 'canlı casino', 'güvenilir bahis'],
+  defaultTitle: 'En Güvenilir Casino Siteleri 2025 | %500 Bonus | CasinoAny',
+  defaultDescription: '2025\'in en güvenilir casino sitelerini inceleyin. %500 hoş geldin bonusu, hızlı para çekme, lisanslı bahis siteleri. 50+ detaylı inceleme.',
+  defaultKeywords: [
+    'casino siteleri', 
+    'güvenilir casino', 
+    'casino bonusları', 
+    'bahis siteleri', 
+    'deneme bonusu', 
+    'online casino', 
+    'canlı casino', 
+    'slot siteleri',
+    'hızlı para çeken casino',
+    'çevrimsiz bonus',
+    'casino incelemeleri',
+    'türkiye casino siteleri',
+    'casino siteleri inceleme',
+    'casino şikayet',
+    'casino yorum',
+    'topluluk değerlendirmeleri'
+  ],
   twitterHandle: '@casinoany',
   fbAppId: '',
   
@@ -18,10 +35,19 @@ export const seoConfig = {
   fbPixelId: '', // Değiştirin
   
   // Google Search Console verification
-  googleSiteVerification: '', // Değiştirin
+  // To get this: 1. Go to https://search.google.com/search-console
+  // 2. Add your property -> Choose "HTML tag" method
+  // 3. Copy the content value from the meta tag
+  googleSiteVerification: 'YOUR_VERIFICATION_CODE_HERE',
   
-  // Yandex verification
-  yandexVerification: '', // Değiştirin
+  // Yandex verification (important for Turkey)
+  // To get this: 1. Go to https://webmaster.yandex.com
+  // 2. Add your site and choose "Meta tag" method
+  // 3. Copy the content value
+  yandexVerification: 'YOUR_YANDEX_VERIFICATION_CODE',
+  
+  // Bing Webmaster verification
+  bingVerification: 'YOUR_BING_VERIFICATION_CODE'
 };
 
 // Google Analytics Snippet

@@ -1,12 +1,20 @@
-import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users } from 'lucide-react';
+import { Mail, Twitter, Facebook, Instagram, Youtube, Pin, Shield, CreditCard, Lock, Clock, Send, Users, ChevronDown } from 'lucide-react';
 import logo from '@/assets/casinodoo-logo.svg';
-import gameCheckLogo from '@/assets/gamecheck-verified.svg';
 import trustpilotLogo from '@/assets/trustpilot-logo.svg';
+import visiontechLogo from '@/assets/visiontech-logo.png';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { FooterCategories } from './footer/FooterCategories';
+import { FooterPaymentSecurity } from './footer/FooterPaymentSecurity';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Footer = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +33,7 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-gradient-to-b from-card/30 to-card/60 mt-20">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 max-w-[1280px]">
         {/* Newsletter Section */}
         <div className="bg-primary/10 rounded-lg p-8 mb-12 border border-primary/20">
           <div className="max-w-2xl mx-auto text-center">
@@ -48,15 +56,16 @@ export const Footer = () => {
         </div>
 
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        {/* Desktop Version - Grid Layout */}
+        <div className="hidden lg:grid lg:grid-cols-8 gap-8 mb-8">
           {/* About Section */}
           <div className="lg:col-span-2">
             <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
-              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi. 
+              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
               2020'den beri sektörde, binlerce kullanıcıya en iyi bahis deneyimini yaşatıyoruz.
             </p>
-            
+
             <div className="space-y-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" />
@@ -70,33 +79,34 @@ export const Footer = () => {
                 <CreditCard className="w-4 h-4 text-primary" />
                 <span>Hızlı Ödemeler</span>
               </div>
-              
+
               {/* Trust Badges */}
-              <div className="pt-2 space-y-3">
-                <a 
-                  href="https://gamecheck.com/tr" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block hover:opacity-80 transition-opacity"
-                  aria-label="GameCheck Verified"
-                >
-                  <img 
-                    src={gameCheckLogo} 
-                    alt="GameCheck Verified" 
-                    className="h-12 w-auto"
-                  />
-                </a>
-                <a 
-                  href="https://www.trustpilot.com" 
-                  target="_blank" 
+              <div className="pt-2 flex items-center gap-4">
+                <a
+                  href="https://www.trustpilot.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="block hover:opacity-80 transition-opacity"
                   aria-label="Trustpilot"
                 >
-                  <img 
-                    src={trustpilotLogo} 
-                    alt="Trustpilot" 
-                    className="h-8 w-auto"
+                  <img
+                    src={trustpilotLogo}
+                    alt="Trustpilot"
+                    className="h-10 w-auto"
+                  />
+                </a>
+                <div className="h-10 w-px bg-white/20"></div>
+                <a
+                  href="https://visiontech.co"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block hover:opacity-80 transition-opacity"
+                  aria-label="VisionTech"
+                >
+                  <img
+                    src={visiontechLogo}
+                    alt="VisionTech"
+                    className="h-10 w-auto"
                   />
                 </a>
               </div>
@@ -128,6 +138,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/sss" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ❓ Sıkça Sorulan Sorular
+                </Link>
+              </li>
+              <li>
                 <Link to="/sitemap.xml" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
                   🗺️ Site Haritası
                 </Link>
@@ -135,42 +150,99 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Categories */}
+          {/* Popular Searches - SEO Links */}
           <div>
-            <h3 className="font-bold text-lg mb-4">Kategoriler</h3>
+            <h3 className="font-bold text-lg mb-4">Popüler</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/casino-siteleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎰 Casino Siteleri
+                <Link to="/canli-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🔥 Canlı Bahis
                 </Link>
               </li>
               <li>
-                <Link to="/spor-bahisleri" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  ⚽ Spor Bahisleri
+                <Link to="/free-spin" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎰 Free Spin
                 </Link>
               </li>
               <li>
-                <Link to="/bonus-kampanyalari" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎁 Bonus Kampanyaları
+                <Link to="/deneme-bonusu" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎁 Deneme Bonusu
                 </Link>
               </li>
               <li>
-                <Link to="/mobil-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  📱 Mobil Bahis
+                <Link to="/kacak-bahis" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ⚠️ Kaçak Bahis
                 </Link>
               </li>
               <li>
-                <Link to="/canli-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
-                  🎮 Canlı Casino
+                <Link to="/bonus-veren-siteler" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  💰 Bonus Veren Siteler
+                </Link>
+              </li>
+              <li>
+                <Link to="/en-iyi-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🏆 En İyi Casino
+                </Link>
+              </li>
+              <li>
+                <Link to="/guvenilir-casino" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🛡️ Güvenilir Casino
                 </Link>
               </li>
             </ul>
           </div>
 
+          {/* Payment Methods */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Ödeme</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/odeme/havale-eft" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🏦 Havale / EFT
+                </Link>
+              </li>
+              <li>
+                <Link to="/odeme/kredi-karti" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  💳 Kredi Kartı
+                </Link>
+              </li>
+              <li>
+                <Link to="/odeme/kripto-para" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  ₿ Kripto Para
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Influencers */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Yayıncılar</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/fenomen/ekrem-abi" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎙️ Ekrem Abi
+                </Link>
+              </li>
+              <li>
+                <Link to="/fenomen/dede" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  👴 Dede (Zeus)
+                </Link>
+              </li>
+              <li>
+                <Link to="/fenomen/roshtein" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">
+                  🎰 Roshtein
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Categories - Dynamic */}
+          <FooterCategories />
+
           {/* Contact & Social */}
           <div>
             <h3 className="font-bold text-lg mb-4">İletişim</h3>
-            
+
             <div className="space-y-3 text-sm text-muted-foreground mb-6">
               <div className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
@@ -198,27 +270,27 @@ export const Footer = () => {
 
             <h4 className="font-semibold mb-3">Sosyal Medya</h4>
             <div className="flex gap-2 justify-start items-center">
-              <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer" 
+              <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Twitter/X">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Facebook">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Instagram">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="YouTube">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer" 
+              <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
                 aria-label="Pinterest">
                 <Pin className="w-5 h-5" />
@@ -227,45 +299,160 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Payment Methods & Security */}
-        <div className="border-t border-border pt-8 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Popüler Ödeme Yöntemleri</h4>
-              <div className="flex flex-wrap gap-3 opacity-70">
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  💳 Papara
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  ₿ Kripto Para
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  🏦 Banka Havalesi
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  💰 CMT Cüzdan
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Güvenlik & Lisanslar</h4>
-              <div className="flex flex-wrap gap-3 opacity-70">
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium flex items-center gap-2">
-                  <Shield className="w-3 h-3" />
-                  SSL Güvenliği
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium flex items-center gap-2">
-                  <Lock className="w-3 h-3" />
-                  Curacao Lisanslı
-                </div>
-                <div className="px-4 py-2 bg-card border border-border rounded text-xs font-medium">
-                  18+ Yaş Sınırı
-                </div>
-              </div>
+        {/* Mobile Version - Accordion */}
+        <div className="lg:hidden mb-8">
+          {/* About Section - Always Visible on Mobile */}
+          <div className="mb-6 pb-6 border-b border-border">
+            <img src={logo} alt="CasinoAny.com" className="h-10 w-auto mb-4" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Türkiye'nin en güvenilir casino ve bahis siteleri rehberi.
+            </p>
+
+            <div className="flex items-center gap-3 mb-4">
+              <a
+                href="https://www.trustpilot.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity"
+                aria-label="Trustpilot"
+              >
+                <img
+                  src={trustpilotLogo}
+                  alt="Trustpilot"
+                  className="h-7 w-auto"
+                />
+              </a>
+              <div className="h-7 w-px bg-border"></div>
+              <a
+                href="https://visiontech.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity"
+                aria-label="VisionTech"
+              >
+                <img
+                  src={visiontechLogo}
+                  alt="VisionTech"
+                  className="h-7 w-auto"
+                />
+              </a>
             </div>
           </div>
+
+          {/* Accordion Sections */}
+          <Accordion type="single" collapsible className="w-full">
+            {/* Keşfet */}
+            <AccordionItem value="discover" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                Keşfet
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-3 pt-2 text-sm">
+                  <li>
+                    <Link to="/" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      🏠 Ana Sayfa
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/haberler" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      📰 Haberler
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      ℹ️ Hakkımızda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      📝 Blog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/sss" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+                      ❓ SSS
+                    </Link>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Kategoriler */}
+            <AccordionItem value="categories" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                Kategoriler
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="pt-2">
+                  <FooterCategories />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* İletişim */}
+            <AccordionItem value="contact" className="border-b border-border">
+              <AccordionTrigger className="text-base font-bold hover:text-primary">
+                İletişim
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-2">
+                      <Mail className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <a href="mailto:hello@visiontech.co" className="hover:text-primary transition-colors">
+                        hello@visiontech.co
+                      </a>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Send className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <a href="https://t.me/visiontechco" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                        @visiontechco
+                      </a>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <span>7/24 Destek</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-3 text-sm">Sosyal Medya</h4>
+                    <div className="flex gap-2">
+                      <a href="https://x.com/CasinoAnyx" target="_blank" rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Twitter/X">
+                        <Twitter className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.facebook.com/profile.php?id=61565906765310" target="_blank" rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Facebook">
+                        <Facebook className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.instagram.com/casinoanytrxx/" target="_blank" rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Instagram">
+                        <Instagram className="w-5 h-5" />
+                      </a>
+                      <a href="https://www.youtube.com/@CasinoAny" target="_blank" rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="YouTube">
+                        <Youtube className="w-5 h-5" />
+                      </a>
+                      <a href="https://pin.it/Qz3eAfhj3" target="_blank" rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-all hover:scale-110 p-2 rounded-lg hover:bg-primary/10"
+                        aria-label="Pinterest">
+                        <Pin className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
+
+        {/* Payment Methods & Security */}
+        <FooterPaymentSecurity />
 
         {/* Bottom Bar */}
         <div className="border-t border-border pt-8 text-center space-y-3">
@@ -292,6 +479,6 @@ export const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 };

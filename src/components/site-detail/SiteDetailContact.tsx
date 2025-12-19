@@ -1,42 +1,19 @@
 import { Mail } from 'lucide-react';
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Badge } from "@/components/ui/badge";
+import { trackSocialClick } from '@/lib/socialTracking';
+import { 
+  normalizeWhatsAppUrl, 
+  normalizeTelegramUrl, 
+  normalizeTwitterUrl, 
+  normalizeInstagramUrl, 
+  normalizeFacebookUrl, 
+  normalizeYouTubeUrl 
+} from '@/lib/socialMediaHelpers';
 
 interface SiteDetailContactProps {
   site: any;
 }
-
-const trackSocialClick = async (siteId: string, platform: string) => {
-  try {
-    const { data: stats } = await supabase
-      .from('site_stats')
-      .select('*')
-      .eq('site_id', siteId)
-      .maybeSingle();
-
-    const columnName = `${platform}_clicks`;
-    
-    if (stats) {
-      const currentValue = Number(stats[columnName as keyof typeof stats] || 0);
-      await supabase
-        .from('site_stats')
-        .update({ [columnName]: currentValue + 1 })
-        .eq('site_id', siteId);
-    } else {
-      await supabase
-        .from('site_stats')
-        .insert({ 
-          site_id: siteId, 
-          views: 0, 
-          clicks: 0,
-          [columnName]: 1 
-        });
-    }
-  } catch (error) {
-    // Silent fail for analytics tracking
-  }
-};
 
 export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
   const hasContactInfo = site.email || site.whatsapp || site.telegram || 
@@ -44,22 +21,42 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
 
   if (!hasContactInfo) return null;
 
+  // Normalize all social media URLs
+  const whatsappUrl = normalizeWhatsAppUrl(site.whatsapp);
+  const telegramUrl = normalizeTelegramUrl(site.telegram);
+  const twitterUrl = normalizeTwitterUrl(site.twitter);
+  const instagramUrl = normalizeInstagramUrl(site.instagram);
+  const facebookUrl = normalizeFacebookUrl(site.facebook);
+  const youtubeUrl = normalizeYouTubeUrl(site.youtube);
+
+  // Count active channels
+  const activeChannels = [
+    site.email, whatsappUrl, telegramUrl, twitterUrl, 
+    instagramUrl, facebookUrl, youtubeUrl
+  ].filter(Boolean).length;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="w-5 h-5" />
-          İletişim Bilgileri
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-4 items-center justify-center">
+    <div className="w-full border rounded-lg px-4 py-4 bg-card">
+      <div className="flex items-center justify-between w-full mb-4">
+        <div className="flex items-center gap-3">
+          <Mail className="w-5 h-5 text-primary" />
+          <span className="font-semibold">İletişim & Sosyal Medya</span>
+        </div>
+        <Badge variant="secondary">
+          {activeChannels} kanal
+        </Badge>
+      </div>
+      <div className="flex flex-wrap gap-4 items-center justify-center">
           {site.email && (
             <a 
               href={`mailto:${site.email}`} 
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Email"
-              onClick={() => trackSocialClick(site.id, 'email')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'email');
+                window.location.href = `mailto:${site.email}`;
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#EA4335] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
@@ -67,14 +64,18 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.whatsapp && (
+          {whatsappUrl && (
             <a 
-              href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
+              href={whatsappUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="WhatsApp"
-              onClick={() => trackSocialClick(site.id, 'whatsapp')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'whatsapp');
+                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -82,14 +83,18 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.telegram && (
+          {telegramUrl && (
             <a 
-              href={`https://t.me/${site.telegram}?text=${encodeURIComponent(`${site.name} hakkında bilgi almak istiyorum`)}`}
+              href={telegramUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Telegram"
-              onClick={() => trackSocialClick(site.id, 'telegram')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'telegram');
+                window.open(telegramUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#0088cc] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#0088cc] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -97,14 +102,18 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.twitter && (
+          {twitterUrl && (
             <a 
-              href={site.twitter} 
+              href={twitterUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Twitter"
-              onClick={() => trackSocialClick(site.id, 'twitter')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'twitter');
+                window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#1DA1F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#1DA1F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -112,14 +121,18 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.instagram && (
+          {instagramUrl && (
             <a 
-              href={site.instagram} 
+              href={instagramUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Instagram"
-              onClick={() => trackSocialClick(site.id, 'instagram')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'instagram');
+                window.open(instagramUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -127,14 +140,18 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.facebook && (
+          {facebookUrl && (
             <a 
-              href={site.facebook} 
+              href={facebookUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Facebook"
-              onClick={() => trackSocialClick(site.id, 'facebook')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'facebook');
+                window.open(facebookUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#1877F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#1877F2] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -142,22 +159,25 @@ export const SiteDetailContact = ({ site }: SiteDetailContactProps) => {
             </a>
           )}
           
-          {site.youtube && (
+          {youtubeUrl && (
             <a 
-              href={site.youtube} 
+              href={youtubeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="group relative transition-all duration-300 ease-out hover:scale-110 p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="YouTube"
-              onClick={() => trackSocialClick(site.id, 'youtube')}
+              onClick={async (e) => {
+                e.preventDefault();
+                await trackSocialClick(site.id, 'youtube');
+                window.open(youtubeUrl, '_blank', 'noopener,noreferrer');
+              }}
             >
               <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
               <div className="absolute inset-0 rounded-full bg-[#FF0000] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <FaYoutube className="w-10 h-10 text-[#FF0000] relative z-10 group-hover:text-white transition-colors duration-300" />
             </a>
           )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+    </div>
   );
 };

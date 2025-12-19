@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { showErrorToast } from '@/lib/toastHelpers';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { getTabIdFromPath, getRouteFromTabId, getBreadcrumbLabel } from '@/config/adminRoutes';
 
 export default function AdminRoot() {
   const { user, isAdmin, loading: authLoading } = useAuth();
@@ -49,77 +50,15 @@ export default function AdminRoot() {
     enabled: !!user?.id,
   });
 
+
+
   // Get active tab from route
   const getActiveTab = () => {
-    const path = location.pathname.replace('/admin/', '').replace('/admin', '');
-    if (!path || path === 'dashboard') return 'dashboard';
-    
-    // Map routes to tab IDs for sidebar
-    const routeToTabMap: Record<string, string> = {
-      'sites': 'manage',
-      'sites/featured': 'featured',
-      'sites/stats': 'site-stats',
-      'blog': 'blog',
-      'blog/stats': 'blog-stats',
-      'blog/comments': 'comments',
-      'reviews': 'reviews',
-      'complaints': 'complaints',
-      'analytics': 'analytics',
-      'analytics/keywords': 'keywords',
-      'content/casino': 'casino-content',
-      'content/categories': 'categories',
-      'content/casino-analytics': 'casino-analytics',
-      'content/planner': 'content-planner',
-      'sites/banners': 'banners',
-      'finance/affiliate': 'affiliate',
-      'finance/bonus': 'bonus',
-      'finance/bonus-requests': 'bonus-requests',
-      'notifications': 'notifications',
-      'news': 'news',
-      'system/health': 'health',
-      'system/logs': 'logs',
-      'system/history': 'history',
-      'system/users': 'users',
-      'system/roles': 'roles',
-      'system/build-health': 'build-health',
-    };
-    
-    return routeToTabMap[path] || path;
+    return getTabIdFromPath(location.pathname);
   };
 
   const handleTabChange = (tabId: string) => {
-    // Map tab IDs to routes
-    const tabToRouteMap: Record<string, string> = {
-      'dashboard': '/admin/dashboard',
-      'manage': '/admin/sites',
-      'featured': '/admin/sites/featured',
-      'site-stats': '/admin/sites/stats',
-      'blog-stats': '/admin/blog/stats',
-      'comments': '/admin/blog/comments',
-      'reviews': '/admin/reviews',
-      'complaints': '/admin/complaints',
-      'blog': '/admin/blog',
-      'analytics': '/admin/analytics',
-      'keywords': '/admin/analytics/keywords',
-      'casino-content': '/admin/content/casino',
-      'categories': '/admin/content/categories',
-      'casino-analytics': '/admin/content/casino-analytics',
-      'content-planner': '/admin/content/planner',
-      'banners': '/admin/sites/banners',
-      'affiliate': '/admin/finance/affiliate',
-      'bonus': '/admin/finance/bonus',
-      'bonus-requests': '/admin/finance/bonus-requests',
-      'notifications': '/admin/notifications',
-      'news': '/admin/news',
-      'health': '/admin/system/health',
-      'logs': '/admin/system/logs',
-      'history': '/admin/system/history',
-      'users': '/admin/system/users',
-      'roles': '/admin/system/roles',
-      'build-health': '/admin/system/build-health',
-    };
-    
-    const route = tabToRouteMap[tabId] || `/admin/${tabId}`;
+    const route = getRouteFromTabId(tabId);
     navigate(route);
   };
 
@@ -129,55 +68,21 @@ export default function AdminRoot() {
     if (!path || path === '/' || path === '/dashboard') {
       return [{ label: 'Genel Bakış' }];
     }
-    
+
     const segments = path.split('/').filter(Boolean);
-    const labelMap: Record<string, string> = {
-      'sites': 'Siteler',
-      'featured': 'Öne Çıkanlar',
-      'stats': 'İstatistikler',
-      'blog': 'Blog',
-      'comments': 'Yorumlar',
-      'reviews': 'Değerlendirmeler',
-      'analytics': 'Analytics',
-      'realtime': 'Canlı Takip',
-      'keywords': 'Anahtar Kelimeler',
-      'content': 'İçerik',
-      'casino': 'Casino',
-      'casino-analytics': 'Casino Analytics',
-      'planner': 'Planlama',
-      'ai': 'AI Asistan',
-      'history': 'Geçmiş',
-      'finance': 'Finans',
-      'affiliate': 'Affiliate',
-      'bonus': 'Bonus',
-      'bonus-requests': 'Bonus Talepleri',
-      'notifications': 'Bildirimler',
-      'news': 'Haberler',
-      'system': 'Sistem',
-      'domains': 'Domain Yönetimi',
-      'health': 'Sistem Durumu',
-      'logs': 'Sistem Logları',
-      'performance': 'Performance İzleme',
-      'roles': 'Rol Yönetimi',
-      'users': 'Kullanıcılar',
-      'build-health': 'Build Sağlığı',
-      'categories': 'Kategoriler',
-      'banners': 'Banner Yönetimi',
-    };
-    
     const items = [];
     let currentPath = '/admin';
-    
+
     for (let i = 0; i < segments.length; i++) {
       currentPath += `/${segments[i]}`;
       const isLast = i === segments.length - 1;
-      
+
       items.push({
-        label: labelMap[segments[i]] || segments[i],
+        label: getBreadcrumbLabel(segments[i]),
         href: isLast ? undefined : currentPath,
       });
     }
-    
+
     return items;
   };
 

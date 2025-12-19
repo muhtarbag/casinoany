@@ -91,7 +91,7 @@ export function AdminLayout({ children, activeTab, onTabChange, username }: Admi
               
               <div className="flex-1 min-w-0">
                 <h1 className="text-base sm:text-xl font-semibold bg-gradient-primary bg-clip-text text-transparent truncate">
-                  {isMobile ? 'Admin Panel' : `Hoş Geldin, ${username || 'Admin'}! 👋`}
+                  {isMobile ? 'Admin Panel' : `Hoş Geldin, Casinoany! 👋`}
                 </h1>
               </div>
 

@@ -107,29 +107,25 @@ export const usePerformanceMonitor = (options: UsePerformanceOptions) => {
 // Hook for tracking page load performance
 export const usePageLoadPerformance = (pageName: string) => {
   useEffect(() => {
-    // Mark page load start
-    performanceMonitor.mark(`${pageName}-load-start`);
+    const startTime = performance.now();
+    console.log(`[Performance] ${pageName} - Component mounted`);
 
-    // Wait for page to be fully loaded
-    const handleLoad = () => {
-      performanceMonitor.mark(`${pageName}-load-end`);
-      const duration = performanceMonitor.measure(
-        `${pageName}-load`,
-        `${pageName}-load-start`,
-        `${pageName}-load-end`
-      );
-
+    // Track when component becomes interactive
+    const timeoutId = setTimeout(() => {
+      const duration = performance.now() - startTime;
+      console.log(`[Performance] ${pageName} - Load complete in ${duration.toFixed(2)}ms`);
+      
       if (duration > 3000) {
         logger.warn('performance', `Slow page load: ${pageName}`, { duration });
+        console.warn(`⚠️ Slow page load detected: ${pageName} took ${duration.toFixed(2)}ms`);
+      } else if (duration > 1000) {
+        console.log(`⏱️ Page load: ${pageName} took ${duration.toFixed(2)}ms`);
+      } else {
+        console.log(`✅ Fast page load: ${pageName} took ${duration.toFixed(2)}ms`);
       }
-    };
+    }, 100); // Small delay to ensure rendering is complete
 
-    if (document.readyState === 'complete') {
-      handleLoad();
-    } else {
-      window.addEventListener('load', handleLoad);
-      return () => window.removeEventListener('load', handleLoad);
-    }
+    return () => clearTimeout(timeoutId);
   }, [pageName]);
 };
 

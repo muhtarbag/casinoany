@@ -8,11 +8,12 @@ export default {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
-        sm: "1.5rem",
-        md: "2rem",
-        lg: "2.5rem",
-        xl: "3rem",
+        DEFAULT: "1rem",      // 16px mobile (iOS HIG minimum)
+        sm: "1rem",           // 16px small phones
+        md: "1.5rem",         // 24px tablet
+        lg: "2rem",           // 32px desktop
+        xl: "2rem",           // 32px large desktop
+        "2xl": "2rem",        // 32px extra large
       },
       screens: {
         "2xl": "1400px",
@@ -27,6 +28,10 @@ export default {
       '2xl': '1536px',
     },
     extend: {
+      fontFamily: {
+        'display': ['Playfair Display', 'serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -101,6 +106,13 @@ export default {
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',
       },
+      spacing: {
+        'header': 'var(--header-height)',
+        'header-desktop': 'var(--header-height-desktop)',
+      },
+      maxWidth: {
+        'container': 'var(--container-max-width)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -153,13 +165,35 @@ export default {
             transform: "translateY(0)",
           },
         },
+        "slide-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(30px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "scale-in": {
+          "0%": {
+            opacity: "0",
+            transform: "scale(0.95)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "shimmer": "shimmer 3s ease-in-out infinite",
         "glow": "glow 3s ease-in-out infinite",
-        "fade-in": "fade-in 0.3s ease-out",
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "slide-up": "slide-up 0.6s ease-out forwards",
+        "scale-in": "scale-in 0.4s ease-out forwards",
       },
       minHeight: {
         'touch': '44px',

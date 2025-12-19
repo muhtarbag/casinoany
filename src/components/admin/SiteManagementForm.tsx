@@ -15,7 +15,7 @@ interface SiteManagementFormProps {
   editingId: string | null;
   initialData?: SiteFormData;
   logoPreview: string | null;
-  onLogoFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onLogoFileChange: (file: File | null, preview?: string) => void;
   onClearLogo: () => void;
   onSubmit: (data: SiteFormData) => void;
   onCancel: () => void;
@@ -69,20 +69,24 @@ export function SiteManagementForm({
 
   const nameValue = watch('name');
 
-  // Auto-generate slug from name
+  // Auto-generate slug from name (only for new sites, not when editing)
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    const slug = name
-      .toLowerCase()
-      .replace(/ğ/g, 'g')
-      .replace(/ü/g, 'u')
-      .replace(/ş/g, 's')
-      .replace(/ı/g, 'i')
-      .replace(/ö/g, 'o')
-      .replace(/ç/g, 'c')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    setValue('slug', slug);
+    
+    // Only auto-generate slug when creating a new site
+    if (!editingId) {
+      const slug = name
+        .toLowerCase()
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ı/g, 'i')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      setValue('slug', slug);
+    }
   };
 
   const handleFormSubmit = (data: SiteFormData) => {
@@ -123,52 +127,53 @@ export function SiteManagementForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug *</Label>
+              <Label htmlFor="slug">Slug * {editingId && '(Değiştirilemez)'}</Label>
               <Input
                 id="slug"
                 {...register('slug')}
                 placeholder="otomatik-olusturulur"
+                disabled={!!editingId}
                 className={errors.slug ? 'border-destructive' : ''}
               />
               {errors.slug && (
                 <p className="text-sm text-destructive">{errors.slug.message}</p>
               )}
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rating">Rating (0-10) *</Label>
-              <Input
-                id="rating"
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                {...register('rating', { valueAsNumber: true })}
-                placeholder="9.5"
-                className={errors.rating ? 'border-destructive' : ''}
-              />
-              {errors.rating && (
-                <p className="text-sm text-destructive">{errors.rating.message}</p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="rating">Rating (0-10) *</Label>
+            <Input
+              id="rating"
+              type="number"
+              step="0.1"
+              min="0"
+              max="10"
+              {...register('rating', { valueAsNumber: true })}
+              placeholder="9.5"
+              className={errors.rating ? 'border-destructive' : ''}
+            />
+            {errors.rating && (
+              <p className="text-sm text-destructive">{errors.rating.message}</p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="bonus">Bonus</Label>
-              <Input
-                id="bonus"
-                {...register('bonus')}
-                placeholder="3000 TL + 200 Free Spin"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="bonus">Bonus</Label>
+            <Input
+              id="bonus"
+              {...register('bonus')}
+              placeholder="3000 TL + 200 Free Spin"
+            />
+          </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="features">Özellikler (virgülle ayır)</Label>
-              <Input
-                id="features"
-                {...register('features')}
-                placeholder="Canlı Casino, Spor Bahisleri, Canlı Destek"
-              />
-            </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="features">Özellikler (virgülle ayır)</Label>
+            <Input
+              id="features"
+              {...register('features')}
+              placeholder="Canlı Casino, Spor Bahisleri, Canlı Destek"
+            />
           </div>
 
           {/* Affiliate Management Section - ALWAYS VISIBLE */}

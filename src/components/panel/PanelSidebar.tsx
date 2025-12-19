@@ -6,7 +6,10 @@ import {
   BarChart3, 
   Bell, 
   MessageCircle,
-  Building2
+  Building2,
+  Gift,
+  User,
+  Home
 } from 'lucide-react';
 import {
   Sidebar,
@@ -21,6 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { SiteData } from '@/types/site';
+import { Link } from 'react-router-dom';
 
 interface PanelSidebarProps {
   siteData: SiteData;
@@ -58,6 +62,18 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
           title: "İçerik Yönetimi",
           icon: FileText,
           description: "Uzman yorumu, rehberler"
+        },
+        {
+          id: "bonuses",
+          title: "Bonuslar",
+          icon: Gift,
+          description: "Bonus ve kampanyalar"
+        },
+        {
+          id: "profile",
+          title: "Profil Ayarları",
+          icon: User,
+          description: "Sosyal medya ve iletişim"
         }
       ]
     },
@@ -99,27 +115,36 @@ export function PanelSidebar({ siteData, activeTab, onTabChange }: PanelSidebarP
 
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          {siteData?.logo_url && !isCollapsed && (
-            <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
-              <img 
-                src={siteData.logo_url} 
-                alt={siteData.name}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <p className="text-sm font-semibold truncate">{siteData?.name}</p>
+      <SidebarHeader className="border-b">
+        <Link 
+          to={`/${siteData?.slug || ''}`} 
+          className={`flex items-center hover:opacity-80 transition-opacity ${
+            isCollapsed ? 'justify-center py-4' : 'gap-3 px-4 py-3'
+          }`}
+        >
+          {isCollapsed ? (
+            <Home className="h-5 w-5 text-primary" />
+          ) : (
+            <>
+              {siteData?.logo_url && (
+                <div className="flex-shrink-0 w-12 h-12 bg-muted rounded-lg flex items-center justify-center p-1.5">
+                  <img 
+                    src={siteData.logo_url} 
+                    alt={siteData.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <p className="text-sm font-semibold truncate">{siteData?.name}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Site Detayına Git</p>
               </div>
-              <p className="text-xs text-muted-foreground">Kurumsal Panel</p>
-            </div>
+            </>
           )}
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>

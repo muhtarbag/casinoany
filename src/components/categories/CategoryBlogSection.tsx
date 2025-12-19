@@ -35,7 +35,7 @@ export function CategoryBlogSection({ blogs, categoryName, categorySlug }: Categ
         {blogs.slice(0, 6).map((blog, index) => (
           <Link 
             key={blog.id} 
-            to={`/blog/${blog.slug}`}
+            to={`/${blog.slug}`}
             style={{ animationDelay: `${index * 100}ms` }}
             className="animate-scale-in"
           >

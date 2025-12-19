@@ -205,15 +205,21 @@
     }
   }
 
-  /* Touch-friendly form inputs */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  input[type="number"],
+  /* Touch-friendly form inputs - Prevents iOS zoom */
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  [contenteditable] {
+    font-size: 16px !important; /* Prevents zoom on iOS Safari */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Ensure comfortable tap targets for inputs */
+  input:not([type="checkbox"]):not([type="radio"]),
   textarea,
   select {
-    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
     padding: 12px;
   }
 

@@ -12,7 +12,7 @@ const Terms = () => {
         description="CasinoAny.com kullanım şartları. Web sitemizi kullanarak kabul ettiğiniz şartlar ve koşullar hakkında detaylı bilgi."
         canonical="/terms"
       />
-      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90">
+      <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background/90 pt-[72px] md:pt-[84px]">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <Breadcrumb 

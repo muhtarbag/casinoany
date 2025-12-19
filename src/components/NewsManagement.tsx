@@ -20,15 +20,30 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 import { useNewsArticles, useDeleteNews, useToggleNewsPublish } from '@/hooks/queries/useNewsQueries';
 import { VirtualList } from '@/components/VirtualList';
-import { sanitizeHtmlContent } from '@/schemas/newsValidation';
+import { BonusImageUploader } from '@/components/bonus/BonusImageUploader';
+import { generateSlug, validateSlug, isSlugAvailable } from '@/lib/slugGenerator';
 
 export function NewsManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<any>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [slugError, setSlugError] = useState<string>('');
 
   const { data: articles, isLoading } = useNewsArticles();
   const deleteMutation = useDeleteNews();
@@ -58,19 +73,91 @@ export function NewsManagement() {
     }
   }, [toast, queryClient]);
 
+  const handleEdit = useCallback((article: any) => {
+    setEditingArticle(article);
+    setEditDialogOpen(true);
+    setSlugError('');
+  }, []);
+
+  const handleSlugChange = useCallback((newSlug: string) => {
+    setEditingArticle({ ...editingArticle, slug: newSlug });
+    
+    // Validate format
+    const validation = validateSlug(newSlug);
+    if (!validation.valid) {
+      setSlugError(validation.error || '');
+    } else {
+      setSlugError('');
+    }
+  }, [editingArticle]);
+
+  const handleGenerateSlug = useCallback(() => {
+    if (!editingArticle?.title) return;
+    const newSlug = generateSlug(editingArticle.title);
+    setEditingArticle({ ...editingArticle, slug: newSlug });
+    setSlugError('');
+  }, [editingArticle]);
+
+  const handleUpdateArticle = useCallback(async () => {
+    if (!editingArticle) return;
+
+    // Validate slug
+    const validation = validateSlug(editingArticle.slug);
+    if (!validation.valid) {
+      setSlugError(validation.error || '');
+      return;
+    }
+
+    // Check slug availability
+    const available = await isSlugAvailable(editingArticle.slug, editingArticle.id);
+    if (!available) {
+      setSlugError('Bu slug zaten kullanımda');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('news_articles')
+        .update({
+          title: editingArticle.title,
+          slug: editingArticle.slug,
+          excerpt: editingArticle.excerpt,
+          featured_image: editingArticle.featured_image,
+          featured_image_alt: editingArticle.featured_image_alt,
+          meta_title: editingArticle.meta_title,
+          meta_description: editingArticle.meta_description,
+        })
+        .eq('id', editingArticle.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Başarılı',
+        description: 'Haber güncellendi',
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['admin-news-articles'] });
+      setEditDialogOpen(false);
+      setEditingArticle(null);
+      setSlugError('');
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Haber güncellenirken hata oluştu',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  }, [editingArticle, toast, queryClient]);
+
   const filteredArticles = useMemo(() => {
     if (!articles) return [];
-    // ✅ SECURITY FIX: Sanitize article data to prevent XSS
-    return articles
-      .map((article: any) => ({
-        ...article,
-        title: sanitizeHtmlContent(article.title || ''),
-        category: sanitizeHtmlContent(article.category || ''),
-      }))
-      .filter((article: any) =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.category?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    return articles.filter((article: any) =>
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   }, [articles, searchTerm]);
 
   const renderArticleItem = useCallback((article: any) => (
@@ -98,6 +185,13 @@ export function NewsManagement() {
               onClick={() => window.open(`/haber/${article.slug}`, '_blank')}
             >
               <Eye className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleEdit(article)}
+            >
+              <Edit className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
@@ -199,6 +293,126 @@ export function NewsManagement() {
           <p className="text-muted-foreground">Henüz haber bulunmamaktadır.</p>
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Haber Düzenle</DialogTitle>
+            <DialogDescription>
+              Haber detaylarını güncelleyin ve featured image ekleyin
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingArticle && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Başlık</Label>
+                <Input
+                  id="title"
+                  value={editingArticle.title}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="slug">URL Slug (SEO için önemli)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="slug"
+                    value={editingArticle.slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    className={slugError ? 'border-destructive' : ''}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGenerateSlug}
+                    disabled={!editingArticle.title}
+                  >
+                    Oluştur
+                  </Button>
+                </div>
+                {slugError && (
+                  <p className="text-sm text-destructive mt-1">{slugError}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  URL: /haber/{editingArticle.slug}
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="excerpt">Özet</Label>
+                <Textarea
+                  id="excerpt"
+                  rows={3}
+                  value={editingArticle.excerpt || ''}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="meta_title">SEO Başlık</Label>
+                <Input
+                  id="meta_title"
+                  value={editingArticle.meta_title || ''}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, meta_title: e.target.value })}
+                  placeholder="Boş bırakılırsa başlık kullanılır"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="meta_description">SEO Açıklama</Label>
+                <Textarea
+                  id="meta_description"
+                  rows={2}
+                  value={editingArticle.meta_description || ''}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, meta_description: e.target.value })}
+                  placeholder="Boş bırakılırsa özet kullanılır"
+                />
+              </div>
+
+              <div>
+                <Label>Featured Image (SEO için önemli)</Label>
+                <BonusImageUploader
+                  currentImageUrl={editingArticle.featured_image}
+                  onImageUploaded={(url) => setEditingArticle({ ...editingArticle, featured_image: url })}
+                  onImageRemoved={() => setEditingArticle({ ...editingArticle, featured_image: null })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="featured_image_alt">Image Alt Text (SEO)</Label>
+                <Input
+                  id="featured_image_alt"
+                  value={editingArticle.featured_image_alt || ''}
+                  onChange={(e) => setEditingArticle({ ...editingArticle, featured_image_alt: e.target.value })}
+                  placeholder="Görselin açıklaması"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditDialogOpen(false);
+                setEditingArticle(null);
+              }}
+            >
+              İptal
+            </Button>
+            <Button
+              onClick={handleUpdateArticle}
+              disabled={isUpdating}
+            >
+              {isUpdating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Güncelle
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -33,10 +33,8 @@ export function useRealtimeNotifications({
           table: 'site_complaints',
           filter: `site_id=eq.${siteId}`,
         },
-        (payload) => {
-          if (!mounted) return; // ✅ Prevent state update on unmounted component
-          
-          // Realtime complaint notification
+        async (payload) => {
+          if (!mounted) return;
           
           queryClientRef.invalidateQueries({ queryKey: ['site-complaints', siteId] });
           queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
@@ -47,6 +45,22 @@ export function useRealtimeNotifications({
               title: '🔔 Yeni Şikayet',
               description: `${complaint.title}`,
             });
+
+            // Telegram bildirimini gönder
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                await supabase.functions.invoke('telegram-notify', {
+                  body: {
+                    userId: user.id,
+                    message: `🚨 <b>Yeni Şikayet</b>\n\n${complaint.title}`,
+                    notificationType: 'complaint',
+                  },
+                });
+              }
+            } catch (error) {
+              console.error('Telegram notification error:', error);
+            }
           }
         }
       )
@@ -63,10 +77,8 @@ export function useRealtimeNotifications({
           table: 'site_reviews',
           filter: `site_id=eq.${siteId}`,
         },
-        (payload) => {
-          if (!mounted) return; // ✅ Prevent state update on unmounted component
-          
-          // Realtime review notification
+        async (payload) => {
+          if (!mounted) return;
           
           queryClientRef.invalidateQueries({ queryKey: ['site-reviews', siteId] });
           queryClientRef.invalidateQueries({ queryKey: ['site-activity-feed', siteId] });
@@ -77,6 +89,22 @@ export function useRealtimeNotifications({
               title: '⭐ Yeni Değerlendirme',
               description: `${review.rating} yıldız aldınız!`,
             });
+
+            // Telegram bildirimini gönder
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) {
+                await supabase.functions.invoke('telegram-notify', {
+                  body: {
+                    userId: user.id,
+                    message: `⭐ <b>Yeni Değerlendirme</b>\n\n${review.rating} yıldız aldınız!\n\n${review.comment || ''}`,
+                    notificationType: 'review',
+                  },
+                });
+              }
+            } catch (error) {
+              console.error('Telegram notification error:', error);
+            }
           }
         }
       )

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { devLogger } from '@/lib/devLogger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { UserCheck, ExternalLink, Trash2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,9 @@ const Memberships = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSiteRequestOpen, setIsSiteRequestOpen] = useState(false);
+  const [isSiteSelectionOpen, setIsSiteSelectionOpen] = useState(false);
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [selectedSiteId, setSelectedSiteId] = useState('');
   const [username, setUsername] = useState('');
   const [notes, setNotes] = useState('');
@@ -48,7 +52,7 @@ const Memberships = () => {
     queryKey: ['user-memberships', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_site_memberships')
         .select(`
           *,
@@ -56,12 +60,13 @@ const Memberships = () => {
             id,
             name,
             slug,
-            logo_url
+            logo_url,
+            affiliate_link
           )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -77,7 +82,7 @@ const Memberships = () => {
         .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
-      
+
       if (error) throw error;
       return data;
     },
@@ -89,7 +94,7 @@ const Memberships = () => {
         throw new Error('Kullanıcı, site veya kullanıcı adı eksik');
       }
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .insert({
           user_id: user.id,
@@ -99,7 +104,7 @@ const Memberships = () => {
           registration_date: registrationDate,
           is_active: true,
         });
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -115,7 +120,7 @@ const Memberships = () => {
       });
     },
     onError: (error: any) => {
-      devLogger.error('Add membership error:', error);
+      console.error('Add membership error:', error);
       toast({
         title: 'Hata',
         description: error.message || 'Site eklenirken bir hata oluştu',
@@ -126,7 +131,7 @@ const Memberships = () => {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .update({ is_active: isActive })
         .eq('id', id);
@@ -143,7 +148,7 @@ const Memberships = () => {
 
   const deleteMembershipMutation = useMutation({
     mutationFn: async (membershipId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_site_memberships')
         .delete()
         .eq('id', membershipId);
@@ -157,6 +162,53 @@ const Memberships = () => {
       });
     },
   });
+
+  const addBulkMembershipsMutation = useMutation({
+    mutationFn: async (siteIds: string[]) => {
+      if (!user || siteIds.length === 0) {
+        throw new Error('Kullanıcı veya site seçimi eksik');
+      }
+
+      const memberships = siteIds.map(siteId => ({
+        user_id: user.id,
+        site_id: siteId,
+        username: '', // Empty for bulk add
+        is_active: true,
+        registration_date: new Date().toISOString().split('T')[0],
+      }));
+
+      const { error } = await supabase
+        .from('user_site_memberships')
+        .insert(memberships);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
+      setIsSiteSelectionOpen(false);
+      setSelectedSiteIds([]);
+      toast({
+        title: 'Başarılı',
+        description: `${selectedSiteIds.length} site başarıyla eklendi`,
+      });
+    },
+    onError: (error: any) => {
+      console.error('Bulk add membership error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Siteler eklenirken bir hata oluştu',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const toggleSiteSelection = (siteId: string) => {
+    setSelectedSiteIds(prev =>
+      prev.includes(siteId)
+        ? prev.filter(id => id !== siteId)
+        : [...prev, siteId]
+    );
+  };
 
   if (!user) {
     return (
@@ -172,7 +224,7 @@ const Memberships = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Kayıtlı Olduğum Siteler"
         description="Kayıt olduğunuz bahis sitelerinizi görüntüleyin ve yönetin"
       />
@@ -184,7 +236,7 @@ const Memberships = () => {
               Üye olduğunuz bahis sitelerini takip edin
             </p>
           </div>
-          
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
@@ -199,10 +251,22 @@ const Memberships = () => {
                   Kayıtlı olduğunuz bahis sitesini ekleyin
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="site">Site Seçin *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="site">Site Seçin *</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsSiteRequestOpen(true)}
+                      className="gap-1.5"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Site Ekle
+                    </Button>
+                  </div>
                   <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
                     <SelectTrigger id="site">
                       <SelectValue placeholder="Bir site seçin..." />
@@ -212,10 +276,11 @@ const Memberships = () => {
                         <SelectItem key={site.id} value={site.id}>
                           <div className="flex items-center gap-2">
                             {site.logo_url && (
-                              <img 
-                                src={site.logo_url} 
+                              <img
+                                src={site.logo_url}
                                 alt={site.name}
                                 className="w-5 h-5 object-contain"
+                                loading="lazy"
                               />
                             )}
                             <span>{site.name}</span>
@@ -284,32 +349,33 @@ const Memberships = () => {
           <div className="grid gap-4">
             {memberships.map((membership: any) => (
               <Card key={membership.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
                     {membership.betting_sites.logo_url && (
                       <img
                         src={membership.betting_sites.logo_url}
                         alt={membership.betting_sites.name}
-                        className="w-16 h-16 object-contain rounded"
+                        className="w-32 h-32 sm:w-36 sm:h-36 object-contain rounded mx-auto sm:mx-0"
+                        loading="lazy"
                       />
                     )}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-2">
+                        <div className="flex-1">
                           <h3 className="font-semibold text-lg">
                             {membership.betting_sites.name}
                           </h3>
                           {membership.username && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground break-all">
                               Kullanıcı adı: <span className="font-medium">{membership.username}</span>
                             </p>
                           )}
                         </div>
-                        <Badge variant={membership.is_active ? 'default' : 'secondary'}>
+                        <Badge variant={membership.is_active ? 'default' : 'secondary'} className="w-fit">
                           {membership.is_active ? 'Aktif' : 'Pasif'}
                         </Badge>
                       </div>
-                      
+
                       <p className="text-sm text-muted-foreground mb-3">
                         Kayıt tarihi: {membership.registration_date ? format(new Date(membership.registration_date), 'dd MMMM yyyy', { locale: tr }) : 'Belirtilmemiş'}
                       </p>
@@ -320,16 +386,22 @@ const Memberships = () => {
                         </p>
                       )}
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           asChild
+                          className="w-full sm:w-auto"
                         >
-                          <Link to={`/sites/${membership.betting_sites.slug}`}>
+                          <a
+                            href={membership.betting_sites.affiliate_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center"
+                          >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            Detay
-                          </Link>
+                            Oynamaya Başla
+                          </a>
                         </Button>
                         <Button
                           size="sm"
@@ -339,6 +411,7 @@ const Memberships = () => {
                             isActive: !membership.is_active
                           })}
                           disabled={toggleActiveMutation.isPending}
+                          className="w-full sm:w-auto"
                         >
                           {membership.is_active ? 'Pasif Yap' : 'Aktif Yap'}
                         </Button>
@@ -347,6 +420,7 @@ const Memberships = () => {
                           variant="destructive"
                           onClick={() => deleteMembershipMutation.mutate(membership.id)}
                           disabled={deleteMembershipMutation.isPending}
+                          className="w-full sm:w-auto"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -364,12 +438,119 @@ const Memberships = () => {
               <p className="text-muted-foreground mb-4">
                 Henüz kayıtlı olduğunuz site yok
               </p>
-              <Button asChild>
-                <Link to="/">Siteleri Keşfet</Link>
+              <Button onClick={() => setIsSiteSelectionOpen(true)}>
+                Siteleri Keşfet
               </Button>
             </CardContent>
           </Card>
         )}
+
+        {/* Bulk Site Selection Dialog */}
+        <Dialog open={isSiteSelectionOpen} onOpenChange={setIsSiteSelectionOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle>Kayıtlı Olduğunuz Siteleri Seçin</DialogTitle>
+              <DialogDescription>
+                Sistemdeki tüm sitelerden kayıtlı olduklarınızı seçin
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto py-4">
+              {/* Site Ekle Button - First Item */}
+              <div className="mb-4">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2 h-auto py-4 border-dashed border-2"
+                  onClick={() => {
+                    setIsSiteSelectionOpen(false);
+                    setIsSiteRequestOpen(true);
+                  }}
+                >
+                  <Plus className="w-5 h-5" />
+                  <div className="text-left">
+                    <p className="font-semibold">Aradığınız Site Yok mu?</p>
+                    <p className="text-xs text-muted-foreground">Site ekleme talebi gönderin</p>
+                  </div>
+                </Button>
+              </div>
+
+              {allSites && allSites.length > 0 ? (
+                <div className="grid gap-3">
+                  {allSites.map((site) => {
+                    const isAlreadyMember = memberships?.some(
+                      (m: any) => m.betting_sites.id === site.id
+                    );
+                    const isSelected = selectedSiteIds.includes(site.id);
+
+                    return (
+                      <div
+                        key={site.id}
+                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${isAlreadyMember
+                          ? 'opacity-50 cursor-not-allowed bg-muted'
+                          : isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'hover:bg-muted/50'
+                          }`}
+                        onClick={() => !isAlreadyMember && toggleSiteSelection(site.id)}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={isAlreadyMember}
+                          onCheckedChange={() => toggleSiteSelection(site.id)}
+                          className="pointer-events-none"
+                        />
+                        {site.logo_url && (
+                          <img
+                            src={site.logo_url}
+                            alt={site.name}
+                            className="w-12 h-12 object-contain rounded"
+                            loading="lazy"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{site.name}</p>
+                          {isAlreadyMember && (
+                            <p className="text-xs text-muted-foreground">Zaten kayıtlısınız</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Site bulunamadı
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsSiteSelectionOpen(false);
+                  setSelectedSiteIds([]);
+                }}
+              >
+                İptal
+              </Button>
+              <Button
+                onClick={() => addBulkMembershipsMutation.mutate(selectedSiteIds)}
+                disabled={selectedSiteIds.length === 0 || addBulkMembershipsMutation.isPending}
+              >
+                {addBulkMembershipsMutation.isPending
+                  ? 'Ekleniyor...'
+                  : `${selectedSiteIds.length} Siteyi Ekle`}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <SiteAdditionRequestDialog
+          open={isSiteRequestOpen}
+          onOpenChange={setIsSiteRequestOpen}
+        />
       </ProfileLayout>
     </>
   );

@@ -18,12 +18,14 @@ import { tr } from 'date-fns/locale';
 import { useState } from 'react';
 import { ProfileLayout } from '@/components/profile/ProfileLayout';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
+import { SiteAdditionRequestDialog } from '@/components/SiteAdditionRequestDialog';
 
 export default function Complaints() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showAdditionDialog, setShowAdditionDialog] = useState(false);
   const [formData, setFormData] = useState({
     site_id: '',
     title: '',
@@ -60,7 +62,7 @@ export default function Complaints() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('betting_sites')
-        .select('id, name, slug')
+        .select('id, name, slug, logo_url')
         .eq('is_active', true)
         .order('name');
 
@@ -166,10 +168,35 @@ export default function Complaints() {
                       <SelectTrigger>
                         <SelectValue placeholder="Site seçin" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border border-border z-50 max-h-[300px] overflow-y-auto">
+                        <div className="border-b border-border mb-2 pb-2 px-2 pt-2">
+                          <button
+                            type="button"
+                            className="w-full text-left px-3 py-2.5 text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex items-center gap-2"
+                            onClick={() => {
+                              setShowAdditionDialog(true);
+                            }}
+                          >
+                            <span className="text-lg font-bold">+</span>
+                            <span>Sitemi bulamıyorum, eklemek istiyorum</span>
+                          </button>
+                        </div>
                         {sites?.map((site) => (
                           <SelectItem key={site.id} value={site.id}>
-                            {site.name}
+                            <div className="flex items-center gap-3">
+                              {site.logo_url ? (
+                                <img 
+                                  src={site.logo_url} 
+                                  alt={site.name}
+                                  className="w-6 h-6 object-contain rounded"
+                                />
+                              ) : (
+                                <div className="w-6 h-6 bg-muted rounded flex items-center justify-center text-xs font-bold">
+                                  {site.name.charAt(0)}
+                                </div>
+                              )}
+                              <span>{site.name}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -278,7 +305,7 @@ export default function Complaints() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => navigate(`/sikayetler/${complaint.id}`)}
+                        onClick={() => navigate(`/sikayetler/${complaint.slug || complaint.id}`)}
                       >
                         {complaint.response_count > 0 
                           ? `${complaint.response_count} Cevap Görüntüle` 
@@ -304,6 +331,10 @@ export default function Complaints() {
             </Card>
           )}
       </ProfileLayout>
+      <SiteAdditionRequestDialog 
+        open={showAdditionDialog} 
+        onOpenChange={setShowAdditionDialog} 
+      />
     </>
   );
 }

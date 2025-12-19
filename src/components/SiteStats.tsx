@@ -5,7 +5,6 @@ import { Eye, MousePointer, TrendingUp, BarChart3, PieChart } from "lucide-react
 import { Bar, BarChart, Pie, PieChart as RechartsPie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useSiteStats } from "@/hooks/queries/useSiteQueries";
-import { SocialMediaStats } from "@/components/analytics/SocialMediaStats";
 
 export default function SiteStats() {
   const { data: statsData, isLoading } = useSiteStats();
@@ -317,9 +316,6 @@ export default function SiteStats() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Social Media Stats */}
-      <SocialMediaStats statsData={statsData || []} />
     </div>
   );
 }

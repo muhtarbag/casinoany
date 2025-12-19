@@ -205,9 +205,9 @@ export const useAdminSiteManagement = () => {
       }
 
       // Update all site data including social media and affiliate info
+      // NOTE: slug is NOT included in updates as it's unique and should never change
       const updateData: {
         name: string;
-        slug: string;
         affiliate_link: string;
         bonus: string;
         rating: number;
@@ -231,7 +231,6 @@ export const useAdminSiteManagement = () => {
         logo_url?: string;
       } = {
         name: formData.name,
-        slug: formData.slug,
         affiliate_link: formData.affiliate_link,
         bonus: formData.bonus,
         rating: formData.rating,
@@ -439,13 +438,17 @@ export const useAdminSiteManagement = () => {
     }
   }, [state.selectedSites]);
 
-  const setLogoFile = useCallback((file: File | null) => {
+  const setLogoFile = useCallback((file: File | null, preview?: string) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      if (preview) {
+        dispatch({ type: 'SET_LOGO', file, preview });
+      } else {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          dispatch({ type: 'SET_LOGO', file, preview: reader.result as string });
+        };
+        reader.readAsDataURL(file);
+      }
     } else {
       dispatch({ type: 'CLEAR_LOGO' });
     }

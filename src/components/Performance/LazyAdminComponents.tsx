@@ -6,15 +6,33 @@
 import { lazyWithRetry } from './LazyComponent';
 
 // Heavy admin components - lazy loaded
-export const LazyBlogManagement = lazyWithRetry(() => import('@/components/BlogManagement').then(m => ({ default: m.BlogManagement })));
+export const LazyBlogManagement = lazyWithRetry(() => 
+  import('@/components/BlogManagement').then(module => ({ 
+    default: module.BlogManagement 
+  }))
+);
 
-export const LazyCasinoContentManagement = lazyWithRetry(() => import('@/components/CasinoContentManagement').then(m => ({ default: m.CasinoContentManagement })));
+export const LazyCasinoContentManagement = lazyWithRetry(() => 
+  import('@/components/CasinoContentManagement').then(module => ({ 
+    default: module.CasinoContentManagement 
+  }))
+);
 
-export const LazyEnhancedReviewManagement = lazyWithRetry(() => import('@/components/EnhancedReviewManagement'));
+export const LazyEnhancedReviewManagement = lazyWithRetry(() => 
+  import('@/components/EnhancedReviewManagement')
+);
 
-export const LazyNewsManagement = lazyWithRetry(() => import('@/components/NewsManagement').then(m => ({ default: m.NewsManagement })));
+export const LazyNewsManagement = lazyWithRetry(() => 
+  import('@/components/NewsManagement').then(module => ({ 
+    default: module.NewsManagement 
+  }))
+);
 
-export const LazyNotificationManagement = lazyWithRetry(() => import('@/components/NotificationManagement'));
+export const LazyNotificationManagement = lazyWithRetry(() => 
+  import('@/components/NotificationManagement').then(module => ({ 
+    default: module.NotificationManagement 
+  }))
+);
 
 export const LazyAffiliateManagement = lazyWithRetry(() => import('@/components/AffiliateManagement').then(m => ({ default: m.AffiliateManagement })));
 

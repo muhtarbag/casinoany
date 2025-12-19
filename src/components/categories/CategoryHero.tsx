@@ -8,10 +8,10 @@ interface CategoryHeroProps {
   };
 }
 
+import { getIcon } from '@/lib/utils';
+
 export function CategoryHero({ category }: CategoryHeroProps) {
-  const IconComponent = (LucideIcons as any)[
-    category.icon.charAt(0).toUpperCase() + category.icon.slice(1)
-  ] || LucideIcons.Folder;
+  const IconComponent = getIcon(category.icon);
 
   return (
     <div className="mb-12 sm:mb-16 animate-fade-in">
@@ -35,7 +35,7 @@ export function CategoryHero({ category }: CategoryHeroProps) {
         />
 
         {/* Gradient Orb */}
-        <div 
+        <div
           className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl opacity-20"
           style={{ backgroundColor: category.color }}
         />
@@ -44,7 +44,7 @@ export function CategoryHero({ category }: CategoryHeroProps) {
           {/* Icon - Büyük ve Merkezde - MOBİL RESPONSIVE */}
           <div
             className="p-6 sm:p-7 md:p-8 rounded-3xl shadow-2xl transform hover:scale-110 transition-all duration-300 hover:rotate-6"
-            style={{ 
+            style={{
               backgroundColor: category.color,
               boxShadow: `0 20px 60px -10px ${category.color}50`
             }}
@@ -57,7 +57,7 @@ export function CategoryHero({ category }: CategoryHeroProps) {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent leading-tight px-4 sm:px-0">
               {category.name}
             </h1>
-            
+
             {category.description && (
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed px-4 sm:px-0">
                 {category.description}
@@ -67,7 +67,7 @@ export function CategoryHero({ category }: CategoryHeroProps) {
             {/* Stats - Kompakt ve Modern - MOBİL STACK */}
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2">
               {category.site_count !== undefined && (
-                <div 
+                <div
                   className="flex items-center gap-2 sm:gap-2.5 px-5 py-3 sm:px-4 sm:py-2 rounded-full backdrop-blur-sm shadow-lg transform hover:scale-105 transition-transform"
                   style={{
                     backgroundColor: `${category.color}25`,
@@ -83,9 +83,9 @@ export function CategoryHero({ category }: CategoryHeroProps) {
                   <span className="text-sm text-muted-foreground">site</span>
                 </div>
               )}
-              
+
               {category.blog_count !== undefined && (
-                <div 
+                <div
                   className="flex items-center gap-2 sm:gap-2.5 px-5 py-3 sm:px-4 sm:py-2 rounded-full backdrop-blur-sm shadow-lg transform hover:scale-105 transition-transform"
                   style={{
                     backgroundColor: `${category.color}25`,

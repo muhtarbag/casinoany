@@ -2,17 +2,65 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SEO } from '@/components/SEO';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { ApplicationDetailModal } from '@/components/admin/ApplicationDetailModal';
+import {
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Building2,
+  User,
+  Mail,
+  Phone,
+  Globe,
+  FileText,
+  Clock,
+  Eye,
+  AlertTriangle
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const SiteOwners = () => {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedApplication, setSelectedApplication] = useState<any>(null);
+  const [selectedSiteId, setSelectedSiteId] = useState<string>('');
+  const [detailModalApplication, setDetailModalApplication] = useState<any>(null);
+
+  // Tüm siteleri çek
+  const { data: allSites } = useQuery({
+    queryKey: ['all-betting-sites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('betting_sites')
+        .select('id, name, slug, logo_url')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
 
   const { data: applications, isLoading } = useQuery({
     queryKey: ['site-owner-applications'],
@@ -21,11 +69,25 @@ const SiteOwners = () => {
         .from('site_owners')
         .select(`
           *,
-          betting_sites (name, slug, logo_url),
-          profiles (email, username)
+          betting_sites (id, name, slug, logo_url),
+          profiles (
+            email,
+            username,
+            first_name,
+            last_name,
+            phone,
+            company_name,
+            company_tax_number,
+            company_type,
+            company_phone,
+            company_email,
+            company_address,
+            company_website,
+            contact_person_name
+          )
         `)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -33,64 +95,84 @@ const SiteOwners = () => {
   });
 
   const approveMutation = useMutation({
-    mutationFn: async ({ ownerId, userId }: { ownerId: string; userId: string }) => {
-      const application = applications?.find(app => app.id === ownerId);
-      if (!application) throw new Error('Application not found');
+    mutationFn: async ({ ownerId, userId, siteId }: { ownerId: string; userId: string; siteId: string }) => {
+      // Check for conflicts
+      const { data: existingSite } = await supabase
+        .from('betting_sites')
+        .select('owner_id, name')
+        .eq('id', siteId)
+        .single();
 
-      let siteId = application.site_id;
-
-      // If new_site_name is provided, create a new site
-      if (application.new_site_name && !siteId) {
-        const slug = application.new_site_name.toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-
-        const { data: newSite, error: siteError } = await (supabase as any)
-          .from('betting_sites')
-          .insert({
-            name: application.new_site_name,
-            slug: slug,
-            affiliate_link: 'https://example.com',
-            logo_url: application.logo_url,
-            is_active: true
-          })
-          .select()
-          .single();
-
-        if (siteError) throw siteError;
-        siteId = newSite.id;
+      if (existingSite?.owner_id && existingSite.owner_id !== userId) {
+        throw new Error(`Bu site zaten başka bir kullanıcıya ait (${existingSite.name})`);
       }
 
-      const { error: ownerError } = await (supabase as any)
+      // Check for other pending applications
+      const { data: pendingApps, error: pendingError } = await supabase
         .from('site_owners')
-        .update({ 
+        .select('id, user_id')
+        .eq('site_id', siteId)
+        .eq('status', 'pending')
+        .neq('id', ownerId);
+
+      if (pendingError) throw pendingError;
+
+      if (pendingApps && pendingApps.length > 0) {
+        console.warn(`${pendingApps.length} other pending applications for this site`);
+      }
+
+      // Site Owner kaydını güncelle
+      const { error: ownerError } = await supabase
+        .from('site_owners')
+        .update({
           status: 'approved',
           approved_at: new Date().toISOString(),
           site_id: siteId
         })
         .eq('id', ownerId);
-      
+
       if (ownerError) throw ownerError;
 
-      const { error: roleError } = await (supabase as any)
+      // User role'ü onayla
+      const { error: roleError } = await supabase
         .from('user_roles')
         .update({ status: 'approved' })
         .eq('user_id', userId)
-        .eq('role', 'site_owner' as any);
-      
+        .eq('role', 'site_owner');
+
       if (roleError) throw roleError;
+
+      // Betting site'ın owner_id'sini güncelle
+      const { error: siteError } = await supabase
+        .from('betting_sites')
+        .update({ owner_id: userId, updated_at: new Date().toISOString() })
+        .eq('id', siteId);
+
+      if (siteError) throw siteError;
+
+      // Reject other pending applications for this site
+      if (pendingApps && pendingApps.length > 0) {
+        await supabase
+          .from('site_owners')
+          .update({ status: 'rejected', admin_notes: 'Site başka bir kullanıcıya atandı' })
+          .in('id', pendingApps.map(app => app.id));
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-owner-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['all-betting-sites'] });
+      setSelectedApplication(null);
+      setSelectedSiteId('');
+      setDetailModalApplication(null);
       toast({
         title: 'Başarılı',
-        description: 'Site sahibi başvurusu onaylandı',
+        description: 'Site sahibi başvurusu onaylandı. Site owner_id atandı.',
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Hata',
-        description: 'İşlem sırasında bir hata oluştu',
+        description: error.message || 'İşlem sırasında bir hata oluştu',
         variant: 'destructive',
       });
     },
@@ -98,30 +180,47 @@ const SiteOwners = () => {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ ownerId, userId }: { ownerId: string; userId: string }) => {
-      const { error: ownerError } = await (supabase as any)
+      const { error: ownerError } = await supabase
         .from('site_owners')
         .update({ status: 'rejected' })
         .eq('id', ownerId);
-      
+
       if (ownerError) throw ownerError;
 
       // Update user_roles status
-      const { error: roleError } = await (supabase as any)
+      const { error: roleError } = await supabase
         .from('user_roles')
         .update({ status: 'rejected' })
         .eq('user_id', userId)
-        .eq('role', 'site_owner' as any);
-      
+        .eq('role', 'site_owner');
+
       if (roleError) throw roleError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-owner-applications'] });
+      setSelectedApplication(null);
+      setDetailModalApplication(null);
       toast({
         title: 'Başarılı',
-        description: 'Site sahibi başvurusu reddedildi',
+        description: 'Başvuru reddedildi',
       });
     },
   });
+
+  // Helper function to check if site has conflict
+  const getSiteStatus = (siteId: string) => {
+    const siteApps = applications?.filter(app => app.site_id === siteId) || [];
+    const hasApproved = siteApps.some(app => app.status === 'approved');
+    const pendingCount = siteApps.filter(app => app.status === 'pending').length;
+
+    return { hasApproved, pendingCount, isAvailable: !hasApproved };
+  };
+
+  // Check if profile email matches site email
+  const checkEmailMatch = (app: any) => {
+    return app.profiles?.email && app.betting_sites?.email &&
+      app.profiles.email === app.betting_sites.email;
+  };
 
   if (!isAdmin) {
     return (
@@ -137,7 +236,7 @@ const SiteOwners = () => {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Site Sahipleri Yönetimi"
         description="Site sahibi başvurularını yönetin"
       />
@@ -161,8 +260,8 @@ const SiteOwners = () => {
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       {app.betting_sites?.logo_url && (
-                        <img 
-                          src={app.betting_sites.logo_url} 
+                        <img
+                          src={app.betting_sites.logo_url}
                           alt={app.betting_sites.name}
                           className="w-8 h-8 object-contain"
                         />
@@ -171,46 +270,70 @@ const SiteOwners = () => {
                     </CardTitle>
                     <Badge variant={
                       app.status === 'approved' ? 'default' :
-                      app.status === 'rejected' ? 'destructive' : 'secondary'
+                        app.status === 'rejected' ? 'destructive' : 'secondary'
                     }>
                       {app.status === 'approved' ? 'Onaylandı' :
-                       app.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
+                        app.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Email:</span> {app.profiles?.email}
-                    </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm">
+                        <span className="font-medium">Email:</span> {app.profiles?.email}
+                      </p>
+                      {checkEmailMatch(app) && (
+                        <Badge variant="outline" className="gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          Email Eşleşiyor
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm">
                       <span className="font-medium">Başvuru Tarihi:</span>{' '}
                       {new Date(app.created_at).toLocaleDateString('tr-TR')}
                     </p>
-                    
-                    {app.status === 'pending' && (
-                      <div className="flex gap-2 mt-4">
-                        <Button
-                          size="sm"
-                          onClick={() => approveMutation.mutate({ ownerId: app.id, userId: app.user_id })}
-                          disabled={approveMutation.isPending}
-                          className="flex-1"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Onayla
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => rejectMutation.mutate({ ownerId: app.id, userId: app.user_id })}
-                          disabled={rejectMutation.isPending}
-                          className="flex-1"
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reddet
-                        </Button>
+                    {app.admin_notes && (
+                      <div className="text-sm bg-muted p-2 rounded">
+                        <span className="font-medium">Not:</span> {app.admin_notes}
                       </div>
                     )}
+
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setDetailModalApplication(app)}
+                        className="flex-1"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Detay
+                      </Button>
+                      {app.status === 'pending' && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedApplication(app)}
+                            disabled={approveMutation.isPending}
+                            className="flex-1"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Onayla
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => rejectMutation.mutate({ ownerId: app.id, userId: app.user_id })}
+                            disabled={rejectMutation.isPending}
+                            className="flex-1"
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Reddet
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -224,6 +347,126 @@ const SiteOwners = () => {
           </Card>
         )}
       </div>
+
+      <Dialog open={!!selectedApplication} onOpenChange={(open) => !open && setSelectedApplication(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Site Sahibi Başvurusunu Onayla</DialogTitle>
+            <DialogDescription>
+              Başvuruyu onaylamak için bir site seçin veya yeni site oluşturun.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedApplication && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="text-sm text-muted-foreground">Firma</p>
+                  <p className="font-medium">{selectedApplication.profiles?.company_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Yetkili Kişi</p>
+                  <p className="font-medium">{selectedApplication.profiles?.contact_person_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{selectedApplication.profiles?.company_email || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Telefon</p>
+                  <p className="font-medium">{selectedApplication.profiles?.company_phone || '-'}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Site Seç</label>
+                <Select value={selectedSiteId} onValueChange={setSelectedSiteId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Bir site seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allSites?.map((site) => {
+                      const status = getSiteStatus(site.id);
+                      const emailMatches = selectedApplication?.betting_sites?.id === site.id &&
+                        checkEmailMatch(selectedApplication);
+
+                      return (
+                        <SelectItem
+                          key={site.id}
+                          value={site.id}
+                          disabled={status.hasApproved}
+                        >
+                          <div className="flex items-center gap-2">
+                            {site.logo_url && (
+                              <img src={site.logo_url} alt={site.name} className="w-4 h-4 object-contain" />
+                            )}
+                            <span>{site.name}</span>
+                            {emailMatches && (
+                              <Badge variant="outline" className="ml-2 gap-1">
+                                <CheckCircle className="h-3 w-3" />
+                                Email Eşleşiyor
+                              </Badge>
+                            )}
+                            {status.hasApproved && (
+                              <Badge variant="secondary">Alınmış</Badge>
+                            )}
+                            {status.pendingCount > 1 && (
+                              <Badge variant="outline" className="gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                {status.pendingCount} Bekleyen
+                              </Badge>
+                            )}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedApplication(null)}>
+              İptal
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedSiteId && selectedApplication) {
+                  approveMutation.mutate({
+                    ownerId: selectedApplication.id,
+                    userId: selectedApplication.user_id,
+                    siteId: selectedSiteId
+                  });
+                }
+              }}
+              disabled={!selectedSiteId || approveMutation.isPending}
+            >
+              {approveMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Onayla
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Application Detail Modal */}
+      <ApplicationDetailModal
+        application={detailModalApplication}
+        isOpen={!!detailModalApplication}
+        onClose={() => setDetailModalApplication(null)}
+        onApprove={() => {
+          setDetailModalApplication(null);
+          setSelectedApplication(detailModalApplication);
+        }}
+        onReject={() => {
+          if (detailModalApplication) {
+            rejectMutation.mutate({
+              ownerId: detailModalApplication.id,
+              userId: detailModalApplication.user_id
+            });
+          }
+        }}
+      />
     </>
   );
 };

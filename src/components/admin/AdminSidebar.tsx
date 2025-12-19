@@ -12,6 +12,11 @@ import {
   Folder,
   Bell,
   AlertTriangle,
+  BarChart3,
+  Trophy,
+  Link2,
+  Megaphone,
+  ExternalLink,
   Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -45,7 +50,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
     return requiredRoles.some(role => userRoles.includes(role));
   };
 
-  // 🎯 5 Main Hubs (simplified from 7 groups)
+  // 🎯 6 Main Hubs
   const navigationGroups = [
     {
       label: '🏠 Dashboard',
@@ -54,9 +59,16 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       ],
     },
     {
+      label: '📊 Analitik Hub',
+      items: [
+        { id: 'analytics', icon: BarChart3, label: 'Analitikler', route: '/admin/analytics', roles: [], shortcut: 'g n' },
+      ],
+    },
+    {
       label: '📝 İçerik Hub',
       items: [
         { id: 'sites', icon: Globe, label: 'Siteler', route: '/admin/sites', roles: ['content_editor'], shortcut: 'g s' },
+        { id: 'site-requests', icon: Mail, label: 'Site Talepleri', route: '/admin/sites/addition-requests', roles: ['content_editor'] },
         { id: 'casino', icon: Gamepad2, label: 'Casino', route: '/admin/content/casino', roles: ['content_editor'], shortcut: 'g c' },
         { id: 'blog', icon: FileText, label: 'Blog', route: '/admin/blog', roles: ['content_editor'], shortcut: 'g b' },
         { id: 'categories', icon: Folder, label: 'Kategoriler', route: '/admin/content/categories', roles: ['content_editor'] },
@@ -69,6 +81,7 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
         { id: 'affiliate', icon: DollarSign, label: 'Affiliate', route: '/admin/finance/affiliate', roles: ['finance'], shortcut: 'g a' },
         { id: 'bonus', icon: Gift, label: 'Bonuslar', route: '/admin/finance/bonus', roles: ['content_editor', 'finance'] },
         { id: 'requests', icon: Mail, label: 'Bonus Talepleri', route: '/admin/finance/bonus-requests', roles: ['finance'] },
+        { id: 'advertising', icon: Megaphone, label: 'Reklam Yönetimi', route: '/admin/advertising', roles: [] },
       ],
     },
     {
@@ -81,11 +94,22 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
       ],
     },
     {
+      label: '🏆 Gamification Hub',
+      items: [
+        { id: 'gamification', icon: Trophy, label: 'Dashboard', route: '/admin/gamification/dashboard', roles: [] },
+        { id: 'achievements', icon: Trophy, label: 'Başarılar', route: '/admin/gamification/achievements', roles: [] },
+        { id: 'rewards', icon: Gift, label: 'Ödüller', route: '/admin/gamification/rewards', roles: [] },
+        { id: 'user-stats', icon: BarChart3, label: 'Kullanıcı Stats', route: '/admin/gamification/user-stats', roles: [] },
+      ],
+    },
+    {
       label: '⚙️ Sistem Hub',
       items: [
         { id: 'users', icon: Shield, label: 'Kullanıcılar', route: '/admin/system/users', roles: [] },
         { id: 'roles', icon: Shield, label: 'Rol Yönetimi', route: '/admin/system/roles', roles: [] },
-        { id: 'errors', icon: Activity, label: 'Error Monitoring', route: '/admin/system/errors', roles: [] },
+        { id: 'performance', icon: Activity, label: 'Performans İzleme', route: '/admin/system/performance', roles: [] },
+        { id: 'domain-monitoring', icon: ExternalLink, label: 'Domain İzleme', route: '/admin/system/domain-monitoring', roles: [] },
+        { id: 'footer', icon: Link2, label: 'Footer Yönetimi', route: '/admin/system/footer', roles: [] },
       ],
     },
   ].map(group => ({
@@ -107,27 +131,18 @@ export function AdminSidebar({ activeTab }: AdminSidebarProps) {
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton asChild>
-                      <Link
-                        to={item.route}
-                        className={cn(
-                          'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground',
-                          activeTab === item.id && 'bg-accent text-accent-foreground font-medium'
-                        )}
-                      >
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && (
-                          <>
-                            <span className="flex-1">{item.label}</span>
-                            {item.shortcut && (
-                              <Badge 
-                                variant="outline" 
-                                className="ml-auto text-[9px] font-mono px-1.5 py-0 opacity-40"
-                              >
-                                {item.shortcut}
-                              </Badge>
-                            )}
-                          </>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={activeTab === item.id}
+                      tooltip={collapsed ? item.label : undefined}
+                    >
+                      <Link to={item.route} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span className={cn(collapsed && "sr-only")}>{item.label}</span>
+                        {!collapsed && item.shortcut && (
+                          <Badge variant="outline" className="ml-auto text-xs">
+                            {item.shortcut}
+                          </Badge>
                         )}
                       </Link>
                     </SidebarMenuButton>

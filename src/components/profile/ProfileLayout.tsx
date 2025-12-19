@@ -24,13 +24,17 @@ import {
   User,
   Home,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Trophy,
+  Award
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PageTransition } from './PageTransition';
 import { PullToRefresh } from './PullToRefresh';
+import { NotificationBell } from '@/components/profile/NotificationBell';
+import { MobileProfileMenu } from '@/components/profile/MobileProfileMenu';
 import logo from '@/assets/casinodoo-logo.svg';
 
 interface ProfileLayoutProps {
@@ -136,18 +140,49 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
       badgeKey: 'bonuses'
     },
     {
+      icon: Trophy,
+      label: 'Sadakat Puanları',
+      href: '/profile/loyalty-points'
+    },
+    {
+      icon: Award,
+      label: 'Başarılarım',
+      href: '/profile/achievements'
+    },
+    {
+      icon: Users,
+      label: 'Arkadaşını Davet Et',
+      href: '/profile/referrals'
+    },
+    {
       icon: Settings,
       label: 'Ayarlar',
       href: '/profile/settings'
     }
   ];
 
-  // Mobile bottom nav items (most important only)
+  // Mobile bottom nav items - World-class approach (max 5 items)
   const mobileBottomNavItems = [
-    menuItems.find(item => item.href === '/')!,
-    menuItems.find(item => item.href === '/profile/dashboard')!,
-    menuItems.find(item => item.href === '/profile/favorites')!,
-    menuItems.find(item => item.href === '/profile/reviews')!,
+    {
+      icon: Home,
+      label: 'Ana Sayfa',
+      href: '/'
+    },
+    {
+      icon: LayoutDashboard,
+      label: 'Panel',
+      href: '/profile/dashboard'
+    },
+    {
+      icon: Heart,
+      label: 'Favoriler',
+      href: '/profile/favorites'
+    },
+    {
+      icon: Trophy,
+      label: 'Puanlar',
+      href: '/profile/loyalty-points'
+    }
   ];
 
   const getInitials = () => {
@@ -163,14 +198,17 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
+      {/* Header - Safe Area Optimized */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-top">
+        <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-8 max-w-[1280px] mx-auto">
           <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img src={logo} alt="CasinoAny.com" className="h-8 w-auto" loading="eager" />
           </Link>
 
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
                 <Avatar className="h-8 w-8">
@@ -203,15 +241,16 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6">
+        <div className="flex gap-4 md:gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <Card className="sticky top-6">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 {/* User Profile Section */}
                 <div className="flex flex-col items-center text-center mb-6">
                   <div className="relative mb-3">
@@ -289,81 +328,19 @@ export const ProfileLayout = ({ children }: ProfileLayoutProps) => {
             </Card>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0 pb-24 lg:pb-0">
+          {/* Main Content - Mobile Optimized */}
+          <main className="flex-1 min-w-0 relative overflow-y-auto">
             <PullToRefresh onRefresh={handleRefresh}>
               <PageTransition>
-                {children}
+                <div className="w-full pb-6 safe-area-bottom">
+                  {children}
+                </div>
               </PageTransition>
             </PullToRefresh>
           </main>
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/95 border-t border-border backdrop-blur-lg shadow-lg" style={{ zIndex: 9999 }}>
-        <div className="flex items-center justify-around py-3 px-2 safe-area-inset-bottom">
-          {mobileBottomNavItems.map((item) => {
-            const isActive = location.pathname === item.href;
-            const Icon = item.icon;
-            const badgeCount = getBadgeCount(item.badgeKey);
-
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  'relative flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 min-w-0',
-                  'active:scale-95 active:bg-muted/50',
-                  'touch-manipulation select-none',
-                  isActive
-                    ? 'text-primary scale-110'
-                    : 'text-muted-foreground'
-                )}
-                style={{
-                  WebkitTapHighlightColor: 'transparent'
-                }}
-              >
-                {badgeCount && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] animate-pulse z-10"
-                  >
-                    {badgeCount > 99 ? '99+' : badgeCount}
-                  </Badge>
-                )}
-                <Icon className={cn(
-                  "h-5 w-5 shrink-0 transition-transform",
-                  isActive && "scale-110"
-                )} />
-                <span className={cn(
-                  "text-[10px] font-medium truncate max-w-full transition-all",
-                  isActive && "font-bold"
-                )}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-          
-          {/* More Menu */}
-          <Link
-            to="/profile/settings"
-            className={cn(
-              'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors touch-manipulation',
-              location.pathname === '/profile/settings'
-                ? 'text-primary'
-                : 'text-muted-foreground'
-            )}
-            style={{
-              WebkitTapHighlightColor: 'transparent'
-            }}
-          >
-            <Settings className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Ayarlar</span>
-          </Link>
-        </div>
-      </nav>
     </div>
   );
 };

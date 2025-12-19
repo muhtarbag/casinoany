@@ -81,7 +81,7 @@ export const SiteBlogSection = ({ siteId, siteName }: SiteBlogSectionProps) => {
           <Card
             key={post.id}
             className="cursor-pointer hover:border-primary/50 transition-all group"
-            onClick={() => navigate(`/blog/${post.slug}`)}
+            onClick={() => navigate(`/${post.slug}`)}
           >
             <CardContent className="p-4">
               <div className="flex gap-4">
@@ -91,6 +91,7 @@ export const SiteBlogSection = ({ siteId, siteName }: SiteBlogSectionProps) => {
                       src={post.featured_image}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      loading="lazy"
                     />
                   </div>
                 )}

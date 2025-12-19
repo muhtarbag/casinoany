@@ -57,6 +57,27 @@ export interface CarouselSetting {
   updated_at: string;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  featured_image: string | null;
+  category: string | null;
+  tags: string[] | null;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author_id: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string[] | null;
+  read_time: string | null;
+  view_count: number;
+}
+
 // Type aliases for clarity
 export type SupabaseTyped = SupabaseClient<Database>;
 
@@ -78,16 +99,19 @@ export function fromExtended<T = unknown>(
 export const TypedQueries = {
   // Site reviews
   siteReviews: (client: SupabaseTyped) => fromExtended<SiteReview>(client, 'site_reviews'),
-  
+
   // User events
   userEvents: (client: SupabaseTyped) => fromExtended<UserEvent>(client, 'user_events'),
-  
+
   // System logs
   systemLogs: (client: SupabaseTyped) => fromExtended<SystemLog>(client, 'system_logs'),
-  
+
   // User roles
   userRoles: (client: SupabaseTyped) => fromExtended<UserRole>(client, 'user_roles'),
-  
+
   // Carousel settings
   carouselSettings: (client: SupabaseTyped) => fromExtended<CarouselSetting>(client, 'carousel_settings'),
+
+  // Blog posts
+  blogPosts: (client: SupabaseTyped) => fromExtended<BlogPost>(client, 'blog_posts'),
 };

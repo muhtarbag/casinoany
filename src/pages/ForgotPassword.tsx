@@ -51,7 +51,7 @@ const ForgotPassword = () => {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-dark p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-dark p-4 pt-[72px] md:pt-[84px]">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-dark p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-dark p-4 pt-[72px] md:pt-[84px]">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Şifremi Unuttum</CardTitle>

@@ -1,8 +1,32 @@
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
+import viteCompression from 'vite-plugin-compression';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+// Custom plugin to run prerendering after build
+function prerenderPlugin(): Plugin {
+  return {
+    name: 'vite-plugin-custom-prerender',
+    apply: 'build',
+    async closeBundle() {
+      console.log('\n🚀 Starting prerendering process...\n');
+      try {
+        // Run the prerender script using tsx for TypeScript support
+        const { stdout, stderr } = await execAsync('npx tsx scripts/prerender.ts');
+        if (stdout) console.log(stdout);
+        if (stderr) console.error(stderr);
+      } catch (error: any) {
+        console.error('❌ Prerendering failed:', error.message);
+      }
+    }
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,11 +35,27 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(), 
+    react(),
     mode === "development" && componentTagger(),
+    mode === "development" && componentTagger(),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'gzip',
+      ext: '.gz',
+    }),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'brotliCompress',
+      ext: '.br',
+    }),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
+      registerType: 'prompt',
+      injectRegister: 'inline',
+      includeAssets: ['favicon.png', 'robots.txt', 'logos/*.png', 'logos/*.svg', 'banners/*.jpg'],
       manifest: {
         name: 'CasinoAny - Casino ve Bahis Siteleri',
         short_name: 'CasinoAny',
@@ -56,8 +96,10 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
-        navigateFallback: null, // Don't use offline.html as fallback, let the app handle it
+        navigateFallback: null,
         navigateFallbackDenylist: [/^\/api/, /^\/admin/],
+        skipWaiting: false,
+        clientsClaim: false,
         runtimeCaching: [
           // API Calls - NetworkFirst (fresh data priority, fallback to cache)
           {
@@ -167,7 +209,8 @@ export default defineConfig(({ mode }) => ({
       devOptions: {
         enabled: false
       }
-    })
+    }),
+    mode === 'production' && prerenderPlugin()
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -189,26 +232,52 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks
+          // Core React - Most critical, loaded first
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+
+          // Data Management - Frequently used
           'vendor-query': ['@tanstack/react-query', '@tanstack/react-virtual'],
-          'vendor-ui': [
+          'vendor-supabase': ['@supabase/supabase-js'],
+
+          // UI Components - Split by usage frequency
+          'vendor-ui-core': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-popover'
+          ],
+          'vendor-ui-extended': [
             '@radix-ui/react-accordion',
             '@radix-ui/react-alert-dialog',
             '@radix-ui/react-avatar',
             '@radix-ui/react-checkbox',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-popover',
             '@radix-ui/react-scroll-area',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast'
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-switch'
           ],
-          'vendor-icons': ['lucide-react'],
+
+          // Icons & Visual
+          'vendor-icons': ['lucide-react', 'react-icons'],
+          'vendor-animation': ['framer-motion'],
+
+          // Charts - Heavy, load on demand
           'vendor-charts': ['recharts'],
+
+          // Forms & Validation
           'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge']
+
+          // Rich Content - Heavy editor
+          'vendor-editor': ['react-quill'],
+
+          // Utilities - Small but frequently used
+          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge', 'lodash-es'],
+
+          // Theme & SEO
+          'vendor-misc': ['next-themes', 'react-helmet-async', 'sonner']
         }
       },
     },
@@ -222,8 +291,8 @@ export default defineConfig(({ mode }) => ({
   // Optimize dependencies - CRITICAL for preventing multiple React instances
   optimizeDeps: {
     include: [
-      'react', 
-      'react-dom', 
+      'react',
+      'react-dom',
       'react-router-dom',
       'react-router',
       '@tanstack/react-query',

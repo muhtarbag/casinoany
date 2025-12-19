@@ -15,47 +15,78 @@ const Favorites = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: favorites, isLoading } = useQuery({
-    queryKey: ['user-favorites', user?.id],
+  const { data: favorites, isLoading, error: queryError } = useQuery({
+    queryKey: ['user-favorites-detail', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await (supabase as any)
+      
+      const { data, error } = await supabase
         .from('user_favorite_sites')
         .select(`
-          *,
+          id,
+          site_id,
+          created_at,
+          notes,
           betting_sites (
             id,
             name,
             slug,
             logo_url,
             rating,
-            bonus
+            bonus,
+            is_active,
+            affiliate_link
           )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('❌ Favorites query error:', error);
+        throw error;
+      }
+      
+      // Filter out favorites where betting_sites is null (inactive sites)
+      const validFavorites = data?.filter(fav => fav.betting_sites) || [];
+      
+      return validFavorites;
     },
     enabled: !!user,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
+
+  // Log query error if exists
+  if (queryError) {
+    console.error('❌ Query Error:', queryError);
+  }
 
   const removeFavoriteMutation = useMutation({
     mutationFn: async (favoriteId: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_favorite_sites')
         .delete()
-        .eq('id', favoriteId);
+        .eq('id', favoriteId)
+        .eq('user_id', user?.id || ''); // Extra security check
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['user-favorites'] }); // Global favorites hook
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] }); // Also refresh stats
       toast({
         title: 'Başarılı',
         description: 'Site favorilerden kaldırıldı',
       });
     },
+    onError: (error) => {
+      console.error('❌ Remove favorite error:', error);
+      toast({
+        title: 'Hata',
+        description: 'Site favorilerden kaldırılırken bir hata oluştu',
+        variant: 'destructive'
+      });
+    }
   });
 
   if (!user) {
@@ -79,17 +110,32 @@ const Favorites = () => {
       <ProfileLayout>
         {isLoading ? (
           <ProfileSkeleton />
+        ) : queryError ? (
+          <Card>
+            <CardContent className="pt-6 text-center py-12">
+              <p className="text-destructive mb-4">
+                Favoriler yüklenirken bir hata oluştu
+              </p>
+              <pre className="text-xs text-left bg-muted p-4 rounded mb-4 overflow-auto">
+                {JSON.stringify(queryError, null, 2)}
+              </pre>
+              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['user-favorites'] })}>
+                Tekrar Dene
+              </Button>
+            </CardContent>
+          </Card>
         ) : favorites && favorites.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav: any) => (
               <Card key={fav.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-start gap-4">
                     {fav.betting_sites.logo_url && (
                       <img
                         src={fav.betting_sites.logo_url}
                         alt={fav.betting_sites.name}
                         className="w-16 h-16 object-contain rounded"
+                        loading="lazy"
                       />
                     )}
                     <div className="flex-1 min-w-0">
@@ -115,14 +161,18 @@ const Favorites = () => {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           asChild
                           className="flex-1"
                         >
-                          <Link to={`/sites/${fav.betting_sites.slug}`}>
+                          <a 
+                            href={fav.betting_sites.affiliate_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            Detay
-                          </Link>
+                            Siteye Git
+                          </a>
                         </Button>
                         <Button
                           size="sm"
